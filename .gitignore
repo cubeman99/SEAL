@@ -1,11 +1,11 @@
 
-buid/vs2013/*.sdf
-buid/vs2013/*.db
-buid/vs2013/*.opendb
-buid/vs2013/*.suo
-buid/vs2013/*.user
-buid/vs2013/Debug/
-buid/vs2013/Release/
+build/vs2013/*.sdf
+build/vs2013/*.db
+build/vs2013/*.opendb
+build/vs2013/*.suo
+build/vs2013/*.user
+build/vs2013/Debug/
+build/vs2013/Release/
 
 
 
