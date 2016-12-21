@@ -2,6 +2,7 @@
 build/vs2013/*.sdf
 build/vs2013/*.db
 build/vs2013/*.opendb
+build/vs2013/*.opensdf
 build/vs2013/*.suo
 build/vs2013/*.user
 build/vs2013/Debug/
