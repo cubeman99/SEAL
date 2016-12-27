@@ -11,10 +11,49 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\HelloWorldApp.cpp" />
+    <ClCompile Include="..\..\src\graphics\Color.cpp" />
+    <ClCompile Include="..\..\src\graphics\glew\GLEW.C" />
+    <ClCompile Include="..\..\src\graphics\Graphics.cpp" />
+    <ClCompile Include="..\..\src\graphics\lodepng\lodepng.cpp" />
+    <ClCompile Include="..\..\src\graphics\Renderer.cpp" />
+    <ClCompile Include="..\..\src\graphics\RenderParams.cpp" />
+    <ClCompile Include="..\..\src\graphics\Shader.cpp" />
+    <ClCompile Include="..\..\src\graphics\SpriteFont.cpp" />
+    <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
+    <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
+    <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
+    <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
+    <ClCompile Include="..\..\src\math\MathLib.cpp" />
+    <ClCompile Include="..\..\src\math\Matrix4f.cpp" />
+    <ClCompile Include="..\..\src\math\Quaternion.cpp" />
+    <ClCompile Include="..\..\src\math\Vector2f.cpp" />
+    <ClCompile Include="..\..\src\math\Vector3f.cpp" />
+    <ClCompile Include="..\..\src\math\Vector4f.cpp" />
+    <ClCompile Include="..\..\src\utilities\Random.cpp" />
+    <ClCompile Include="..\..\src\utilities\Timing.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\HelloWorldApp.h" />
+    <ClInclude Include="..\..\src\graphics\Color.h" />
+    <ClInclude Include="..\..\src\graphics\glew\GLEW.H" />
+    <ClInclude Include="..\..\src\graphics\Graphics.h" />
+    <ClInclude Include="..\..\src\graphics\lodepng\lodepng.h" />
+    <ClInclude Include="..\..\src\graphics\OpenGLIncludes.h" />
+    <ClInclude Include="..\..\src\graphics\Renderer.h" />
+    <ClInclude Include="..\..\src\graphics\RenderParams.h" />
+    <ClInclude Include="..\..\src\graphics\Shader.h" />
+    <ClInclude Include="..\..\src\graphics\SpriteFont.h" />
+    <ClInclude Include="..\..\src\interface\MainApplication.h" />
+    <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
+    <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
+    <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
+    <ClInclude Include="..\..\src\math\MathLib.h" />
+    <ClInclude Include="..\..\src\math\Matrix4f.h" />
+    <ClInclude Include="..\..\src\math\Quaternion.h" />
+    <ClInclude Include="..\..\src\math\Vector2f.h" />
+    <ClInclude Include="..\..\src\math\Vector3f.h" />
+    <ClInclude Include="..\..\src\math\Vector4f.h" />
+    <ClInclude Include="..\..\src\utilities\Random.h" />
+    <ClInclude Include="..\..\src\utilities\Timing.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E03D0738-5F20-40FB-89A2-DFDAA49A304A}</ProjectGuid>
@@ -50,8 +89,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\wxWidgets\include;..\..\wxWidgets\include\msvc</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WINVER=0x0400;__WXMSW__;_WINDOWS;wxUSE_GUI=1;_UNICODE;_DEBUG;__WXDEBUG__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\wxWidgets\include;..\..\wxWidgets\include\msvc;..\..\src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WINVER=0x0400;__WXMSW__;_WINDOWS;wxUSE_GUI=1;_UNICODE;UNICODE;wxUSE_UNICODE;_DEBUG;__WXDEBUG__;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
