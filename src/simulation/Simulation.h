@@ -11,6 +11,9 @@ public:
 	Simulation();
 
 	void Tick();
+	
+	AgentSystem* GetAgentSystem() { return &m_agentSystem; }
+	World* GetWorld() { return &m_world; }
 
 private:
 	float m_tickRate; // How many ticks per second.

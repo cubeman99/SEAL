@@ -11,6 +11,7 @@ public:
 	World();
 	~World();
 
+	inline float GetRadius() { return m_radius; }
 	inline std::vector<Vector3f>& GetVertices() { return m_vertices; }
 
 private:

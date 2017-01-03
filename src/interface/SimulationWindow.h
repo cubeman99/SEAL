@@ -2,6 +2,7 @@
 #define _SIMULATION_WINDOW_H_
 
 #include <wx/wx.h>
+#include <simulation/Simulation.h>
 
 
 // Define a new frame type
@@ -15,6 +16,8 @@ private:
     void OnNewWindow(wxCommandEvent& event);
 
     wxDECLARE_EVENT_TABLE();
+	
+	Simulation m_simulation;
 };
 
 enum

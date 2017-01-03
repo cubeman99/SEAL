@@ -22,6 +22,8 @@
     <ClCompile Include="..\..\src\graphics\SpriteFont.cpp" />
     <ClCompile Include="..\..\src\graphics\Texture.cpp" />
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
+    <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
+    <ClCompile Include="..\..\src\interface\ICamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
@@ -32,6 +34,7 @@
     <ClCompile Include="..\..\src\math\Vector2f.cpp" />
     <ClCompile Include="..\..\src\math\Vector3f.cpp" />
     <ClCompile Include="..\..\src\math\Vector4f.cpp" />
+    <ClCompile Include="..\..\src\simulation\Agent.cpp" />
     <ClCompile Include="..\..\src\simulation\AgentSystem.cpp" />
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
@@ -51,6 +54,8 @@
     <ClInclude Include="..\..\src\graphics\SpriteFont.h" />
     <ClInclude Include="..\..\src\graphics\Texture.h" />
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
+    <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
+    <ClInclude Include="..\..\src\interface\ICamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
@@ -61,6 +66,7 @@
     <ClInclude Include="..\..\src\math\Vector2f.h" />
     <ClInclude Include="..\..\src\math\Vector3f.h" />
     <ClInclude Include="..\..\src\math\Vector4f.h" />
+    <ClInclude Include="..\..\src\simulation\Agent.h" />
     <ClInclude Include="..\..\src\simulation\AgentSystem.h" />
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />

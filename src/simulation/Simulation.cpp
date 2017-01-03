@@ -1,7 +1,8 @@
 #include "Simulation.h"
 
 
-Simulation::Simulation()
+Simulation::Simulation() :
+	m_agentSystem(this)
 {
 	m_tickRate = 60;
 	m_timeStep = 1 / m_tickRate;
@@ -10,5 +11,6 @@ Simulation::Simulation()
 
 void Simulation::Tick()
 {
+	m_agentSystem.UpdateAgents(m_timeStep);
 }
 

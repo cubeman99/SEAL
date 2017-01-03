@@ -1,7 +1,8 @@
 #include "World.h"
 #include <math/MathLib.h>
 
-World::World()
+World::World() :
+	m_radius(1.0f)
 {
 	// Create a icosahedron.
 	float g = 1.61803398875f;
@@ -48,7 +49,7 @@ World::World()
 		m_vertices[i].Normalize();
 
 	// Subdivide.
-	for (int k = 0; k < 4; k++)
+	for (int k = 0; k < 5; k++)
 	{
 		std::vector<Vector3f> newVertices;
 		for (unsigned int i = 0; i < m_vertices.size(); i += 3)

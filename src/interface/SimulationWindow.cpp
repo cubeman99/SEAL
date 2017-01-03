@@ -13,7 +13,7 @@ wxEND_EVENT_TABLE()
 SimulationWindow::SimulationWindow() :
 	   wxFrame(NULL, wxID_ANY, wxT("wxWidgets OpenGL Cube Sample"))
 {
-    new SimulationRenderPanel(this, NULL);
+    new SimulationRenderPanel(&m_simulation, this, NULL);
 
     SetIcon(wxICON(sample));
 

@@ -6,18 +6,17 @@
 #include <wx/glcanvas.h>
 
 
+void CheckGLError();
+wxString glGetwxString(GLenum name);
+
+
 // the rendering context used by all GL canvases
 class OpenGLContext : public wxGLContext
 {
 public:
     OpenGLContext(wxGLCanvas *canvas);
 
-    // render the cube showing it at given angles
-    void DrawRotatedCube(float xangle, float yangle);
-
 private:
-    // textures for the cube faces
-    GLuint m_textures[6];
 };
 
 

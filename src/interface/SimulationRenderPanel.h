@@ -5,43 +5,36 @@
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <simulation/World.h>
+#include <simulation/Simulation.h>
 #include <math/Quaternion.h>
+#include <interface/ICamera.h>
+#include <interface/GlobeCamera.h>
 
 
-struct Agent
-{
-	Vector3f position;
-	Quaternion orientation;
-};
-
-
+// This is the panel where the simulation is drawn and can be interacted with.
 class SimulationRenderPanel : public wxGLCanvas
 {
 public:
-    SimulationRenderPanel(wxWindow* parent, int* attribList = NULL);
+    SimulationRenderPanel(Simulation* simulation,
+		wxWindow* parent, int* attribList = NULL);
 
 private:
-    void OnPaint(wxPaintEvent& e);
-    void Spin(float xSpin, float ySpin);
+	wxDECLARE_EVENT_TABLE();
+
     void OnKeyDown(wxKeyEvent& e);
 	void OnMouseDown(wxMouseEvent& e);
 	void OnMouseMotion(wxMouseEvent& e);
 	void OnMouseWheel(wxMouseEvent& e);
-    void OnSpinTimer(wxTimerEvent& e);
-    void OnSize(wxSizeEvent& e);
+    void OnTickTimer(wxTimerEvent& e);
+    void OnPaint(wxPaintEvent& e);
 
-    // angles of rotation around x and y axes.
-    float m_xangle;
-    float m_yangle;
 	float m_scale;
-
-    wxTimer m_spinTimer;
-	World m_world;
+    wxTimer m_tickTimer;
+	Simulation* m_simulation;
 	Quaternion m_cameraRotation;
 
-	std::vector<Agent> m_agents;
-
-    wxDECLARE_EVENT_TABLE();
+	ICamera* m_camera; // The currently-active camera.
+	GlobeCamera m_globeCamera;
 };
 
 
