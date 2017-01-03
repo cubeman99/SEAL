@@ -31,6 +31,9 @@
     <Filter Include="Source Files\interface">
       <UniqueIdentifier>{9249dc77-5bad-40eb-9855-477200f9e157}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\simulation">
+      <UniqueIdentifier>{7a411772-be75-4845-88c7-8ad4f5fe5935}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -92,6 +95,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp">
       <Filter>Source Files\interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\simulation\Simulation.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\graphics\Texture.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\graphics\TextureParams.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\graphics\ImageFormat.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\simulation\World.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\simulation\AgentSystem.cpp">
+      <Filter>Source Files\simulation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +178,24 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\SimulationWindow.h">
       <Filter>Source Files\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\Simulation.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\Texture.h">
+      <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\TextureParams.h">
+      <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\ImageFormat.h">
+      <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\World.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\AgentSystem.h">
+      <Filter>Source Files\simulation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

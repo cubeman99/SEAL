@@ -4,6 +4,7 @@
 #include <graphics/OpenGLIncludes.h>
 #include <wx/wx.h>
 #include "OpenGLContext.h"
+#include <simulation/Simulation.h>
 
 
 // Define a new application type
@@ -22,6 +23,7 @@ public:
 
 private:
     OpenGLContext *m_glContext;
+	Simulation m_simulation;
 };
 
 

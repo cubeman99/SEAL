@@ -434,3 +434,4 @@ Quaternion Quaternion::FromEuler(float pitch, float yaw, float roll)
 	q.SetEuler(pitch, yaw, roll);
 	return q;
 }
+

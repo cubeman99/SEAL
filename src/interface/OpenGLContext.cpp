@@ -104,13 +104,13 @@ OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
     // set up the parameters we want to use
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
     glEnable(GL_TEXTURE_2D);
 
     // add slightly more light, the default lighting is rather dark
-    GLfloat ambient[] = { 0.5, 0.5, 0.5, 0.5 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    //GLfloat ambient[] = { 0.5, 0.5, 0.5, 0.5 };
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 
     // set viewing projection
     glMatrixMode(GL_PROJECTION);
@@ -146,7 +146,7 @@ OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
 void OpenGLContext::DrawRotatedCube(float xangle, float yangle)
 {
 		
-    glEnable(GL_TEXTURE_2D);
+    /*glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDepthMask(false);
     glDisable(GL_CULL_FACE);
@@ -154,15 +154,15 @@ void OpenGLContext::DrawRotatedCube(float xangle, float yangle)
     glDisable(GL_DEPTH_CLAMP);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_COLOR_MATERIAL);*/
 	
-	Graphics graphics;
+	/*Graphics graphics;
 	graphics.Clear(Color::BLACK);
 	graphics.SetProjection(Matrix4f::CreateOrthographic(-1, 1, -1, 1, -1, 1));
 	graphics.ResetTransform();
 	graphics.FillCircle(Vector2f::ZERO, 0.5f, Color::GREEN);
 
-	return;
+	return;*/
 	
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
