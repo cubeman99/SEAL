@@ -9,6 +9,7 @@
 #include <math/Quaternion.h>
 #include <interface/ICamera.h>
 #include <interface/GlobeCamera.h>
+#include <interface/ArcBallCamera.h>
 
 
 // This is the panel where the simulation is drawn and can be interacted with.
@@ -17,6 +18,8 @@ class SimulationRenderPanel : public wxGLCanvas
 public:
     SimulationRenderPanel(Simulation* simulation,
 		wxWindow* parent, int* attribList = NULL);
+		
+	void OnWindowClose();
 
 private:
 	wxDECLARE_EVENT_TABLE();
@@ -35,6 +38,9 @@ private:
 
 	ICamera* m_camera; // The currently-active camera.
 	GlobeCamera m_globeCamera;
+	ArcBallCamera m_arcBallCamera;
+
+	Agent* m_followAgent;
 };
 
 

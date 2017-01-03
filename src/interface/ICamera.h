@@ -14,6 +14,10 @@ public:
 	virtual Matrix4f GetViewProjection() const = 0;
 	virtual Matrix4f GetProjection() const = 0;
 	virtual void SetProjection(const Matrix4f& projection) = 0;
+
+	virtual void Rotate(float horizontal, float vertical) = 0;
+	virtual void AltRotate(float horizontal, float vertical) = 0;
+	virtual void Zoom(float amount) = 0;
 };
 
 

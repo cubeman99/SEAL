@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include <simulation/Simulation.h>
+#include <interface/SimulationRenderPanel.h>
 
 
 // Define a new frame type
@@ -13,11 +14,13 @@ public:
 
 private:
     void OnClose(wxCommandEvent& event);
+    void OnClose2(wxCloseEvent& event);
     void OnNewWindow(wxCommandEvent& event);
 
     wxDECLARE_EVENT_TABLE();
 	
 	Simulation m_simulation;
+	SimulationRenderPanel* m_simulationPanel;
 };
 
 enum

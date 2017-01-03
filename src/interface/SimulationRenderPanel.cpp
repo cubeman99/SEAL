@@ -43,14 +43,32 @@ SimulationRenderPanel::SimulationRenderPanel(Simulation* simulation, wxWindow* p
 	  m_scale(0.8f),
 	  m_cameraRotation(Quaternion::IDENTITY),
 	  m_simulation(simulation),
-      m_tickTimer(this, TICK_TIMER)
+      m_tickTimer(this, TICK_TIMER),
+	  m_followAgent(NULL)
 {
-	m_tickTimer.Start(17);
+	//int t = (int) (m_simulation->GetTimeStep() + 0.5f);
+	//m_tickTimer.Start((int) (m_simulation->GetTimeStep() + 0.5f));
+	m_tickTimer.Start(5);
 
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
-	m_globeCamera.Initialize(Vector3f::ZERO, worldRadius, worldRadius * 2, 0.0f);
+	
+	m_globeCamera.SetGlobePosition(Vector3f::ZERO);
+	m_globeCamera.SetGlobeOrientation(Quaternion::IDENTITY);
+	m_globeCamera.SetGlobeRadius(worldRadius);
+	m_globeCamera.SetSurfaceDistance(worldRadius * 2);
+	m_globeCamera.SetSurfaceAngle(0.0f);
 
-	m_camera = &m_globeCamera;
+	m_arcBallCamera.SetDistance(worldRadius * 2.0f);
+	m_arcBallCamera.SetUpVector(Vector3f::UP);
+	m_arcBallCamera.SetCenterPosition(Vector3f::ZERO);
+	m_arcBallCamera.SetOrientation(Quaternion::IDENTITY);
+
+	m_camera = &m_arcBallCamera;//m_globeCamera;
+}
+
+void SimulationRenderPanel::OnWindowClose()
+{
+	m_tickTimer.Stop();
 }
 
 void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
@@ -99,17 +117,20 @@ void SimulationRenderPanel::OnMouseMotion(wxMouseEvent& e)
 	int myPrev = my;
 	mx = e.GetX();
 	my = e.GetY();
+	
+    const wxSize clientSize = GetClientSize();
+	float aspectRatio = (float) clientSize.x / (float) clientSize.y;
 
 	// Update camera controls.
 	if (mxPrev != -1 && myPrev != -1 && e.RightIsDown())
 	{
-		float deltaX = mx - mxPrev;
-		float deltaY = my - myPrev;
+		float deltaX = aspectRatio * ((mx - mxPrev) / (float) clientSize.x);
+		float deltaY = (my - myPrev) / (float) clientSize.y;
 
 		if (e.GetModifiers() & wxMOD_CONTROL)
-			m_globeCamera.RotateSurfaceCamera(deltaX, deltaY);
+			m_camera->AltRotate(deltaX, deltaY);
 		else
-			m_globeCamera.RotateAroundGlobe(deltaX, deltaY);
+			m_camera->Rotate(deltaX, deltaY);
 	}
 }
 
@@ -118,13 +139,30 @@ void SimulationRenderPanel::OnMouseWheel(wxMouseEvent& e)
 	float mouseDelta = (float) e.GetWheelRotation() / 120.0f;
 	
 	// Adjust camera distance from surface.
-	m_globeCamera.Zoom(mouseDelta);
+	m_camera->Zoom(mouseDelta);
 }
 
 void SimulationRenderPanel::OnTickTimer(wxTimerEvent& e)
 {
 	// 1. Update simulation.
 	m_simulation->Tick();
+
+	// Update following agent.
+
+	if (m_followAgent != NULL)
+	{
+		m_arcBallCamera.SetCenterPosition(m_followAgent->GetPosition());
+		m_arcBallCamera.SetParentOrientation(m_followAgent->GetOrientation());
+	}
+
+	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
+	m_followAgent = NULL;
+	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+	{
+		Agent* agent = *it;
+		m_followAgent = agent;
+		break;
+	}
 
 	// 2. Render the simulation, this will call OnPaint()
     Refresh(false);
@@ -133,7 +171,7 @@ void SimulationRenderPanel::OnTickTimer(wxTimerEvent& e)
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
     // This is required even though dc is not used otherwise.
-    wxPaintDC dc(this);
+    //wxPaintDC dc(this);
 
     // Set the OpenGL viewport according to the client size of this canvas.
     // This is done here rather than in a wxSizeEvent handler because our
@@ -169,23 +207,14 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
     glEnable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	Matrix4f projection = Matrix4f::CreatePerspective(1.4f, aspectRatio, 0.01f, 100.0f);
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 	
-	m_camera->SetProjection(Matrix4f::CreatePerspective(1.4f, aspectRatio, 0.01f, 100.0f));
+	m_camera->SetProjection(Matrix4f::CreatePerspective(
+		1.4f, aspectRatio, 0.01f, 100.0f));
 
-	Matrix4f viewMatrix = Matrix4f::IDENTITY;
-	viewMatrix *= Matrix4f::CreateTranslation(0.0f, 0.0f, -2.0f);
-	viewMatrix *= Matrix4f::CreateRotation(m_cameraRotation);
-	viewMatrix *= Matrix4f::CreateScale(m_scale);
-
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(m_camera->GetViewProjection().GetTranspose().data());
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glScalef(worldRadius, worldRadius, worldRadius);
@@ -193,7 +222,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	// Draw the world.
 	std::vector<Vector3f>& vertices = m_simulation->GetWorld()->GetVertices();
 	glBegin(GL_TRIANGLES);
-	glColor3f(0.1f, 0.7f, 0.1f);
 	glColor3f(0.05f, 0.05f, 0.05f);
 	Vector3f normal;
 	for (unsigned int i = 0; i < vertices.size(); i++)
@@ -212,27 +240,27 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		glVertex3fv(vertices[i].data());
 	}
 	glEnd();
-	/*
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glBegin(GL_TRIANGLES);
-	glColor3f(0.1f, 0.7f, 0.1f);
-	for (unsigned int i = 0; i < vertices.size(); i++)
-	{
-		if (i % 3 == 0)
-		{
-			Vector3f v1 = vertices[i];
-			Vector3f v2 = vertices[i + 1];
-			Vector3f v3 = vertices[i + 2];
-			normal = (v3 - v2).Cross(v2 - v1);
-			normal.Normalize();
-		}
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glBegin(GL_TRIANGLES);
+	//glColor3f(0.1f, 0.7f, 0.1f);
+	//for (unsigned int i = 0; i < vertices.size(); i++)
+	//{
+	//	if (i % 3 == 0)
+	//	{
+	//		Vector3f v1 = vertices[i];
+	//		Vector3f v2 = vertices[i + 1];
+	//		Vector3f v3 = vertices[i + 2];
+	//		normal = (v3 - v2).Cross(v2 - v1);
+	//		normal.Normalize();
+	//	}
 
-		glNormal3fv(normal.data());//vertices[i].Normalize().data());
-		glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
-		glVertex3fv((vertices[i] * 1.02).data());
-	}
-	glEnd();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
+	//	glNormal3fv(normal.data());//vertices[i].Normalize().data());
+	//	glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
+	//	glVertex3fv((vertices[i] * 1.0001).data());
+	//}
+	//glEnd();
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

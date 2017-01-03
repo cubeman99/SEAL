@@ -6,6 +6,7 @@
 wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(wxID_NEW, SimulationWindow::OnNewWindow)
     EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
+    EVT_CLOSE(SimulationWindow::OnClose2)
 	
     //EVT_MENU(wxID_ABOUT, SimulationWindow::OnAbout)
 wxEND_EVENT_TABLE()
@@ -13,7 +14,7 @@ wxEND_EVENT_TABLE()
 SimulationWindow::SimulationWindow() :
 	   wxFrame(NULL, wxID_ANY, wxT("wxWidgets OpenGL Cube Sample"))
 {
-    new SimulationRenderPanel(&m_simulation, this, NULL);
+    m_simulationPanel = new SimulationRenderPanel(&m_simulation, this, NULL);
 
     SetIcon(wxICON(sample));
 
@@ -54,6 +55,12 @@ SimulationWindow::SimulationWindow() :
 void SimulationWindow::OnClose(wxCommandEvent& e)
 {
     Close(true); // true is to force the frame to close
+}
+
+void SimulationWindow::OnClose2(wxCloseEvent& e)
+{
+	m_simulationPanel->OnWindowClose();
+    Destroy(); // true is to force the frame to close
 }
 
 void SimulationWindow::OnNewWindow(wxCommandEvent& e)

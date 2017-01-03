@@ -1,5 +1,5 @@
-#ifndef _GLOBEL_CAMERA_H_
-#define _GLOBEL_CAMERA_H_
+#ifndef _GLOBE_CAMERA_H_
+#define _GLOBE_CAMERA_H_
 
 #include "ICamera.h"
 
@@ -20,7 +20,6 @@ public:
 
 	void RotateSurfaceCamera(float horizontal, float vertical);
 	void RotateAroundGlobe(float horizontal, float vertical);
-	void Zoom(float amount);
 	Vector3f GetSurfacePosition() const;
 	float GetAdjustedSurfaceAngle() const;
 
@@ -29,6 +28,10 @@ public:
 	Matrix4f GetProjection() const override;
 	void SetProjection(const Matrix4f& projection) override;
 	Matrix4f GetViewProjection() const override;
+	
+	void Rotate(float horizontal, float vertical) override;
+	void AltRotate(float horizontal, float vertical) override;
+	void Zoom(float amount) override;
 
 private:
 	Matrix4f	m_projection;
@@ -40,4 +43,4 @@ private:
 };
 
 
-#endif // _GLOBEL_CAMERA_H_
+#endif // _GLOBE_CAMERA_H_

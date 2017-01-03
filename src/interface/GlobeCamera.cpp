@@ -46,7 +46,7 @@ void GlobeCamera::SetSurfaceAngle(float surfaceAngle)
 
 void GlobeCamera::RotateSurfaceCamera(float horizontal, float vertical)
 {
-	float rotateSpeed = 0.008f;
+	float rotateSpeed = Math::TWO_PI * 1.0f;
 
 	m_globeOrientation.Rotate(m_globeOrientation.GetForward(), -horizontal * rotateSpeed);
 	m_surfaceAngle -= vertical * rotateSpeed * 0.5f;
@@ -55,19 +55,12 @@ void GlobeCamera::RotateSurfaceCamera(float horizontal, float vertical)
 
 void GlobeCamera::RotateAroundGlobe(float horizontal, float vertical)
 {
-	float rotateSpeed = 0.01f;
+	float rotateSpeed = Math::TWO_PI * 1.0f;
 	float mult = Math::Min(m_surfaceDistance / m_globeRadius, 1.0f);
 	rotateSpeed *= mult;
 
 	m_globeOrientation.Rotate(m_globeOrientation.GetUp(), horizontal * rotateSpeed);
 	m_globeOrientation.Rotate(m_globeOrientation.GetRight(), vertical * rotateSpeed);
-}
-
-void GlobeCamera::Zoom(float amount)
-{
-	m_surfaceDistance = Math::Clamp(
-		m_surfaceDistance * Math::Pow(1.1f, (float) -amount),
-		m_globeRadius * 0.01f, m_globeRadius * 4.0f);
 }
 
 Vector3f GlobeCamera::GetSurfacePosition() const
@@ -117,10 +110,26 @@ void GlobeCamera::SetProjection(const Matrix4f& projection)
 
 Matrix4f GlobeCamera::GetViewProjection() const
 {
-	Vector3f pos = GetViewPosition();
 	Matrix4f viewMatrix = Matrix4f::CreateRotation(GetOrientation().GetConjugate()) *
-		Matrix4f::CreateTranslation(-pos);
+		Matrix4f::CreateTranslation(-GetViewPosition());
 	return (m_projection * viewMatrix);
+}
+
+void GlobeCamera::Rotate(float horizontal, float vertical)
+{
+	RotateAroundGlobe(horizontal, vertical);
+}
+
+void GlobeCamera::AltRotate(float horizontal, float vertical)
+{
+	RotateSurfaceCamera(horizontal, vertical);
+}
+
+void GlobeCamera::Zoom(float amount)
+{
+	m_surfaceDistance = Math::Clamp(
+		m_surfaceDistance * Math::Pow(1.1f, (float) -amount),
+		m_globeRadius * 0.01f, m_globeRadius * 4.0f);
 }
 
 
