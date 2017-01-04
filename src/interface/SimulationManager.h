@@ -23,6 +23,7 @@ public:
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 
+	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
 	void ToggleCameraTracking();
 	void StartCameraTracking();

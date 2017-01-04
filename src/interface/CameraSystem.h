@@ -5,6 +5,8 @@
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
 #include <simulation/Simulation.h>
+#include <math/Ray.h>
+#include <math/Vector2f.h>
 
 class Agent;
 
@@ -19,6 +21,8 @@ public:
 	inline ICamera* GetActiveCamera() const { return m_camera; }
 	inline Matrix4f GetViewProjectionMatrix() const { return m_camera->GetViewProjection(); }
 	inline bool IsTrackingAgent() const { return m_cameraTracking; }
+
+	Ray GetRay(const Vector2f& screenCoord);
 
 	void SetFieldOfView(float fieldOfView);
 	void SetAspectRatio(float aspectRatio);

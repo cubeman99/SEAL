@@ -80,7 +80,40 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 {
 	if (e.LeftDown())
 	{
-		// TODO: check for selecting agents.
+		// Convert the screen coordinate to OpenGL clip space,
+		// then convert that to a ray based on the camera's state.
+		Vector2f screenCoord((float) e.GetX(), (float) e.GetY());
+		const wxSize clientSize = GetClientSize();
+		screenCoord /= Vector2f((float) clientSize.x, (float) clientSize.y);
+		screenCoord = (screenCoord * 2.0f) - Vector2f::ONE;
+		screenCoord.y = -screenCoord.y;
+		Ray ray = GetSimulationManager()->GetCameraSystem()->GetRay(screenCoord);
+
+		// Cast the ray onto the world sphere.
+		float distance;
+		if (GetSimulation()->GetWorld()->CastRay(ray, distance))
+		{
+			Vector3f point = ray.GetPoint(distance);
+			
+			// Check for selecting agents.
+			AgentSystem* agentSystem = GetSimulation()->GetAgentSystem();
+			GetSimulationManager()->SetSelectedAgent(nullptr);
+			for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+			{
+				Agent* agent = *it;
+				if (agent->GetPosition().DistTo(point) < 0.1f)
+				{
+					GetSimulationManager()->SetSelectedAgent(agent);
+					break;
+				}
+			}
+
+			// DEBUG: spawn a test ray to visualize the ray cast.
+			ray.origin = point;
+			ray.direction = -ray.direction;
+			m_testRays.push_back(ray);
+		}
+
 	}
 	else if (e.RightDown())
 	{
@@ -295,7 +328,22 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		glVertex3f(0.0f, 0.0f, 2.0f);
 		glVertex3f(0.0f, 0.0f, -2.0f);
 	glEnd();
+	
+	// DEBUG: Render some test rays.
+    glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glBegin(GL_LINES);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	for (unsigned int i = 0; i < m_testRays.size(); i++)
+	{
+		glVertex3fv(m_testRays[i].origin.data());
+		glVertex3fv(m_testRays[i].GetPoint(0.5f).data());
+	}
+	glEnd();
 
+    glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
     // Swap the buffers.
     SwapBuffers();
 }

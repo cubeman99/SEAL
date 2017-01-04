@@ -57,12 +57,13 @@ void SimulationManager::Update()
 	// Update camera system.
 	m_cameraSystem.Update();
 
-	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
-	m_selectedAgent = NULL;
-	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
-	{
-		Agent* agent = *it;
-		m_selectedAgent = agent;
-		break;
-	}
+	// TEMP: select the first agent.
+	//AgentSystem* agentSystem = m_simulation->GetAgentSystem();
+	//m_selectedAgent = NULL;
+	//for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+	//{
+	//	Agent* agent = *it;
+	//	m_selectedAgent = agent;
+	//	break;
+	//}
 }

@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-
 struct Vector2f;
 struct Vector3f;
 struct Matrix4f;

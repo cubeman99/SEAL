@@ -135,6 +135,9 @@
     <ClCompile Include="..\..\src\interface\CameraSystem.cpp">
       <Filter>Source Files\interface\camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\math\Ray.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -235,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\CameraSystem.h">
       <Filter>Source Files\interface\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Ray.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

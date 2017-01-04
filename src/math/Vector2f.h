@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-
 struct Matrix3f;
 struct Point2i;
 

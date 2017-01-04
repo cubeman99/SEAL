@@ -7,6 +7,7 @@
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
 #include <math/Quaternion.h>
+#include <math/Ray.h>
 #include <interface/ICamera.h>
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
@@ -35,6 +36,7 @@ private:
     void OnPaint(wxPaintEvent& e);
 
 	SimulationWindow* m_simulationWindow;
+	std::vector<Ray> m_testRays;
 };
 
 
