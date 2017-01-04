@@ -1,0 +1,93 @@
+#include "CameraSystem.h"
+#include <simulation/Agent.h>
+#include <math/MathLib.h>
+
+
+CameraSystem::CameraSystem() :
+	m_simulation(nullptr),
+	m_cameraTracking(false),
+	m_trackedAgent(nullptr),
+	m_aspectRatio(1.0f),
+	m_fieldOfView(1.4f),
+	m_isProjectionDirty(true)
+{
+	m_camera = &m_globeCamera;
+}
+
+void CameraSystem::Initialize(Simulation* simulation)
+{
+	m_simulation = simulation;
+	
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
+	
+	m_globeCamera.SetGlobePosition(Vector3f::ZERO);
+	m_globeCamera.SetGlobeOrientation(Quaternion::IDENTITY);
+	m_globeCamera.SetGlobeRadius(worldRadius);
+	m_globeCamera.SetSurfaceDistance(worldRadius * 0.8f);
+	m_globeCamera.SetSurfaceAngle(0.0f);
+
+	m_arcBallCamera.SetDistance(worldRadius * 2.0f);
+	m_arcBallCamera.SetUpVector(Vector3f::UP);
+	m_arcBallCamera.SetCenterPosition(Vector3f::ZERO);
+	m_arcBallCamera.SetOrientation(Quaternion::IDENTITY);
+	
+	m_camera = &m_globeCamera;
+}
+
+void CameraSystem::SetFieldOfView(float fieldOfView)
+{
+	m_fieldOfView = fieldOfView;
+	m_isProjectionDirty = true;
+}
+
+void CameraSystem::SetAspectRatio(float aspectRatio)
+{
+	m_aspectRatio = aspectRatio;
+	m_isProjectionDirty = true;
+}
+
+void CameraSystem::StartTrackingAgent(Agent* agent)
+{
+	m_cameraTracking = true;
+	m_trackedAgent = agent;
+	m_camera = &m_arcBallCamera;
+
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
+
+	m_arcBallCamera.SetDistance(worldRadius * 0.5f);
+	m_arcBallCamera.SetUpVector(Vector3f::UP);
+	m_arcBallCamera.SetCenterPosition(m_trackedAgent->GetPosition());
+
+	Quaternion orientation = Quaternion::IDENTITY;
+	orientation.Rotate(Vector3f::RIGHT, Math::HALF_PI * 0.5f);
+	m_arcBallCamera.SetOrientation(orientation);
+}
+
+void CameraSystem::StopTrackingAgent()
+{
+	m_cameraTracking = false;
+	m_trackedAgent = nullptr;
+	m_camera = &m_globeCamera;
+}
+
+void CameraSystem::Update()
+{
+	// Update camera tracking.
+	if (m_cameraTracking && m_trackedAgent != nullptr)
+	{
+		m_arcBallCamera.SetCenterPosition(m_trackedAgent->GetPosition());
+		m_arcBallCamera.SetParentOrientation(m_trackedAgent->GetOrientation());
+	}
+	
+	// Update camera projection.
+	if (m_isProjectionDirty)
+	{
+		Matrix4f projection = Matrix4f::CreatePerspective(
+			m_fieldOfView, m_aspectRatio, 0.01f, 100.0f);
+		
+		m_arcBallCamera.SetProjection(projection);
+		m_globeCamera.SetProjection(projection);
+
+		m_isProjectionDirty = false;
+	}
+}

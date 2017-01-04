@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\src\graphics\Texture.cpp" />
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
     <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp" />
+    <ClCompile Include="..\..\src\interface\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\interface\ICamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="..\..\src\graphics\Texture.h" />
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
     <ClInclude Include="..\..\src\interface\ArcBallCamera.h" />
+    <ClInclude Include="..\..\src\interface\CameraSystem.h" />
     <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
     <ClInclude Include="..\..\src\interface\ICamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />

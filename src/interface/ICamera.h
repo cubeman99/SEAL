@@ -15,45 +15,11 @@ public:
 	virtual Matrix4f GetProjection() const = 0;
 	virtual void SetProjection(const Matrix4f& projection) = 0;
 
+	// Camera controls:
+
 	virtual void Rotate(float horizontal, float vertical) = 0;
 	virtual void AltRotate(float horizontal, float vertical) = 0;
 	virtual void Zoom(float amount) = 0;
-};
-
-
-class Camera : public ICamera
-{
-public:
-	Matrix4f	projection;
-	Vector3f	position;
-	Quaternion	rotation;
-
-	Vector3f GetViewPosition() const  override
-	{
-		return position;
-	}
-	
-	Quaternion GetOrientation() const override
-	{
-		return rotation;
-	}
-	
-	void SetProjection(const Matrix4f& projection) override
-	{
-		this->projection = projection;
-	}
-	
-	Matrix4f GetProjection() const override
-	{
-		return projection;
-	}
-
-	Matrix4f GetViewProjection() const override
-	{
-		Matrix4f viewMatrix = Matrix4f::CreateRotation(rotation.GetConjugate()) *
-			Matrix4f::CreateTranslation(-position);
-		return (projection * viewMatrix);
-	}
 };
 
 

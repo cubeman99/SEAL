@@ -31,6 +31,7 @@ private:
 	void OnMouseDown(wxMouseEvent& e);
 	void OnMouseMotion(wxMouseEvent& e);
 	void OnMouseWheel(wxMouseEvent& e);
+	void OnSize(wxSizeEvent& e);
     void OnPaint(wxPaintEvent& e);
 
 	SimulationWindow* m_simulationWindow;

@@ -8,6 +8,7 @@
 #include <interface/ICamera.h>
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
+#include <interface/CameraSystem.h>
 
 
 class SimulationManager
@@ -19,7 +20,9 @@ public:
 	inline Simulation* GetSimulation() { return m_simulation; }
 	inline bool IsSimulationPuased() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() const { return m_selectedAgent; }
-	inline ICamera* GetActiveCamera() const { return m_camera; }
+	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
+	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
+
 
 	void ToggleCameraTracking();
 	void StartCameraTracking();
@@ -30,13 +33,9 @@ public:
 	
 private:
 	Simulation* m_simulation;
-
-	ICamera* m_camera; // The currently-active camera.
-	GlobeCamera m_globeCamera;
-	ArcBallCamera m_arcBallCamera;
+	CameraSystem m_cameraSystem;
 
 	bool m_isSimulationPaused;
-	bool m_cameraTracking;
 	Agent* m_selectedAgent;
 };
 

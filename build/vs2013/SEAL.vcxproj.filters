@@ -132,6 +132,9 @@
     <ClCompile Include="..\..\src\interface\ICamera.cpp">
       <Filter>Source Files\interface\camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\interface\CameraSystem.cpp">
+      <Filter>Source Files\interface\camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -228,6 +231,9 @@
       <Filter>Source Files\interface\camera</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\interface\ICamera.h">
+      <Filter>Source Files\interface\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\CameraSystem.h">
       <Filter>Source Files\interface\camera</Filter>
     </ClInclude>
   </ItemGroup>

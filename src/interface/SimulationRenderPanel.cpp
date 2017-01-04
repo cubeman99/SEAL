@@ -30,6 +30,7 @@ wxBEGIN_EVENT_TABLE(SimulationRenderPanel, wxGLCanvas)
 	EVT_MOTION(SimulationRenderPanel::OnMouseMotion)
 	EVT_MOUSEWHEEL(SimulationRenderPanel::OnMouseWheel)
     EVT_PAINT(SimulationRenderPanel::OnPaint)
+	EVT_SIZE(SimulationRenderPanel::OnSize)
 wxEND_EVENT_TABLE()
 
 SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
@@ -124,10 +125,18 @@ void SimulationRenderPanel::OnMouseWheel(wxMouseEvent& e)
 	camera->Zoom(mouseDelta);
 }
 
+void SimulationRenderPanel::OnSize(wxSizeEvent& e)
+{
+	const wxSize clientSize = GetClientSize();
+	float aspectRatio = (float) clientSize.x / (float) clientSize.y;
+
+	GetSimulationManager()->GetCameraSystem()->SetAspectRatio(aspectRatio);
+}
+
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
 	Simulation* m_simulation = GetSimulation();
-	ICamera* m_camera = GetSimulationManager()->GetActiveCamera();
+	ICamera* camera = GetSimulationManager()->GetCameraSystem()->GetActiveCamera();
 	Agent* m_selectedAgent = GetSimulationManager()->GetSelectedAgent();
 
     // This is required even though dc is not used otherwise.
@@ -169,11 +178,8 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 	
-	m_camera->SetProjection(Matrix4f::CreatePerspective(
-		1.4f, aspectRatio, 0.01f, 100.0f));
-
     glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(m_camera->GetViewProjection().GetTranspose().data());
+	glLoadMatrixf(camera->GetViewProjection().GetTranspose().data());
 
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
