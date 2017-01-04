@@ -43,6 +43,9 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
                  wxFULL_REPAINT_ON_RESIZE)
 {
 	m_simulationWindow = (SimulationWindow*) parent;
+
+	// Force the OpenGL context to be created  now.
+	wxGetApp().GetGLContext(this);
 }
 
 SimulationManager* SimulationRenderPanel::GetSimulationManager()
@@ -219,28 +222,35 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	glScalef(worldRadius, worldRadius, worldRadius);
 
 	// Draw the world.
-	std::vector<Vector3f>& vertices = m_simulation->GetWorld()->GetVertices();
-	glBegin(GL_TRIANGLES);
-	glColor3f(0.05f, 0.05f, 0.05f);
-	Vector3f normal;
-	for (unsigned int i = 0; i < vertices.size(); i++)
-	{
-		/*if (i % 3 == 0)
-		{
-			Vector3f v1 = vertices[i];
-			Vector3f v2 = vertices[i + 1];
-			Vector3f v3 = vertices[i + 2];
-			normal = (v3 - v2).Cross(v2 - v1);
-			normal.Normalize();
-		}*/
-		normal = vertices[i];
-		normal.Normalize();
+	
+	Mesh* mesh = m_simulation->GetWorld()->GetMesh();
+	glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
+	glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
 
-		glNormal3fv(normal.data());
-		glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
-		glVertex3fv(vertices[i].data());
-	}
-	glEnd();
+
+	//std::vector<Vector3f>& vertices = m_simulation->GetWorld()->GetVertices();
+	//glBegin(GL_TRIANGLES);
+	//glColor3f(0.05f, 0.05f, 0.05f);
+	//Vector3f normal;
+	//for (unsigned int i = 0; i < vertices.size(); i++)
+	//{
+	//	/*if (i % 3 == 0)
+	//	{
+	//		Vector3f v1 = vertices[i];
+	//		Vector3f v2 = vertices[i + 1];
+	//		Vector3f v3 = vertices[i + 2];
+	//		normal = (v3 - v2).Cross(v2 - v1);
+	//		normal.Normalize();
+	//	}*/
+	//	normal = vertices[i];
+	//	normal.Normalize();
+
+	//	glNormal3fv(normal.data());
+	//	glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
+	//	glVertex3fv(vertices[i].data());
+	//}
+	//glEnd();
 	
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glBegin(GL_TRIANGLES);
@@ -341,9 +351,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	}
 	glEnd();
 
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	
     // Swap the buffers.
     SwapBuffers();
 }

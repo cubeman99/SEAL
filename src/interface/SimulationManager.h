@@ -17,6 +17,8 @@ public:
     SimulationManager();
 	~SimulationManager();
 
+	void Initialize();
+
 	inline Simulation* GetSimulation() { return m_simulation; }
 	inline bool IsSimulationPuased() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() const { return m_selectedAgent; }

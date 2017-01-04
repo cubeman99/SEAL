@@ -16,12 +16,14 @@
     <ClCompile Include="..\..\src\graphics\Graphics.cpp" />
     <ClCompile Include="..\..\src\graphics\ImageFormat.cpp" />
     <ClCompile Include="..\..\src\graphics\lodepng\lodepng.cpp" />
+    <ClCompile Include="..\..\src\graphics\Mesh.cpp" />
     <ClCompile Include="..\..\src\graphics\Renderer.cpp" />
     <ClCompile Include="..\..\src\graphics\RenderParams.cpp" />
     <ClCompile Include="..\..\src\graphics\Shader.cpp" />
     <ClCompile Include="..\..\src\graphics\SpriteFont.cpp" />
     <ClCompile Include="..\..\src\graphics\Texture.cpp" />
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
+    <ClCompile Include="..\..\src\graphics\VertexData.cpp" />
     <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp" />
     <ClCompile Include="..\..\src\interface\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
@@ -51,6 +53,7 @@
     <ClInclude Include="..\..\src\graphics\Graphics.h" />
     <ClInclude Include="..\..\src\graphics\ImageFormat.h" />
     <ClInclude Include="..\..\src\graphics\lodepng\lodepng.h" />
+    <ClInclude Include="..\..\src\graphics\Mesh.h" />
     <ClInclude Include="..\..\src\graphics\OpenGLIncludes.h" />
     <ClInclude Include="..\..\src\graphics\Renderer.h" />
     <ClInclude Include="..\..\src\graphics\RenderParams.h" />
@@ -58,6 +61,7 @@
     <ClInclude Include="..\..\src\graphics\SpriteFont.h" />
     <ClInclude Include="..\..\src\graphics\Texture.h" />
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
+    <ClInclude Include="..\..\src\graphics\VertexData.h" />
     <ClInclude Include="..\..\src\interface\ArcBallCamera.h" />
     <ClInclude Include="..\..\src\interface\CameraSystem.h" />
     <ClInclude Include="..\..\src\interface\GlobeCamera.h" />

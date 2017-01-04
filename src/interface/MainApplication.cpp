@@ -6,14 +6,14 @@
 IMPLEMENT_APP(MainApplication)
 
 
-MainApplication::MainApplication()
+MainApplication::MainApplication() :
+	m_glContext(nullptr)
 {
-	m_glContext = NULL;
 }
 
 bool MainApplication::OnInit()
 {
-    if ( !wxApp::OnInit() )
+    if (!wxApp::OnInit())
         return false;
 
     new SimulationWindow();
@@ -39,8 +39,7 @@ OpenGLContext& MainApplication::GetGLContext(wxGLCanvas* canvas)
         m_glContext = new OpenGLContext(canvas);
     }
 
-    glContext = m_glContext;
-    glContext->SetCurrent(*canvas);
-    return *glContext;
+    m_glContext->SetCurrent(*canvas);
+    return *m_glContext;
 }
 

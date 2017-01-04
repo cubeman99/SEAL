@@ -22,7 +22,7 @@ World::World() :
 	Vector3f zPxNy = Vector3f(l, -g, 0);
 	Vector3f zPxPy = Vector3f(l, g, 0);
 	Vector3f zNxPy = Vector3f(-l, g, 0);
-	Vector3f v[] = {
+	Vector3f startingPositions[] = {
 		xPyPz, yPxPz, xNyPz,
 		xPyPz, xNyPz, yNxPz,
 		xPyNz, xNyNz, yPxNz,
@@ -44,22 +44,47 @@ World::World() :
 		xNyNz, zPxNy, yPxNz,
 		xNyNz, yNxNz, zNxNy,
 	};
+
+	std::vector<VertexPosTexNorm> vertices;
 	for (int i = 0; i < 20 * 3; i++)
-		m_vertices.push_back(v[i]);
+	{
+		VertexPosTexNorm v;
+		v.position = startingPositions[i];
+		v.position.Normalize();
+		v.normal = v.position;
+		v.texCoord = Vector2f::ZERO;
+		vertices.push_back(v);
+	}
 
 	// Normalize vertices.
 	for (unsigned int i = 0; i < m_vertices.size(); i++)
-		m_vertices[i].Normalize();
+		vertices[i].position.Normalize();
 
 	// Subdivide.
 	for (int k = 0; k < 5; k++)
 	{
-		std::vector<Vector3f> newVertices;
-		for (unsigned int i = 0; i < m_vertices.size(); i += 3)
+		std::vector<VertexPosTexNorm> newVertices;
+		for (unsigned int i = 0; i < vertices.size(); i += 3)
 		{
-			Vector3f a = m_vertices[i];
-			Vector3f b = m_vertices[i + 1];
-			Vector3f c = m_vertices[i + 2];
+			VertexPosTexNorm a = vertices[i];
+			VertexPosTexNorm b = vertices[i + 1];
+			VertexPosTexNorm c = vertices[i + 2];
+			VertexPosTexNorm ab;
+			ab.position = Vector3f::Normalize((a.position + b.position) * 0.5f);
+			ab.normal = ab.position;
+			ab.texCoord = Vector2f::ZERO;
+			VertexPosTexNorm bc;
+			bc.position = Vector3f::Normalize((b.position + c.position) * 0.5f);
+			bc.normal = bc.position;
+			bc.texCoord = Vector2f::ZERO;
+			VertexPosTexNorm ac;
+			ac.position = Vector3f::Normalize((a.position + c.position) * 0.5f);
+			ac.normal = ac.position;
+			ac.texCoord = Vector2f::ZERO;
+/*
+			Vector3f a = vertices[i].position;
+			Vector3f b = vertices[i + 1].position;
+			Vector3f c = vertices[i + 2].position;
 			Vector3f ab = (a + b) * 0.5f;
 			Vector3f bc = (b + c) * 0.5f;
 			Vector3f ac = (a + c) * 0.5f;
@@ -69,7 +94,7 @@ World::World() :
 			c.Normalize();
 			ab.Normalize();
 			bc.Normalize();
-			ac.Normalize();
+			ac.Normalize();*/
 
 			newVertices.push_back(a);
 			newVertices.push_back(ab);
@@ -84,12 +109,21 @@ World::World() :
 			newVertices.push_back(bc);
 			newVertices.push_back(ac);
 		}
-		m_vertices = newVertices;
+		vertices = newVertices;
 	}
+
+	std::vector<unsigned int> indices;
+	for (unsigned int i = 0; i < vertices.size(); i++)
+		indices.push_back(i);
+
+	m_mesh = new Mesh();
+	m_mesh->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
+	m_mesh->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
 }
 
 World::~World()
 {
+	delete m_mesh;
 }
 
 // Perform a sphere-ray intersection.

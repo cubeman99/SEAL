@@ -72,5 +72,7 @@ OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
     glLoadIdentity();
     glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
 	
+	glewInit();
+
     CheckGLError();
 }

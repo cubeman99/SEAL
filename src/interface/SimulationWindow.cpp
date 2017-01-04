@@ -75,6 +75,8 @@ SimulationWindow::SimulationWindow() :
     Show();
 
 	m_updateTimer.Start(17);
+
+	m_simulationManager.Initialize();
 }
 
 void SimulationWindow::OnClose(wxCommandEvent& e)

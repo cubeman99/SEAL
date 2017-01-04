@@ -12,17 +12,22 @@
 // ----------------------------------------------------------------------------
 
 SimulationManager::SimulationManager() :
-	  m_selectedAgent(NULL),
-	  m_isSimulationPaused(false)
+	  m_selectedAgent(nullptr),
+	  m_isSimulationPaused(false),
+	  m_simulation(nullptr)
 {
-	m_simulation = new Simulation();
-
-	m_cameraSystem.Initialize(m_simulation);
 }
 
 SimulationManager::~SimulationManager()
 {
 	delete m_simulation;
+}
+
+void SimulationManager::Initialize()
+{
+	m_simulation = new Simulation();
+
+	m_cameraSystem.Initialize(m_simulation);
 }
 		
 void SimulationManager::ToggleCameraTracking()
