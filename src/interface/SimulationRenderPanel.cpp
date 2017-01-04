@@ -5,6 +5,7 @@
 #include <math/MathLib.h>
 #include <utilities/Random.h>
 #include <simulation/Simulation.h>
+#include "SimulationWindow.h"
 
 
 // ----------------------------------------------------------------------------
@@ -28,84 +29,31 @@ wxBEGIN_EVENT_TABLE(SimulationRenderPanel, wxGLCanvas)
 	EVT_MIDDLE_DOWN(SimulationRenderPanel::OnMouseDown)
 	EVT_MOTION(SimulationRenderPanel::OnMouseMotion)
 	EVT_MOUSEWHEEL(SimulationRenderPanel::OnMouseWheel)
-    EVT_TIMER(TICK_TIMER, SimulationRenderPanel::OnTickTimer)
     EVT_PAINT(SimulationRenderPanel::OnPaint)
 wxEND_EVENT_TABLE()
 
-SimulationRenderPanel::SimulationRenderPanel(Simulation* simulation, wxWindow* parent, int* attribList)
+SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
     // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
     // flag should always be set, because even making the canvas smaller should
     // be followed by a paint event that updates the entire canvas with new
     // viewport settings.
     : wxGLCanvas(parent, wxID_ANY, attribList,
                  wxDefaultPosition, wxDefaultSize,
-                 wxFULL_REPAINT_ON_RESIZE),
-	  m_simulation(simulation),
-      m_tickTimer(this, TICK_TIMER),
-	  m_selectedAgent(NULL),
-	  m_cameraTracking(false),
-	  m_isSimulationPaused(false)
+                 wxFULL_REPAINT_ON_RESIZE)
 {
-	//int t = (int) (m_simulation->GetTimeStep() + 0.5f);
-	//m_tickTimer.Start((int) (m_simulation->GetTimeStep() + 0.5f));
-	m_tickTimer.Start(5);
-
-	float worldRadius = m_simulation->GetWorld()->GetRadius();
-	
-	m_globeCamera.SetGlobePosition(Vector3f::ZERO);
-	m_globeCamera.SetGlobeOrientation(Quaternion::IDENTITY);
-	m_globeCamera.SetGlobeRadius(worldRadius);
-	m_globeCamera.SetSurfaceDistance(worldRadius * 0.8f);
-	m_globeCamera.SetSurfaceAngle(0.0f);
-
-	m_arcBallCamera.SetDistance(worldRadius * 2.0f);
-	m_arcBallCamera.SetUpVector(Vector3f::UP);
-	m_arcBallCamera.SetCenterPosition(Vector3f::ZERO);
-	m_arcBallCamera.SetOrientation(Quaternion::IDENTITY);
-
-	//m_camera = &m_arcBallCamera;
-	m_camera = &m_globeCamera;
-}
-		
-void SimulationRenderPanel::ToggleCameraTracking()
-{
-	if (m_cameraTracking)
-		StopCameraTracking();
-	else if (m_selectedAgent != NULL)
-		StartCameraTracking();
-}
-		
-void SimulationRenderPanel::StartCameraTracking()
-{
-	m_cameraTracking = true;
-	m_camera = &m_arcBallCamera;
-	
-	float worldRadius = m_simulation->GetWorld()->GetRadius();
-
-	m_arcBallCamera.SetDistance(worldRadius * 0.5f);
-	m_arcBallCamera.SetUpVector(Vector3f::UP);
-	m_arcBallCamera.SetCenterPosition(m_selectedAgent->GetPosition());
-
-	Quaternion orientation = Quaternion::IDENTITY;
-	orientation.Rotate(Vector3f::RIGHT, Math::HALF_PI * 0.5f);
-	m_arcBallCamera.SetOrientation(orientation);
+	m_simulationWindow = (SimulationWindow*) parent;
 }
 
-void SimulationRenderPanel::StopCameraTracking()
+SimulationManager* SimulationRenderPanel::GetSimulationManager()
 {
-	m_cameraTracking = false;
-	m_camera = &m_globeCamera;
+	return m_simulationWindow->GetSimulationManager();
 }
 
-void SimulationRenderPanel::PauseSimulation()
+Simulation* SimulationRenderPanel::GetSimulation()
 {
-	m_isSimulationPaused = !m_isSimulationPaused;
+	return m_simulationWindow->GetSimulationManager()->GetSimulation();
 }
 
-void SimulationRenderPanel::OnWindowClose()
-{
-	m_tickTimer.Stop();
-}
 
 void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
 {
@@ -158,49 +106,30 @@ void SimulationRenderPanel::OnMouseMotion(wxMouseEvent& e)
 		float deltaX = aspectRatio * ((mx - mxPrev) / (float) clientSize.x);
 		float deltaY = (my - myPrev) / (float) clientSize.y;
 
+		ICamera* camera = GetSimulationManager()->GetActiveCamera();
+
 		if (e.GetModifiers() & wxMOD_CONTROL)
-			m_camera->AltRotate(deltaX, deltaY);
+			camera->AltRotate(deltaX, deltaY);
 		else
-			m_camera->Rotate(deltaX, deltaY);
+			camera->Rotate(deltaX, deltaY);
 	}
 }
 
 void SimulationRenderPanel::OnMouseWheel(wxMouseEvent& e)
 {
 	float mouseDelta = (float) e.GetWheelRotation() / 120.0f;
-	
+
 	// Adjust camera distance from surface.
-	m_camera->Zoom(mouseDelta);
-}
-
-void SimulationRenderPanel::OnTickTimer(wxTimerEvent& e)
-{
-	// 1. Update simulation.
-	if (!m_isSimulationPaused)
-		m_simulation->Tick();
-
-	// Update camera tracking.
-	if (m_cameraTracking && m_selectedAgent != NULL)
-	{
-		m_arcBallCamera.SetCenterPosition(m_selectedAgent->GetPosition());
-		m_arcBallCamera.SetParentOrientation(m_selectedAgent->GetOrientation());
-	}
-
-	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
-	m_selectedAgent = NULL;
-	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
-	{
-		Agent* agent = *it;
-		m_selectedAgent = agent;
-		break;
-	}
-
-	// 2. Render the simulation, this will call OnPaint()
-    Refresh(false);
+	ICamera* camera = GetSimulationManager()->GetActiveCamera();
+	camera->Zoom(mouseDelta);
 }
 
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
+	Simulation* m_simulation = GetSimulation();
+	ICamera* m_camera = GetSimulationManager()->GetActiveCamera();
+	Agent* m_selectedAgent = GetSimulationManager()->GetSelectedAgent();
+
     // This is required even though dc is not used otherwise.
     //wxPaintDC dc(this);
 

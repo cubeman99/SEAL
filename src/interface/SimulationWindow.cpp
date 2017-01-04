@@ -9,26 +9,30 @@ enum
 	PLAY_PAUSE_SIMULATION,
 	TOGGLE_CAMERA_TRACKING,
 	DEBUG_SPAWN_AGENTS,
+	UPDATE_TIMER,
 };
 
 
 wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     
-EVT_MENU(wxID_NEW, SimulationWindow::OnNewWindow)
+	EVT_MENU(wxID_NEW, SimulationWindow::OnNewWindow)
+    EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
     EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
     EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
-    EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
+    //EVT_MENU(wxID_ABOUT, SimulationWindow::OnAbout)
 
+    EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
 	
-    //EVT_MENU(wxID_ABOUT, SimulationWindow::OnAbout)
 wxEND_EVENT_TABLE()
 
+
 SimulationWindow::SimulationWindow() :
-	   wxFrame(NULL, wxID_ANY, wxT("New Simulation - SEAL"))
+	wxFrame(NULL, wxID_ANY, wxT("New Simulation - SEAL")),
+	m_updateTimer(this, UPDATE_TIMER)
 {
-    m_simulationPanel = new SimulationRenderPanel(&m_simulation, this, NULL);
+    m_simulationPanel = new SimulationRenderPanel(this, NULL);
 
     SetIcon(wxICON(sample));
 
@@ -69,6 +73,8 @@ SimulationWindow::SimulationWindow() :
 
     SetClientSize(800, 600);
     Show();
+
+	m_updateTimer.Start(17);
 }
 
 void SimulationWindow::OnClose(wxCommandEvent& e)
@@ -83,22 +89,29 @@ void SimulationWindow::OnNewWindow(wxCommandEvent& e)
 
 void SimulationWindow::OnPlayPauseSimulation(wxCommandEvent& e)
 {
-	m_simulationPanel->PauseSimulation();
+	m_simulationManager.PauseSimulation();
 }
 
 void SimulationWindow::OnToggleCameraTracking(wxCommandEvent& e)
 {
-	m_simulationPanel->ToggleCameraTracking();
+	m_simulationManager.ToggleCameraTracking();
 }
 
 void SimulationWindow::OnSpawnAgents(wxCommandEvent& e)
 {
 	for (int i = 0; i < 10; i++)
-		m_simulation.GetAgentSystem()->SpawnAgent();
+		m_simulationManager.GetSimulation()->GetAgentSystem()->SpawnAgent();
+}
+
+void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
+{
+	m_simulationManager.Update();
+
+	m_simulationPanel->Refresh(true);
 }
 
 void SimulationWindow::OnWindowClose(wxCloseEvent& e)
 {
-	m_simulationPanel->OnWindowClose();
+	m_updateTimer.Stop();
     Destroy(); // true is to force the frame to close
 }

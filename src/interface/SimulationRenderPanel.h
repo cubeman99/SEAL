@@ -1,5 +1,5 @@
-#ifndef _TEST_GL_CANVAS_H_
-#define _TEST_GL_CANVAS_H_
+#ifndef _SIMULATION_RENDER_PANEL_H_
+#define _SIMULATION_RENDER_PANEL_H_
 
 #include <graphics/OpenGLIncludes.h>
 #include <wx/wx.h>
@@ -11,21 +11,18 @@
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
 
+class SimulationWindow;
+class SimulationManager;
 
 // This is the panel where the simulation is drawn and can be interacted with.
 class SimulationRenderPanel : public wxGLCanvas
 {
 public:
-    SimulationRenderPanel(Simulation* simulation,
-		wxWindow* parent, int* attribList = NULL);
+    SimulationRenderPanel(wxWindow* parent, int* attribList = NULL);
 	
-	void ToggleCameraTracking();
-	void StartCameraTracking();
-	void StopCameraTracking();
+	SimulationManager* GetSimulationManager();
+	Simulation* GetSimulation();
 
-	void PauseSimulation();
-
-	void OnWindowClose();
 
 private:
 	wxDECLARE_EVENT_TABLE();
@@ -34,20 +31,10 @@ private:
 	void OnMouseDown(wxMouseEvent& e);
 	void OnMouseMotion(wxMouseEvent& e);
 	void OnMouseWheel(wxMouseEvent& e);
-    void OnTickTimer(wxTimerEvent& e);
     void OnPaint(wxPaintEvent& e);
 
-    wxTimer m_tickTimer;
-	Simulation* m_simulation;
-
-	ICamera* m_camera; // The currently-active camera.
-	GlobeCamera m_globeCamera;
-	ArcBallCamera m_arcBallCamera;
-
-	bool m_isSimulationPaused;
-	bool m_cameraTracking;
-	Agent* m_selectedAgent;
+	SimulationWindow* m_simulationWindow;
 };
 
 
-#endif // _TEST_GL_CANVAS_H_
+#endif // _SIMULATION_RENDER_PANEL_H_

@@ -1,5 +1,5 @@
-#ifndef _TEST_GL_CONTEXT_H_
-#define _TEST_GL_CONTEXT_H_
+#ifndef _OPEN_GL_CONTEXT_H_
+#define _OPEN_GL_CONTEXT_H_
 
 #include <graphics/OpenGLIncludes.h>
 #include <wx/wx.h>
@@ -20,4 +20,4 @@ private:
 };
 
 
-#endif // _TEST_GL_CONTEXT_H_
+#endif // _OPEN_GL_CONTEXT_H_

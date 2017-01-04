@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\src\interface\ICamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
+    <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
     <ClCompile Include="..\..\src\math\MathLib.cpp" />
@@ -60,6 +61,7 @@
     <ClInclude Include="..\..\src\interface\ICamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
+    <ClInclude Include="..\..\src\interface\SimulationManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
     <ClInclude Include="..\..\src\math\MathLib.h" />

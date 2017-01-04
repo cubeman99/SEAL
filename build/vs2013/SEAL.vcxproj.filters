@@ -34,6 +34,9 @@
     <Filter Include="Source Files\simulation">
       <UniqueIdentifier>{7a411772-be75-4845-88c7-8ad4f5fe5935}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\interface\camera">
+      <UniqueIdentifier>{fdfc6557-4d5e-4b15-a25f-ff2cf086a76a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -117,14 +120,17 @@
     <ClCompile Include="..\..\src\simulation\Agent.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\ICamera.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\interface\GlobeCamera.cpp">
+    <ClCompile Include="..\..\src\interface\SimulationManager.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp">
-      <Filter>Source Files\interface</Filter>
+      <Filter>Source Files\interface\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interface\GlobeCamera.cpp">
+      <Filter>Source Files\interface\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interface\ICamera.cpp">
+      <Filter>Source Files\interface\camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,14 +218,17 @@
     <ClInclude Include="..\..\src\simulation\Agent.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\ICamera.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interface\GlobeCamera.h">
+    <ClInclude Include="..\..\src\interface\SimulationManager.h">
       <Filter>Source Files\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\interface\ArcBallCamera.h">
-      <Filter>Source Files\interface</Filter>
+      <Filter>Source Files\interface\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\GlobeCamera.h">
+      <Filter>Source Files\interface\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\ICamera.h">
+      <Filter>Source Files\interface\camera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
