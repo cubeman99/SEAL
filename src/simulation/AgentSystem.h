@@ -17,6 +17,8 @@ public:
 	void RemoveAllAgents();
 	void UpdateAgents(float timeDelta);
 
+	inline int GetNumAgents() const { return (int) m_agents.size(); }
+
 	std::vector<Agent*>::iterator agents_begin() { return m_agents.begin(); }
 	std::vector<Agent*>::iterator agents_end() { return m_agents.end(); }
 

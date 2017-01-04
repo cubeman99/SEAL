@@ -40,11 +40,11 @@ SimulationRenderPanel::SimulationRenderPanel(Simulation* simulation, wxWindow* p
     : wxGLCanvas(parent, wxID_ANY, attribList,
                  wxDefaultPosition, wxDefaultSize,
                  wxFULL_REPAINT_ON_RESIZE),
-	  m_scale(0.8f),
-	  m_cameraRotation(Quaternion::IDENTITY),
 	  m_simulation(simulation),
       m_tickTimer(this, TICK_TIMER),
-	  m_followAgent(NULL)
+	  m_selectedAgent(NULL),
+	  m_cameraTracking(false),
+	  m_isSimulationPaused(false)
 {
 	//int t = (int) (m_simulation->GetTimeStep() + 0.5f);
 	//m_tickTimer.Start((int) (m_simulation->GetTimeStep() + 0.5f));
@@ -55,7 +55,7 @@ SimulationRenderPanel::SimulationRenderPanel(Simulation* simulation, wxWindow* p
 	m_globeCamera.SetGlobePosition(Vector3f::ZERO);
 	m_globeCamera.SetGlobeOrientation(Quaternion::IDENTITY);
 	m_globeCamera.SetGlobeRadius(worldRadius);
-	m_globeCamera.SetSurfaceDistance(worldRadius * 2);
+	m_globeCamera.SetSurfaceDistance(worldRadius * 0.8f);
 	m_globeCamera.SetSurfaceAngle(0.0f);
 
 	m_arcBallCamera.SetDistance(worldRadius * 2.0f);
@@ -63,7 +63,43 @@ SimulationRenderPanel::SimulationRenderPanel(Simulation* simulation, wxWindow* p
 	m_arcBallCamera.SetCenterPosition(Vector3f::ZERO);
 	m_arcBallCamera.SetOrientation(Quaternion::IDENTITY);
 
-	m_camera = &m_arcBallCamera;//m_globeCamera;
+	//m_camera = &m_arcBallCamera;
+	m_camera = &m_globeCamera;
+}
+		
+void SimulationRenderPanel::ToggleCameraTracking()
+{
+	if (m_cameraTracking)
+		StopCameraTracking();
+	else if (m_selectedAgent != NULL)
+		StartCameraTracking();
+}
+		
+void SimulationRenderPanel::StartCameraTracking()
+{
+	m_cameraTracking = true;
+	m_camera = &m_arcBallCamera;
+	
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
+
+	m_arcBallCamera.SetDistance(worldRadius * 0.5f);
+	m_arcBallCamera.SetUpVector(Vector3f::UP);
+	m_arcBallCamera.SetCenterPosition(m_selectedAgent->GetPosition());
+
+	Quaternion orientation = Quaternion::IDENTITY;
+	orientation.Rotate(Vector3f::RIGHT, Math::HALF_PI * 0.5f);
+	m_arcBallCamera.SetOrientation(orientation);
+}
+
+void SimulationRenderPanel::StopCameraTracking()
+{
+	m_cameraTracking = false;
+	m_camera = &m_globeCamera;
+}
+
+void SimulationRenderPanel::PauseSimulation()
+{
+	m_isSimulationPaused = !m_isSimulationPaused;
 }
 
 void SimulationRenderPanel::OnWindowClose()
@@ -83,11 +119,6 @@ void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
             break;
         case WXK_UP:
             break;
-        case WXK_SPACE:
-		{
-			m_simulation->GetAgentSystem()->SpawnAgent();
-            break;
-		}
         default:
 		{
             e.Skip();
@@ -145,22 +176,22 @@ void SimulationRenderPanel::OnMouseWheel(wxMouseEvent& e)
 void SimulationRenderPanel::OnTickTimer(wxTimerEvent& e)
 {
 	// 1. Update simulation.
-	m_simulation->Tick();
+	if (!m_isSimulationPaused)
+		m_simulation->Tick();
 
-	// Update following agent.
-
-	if (m_followAgent != NULL)
+	// Update camera tracking.
+	if (m_cameraTracking && m_selectedAgent != NULL)
 	{
-		m_arcBallCamera.SetCenterPosition(m_followAgent->GetPosition());
-		m_arcBallCamera.SetParentOrientation(m_followAgent->GetOrientation());
+		m_arcBallCamera.SetCenterPosition(m_selectedAgent->GetPosition());
+		m_arcBallCamera.SetParentOrientation(m_selectedAgent->GetOrientation());
 	}
 
 	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
-	m_followAgent = NULL;
+	m_selectedAgent = NULL;
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
-		m_followAgent = agent;
+		m_selectedAgent = agent;
 		break;
 	}
 
@@ -226,14 +257,16 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	Vector3f normal;
 	for (unsigned int i = 0; i < vertices.size(); i++)
 	{
-		if (i % 3 == 0)
+		/*if (i % 3 == 0)
 		{
 			Vector3f v1 = vertices[i];
 			Vector3f v2 = vertices[i + 1];
 			Vector3f v3 = vertices[i + 2];
 			normal = (v3 - v2).Cross(v2 - v1);
 			normal.Normalize();
-		}
+		}*/
+		normal = vertices[i];
+		normal.Normalize();
 
 		glNormal3fv(normal.data());
 		glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
@@ -267,19 +300,48 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 
 	// Draw the agents.
 	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
+	float r = 0.016f;
+	float h = 0.0005f;
+	Vector3f v1(0, h, -r);
+	Vector3f v2(r * 0.7f, h, r * 0.8f);
+	Vector3f v3(-r * 0.7f, h, r * 0.8f);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
 
-		glBegin(GL_LINES);
-			glColor3f(0.0f, 1.0f, 0.0f);
-			Vector3f up = agent->GetPosition() + agent->GetOrientation().GetUp() * 0.02f;
-			Vector3f forward = agent->GetPosition() + agent->GetOrientation().GetForward() * 0.02f;
-			glVertex3fv(agent->GetPosition().data());
-			glVertex3fv(up.data());
-			glVertex3fv(agent->GetPosition().data());
-			glVertex3fv(forward.data());
+		Matrix4f modelMatrix = Matrix4f::CreateTranslation(agent->GetPosition()) *
+			Matrix4f::CreateRotation(agent->GetOrientation());
+				
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glLoadMatrixf(modelMatrix.GetTranspose().data());
+		
+		// Draw agent.
+		glBegin(GL_LINE_LOOP);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glVertex3fv(v1.data());
+			glVertex3fv(v2.data());
+			glVertex3fv(v3.data());
 		glEnd();
+		glBegin(GL_TRIANGLES);
+			glColor3f(0.5f, 1.0f, 0.5f);
+			glVertex3fv(v1.data());
+			glVertex3fv(v2.data());
+			glVertex3fv(v3.data());
+		glEnd();
+
+		// Draw selection circle.
+		if (m_selectedAgent == agent)
+		{
+			glBegin(GL_LINE_LOOP);
+			glColor3f(0.0f, 1.0f, 0.0f);
+			for (int i = 0; i < 20; i++)
+			{
+				float a = (i / 20.0f) * Math::TWO_PI;
+				glVertex3f(cos(a) * r * 1.2f, h, sin(a) * r * 1.2f);
+			}
+			glEnd();
+		}
 	}
 	
     glMatrixMode(GL_MODELVIEW);
@@ -297,14 +359,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(0.0f, 0.0f, 2.0f);
 		glVertex3f(0.0f, 0.0f, -2.0f);
-	glEnd();
-	
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glBegin(GL_LINES);
-		glColor3f(1,1,1);
-		glVertex3fv(m_globeCamera.GetSurfacePosition().data());
-		glVertex3fv((m_globeCamera.GetSurfacePosition() * 1.1f).data());
 	glEnd();
 
     // Swap the buffers.

@@ -53,16 +53,22 @@ void AgentSystem::UpdateAgents(float timeDelta)
 	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
 	{
 		Agent* agent = *it;
-		
-		// Turn agent.
+	
+		agent->UpdateBrain();
+
+		// Turn the agent's orientation.
 		agent->m_orientation.Rotate(agent->m_orientation.GetUp(),
 			agent->m_turnSpeed * timeDelta);
 
-		// Move agent forward.
+		// Move the agent forward linearly first.
 		Vector3f posPrev = agent->m_position;
 		agent->m_position += agent->m_orientation.GetForward() * agent->m_moveSpeed * timeDelta;
+
+		// Snap the position to the world's surface.
 		agent->m_position.Normalize();
 		agent->m_position *= m_simulation->GetWorld()->GetRadius();
+
+		// Keep the orientation tangent to the world's surface.
 		float angle = Math::ACos(Vector3f::Normalize(agent->m_position).Dot(Vector3f::Normalize(posPrev)));
 		agent->m_orientation.Rotate(agent->m_orientation.GetRight(), angle);
 	}

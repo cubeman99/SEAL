@@ -18,7 +18,13 @@ class SimulationRenderPanel : public wxGLCanvas
 public:
     SimulationRenderPanel(Simulation* simulation,
 		wxWindow* parent, int* attribList = NULL);
-		
+	
+	void ToggleCameraTracking();
+	void StartCameraTracking();
+	void StopCameraTracking();
+
+	void PauseSimulation();
+
 	void OnWindowClose();
 
 private:
@@ -31,16 +37,16 @@ private:
     void OnTickTimer(wxTimerEvent& e);
     void OnPaint(wxPaintEvent& e);
 
-	float m_scale;
     wxTimer m_tickTimer;
 	Simulation* m_simulation;
-	Quaternion m_cameraRotation;
 
 	ICamera* m_camera; // The currently-active camera.
 	GlobeCamera m_globeCamera;
 	ArcBallCamera m_arcBallCamera;
 
-	Agent* m_followAgent;
+	bool m_isSimulationPaused;
+	bool m_cameraTracking;
+	Agent* m_selectedAgent;
 };
 
 

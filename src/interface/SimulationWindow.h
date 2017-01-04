@@ -14,19 +14,16 @@ public:
 
 private:
     void OnClose(wxCommandEvent& event);
-    void OnClose2(wxCloseEvent& event);
     void OnNewWindow(wxCommandEvent& event);
+    void OnWindowClose(wxCloseEvent& event);
+    void OnPlayPauseSimulation(wxCommandEvent& event);
+    void OnToggleCameraTracking(wxCommandEvent& event);
+    void OnSpawnAgents(wxCommandEvent& event);
 
     wxDECLARE_EVENT_TABLE();
 	
 	Simulation m_simulation;
 	SimulationRenderPanel* m_simulationPanel;
-};
-
-enum
-{
-    NEW_STEREO_WINDOW = wxID_HIGHEST + 1,
-	PAUSE_SIMULATION,
 };
 
 
