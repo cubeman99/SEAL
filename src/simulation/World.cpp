@@ -7,7 +7,7 @@
 
 
 World::World() :
-	m_radius(1.0f)
+	m_radius(3.0f)
 {
 	m_mesh = Primitives::CreateIcoSphere(1.0f, 6, true);
 }

@@ -2,12 +2,9 @@
 #define _SIMULATION_MANAGER_H_
 
 #include <graphics/OpenGLIncludes.h>
+#include <math/Quaternion.h>
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
-#include <math/Quaternion.h>
-#include <interface/ICamera.h>
-#include <interface/GlobeCamera.h>
-#include <interface/ArcBallCamera.h>
 #include <interface/CameraSystem.h>
 
 
@@ -25,6 +22,9 @@ public:
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 
+	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
+	void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
+
 	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
 	void ToggleCameraTracking();
@@ -37,9 +37,9 @@ public:
 private:
 	Simulation* m_simulation;
 	CameraSystem m_cameraSystem;
-
 	bool m_isSimulationPaused;
 	Agent* m_selectedAgent;
+	bool m_viewWireFrameMode;
 };
 
 

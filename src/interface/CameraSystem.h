@@ -1,7 +1,7 @@
 #ifndef _CAMERA_SYSTEM_H_
 #define _CAMERA_SYSTEM_H_
 
-#include <interface/ICamera.h>
+#include <graphics/ICamera.h>
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
 #include <simulation/Simulation.h>

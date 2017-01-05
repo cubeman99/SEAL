@@ -1,7 +1,7 @@
 #ifndef _ARC_BALL_CAMERA_H_
 #define _ARC_BALL_CAMERA_H_
 
-#include "ICamera.h"
+#include <graphics/ICamera.h>
 
 
 class ArcBallCamera : public ICamera

@@ -8,10 +8,8 @@
 #include <simulation/Simulation.h>
 #include <math/Quaternion.h>
 #include <math/Ray.h>
-#include <interface/ICamera.h>
-#include <interface/GlobeCamera.h>
-#include <interface/ArcBallCamera.h>
 #include <graphics/Shader.h>
+#include <graphics/Renderer.h>
 
 
 class SimulationWindow;
@@ -41,6 +39,7 @@ private:
 	SimulationWindow* m_simulationWindow;
 	std::vector<Ray> m_testRays;
 	Shader* m_shader;
+	Renderer m_renderer;
 };
 
 

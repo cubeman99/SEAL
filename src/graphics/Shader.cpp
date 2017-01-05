@@ -63,6 +63,29 @@ const Uniform* Shader::GetUniform(const std::string& name) const
 	return nullptr;
 }
 
+int Shader::GetUniformLocation(const std::string& name) const
+{
+	for (unsigned int i = 0; i < m_uniforms.size(); ++i)
+	{
+		if (m_uniforms[i].m_name == name)
+			return m_uniforms[i].GetLocation();
+	}
+	return -1;
+}
+
+bool Shader::GetUniformLocation(const std::string& name, int& outUniformLocation) const
+{
+	for (unsigned int i = 0; i < m_uniforms.size(); ++i)
+	{
+		if (m_uniforms[i].m_name == name)
+		{
+			outUniformLocation = m_uniforms[i].GetLocation();
+			return true;
+		}
+	}
+	return false;
+}
+
 	
 //-----------------------------------------------------------------------------
 // Compiling and Linking

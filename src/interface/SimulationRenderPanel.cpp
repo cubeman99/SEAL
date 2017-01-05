@@ -303,16 +303,51 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	
 	Mesh* mesh = m_simulation->GetWorld()->GetMesh();
 
+
+	RenderParams renderParams;
+	renderParams.EnableDepthTest(true);
+	renderParams.EnableDepthBufferWrite(true);
+	renderParams.EnableNearFarPlaneClipping(true);
+	renderParams.EnableBlend(true);
+	renderParams.EnableLineSmooth(false);
+	renderParams.EnablePolygonSmooth(false);
+	renderParams.EnableCullFace(true);
+	renderParams.SetCullFace(CullFace::BACK);
+	renderParams.SetFrontFace(FrontFace::CLOCKWISE);
+	renderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT | ClearBits::DEPTH_BUFFER_BIT);
+	renderParams.SetClearColor(Color::BLACK);
+	renderParams.SetPolygonMode(PolygonMode::FILL);
+	renderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
+	renderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA, BlendFunc::ONE_MINUS_SOURCE_ALPHA);
 	
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glUseProgram(m_shader->m_glProgram);
-		glUniformMatrix4fv(m_shader->GetUniform("u_mvp")->GetLocation(), 1, GL_TRUE, mvp.data());
-		glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
-			glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	glUseProgram(0);
+	if (GetSimulationManager()->IsViewWireFrameMode())
+		renderParams.SetPolygonMode(PolygonMode::LINE);
+	else
+		renderParams.SetPolygonMode(PolygonMode::FILL);
+	
+	m_renderer.SetRenderParams(renderParams);
+	m_renderer.ApplyRenderSettings(true);
+	m_renderer.SetCamera(camera);
+
+	Transform3f worldTransform;
+	worldTransform.scale = Vector3f(worldRadius, worldRadius, worldRadius);
+	
+	m_renderer.SetShader(m_shader);
+	m_renderer.RenderMesh(mesh, worldTransform);
+	
+
+	// Draw the world.
+	//m_renderer.SetShader(m_shader);
+	//glUseProgram(m_shader->m_glProgram);
+		//glUniformMatrix4fv(m_shader->GetUniform("u_mvp")->GetLocation(), 1, GL_TRUE, mvp.data());
+		//glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
+		//	glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glBindVertexArray(0);
+	//glUseProgram(0);
+	m_renderer.SetShader(NULL);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 

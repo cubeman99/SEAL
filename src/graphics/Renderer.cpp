@@ -85,13 +85,42 @@ namespace
 			return GL_FRONT_AND_BACK;
 	}
 
+	GLenum TranslatePolygonMode(PolygonMode::value_type polygonMode)
+	{
+		if (polygonMode == PolygonMode::FILL)
+			return GL_FILL;
+		else if (polygonMode == PolygonMode::LINE)
+			return GL_LINE;
+		else
+			return GL_POINT;
+	}
+
+	GLenum TranslateVertexPrimitiveType(VertexPrimitiveType::value_type primitiveType)
+	{
+		switch (primitiveType)
+		{
+		case VertexPrimitiveType::TRIANGLES:		return GL_TRIANGLES;
+		case VertexPrimitiveType::POINTS:			return GL_POINTS;
+		case VertexPrimitiveType::LINES:			return GL_LINES;
+		case VertexPrimitiveType::LINE_STRIP:		return GL_LINE_STRIP;
+		case VertexPrimitiveType::LINE_LOOP:		return GL_LINE_LOOP;
+		case VertexPrimitiveType::TRIANGLE_STRIP:	return GL_TRIANGLE_STRIP;
+		case VertexPrimitiveType::TRIANGLE_FAN:		return GL_TRIANGLE_FAN;
+		case VertexPrimitiveType::QUAD_STRIP:		return GL_QUAD_STRIP;
+		case VertexPrimitiveType::POLYGON:			return GL_POLYGON;
+		}
+		return GL_TRIANGLES;
+	}
+
 };
 
 
-Renderer::Renderer()
-	: m_modelMatrix(Matrix4f::IDENTITY)
-	, m_viewMatrix(Matrix4f::IDENTITY)
-	, m_projectionMatrix(Matrix4f::IDENTITY)
+Renderer::Renderer() :
+	//m_modelMatrix(Matrix4f::IDENTITY),
+	//m_viewMatrix(Matrix4f::IDENTITY),
+	//m_projectionMatrix(Matrix4f::IDENTITY),
+	m_camera(nullptr),
+	m_activeShader(nullptr)
 {
 }
 
@@ -99,34 +128,47 @@ Renderer::Renderer()
 void Renderer::SetShader(Shader* shader)
 {
 	m_activeShader = shader;
-	glUseProgram(m_activeShader->m_glProgram);
+	if (m_activeShader != nullptr)
+		glUseProgram(m_activeShader->m_glProgram);
+	else
+		glUseProgram(0);
 }
 
-void Renderer::SetColor(const Color& color)
+
+void Renderer::SetCamera(ICamera* camera)
 {
-	m_color = color.ToVector4f();
+	m_camera = camera;
 }
 
-void Renderer::SetColor(const Vector3f& color)
-{
-	m_color = Vector4f(color, 1.0f);
-}
-
-void Renderer::SetColor(const Vector4f& color)
-{
-	m_color = color;
-}
+//void Renderer::SetColor(const Color& color)
+//{
+//	m_color = color.ToVector4f();
+//}
+//
+//void Renderer::SetColor(const Vector3f& color)
+//{
+//	m_color = Vector4f(color, 1.0f);
+//}
+//
+//void Renderer::SetColor(const Vector4f& color)
+//{
+//	m_color = color;
+//}
 
 void Renderer::UpdateUniforms()
 {
-	if (m_activeShader != NULL)
+	if (m_activeShader != nullptr)
 	{
-		// Color
-		glUniform4fv(m_activeShader->GetUniform("u_color")->GetLocation(), 1, m_color.data());
+		int uniformLocation = -1;
+		
+		// Color.
+		//if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
+		//	glUniform4fv(uniformLocation, 1, m_color.data());
 
 		// MVP matrix.
-		Matrix4f mvp = GetMVP();
-		glUniformMatrix4fv(m_activeShader->GetUniform("u_mvp")->GetLocation(), 1, GL_TRUE, mvp.data());
+		//Matrix4f mvp = GetMVP();
+		//if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
+		//	glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
 	}
 }
 
@@ -152,6 +194,8 @@ void Renderer::ApplyRenderSettings(bool clear)
 	glBlendFunc(TranslateBlendFunc(m_params.GetBlendFunction().source),
 				TranslateBlendFunc(m_params.GetBlendFunction().destination));
 
+	// Polygon mode.
+	glPolygonMode(GL_FRONT_AND_BACK, TranslatePolygonMode(m_params.GetPolygonMode()));
 
 	// Clear color.
 	Vector4f clearColorVec = m_params.GetClearColor().ToVector4f();
@@ -167,23 +211,56 @@ void Renderer::Clear()
 	glClear(TranslateClearBits(m_params.GetClearBits()));
 }
 
-void Renderer::SetModelMatrix(const Matrix4f& model)
+//void Renderer::SetModelMatrix(const Matrix4f& model)
+//{
+//	m_modelMatrix = model;
+//}
+//
+//void Renderer::SetViewMatrix(const Matrix4f& view)
+//{
+//	m_viewMatrix = view;
+//}
+//
+//void Renderer::SetProjectionMatrix(const Matrix4f& projection)
+//{
+//	m_projectionMatrix = projection;
+//}
+//
+//Matrix4f Renderer::GetMVP()
+//{
+//	return (m_projectionMatrix * m_viewMatrix * m_modelMatrix);
+//}
+
+
+
+void Renderer::RenderMesh(Mesh* mesh, const Transform3f& transform)
 {
-	m_modelMatrix = model;
+	RenderMesh(mesh, transform.GetMatrix());
 }
 
-void Renderer::SetViewMatrix(const Matrix4f& view)
+void Renderer::RenderMesh(Mesh* mesh, const Matrix4f& modelMatrix)
 {
-	m_viewMatrix = view;
-}
+	// Update uniforms.
+	if (m_activeShader != nullptr)
+	{
+		int uniformLocation = -1;
+		
+		// Color.
+		//if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
+		//	glUniform4fv(uniformLocation, 1, m_color.data());
 
-void Renderer::SetProjectionMatrix(const Matrix4f& projection)
-{
-	m_projectionMatrix = projection;
-}
+		// MVP matrix.
+		Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
+		if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
+			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
+	}
 
-Matrix4f Renderer::GetMVP()
-{
-	return (m_projectionMatrix * m_viewMatrix * m_modelMatrix);
-}
+	glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
 
+	glDrawElements(TranslateVertexPrimitiveType(mesh->GetPrimitiveType()),
+		mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}

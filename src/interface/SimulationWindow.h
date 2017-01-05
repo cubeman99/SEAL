@@ -23,6 +23,8 @@ private:
     void OnPlayPauseSimulation(wxCommandEvent& e);
     void OnToggleCameraTracking(wxCommandEvent& e);
     void OnSpawnAgents(wxCommandEvent& e);
+	
+    void OnMenuItem(wxCommandEvent& e);
 
     void OnUpdateTimer(wxTimerEvent& e);
 

@@ -10,6 +10,7 @@ enum
 	TOGGLE_CAMERA_TRACKING,
 	DEBUG_SPAWN_AGENTS,
 	UPDATE_TIMER,
+	VIEW_WIREFRAME_MODE,
 };
 
 
@@ -20,6 +21,7 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
     EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
+	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
     //EVT_MENU(wxID_ABOUT, SimulationWindow::OnAbout)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
@@ -55,7 +57,8 @@ SimulationWindow::SimulationWindow() :
 	// VIEW
     wxMenu* menuView = new wxMenu;
     menuBar->Append(menuView, wxT("&View"));
-    menuView->Append(TOGGLE_CAMERA_TRACKING, "Toggle Camera &Tracking\tT");
+    menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Toggle Camera &Tracking\tT");
+    menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
 
 	// DEBUG
     wxMenu* menuDebug = new wxMenu;
@@ -103,6 +106,17 @@ void SimulationWindow::OnSpawnAgents(wxCommandEvent& e)
 {
 	for (int i = 0; i < 10; i++)
 		m_simulationManager.GetSimulation()->GetAgentSystem()->SpawnAgent();
+}
+
+void SimulationWindow::OnMenuItem(wxCommandEvent& e)
+{
+	switch (e.GetId())
+	{
+	case VIEW_WIREFRAME_MODE:
+		m_simulationManager.SetViewWireFrameMode(
+			!m_simulationManager.IsViewWireFrameMode());
+		break;
+	}
 }
 
 void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)

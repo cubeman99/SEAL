@@ -1,7 +1,7 @@
 #ifndef _GLOBE_CAMERA_H_
 #define _GLOBE_CAMERA_H_
 
-#include "ICamera.h"
+#include <graphics/ICamera.h>
 
 
 class GlobeCamera : public ICamera

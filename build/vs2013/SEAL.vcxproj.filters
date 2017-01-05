@@ -129,9 +129,6 @@
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp">
       <Filter>Source Files\interface\camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\ICamera.cpp">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\interface\CameraSystem.cpp">
       <Filter>Source Files\interface\camera</Filter>
     </ClCompile>
@@ -146,6 +143,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\graphics\Primitives.cpp">
       <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\graphics\ICamera.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\Transform3f.cpp">
+      <Filter>Source Files\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,9 +245,6 @@
     <ClInclude Include="..\..\src\interface\GlobeCamera.h">
       <Filter>Source Files\interface\camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\ICamera.h">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\interface\CameraSystem.h">
       <Filter>Source Files\interface\camera</Filter>
     </ClInclude>
@@ -259,6 +259,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\graphics\Primitives.h">
       <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\ICamera.h">
+      <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Transform3f.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

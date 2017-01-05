@@ -86,6 +86,8 @@ public:
 	unsigned int		GetNumUniforms() const;
 	const Uniform&		GetUniform(unsigned int index) const;
 	const Uniform*		GetUniform(const std::string& name) const;
+	int					GetUniformLocation(const std::string& name) const;
+	bool				GetUniformLocation(const std::string& name, int& outUniformLocation) const;
 			
 	bool AddStage(const std::string& code, ShaderType::value_type type);
 	bool CompileAndLink();

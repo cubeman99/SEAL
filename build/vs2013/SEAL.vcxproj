@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\src\graphics\Color.cpp" />
     <ClCompile Include="..\..\src\graphics\glew\GLEW.C" />
     <ClCompile Include="..\..\src\graphics\Graphics.cpp" />
+    <ClCompile Include="..\..\src\graphics\ICamera.cpp" />
     <ClCompile Include="..\..\src\graphics\ImageFormat.cpp" />
     <ClCompile Include="..\..\src\graphics\lodepng\lodepng.cpp" />
     <ClCompile Include="..\..\src\graphics\Mesh.cpp" />
@@ -28,7 +29,6 @@
     <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp" />
     <ClCompile Include="..\..\src\interface\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
-    <ClCompile Include="..\..\src\interface\ICamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\src\math\Matrix4f.cpp" />
     <ClCompile Include="..\..\src\math\Quaternion.cpp" />
     <ClCompile Include="..\..\src\math\Ray.cpp" />
+    <ClCompile Include="..\..\src\math\Transform3f.cpp" />
     <ClCompile Include="..\..\src\math\Vector2f.cpp" />
     <ClCompile Include="..\..\src\math\Vector3f.cpp" />
     <ClCompile Include="..\..\src\math\Vector4f.cpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="..\..\src\graphics\Color.h" />
     <ClInclude Include="..\..\src\graphics\glew\GLEW.H" />
     <ClInclude Include="..\..\src\graphics\Graphics.h" />
+    <ClInclude Include="..\..\src\graphics\ICamera.h" />
     <ClInclude Include="..\..\src\graphics\ImageFormat.h" />
     <ClInclude Include="..\..\src\graphics\lodepng\lodepng.h" />
     <ClInclude Include="..\..\src\graphics\Mesh.h" />
@@ -67,7 +69,6 @@
     <ClInclude Include="..\..\src\interface\ArcBallCamera.h" />
     <ClInclude Include="..\..\src\interface\CameraSystem.h" />
     <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
-    <ClInclude Include="..\..\src\interface\ICamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\SimulationManager.h" />
@@ -77,6 +78,7 @@
     <ClInclude Include="..\..\src\math\Matrix4f.h" />
     <ClInclude Include="..\..\src\math\Quaternion.h" />
     <ClInclude Include="..\..\src\math\Ray.h" />
+    <ClInclude Include="..\..\src\math\Transform3f.h" />
     <ClInclude Include="..\..\src\math\Vector2f.h" />
     <ClInclude Include="..\..\src\math\Vector3f.h" />
     <ClInclude Include="..\..\src\math\Vector4f.h" />

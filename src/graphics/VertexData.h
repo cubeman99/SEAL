@@ -214,6 +214,8 @@ struct VertexPos
 // attributes.
 class VertexBuffer
 {
+	friend class Renderer;
+
 public:
 	// Constructors/destructor.
 	VertexBuffer();
@@ -244,6 +246,8 @@ public:
 // elements inside another buffer (usually a vertex buffer).
 class IndexBuffer
 {
+	friend class Renderer;
+
 public:
 	// Constructors/destructor.
 	IndexBuffer();
