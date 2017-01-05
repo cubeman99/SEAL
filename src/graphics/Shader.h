@@ -8,6 +8,25 @@
 #define MAX_SHADER_STAGES 4
 
 
+class ShaderCompileError
+{
+public:
+	friend class Shader;
+
+public:
+	ShaderCompileError() {}
+	ShaderCompileError(const std::string& message) :
+		m_message(message)
+	{}
+
+	const std::string& GetMessage() const { return m_message; }
+
+private:
+
+	std::string m_message;
+};
+
+
 // Data types for shader parameters.
 struct UniformType
 {
@@ -89,8 +108,8 @@ public:
 	int					GetUniformLocation(const std::string& name) const;
 	bool				GetUniformLocation(const std::string& name, int& outUniformLocation) const;
 			
-	bool AddStage(const std::string& code, ShaderType::value_type type);
-	bool CompileAndLink();
+	bool AddStage(const std::string& code, ShaderType::value_type type, const std::string& fileName = "");
+	bool CompileAndLink(ShaderCompileError* outError = nullptr);
 
 private:
 public:
@@ -98,6 +117,7 @@ public:
 
 	unsigned int			m_glProgram;
 	unsigned int			m_glShaderStages[MAX_SHADER_STAGES];
+	std::string				m_shaderStageFileNames[MAX_SHADER_STAGES];
 	bool					m_isLinked;
 	std::vector<Uniform>	m_uniforms;
 	//std::map<std::string, ShaderParam> m_paramMap;

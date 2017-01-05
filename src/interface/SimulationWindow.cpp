@@ -22,7 +22,7 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
 	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
-    //EVT_MENU(wxID_ABOUT, SimulationWindow::OnAbout)
+    EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
@@ -116,6 +116,12 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		m_simulationManager.SetViewWireFrameMode(
 			!m_simulationManager.IsViewWireFrameMode());
 		break;
+	case wxID_ABOUT:
+	{
+		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russel (2017)",
+			"About SEAL", wxICON_INFORMATION);
+		break;
+	}
 	}
 }
 

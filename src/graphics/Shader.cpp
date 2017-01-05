@@ -91,7 +91,7 @@ bool Shader::GetUniformLocation(const std::string& name, int& outUniformLocation
 // Compiling and Linking
 //-----------------------------------------------------------------------------
 
-bool Shader::AddStage(const std::string& code, ShaderType::value_type type)
+bool Shader::AddStage(const std::string& code, ShaderType::value_type type, const std::string& fileName)
 {
 	GLuint shaderGL = 0;
 
@@ -119,11 +119,12 @@ bool Shader::AddStage(const std::string& code, ShaderType::value_type type)
 	// Attach the shader stage to the shader program.
 	glAttachShader(m_glProgram, shaderGL);
 	m_glShaderStages[(int) type] = shaderGL;
+	m_shaderStageFileNames[(int) type] = fileName;
 	m_isLinked = false;
 	return true;
 }
 	
-bool Shader::CompileAndLink()
+bool Shader::CompileAndLink(ShaderCompileError* outError)
 {
 	GLint  isStatusOK;
 	GLuint shaderGL;
@@ -142,7 +143,9 @@ bool Shader::CompileAndLink()
 			if (isStatusOK == GL_FALSE)
 			{
 				glGetShaderInfoLog(shaderGL, sizeof(errorMsg), NULL, errorMsg);
-				fprintf(stderr, "Error compiling shader:\n%s\n", errorMsg);
+				if (outError != nullptr)
+					outError->m_message = "Error compiling shader:\n" + std::string(errorMsg) + "\n";
+				//fprintf(stderr, "Error compiling shader:\n%s\n", errorMsg);
 				return false;
 			}
 		}
@@ -154,7 +157,9 @@ bool Shader::CompileAndLink()
 	if (isStatusOK == GL_FALSE)
 	{
 		glGetProgramInfoLog(m_glProgram, sizeof(errorMsg), NULL, errorMsg);
-		fprintf(stderr, "Error linking shader:\n%s\n", errorMsg);
+		if (outError != nullptr)
+			outError->m_message = "Error linking shader:\n" + std::string(errorMsg) + "\n";
+		//fprintf(stderr, "Error linking shader:\n%s\n", errorMsg);
 		return false;
 	}
 
@@ -164,7 +169,9 @@ bool Shader::CompileAndLink()
 	if (isStatusOK == GL_FALSE)
 	{
 		glGetProgramInfoLog(m_glProgram, sizeof(errorMsg), NULL, errorMsg);
-		fprintf(stderr, "Shader validation failed:\n%s\n", errorMsg);
+		if (outError != nullptr)
+			outError->m_message = "Error validation failed:\n" + std::string(errorMsg) + "\n";
+		//fprintf(stderr, "Shader validation failed:\n%s\n", errorMsg);
 		return false;
 	}
 

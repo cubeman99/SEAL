@@ -253,6 +253,10 @@ void Renderer::RenderMesh(Mesh* mesh, const Matrix4f& modelMatrix)
 		Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
 		if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
 			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
+
+		// Model matrix.
+		if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
+			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
 	}
 
 	glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);

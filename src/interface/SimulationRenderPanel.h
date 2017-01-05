@@ -38,8 +38,12 @@ private:
 
 	SimulationWindow* m_simulationWindow;
 	std::vector<Ray> m_testRays;
+	
 	Shader* m_shader;
 	Renderer m_renderer;
+
+	Mesh* m_agentMesh;
+	Mesh* m_meshSelectionCircle;
 };
 
 

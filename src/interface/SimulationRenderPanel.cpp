@@ -41,31 +41,34 @@ bool OpenAndGetContents(const std::string& fileName, std::string& out)
 	return true;
 }
 
-
 Shader* LoadShader(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	std::string vertexSource;
 	std::string fragmentSource;
 	
 	if (!OpenAndGetContents(vertexPath, vertexSource))
+	{
+		wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
 		return false;
+	}
 	if (!OpenAndGetContents(fragmentPath, fragmentSource))
+	{
+		wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
 		return false;
+	}
 
 	Shader* shader = new Shader();
+	
+	// Add the two stages.
+	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER);
+	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER);
 
-	if (!shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER))
+	// Compile and link the shader.
+	ShaderCompileError compileError;
+	if (!shader->CompileAndLink(&compileError))
 	{
-		delete shader;
-		return nullptr;
-	}
-	if (!shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER))
-	{
-		delete shader;
-		return nullptr;
-	}
-	if (!shader->CompileAndLink())
-	{
+		wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
+
 		delete shader;
 		return nullptr;
 	}
@@ -114,9 +117,77 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	// Force the OpenGL context to be created  now.
 	wxGetApp().GetGLContext(this);
 
+	// Load shaders.
 	m_shader = LoadShader(
 		"../../assets/shaders/generic_vs.glsl",
 		"../../assets/shaders/generic_fs.glsl");
+
+	// Create agent mesh.
+	{
+		float h = 0.3f;
+		Vector3f v1(0, h, -1);
+		Vector3f v2(0.7f, h, 0.7f);
+		Vector3f v3(-0.7f, h, 0.7f);
+		Vector3f v4(0, 0, -1);
+		Vector3f v5(0.7f, 0, 0.7f);
+		Vector3f v6(-0.7f, 0, 0.7f);
+		Vector3f n1 = Vector3f::UP;
+		Vector3f n2 = Vector3f(1.7f, 0, 0.7f).Normalize();
+		Vector3f n3 = Vector3f::BACK;
+		Vector3f n4 = Vector3f(-1.7f, 0, 0.7f).Normalize();
+
+		Vector4f color = Color::GREEN.ToVector4f();
+		VertexPosNormCol vertices[] = {
+			VertexPosNormCol(v1, n1, color), // Top
+			VertexPosNormCol(v2, n1, color),
+			VertexPosNormCol(v3, n1, color),
+			VertexPosNormCol(v2, n2, color), // Right
+			VertexPosNormCol(v1, n2, color),
+			VertexPosNormCol(v4, n2, color),
+			VertexPosNormCol(v5, n2, color),
+			VertexPosNormCol(v3, n3, color), // Back
+			VertexPosNormCol(v2, n3, color),
+			VertexPosNormCol(v5, n3, color),
+			VertexPosNormCol(v6, n3, color),
+			VertexPosNormCol(v1, n4, color), // Left
+			VertexPosNormCol(v3, n4, color),
+			VertexPosNormCol(v6, n4, color),
+			VertexPosNormCol(v4, n4, color),
+		};
+		unsigned int indices[] = {
+			0, 1, 2,
+			3, 4, 5, 3, 5, 6,
+			7, 8, 9, 7, 9, 10,
+			11, 12, 13, 11, 13, 14,
+		};
+
+		m_agentMesh = new Mesh();
+		m_agentMesh->GetVertexData()->BufferVertices(15, vertices);
+		m_agentMesh->GetIndexData()->BufferIndices(21, indices);
+	}
+
+	// Create selection circle mesh.
+	{
+		Vector4f color = Color::GREEN.ToVector4f();
+		std::vector<VertexPosNormCol> vertices;
+		std::vector<unsigned int> indices;
+
+		for (int i = 0; i < 40; i++)
+		{
+			float a = (i / 40.0f) * Math::TWO_PI;
+			VertexPosNormCol v;
+			v.position = Vector3f(cos(a), 0.0f, sin(a));
+			v.color = color;
+			v.normal = Vector3f::UP;
+			vertices.push_back(v);
+			indices.push_back((unsigned int) i);
+		}
+
+		m_meshSelectionCircle = new Mesh();
+		m_meshSelectionCircle->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
+		m_meshSelectionCircle->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
+		m_meshSelectionCircle->SetPrimitiveType(VertexPrimitiveType::LINE_LOOP);
+	}
 }
 
 SimulationRenderPanel::~SimulationRenderPanel()
@@ -247,9 +318,9 @@ void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
-	Simulation* m_simulation = GetSimulation();
+	Simulation* simulation = GetSimulation();
 	ICamera* camera = GetSimulationManager()->GetCameraSystem()->GetActiveCamera();
-	Agent* m_selectedAgent = GetSimulationManager()->GetSelectedAgent();
+	Agent* selectedAgent = GetSimulationManager()->GetSelectedAgent();
 
     // This is required even though dc is not used otherwise.
     //wxPaintDC dc(this);
@@ -265,45 +336,13 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
     OpenGLContext& canvas = wxGetApp().GetGLContext(this);
     glViewport(0, 0, clientSize.x, clientSize.y);
 
-	float worldRadius = m_simulation->GetWorld()->GetRadius();
+	float worldRadius = simulation->GetWorld()->GetRadius();
 	
-	Matrix4f mvp = camera->GetViewProjection() * 
-		Matrix4f::CreateScale(worldRadius);
-
-
-    /*glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDepthMask(false);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_DEPTH_CLAMP);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_COLOR_MATERIAL);*/
-	
-    glDisable(GL_CULL_FACE);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_COLOR_MATERIAL);
-	
-    glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-	glCullFace(GL_BACK);
-    glEnable(GL_DEPTH_TEST);
-    glBindTexture(GL_TEXTURE_2D, 0);
-	
+	glBindTexture(GL_TEXTURE_2D, 0);
     glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(camera->GetViewProjection().GetTranspose().data());
-
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glScalef(worldRadius, worldRadius, worldRadius);
-
-	// Draw the world.
 	
-	Mesh* mesh = m_simulation->GetWorld()->GetMesh();
-
-
 	RenderParams renderParams;
 	renderParams.EnableDepthTest(true);
 	renderParams.EnableDepthBufferWrite(true);
@@ -330,81 +369,14 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	m_renderer.ApplyRenderSettings(true);
 	m_renderer.SetCamera(camera);
 
+	// Render the world.
 	Transform3f worldTransform;
 	worldTransform.scale = Vector3f(worldRadius, worldRadius, worldRadius);
-	
 	m_renderer.SetShader(m_shader);
-	m_renderer.RenderMesh(mesh, worldTransform);
+	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), worldTransform);
 	
-
-	// Draw the world.
-	//m_renderer.SetShader(m_shader);
-	//glUseProgram(m_shader->m_glProgram);
-		//glUniformMatrix4fv(m_shader->GetUniform("u_mvp")->GetLocation(), 1, GL_TRUE, mvp.data());
-		//glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
-		//	glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0);
-	//glUseProgram(0);
-	m_renderer.SetShader(NULL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-	//std::vector<Vector3f>& vertices = m_simulation->GetWorld()->GetVertices();
-	//glBegin(GL_TRIANGLES);
-	//glColor3f(0.05f, 0.05f, 0.05f);
-	//Vector3f normal;
-	//for (unsigned int i = 0; i < vertices.size(); i++)
-	//{
-	//	/*if (i % 3 == 0)
-	//	{
-	//		Vector3f v1 = vertices[i];
-	//		Vector3f v2 = vertices[i + 1];
-	//		Vector3f v3 = vertices[i + 2];
-	//		normal = (v3 - v2).Cross(v2 - v1);
-	//		normal.Normalize();
-	//	}*/
-	//	normal = vertices[i];
-	//	normal.Normalize();
-
-	//	glNormal3fv(normal.data());
-	//	glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
-	//	glVertex3fv(vertices[i].data());
-	//}
-	//glEnd();
-	
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glBegin(GL_TRIANGLES);
-	//glColor3f(0.1f, 0.7f, 0.1f);
-	//for (unsigned int i = 0; i < vertices.size(); i++)
-	//{
-	//	if (i % 3 == 0)
-	//	{
-	//		Vector3f v1 = vertices[i];
-	//		Vector3f v2 = vertices[i + 1];
-	//		Vector3f v3 = vertices[i + 2];
-	//		normal = (v3 - v2).Cross(v2 - v1);
-	//		normal.Normalize();
-	//	}
-
-	//	glNormal3fv(normal.data());//vertices[i].Normalize().data());
-	//	glColor3fv(((normal + Vector3f::ONE) * 0.5f).data());
-	//	glVertex3fv((vertices[i] * 1.0001).data());
-	//}
-	//glEnd();
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// Draw the agents.
-	AgentSystem* agentSystem = m_simulation->GetAgentSystem();
-	float r = 0.016f;
-	float h = 0.0005f;
-	Vector3f v1(0, h, -r);
-	Vector3f v2(r * 0.7f, h, r * 0.8f);
-	Vector3f v3(-r * 0.7f, h, r * 0.8f);
+	// Render the agents.
+	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
@@ -412,38 +384,32 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		Matrix4f modelMatrix = Matrix4f::CreateTranslation(agent->GetPosition()) *
 			Matrix4f::CreateRotation(agent->GetOrientation());
 				
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glLoadMatrixf(modelMatrix.GetTranspose().data());
-		
-		// Draw agent.
-		glBegin(GL_LINE_LOOP);
-			glColor3f(1.0f, 1.0f, 1.0f);
-			glVertex3fv(v1.data());
-			glVertex3fv(v2.data());
-			glVertex3fv(v3.data());
-		glEnd();
-		glBegin(GL_TRIANGLES);
-			glColor3f(0.5f, 1.0f, 0.5f);
-			glVertex3fv(v1.data());
-			glVertex3fv(v2.data());
-			glVertex3fv(v3.data());
-		glEnd();
+		float agentRadius = 0.016f;
+		float offset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
 
-		// Draw selection circle.
-		if (m_selectedAgent == agent)
-		{
-			glBegin(GL_LINE_LOOP);
-			glColor3f(0.0f, 1.0f, 0.0f);
-			for (int i = 0; i < 20; i++)
-			{
-				float a = (i / 20.0f) * Math::TWO_PI;
-				glVertex3f(cos(a) * r * 1.2f, h, sin(a) * r * 1.2f);
-			}
-			glEnd();
+		// Create the agent transform.
+		Transform3f transform;
+		transform.scale = Vector3f(agentRadius, agentRadius, agentRadius);
+		transform.pos = agent->GetPosition();
+		transform.pos.Normalize();
+		transform.pos *= worldRadius - offset;
+		transform.rot = agent->GetOrientation();
+	
+		// Render the agent.
+		m_renderer.SetShader(m_shader);
+		m_renderer.RenderMesh(m_agentMesh, transform);
+
+		// Draw the selection circle.
+		if (selectedAgent == agent)
+		{	
+			transform.scale *= 1.2f;
+			transform.pos.Normalize();
+			transform.pos *= worldRadius + 0.001f;
+			m_renderer.RenderMesh(m_meshSelectionCircle, transform);
 		}
 	}
 	
+	m_renderer.SetShader(nullptr);
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glScalef(worldRadius, worldRadius, worldRadius);

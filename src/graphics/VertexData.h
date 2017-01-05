@@ -140,6 +140,10 @@ struct VertexPosNormCol
 	VertexPosNormCol(Vector3f position) :
 		position(position)
 	{}
+	
+	VertexPosNormCol(Vector3f position, Vector3f normal, Vector4f color) :
+		position(position), normal(normal), color(color)
+	{}
 
 	DECLARE_VERTEX_TYPE(VertexType::POSITION |
 						VertexType::NORMAL |
