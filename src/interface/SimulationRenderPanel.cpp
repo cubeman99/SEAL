@@ -7,6 +7,72 @@
 #include <simulation/Simulation.h>
 #include "SimulationWindow.h"
 
+	
+bool OpenAndGetContents(const std::string& fileName, std::string& out)
+{
+	FILE* m_file = fopen(fileName.c_str(), "r");
+
+	if (m_file == nullptr)
+		return false;
+
+	if (fseek(m_file, 0, SEEK_END) != 0)
+		return false;
+
+	long fileSize = ftell(m_file);
+	if (fileSize < 0)
+		return false;
+
+	rewind(m_file);
+
+	const size_t fileSizeInclNull = fileSize + 1;
+	char* buffer = new char[fileSizeInclNull];
+
+	size_t result = fread(buffer, 1, fileSizeInclNull, m_file);
+	if (result == 0)
+	{
+		delete buffer;
+		return false;
+	}
+
+	buffer[result] = '\0';
+	out.assign(buffer, buffer + result);
+
+	delete buffer;
+	return true;
+}
+
+
+Shader* LoadShader(const std::string& vertexPath, const std::string& fragmentPath)
+{
+	std::string vertexSource;
+	std::string fragmentSource;
+	
+	if (!OpenAndGetContents(vertexPath, vertexSource))
+		return false;
+	if (!OpenAndGetContents(fragmentPath, fragmentSource))
+		return false;
+
+	Shader* shader = new Shader();
+
+	if (!shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER))
+	{
+		delete shader;
+		return nullptr;
+	}
+	if (!shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER))
+	{
+		delete shader;
+		return nullptr;
+	}
+	if (!shader->CompileAndLink())
+	{
+		delete shader;
+		return nullptr;
+	}
+
+	return shader;
+}
+
 
 // ----------------------------------------------------------------------------
 // constants
@@ -40,13 +106,23 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
     // viewport settings.
     : wxGLCanvas(parent, wxID_ANY, attribList,
                  wxDefaultPosition, wxDefaultSize,
-                 wxFULL_REPAINT_ON_RESIZE)
+                 wxFULL_REPAINT_ON_RESIZE),
+	m_shader(nullptr)
 {
 	m_simulationWindow = (SimulationWindow*) parent;
 
 	// Force the OpenGL context to be created  now.
 	wxGetApp().GetGLContext(this);
+
+	m_shader = LoadShader(
+		"../../assets/shaders/generic_vs.glsl",
+		"../../assets/shaders/generic_fs.glsl");
 }
+
+SimulationRenderPanel::~SimulationRenderPanel()
+{
+	delete m_shader;
+};
 
 SimulationManager* SimulationRenderPanel::GetSimulationManager()
 {
@@ -184,12 +260,16 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
     // multiple canvases: If we updated the viewport in the wxSizeEvent
     // handler, changing the size of one canvas causes a viewport setting that
     // is wrong when next another canvas is repainted.
-    const wxSize clientSize = GetClientSize();
 
+    const wxSize clientSize = GetClientSize();
     OpenGLContext& canvas = wxGetApp().GetGLContext(this);
     glViewport(0, 0, clientSize.x, clientSize.y);
+
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
 	
-	float aspectRatio = (float) clientSize.x / (float) clientSize.y;
+	Matrix4f mvp = camera->GetViewProjection() * 
+		Matrix4f::CreateScale(worldRadius);
+
 
     /*glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -211,8 +291,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D, 0);
-
-	float worldRadius = m_simulation->GetWorld()->GetRadius();
 	
     glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(camera->GetViewProjection().GetTranspose().data());
@@ -224,9 +302,18 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	// Draw the world.
 	
 	Mesh* mesh = m_simulation->GetWorld()->GetMesh();
-	glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
-	glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
+
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glUseProgram(m_shader->m_glProgram);
+		glUniformMatrix4fv(m_shader->GetUniform("u_mvp")->GetLocation(), 1, GL_TRUE, mvp.data());
+		glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
+			glDrawElements(GL_TRIANGLES, mesh->GetIndexData()->GetCount(), GL_UNSIGNED_INT, (unsigned int*) 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	glUseProgram(0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 	//std::vector<Vector3f>& vertices = m_simulation->GetWorld()->GetVertices();

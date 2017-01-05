@@ -30,8 +30,6 @@ int MainApplication::OnExit()
 
 OpenGLContext& MainApplication::GetGLContext(wxGLCanvas* canvas)
 {
-    OpenGLContext* glContext;
-    
     if (m_glContext == NULL)
     {
         // Create the OpenGL context for the first window which needs it:

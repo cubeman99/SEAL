@@ -11,6 +11,8 @@
 #include <interface/ICamera.h>
 #include <interface/GlobeCamera.h>
 #include <interface/ArcBallCamera.h>
+#include <graphics/Shader.h>
+
 
 class SimulationWindow;
 class SimulationManager;
@@ -20,7 +22,8 @@ class SimulationRenderPanel : public wxGLCanvas
 {
 public:
     SimulationRenderPanel(wxWindow* parent, int* attribList = NULL);
-	
+	~SimulationRenderPanel();
+
 	SimulationManager* GetSimulationManager();
 	Simulation* GetSimulation();
 
@@ -37,6 +40,7 @@ private:
 
 	SimulationWindow* m_simulationWindow;
 	std::vector<Ray> m_testRays;
+	Shader* m_shader;
 };
 
 
