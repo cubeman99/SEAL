@@ -78,16 +78,6 @@ Shader* LoadShader(const std::string& vertexPath, const std::string& fragmentPat
 
 
 // ----------------------------------------------------------------------------
-// constants
-// ----------------------------------------------------------------------------
-
-// control ids
-enum
-{
-	TICK_TIMER = wxID_HIGHEST + 1,
-};
-
-// ----------------------------------------------------------------------------
 // SimulationRenderPanel
 // ----------------------------------------------------------------------------
 
@@ -114,18 +104,21 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 {
 	m_simulationWindow = (SimulationWindow*) parent;
 
-	// Force the OpenGL context to be created  now.
+	// Force the OpenGL context to be created now.
 	wxGetApp().GetGLContext(this);
 
-	// Load shaders.
+	// Load resources.
 	m_shader = LoadShader(
 		"../../assets/shaders/generic_vs.glsl",
 		"../../assets/shaders/generic_fs.glsl");
-	
+	m_shaderUnlitVertexColored = LoadShader(
+		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
+		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
+	m_shaderUnlitColored = LoadShader(
+		"../../assets/shaders/unlit_colored_vs.glsl",
+		"../../assets/shaders/unlit_colored_fs.glsl");
 	
 	Shader* m_defaultShader = new Shader();
-	
-	// Add the two stages.
 	const std::string vertexSource = 
 		"#version 330 core\n"
 		"in vec3 a_vertPos;\n"
@@ -143,10 +136,7 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 		"}";
 	m_defaultShader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, "default_shader_vs");
 	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
-
-	// Compile and link the shader.
-	ShaderCompileError compileError;
-	m_defaultShader->CompileAndLink(&compileError);
+	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
 	// Create agent mesh.
@@ -198,29 +188,43 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 
 	// Create selection circle mesh.
 	{
-		Vector4f color = Color::WHITE.ToVector4f();
-		std::vector<VertexPosNormCol> vertices;
+		std::vector<VertexPos> vertices;
 		std::vector<unsigned int> indices;
 
-		for (int i = 0; i < 40; i++)
+		for (unsigned int i = 0; i < 40; i++)
 		{
 			float a = (i / 40.0f) * Math::TWO_PI;
-			VertexPosNormCol v;
-			v.position = Vector3f(cos(a), 0.0f, sin(a));
-			v.color = color;
-			v.normal = Vector3f::UP;
-			vertices.push_back(v);
-			indices.push_back((unsigned int) i);
+			vertices.push_back(VertexPos(cos(a), 0.0f, sin(a)));
+			indices.push_back(i);
 		}
 
 		m_meshSelectionCircle = new Mesh();
 		m_meshSelectionCircle->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
 		m_meshSelectionCircle->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
 		m_meshSelectionCircle->SetPrimitiveType(VertexPrimitiveType::LINE_LOOP);
-		
 		m_materialSelectionCircle = new Material();
 		m_materialSelectionCircle->SetColor(Color::GREEN);
 		m_materialSelectionCircle->SetIsLit(false);
+	}
+	{
+		std::vector<VertexPosCol> vertices;
+		std::vector<unsigned int> indices;
+		vertices.push_back(VertexPosCol(Vector3f(1,0,0),  Color::RED));
+		vertices.push_back(VertexPosCol(Vector3f(-1,0,0),  Color::RED));
+		vertices.push_back(VertexPosCol(Vector3f(0,1,0),  Color::GREEN));
+		vertices.push_back(VertexPosCol(Vector3f(0,-1,0),  Color::GREEN));
+		vertices.push_back(VertexPosCol(Vector3f(0,0,1),  Color::BLUE));
+		vertices.push_back(VertexPosCol(Vector3f(0,0,-1),  Color::BLUE));
+		for (unsigned int i = 0; i < vertices.size(); i++)
+			indices.push_back(i);
+
+		m_meshAxisLines = new Mesh();
+		m_meshAxisLines->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
+		m_meshAxisLines->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
+		m_meshAxisLines->SetPrimitiveType(VertexPrimitiveType::LINES);
+		m_materialAxisLines= new Material();
+		m_materialAxisLines->SetColor(Color::WHITE);
+		m_materialAxisLines->SetIsLit(false);
 	}
 
 	m_worldMaterial = new Material();
@@ -301,11 +305,6 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 					break;
 				}
 			}
-
-			// DEBUG: spawn a test ray to visualize the ray cast.
-			ray.origin = point;
-			ray.direction = -ray.direction;
-			m_testRays.push_back(ray);
 		}
 
 	}
@@ -366,26 +365,14 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	ICamera* camera = GetSimulationManager()->GetCameraSystem()->GetActiveCamera();
 	Agent* selectedAgent = GetSimulationManager()->GetSelectedAgent();
 
+	float worldRadius = simulation->GetWorld()->GetRadius();
+
     // This is required even though dc is not used otherwise.
     //wxPaintDC dc(this);
-
-    // Set the OpenGL viewport according to the client size of this canvas.
-    // This is done here rather than in a wxSizeEvent handler because our
-    // OpenGL rendering context (and thus viewport setting) is used with
-    // multiple canvases: If we updated the viewport in the wxSizeEvent
-    // handler, changing the size of one canvas causes a viewport setting that
-    // is wrong when next another canvas is repainted.
 
     const wxSize clientSize = GetClientSize();
     OpenGLContext& canvas = wxGetApp().GetGLContext(this);
     glViewport(0, 0, clientSize.x, clientSize.y);
-
-	float worldRadius = simulation->GetWorld()->GetRadius();
-	
-	glEnable(GL_COLOR_MATERIAL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-    glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(camera->GetViewProjection().GetTranspose().data());
 	
 	RenderParams renderParams;
 	renderParams.EnableDepthTest(true);
@@ -402,44 +389,36 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	renderParams.SetPolygonMode(PolygonMode::FILL);
 	renderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
 	renderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA, BlendFunc::ONE_MINUS_SOURCE_ALPHA);
-	
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (GetSimulationManager()->IsViewWireFrameMode())
 		renderParams.SetPolygonMode(PolygonMode::LINE);
 	else
 		renderParams.SetPolygonMode(PolygonMode::FILL);
-	
+
 	m_renderer.SetRenderParams(renderParams);
 	m_renderer.ApplyRenderSettings(true);
 	m_renderer.SetCamera(camera);
+	m_renderer.SetShader(m_shader);
 
 	// Render the world.
-	Transform3f worldTransform;
-	worldTransform.scale = Vector3f(worldRadius, worldRadius, worldRadius);
+	Transform3f transform;
+	transform.SetIdentity();
+	transform.SetScale(worldRadius);
 	m_renderer.SetShader(m_shader);
-	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, worldTransform);
+	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
 	// Render the agents.
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
+	float agentRadius = 0.016f;
+	float agentOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
-
-		Matrix4f modelMatrix = Matrix4f::CreateTranslation(agent->GetPosition()) *
-			Matrix4f::CreateRotation(agent->GetOrientation());
-				
-		float agentRadius = 0.016f;
-		float offset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
-
-		// Create the agent transform.
-		Transform3f transform;
-		transform.scale = Vector3f(agentRadius, agentRadius, agentRadius);
+		// Create the agent transform and render it.
 		transform.pos = agent->GetPosition();
 		transform.pos.Normalize();
-		transform.pos *= worldRadius - offset;
+		transform.pos *= worldRadius - agentOffset;
 		transform.rot = agent->GetOrientation();
-	
-		// Render the agent.
+		transform.SetScale(agentRadius);
 		m_renderer.SetShader(m_shader);
 		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
 
@@ -449,40 +428,17 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 			transform.scale *= 1.2f;
 			transform.pos.Normalize();
 			transform.pos *= worldRadius + 0.001f;
+			m_renderer.SetShader(m_shaderUnlitColored);
 			m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
 		}
 	}
 	
-	m_renderer.SetShader(nullptr);
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glScalef(worldRadius, worldRadius, worldRadius);
-	
-	// Draw x/y/z axis lines.
-	glBegin(GL_LINES);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(2.0f, 0.0f, 0.0f);
-		glVertex3f(-2.0f, 0.0f, 0.0f);
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(0.0f, 2.0f, 0.0f);
-		glVertex3f(0.0f, -2.0f, 0.0f);
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(0.0f, 0.0f, 2.0f);
-		glVertex3f(0.0f, 0.0f, -2.0f);
-	glEnd();
-	
-	// DEBUG: Render some test rays.
-    glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	for (unsigned int i = 0; i < m_testRays.size(); i++)
-	{
-		glVertex3fv(m_testRays[i].origin.data());
-		glVertex3fv(m_testRays[i].GetPoint(0.5f).data());
-	}
-	glEnd();
+	// Render the X/Y/Z axis lines.
+	transform.SetIdentity();
+	transform.SetScale(worldRadius * 20.0f);
+	m_renderer.SetShader(m_shaderUnlitVertexColored);
+	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
 
-    // Swap the buffers.
+    // Swap the display buffers.
     SwapBuffers();
 }

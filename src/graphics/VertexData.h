@@ -137,12 +137,16 @@ struct VertexPosNormCol
 
 	VertexPosNormCol() {}
 
-	VertexPosNormCol(Vector3f position) :
+	VertexPosNormCol(const Vector3f& position) :
 		position(position)
 	{}
 	
-	VertexPosNormCol(Vector3f position, Vector3f normal, Vector4f color) :
+	VertexPosNormCol(const Vector3f& position, const Vector3f& normal, const Vector4f& color) :
 		position(position), normal(normal), color(color)
+	{}
+
+	VertexPosNormCol(const Vector3f& position, const Vector3f& normal, const Color& color) :
+		position(position), normal(normal), color(color.ToVector4f())
 	{}
 
 	DECLARE_VERTEX_TYPE(VertexType::POSITION |
@@ -160,7 +164,7 @@ struct VertexPosTex
 		position(x, y, z),
 		texCoord(u, v)
 	{}
-	VertexPosTex(Vector3f position, Vector2f texCoord) :
+	VertexPosTex(const Vector3f& position, const Vector2f& texCoord) :
 		position(position),
 		texCoord(texCoord)
 	{}
@@ -180,6 +184,20 @@ struct VertexPosCol
 {
 	Vector3f	position;
 	Vector4f	color;
+
+	VertexPosCol() {}
+
+	VertexPosCol(const Vector3f& position) :
+		position(position)
+	{}
+	
+	VertexPosCol(const Vector3f& position, const Vector4f& color) :
+		position(position), color(color)
+	{}
+
+	VertexPosCol(const Vector3f& position, const Color& color) :
+		position(position), color(color.ToVector4f())
+	{}
 	
 	DECLARE_VERTEX_TYPE(VertexType::POSITION | VertexType::COLOR);
 };
@@ -187,6 +205,14 @@ struct VertexPosCol
 struct VertexPos
 {
 	Vector3f	position;
+	
+	VertexPos(float x, float y, float z) :
+		position(x, y, z)
+	{}
+	VertexPos(const Vector3f& position) :
+		position(position)
+	{}
+
 
 	DECLARE_VERTEX_TYPE(VertexType::POSITION);
 };

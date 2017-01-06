@@ -37,16 +37,20 @@ private:
     void OnPaint(wxPaintEvent& e);
 
 	SimulationWindow* m_simulationWindow;
-	std::vector<Ray> m_testRays;
 	
-	Shader* m_shader;
 	Renderer m_renderer;
 
+	// Resources.
+	Shader* m_shader;
+	Shader* m_shaderUnlitVertexColored;
+	Shader* m_shaderUnlitColored;
 	Mesh* m_agentMesh;
 	Mesh* m_meshSelectionCircle;
+	Mesh* m_meshAxisLines;
 	Material* m_worldMaterial;
 	Material* m_agentMaterial;
 	Material* m_materialSelectionCircle;
+	Material* m_materialAxisLines;
 };
 
 

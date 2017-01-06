@@ -33,10 +33,14 @@ struct Transform3f
 	Matrix4f GetInvMatrix() const;
 
 	// Mutators.
-	void SetIdentity();					// Set to the identity transform (no transform).
-	void Set(const Vector3f& pos,		// Set the position and rotation of this transform.
-			const Quaternion& rot,
-			const Vector3f& scale);
+	void SetIdentity();
+	void Set(const Vector3f& pos, const Quaternion& rot, const Vector3f& scale);
+	void Set(const Vector3f& pos, const Quaternion& rot, float scale);
+
+	inline void SetPosition(const Vector3f& position) { this->pos = position; }
+	inline void SetRotation(const Quaternion& rotation) { this->rot = rotation; }
+	inline void SetScale(const Vector3f& scale) { this->scale = scale; }
+	inline void SetScale(float scale) { this->scale = Vector3f(scale, scale, scale); }
 };
 
 #endif // _TRANSFORM_3F_H_

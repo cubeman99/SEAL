@@ -62,10 +62,18 @@ void Transform3f::SetIdentity()
 	scale = Vector3f::ONE;
 }
 
-// Set the position and rotation of this transform.
+// Set the position, rotation, and scale of this transform.
 void Transform3f::Set(const Vector3f& _pos, const Quaternion& _rot, const Vector3f& _scale)
 {
 	pos = _pos;
 	rot = _rot;
 	scale = _scale;
+}
+
+// Set the position, rotation, and scale of this transform.
+void Transform3f::Set(const Vector3f& _pos, const Quaternion& _rot, float _scale)
+{
+	pos = _pos;
+	rot = _rot;
+	scale = Vector3f(_scale, _scale, _scale);
 }
