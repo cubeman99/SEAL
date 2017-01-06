@@ -129,6 +129,9 @@ bool Shader::CompileAndLink(ShaderCompileError* outError)
 	GLint  isStatusOK;
 	GLuint shaderGL;
 	GLchar errorMsg[1024] = { 0 };
+	bool compileError = false;
+	if (outError != nullptr)
+		outError->m_message = "";
 
 	// Compile all shader stages.
 	for (int i = 0; i < MAX_SHADER_STAGES; ++i)
@@ -142,13 +145,43 @@ bool Shader::CompileAndLink(ShaderCompileError* outError)
 			glGetShaderiv(shaderGL, GL_COMPILE_STATUS, &isStatusOK);
 			if (isStatusOK == GL_FALSE)
 			{
+				// Get the shader compile error message.
+				compileError = true;
 				glGetShaderInfoLog(shaderGL, sizeof(errorMsg), NULL, errorMsg);
+
 				if (outError != nullptr)
-					outError->m_message = "Error compiling shader:\n" + std::string(errorMsg) + "\n";
-				//fprintf(stderr, "Error compiling shader:\n%s\n", errorMsg);
-				return false;
+				{
+					std::string msg = errorMsg;
+					msg = "\n" + msg;
+					std::string toReplace = "\n" + m_shaderStageFileNames[i] + "(";
+
+					// Insert the shader file name before each error.
+					size_t index = 0;
+					while (true) {
+						 // Locate the substring to replace.
+						 index = msg.find("\n0(", index);
+						 if (index == std::string::npos)
+							 break;
+
+						 // Make the replacement.
+						 msg.replace(index, 3, toReplace);
+
+						 // Advance index forward so the next iteration doesn't pick it up as well.
+						 index += toReplace.length();
+					}
+					msg.erase(msg.begin());
+					outError->m_message += msg + "\n";
+				}
 			}
 		}
+	}
+
+	// Return on any compile errors.
+	if (compileError)
+	{
+		if (outError != nullptr)
+			outError->m_message = "There were shader compile errors:\n\n" + outError->m_message;
+		return false;
 	}
 
 	// Link the program.
@@ -156,10 +189,10 @@ bool Shader::CompileAndLink(ShaderCompileError* outError)
 	glGetProgramiv(m_glProgram, GL_LINK_STATUS, &isStatusOK);
 	if (isStatusOK == GL_FALSE)
 	{
+		// Get the error message.
 		glGetProgramInfoLog(m_glProgram, sizeof(errorMsg), NULL, errorMsg);
 		if (outError != nullptr)
-			outError->m_message = "Error linking shader:\n" + std::string(errorMsg) + "\n";
-		//fprintf(stderr, "Error linking shader:\n%s\n", errorMsg);
+			outError->m_message = "Error linking shader:\n\n" + std::string(errorMsg) + "\n";
 		return false;
 	}
 
@@ -168,10 +201,10 @@ bool Shader::CompileAndLink(ShaderCompileError* outError)
 	glGetProgramiv(m_glProgram, GL_VALIDATE_STATUS, &isStatusOK);
 	if (isStatusOK == GL_FALSE)
 	{
+		// Get the error message.
 		glGetProgramInfoLog(m_glProgram, sizeof(errorMsg), NULL, errorMsg);
 		if (outError != nullptr)
-			outError->m_message = "Error validation failed:\n" + std::string(errorMsg) + "\n";
-		//fprintf(stderr, "Shader validation failed:\n%s\n", errorMsg);
+			outError->m_message = "Error validation failed:\n\n" + std::string(errorMsg) + "\n";
 		return false;
 	}
 

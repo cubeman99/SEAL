@@ -8,12 +8,14 @@ in vec3 v_lightColor;
 out vec4 o_color;
 
 //uniform sampler2D s_texture;
+uniform vec4 u_color =  vec4(1,1,1,1);
+uniform vec3 u_ambientLight = vec3(0.5, 0.5, 0.5);
 
 
 void main()
 {
-	o_color = v_color;
-	o_color.rgb *= v_lightColor;
-	//o_color = texture2D(s_texture, v_texCoord);
+	//o_color = u_color;
+	o_color = v_color * u_color;
+	//o_color = texture2D(s_texture, v_texCoord) * u_color;
+	o_color.rgb *= v_lightColor + u_ambientLight;
 }
-

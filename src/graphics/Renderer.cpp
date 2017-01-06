@@ -120,7 +120,8 @@ Renderer::Renderer() :
 	//m_viewMatrix(Matrix4f::IDENTITY),
 	//m_projectionMatrix(Matrix4f::IDENTITY),
 	m_camera(nullptr),
-	m_activeShader(nullptr)
+	m_activeShader(nullptr),
+	m_defaultShader(nullptr)
 {
 }
 
@@ -128,10 +129,31 @@ Renderer::Renderer() :
 void Renderer::SetShader(Shader* shader)
 {
 	m_activeShader = shader;
+	
 	if (m_activeShader != nullptr)
-		glUseProgram(m_activeShader->m_glProgram);
+	{
+		if (m_activeShader->IsLinked())
+			glUseProgram(m_activeShader->m_glProgram);
+		else if (m_defaultShader != nullptr && m_defaultShader->IsLinked())
+		{
+			m_activeShader = m_defaultShader;
+			glUseProgram(m_defaultShader->m_glProgram);
+		}
+		else
+			glUseProgram(0);
+	}
+	else if (m_defaultShader != nullptr && m_defaultShader->IsLinked())
+	{
+		m_activeShader = m_defaultShader;
+		glUseProgram(m_defaultShader->m_glProgram);
+	}
 	else
 		glUseProgram(0);
+}
+
+void Renderer::SetDefaultShader(Shader* defaultShader)
+{
+	m_defaultShader = defaultShader;
 }
 
 
@@ -240,14 +262,31 @@ void Renderer::RenderMesh(Mesh* mesh, const Transform3f& transform)
 
 void Renderer::RenderMesh(Mesh* mesh, const Matrix4f& modelMatrix)
 {
+
+
+	Vector3f m_lightDirection = Vector3f(-1, -1, -1);
+	Color m_lightColor = Color::GRAY;
+	Color m_ambientLight = Color::GRAY;
+	
+	m_lightColor = Color(255, 199, 0);
+	m_ambientLight = Color(33, 36, 63);
+
 	// Update uniforms.
 	if (m_activeShader != nullptr)
 	{
 		int uniformLocation = -1;
 		
+		if (m_activeShader->GetUniformLocation("u_lightColor", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_lightColor.ToVector3f().data());
+		if (m_activeShader->GetUniformLocation("u_ambientLight", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_ambientLight.ToVector3f().data());
+		if (m_activeShader->GetUniformLocation("u_lightDir", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_lightDirection.data());
+		
 		// Color.
-		//if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
-		//	glUniform4fv(uniformLocation, 1, m_color.data());
+		Vector4f m_color = Color::WHITE.ToVector4f();
+		if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
+			glUniform4fv(uniformLocation, 1, m_color.data());
 
 		// MVP matrix.
 		Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;

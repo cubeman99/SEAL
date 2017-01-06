@@ -60,8 +60,8 @@ Shader* LoadShader(const std::string& vertexPath, const std::string& fragmentPat
 	Shader* shader = new Shader();
 	
 	// Add the two stages.
-	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER);
-	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER);
+	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, vertexPath);
+	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, fragmentPath);
 
 	// Compile and link the shader.
 	ShaderCompileError compileError;
@@ -121,6 +121,36 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_shader = LoadShader(
 		"../../assets/shaders/generic_vs.glsl",
 		"../../assets/shaders/generic_fs.glsl");
+	
+	
+	Shader* m_defaultShader = new Shader();
+	
+	// Add the two stages.
+	const std::string vertexSource = 
+		"#version 330 core\n"
+		"in vec3 a_vertPos;\n"
+		"uniform mat4 u_mvp;\n"
+		"void main()\n"
+		"{\n"
+			"gl_Position = u_mvp * vec4(a_vertPos, 1);\n"
+		"}";
+	const std::string fragmentSource = 
+		"#version 330 core\n"
+		"out vec4 o_color;\n"
+		"void main()\n"
+		"{\n"
+			"o_color = vec4(1,0,1,1);\n" // default color = magenta
+		"}";
+	m_defaultShader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, "default_shader_vs");
+	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
+
+	// Compile and link the shader.
+	ShaderCompileError compileError;
+	if (!m_defaultShader->CompileAndLink(&compileError))
+	{
+		printf("ASDASD");
+	}
+	m_renderer.SetDefaultShader(m_defaultShader);
 
 	// Create agent mesh.
 	{

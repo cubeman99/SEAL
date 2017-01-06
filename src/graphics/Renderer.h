@@ -32,6 +32,7 @@ public:
 	inline ICamera* GetCamera() { return m_camera; }
 
 	void SetShader(Shader* shader);
+	void SetDefaultShader(Shader* defaultShader);
 	void SetCamera(ICamera* camera);
 
 	//void SetColor(const Color& color);
@@ -51,6 +52,8 @@ private:
 	//Matrix4f		m_modelMatrix;
 	//Matrix4f		m_projectionMatrix;
 	//Matrix4f		m_viewMatrix;
+
+	Shader*			m_defaultShader;
 };
 
 

@@ -12,6 +12,9 @@ out vec3 v_lightColor;
 
 uniform mat4 u_mvp;
 uniform mat4 u_model;
+uniform vec3 u_lightColor = vec3(0.5, 0.5, 0.5);
+uniform vec3 u_lightDir = vec3(-1, -1, -1);
+
 
 void main()
 {
@@ -21,12 +24,11 @@ void main()
 	v_normal = normalize((u_model * vec4(a_vertNorm, 0)).xyz);
 	v_color = a_vertColor;
 	
-	vec3 lightDir = normalize(vec3(-1, -1, -1));
+	// Calculate lighting (half-lambartian).
+	vec3 lightDir = normalize(u_lightDir);
 	float lightAmount = dot(-lightDir, v_normal);
-	lightAmount = (lightAmount + 1) / 2;
-	lightAmount = (lightAmount + 1) / 2;
-	//lightAmount = max(0, lightAmount);
-	
-	v_lightColor = vec3(lightAmount);
-	//v_lightColor = (n + vec3(1)) / 2;
+	//lightAmount = (lightAmount + 1) / 2;
+	lightAmount = max(0, lightAmount);
+	v_lightColor = u_lightColor * lightAmount;
+	//v_lightColor = (max(0, lightAmount) + vec3(1)) / 2; 
 }
