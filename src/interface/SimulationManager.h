@@ -24,6 +24,8 @@ public:
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
 	void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
+	inline bool IsLightingEnabled() const { return m_viewLighting; }
+	void EnableLighting(bool enableLighting) { m_viewLighting = enableLighting; }
 
 	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
@@ -40,6 +42,7 @@ private:
 	bool m_isSimulationPaused;
 	Agent* m_selectedAgent;
 	bool m_viewWireFrameMode;
+	bool m_viewLighting;
 };
 
 

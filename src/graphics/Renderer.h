@@ -37,7 +37,7 @@ public:
 	void SetCamera(ICamera* camera);
 
 	void SetLightColor(const Color& lightColor);
-	void SetAmbientLight(const Vector4f& ambientLight);
+	void SetAmbientLight(const Color& ambientLight);
 	void SetLightDirection(const Vector3f& lightDir);
 	void UpdateUniforms();
 
@@ -54,6 +54,13 @@ private:
 	Color			m_ambientLight;
 
 	Shader*			m_defaultShader;
+
+	Mesh*			m_mesh;
+	Material*		m_material;
+
+	bool			m_isMeshChanged;
+	bool			m_isMaterialChanged;
+	bool			m_isShaderChanged;
 };
 
 

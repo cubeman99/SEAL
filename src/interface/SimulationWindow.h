@@ -33,7 +33,10 @@ private:
 	SimulationManager m_simulationManager;
 
     wxTimer m_updateTimer;
-	
+	int m_frameCounter;
+	float m_fps;
+	double m_lastFrameTimeStamp;
+
 	SimulationRenderPanel* m_simulationPanel;
 };
 

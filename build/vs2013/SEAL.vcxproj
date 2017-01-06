@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
+    <ClCompile Include="..\..\src\interface\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
@@ -73,6 +74,7 @@
     <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
+    <ClInclude Include="..\..\src\interface\ResourceManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />

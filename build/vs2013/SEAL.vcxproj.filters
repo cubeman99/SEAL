@@ -153,6 +153,9 @@
     <ClCompile Include="..\..\src\graphics\Material.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\interface\ResourceManager.cpp">
+      <Filter>Source Files\interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -271,6 +274,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\graphics\Material.h">
       <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\ResourceManager.h">
+      <Filter>Source Files\interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

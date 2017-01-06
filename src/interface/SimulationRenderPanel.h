@@ -10,6 +10,7 @@
 #include <math/Ray.h>
 #include <graphics/Shader.h>
 #include <graphics/Renderer.h>
+#include "ResourceManager.h"
 
 
 class SimulationWindow;
@@ -39,6 +40,9 @@ private:
 	SimulationWindow* m_simulationWindow;
 	
 	Renderer m_renderer;
+
+
+	ResourceManager m_resourceManager;
 
 	// Resources.
 	Shader* m_shader;

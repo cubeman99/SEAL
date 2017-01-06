@@ -7,75 +7,6 @@
 #include <simulation/Simulation.h>
 #include "SimulationWindow.h"
 
-	
-bool OpenAndGetContents(const std::string& fileName, std::string& out)
-{
-	FILE* m_file = fopen(fileName.c_str(), "r");
-
-	if (m_file == nullptr)
-		return false;
-
-	if (fseek(m_file, 0, SEEK_END) != 0)
-		return false;
-
-	long fileSize = ftell(m_file);
-	if (fileSize < 0)
-		return false;
-
-	rewind(m_file);
-
-	const size_t fileSizeInclNull = fileSize + 1;
-	char* buffer = new char[fileSizeInclNull];
-
-	size_t result = fread(buffer, 1, fileSizeInclNull, m_file);
-	if (result == 0)
-	{
-		delete buffer;
-		return false;
-	}
-
-	buffer[result] = '\0';
-	out.assign(buffer, buffer + result);
-
-	delete buffer;
-	return true;
-}
-
-Shader* LoadShader(const std::string& vertexPath, const std::string& fragmentPath)
-{
-	std::string vertexSource;
-	std::string fragmentSource;
-	
-	if (!OpenAndGetContents(vertexPath, vertexSource))
-	{
-		wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
-		return false;
-	}
-	if (!OpenAndGetContents(fragmentPath, fragmentSource))
-	{
-		wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
-		return false;
-	}
-
-	Shader* shader = new Shader();
-	
-	// Add the two stages.
-	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, vertexPath);
-	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, fragmentPath);
-
-	// Compile and link the shader.
-	ShaderCompileError compileError;
-	if (!shader->CompileAndLink(&compileError))
-	{
-		wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
-
-		delete shader;
-		return nullptr;
-	}
-
-	return shader;
-}
-
 
 // ----------------------------------------------------------------------------
 // SimulationRenderPanel
@@ -108,16 +39,17 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	wxGetApp().GetGLContext(this);
 
 	// Load resources.
-	m_shader = LoadShader(
+	m_shader = m_resourceManager.LoadShader("generic",
 		"../../assets/shaders/generic_vs.glsl",
 		"../../assets/shaders/generic_fs.glsl");
-	m_shaderUnlitVertexColored = LoadShader(
+	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
 		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
 		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
-	m_shaderUnlitColored = LoadShader(
+	m_shaderUnlitColored = m_resourceManager.LoadShader("unlit_colored",
 		"../../assets/shaders/unlit_colored_vs.glsl",
 		"../../assets/shaders/unlit_colored_fs.glsl");
 	
+	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
 	const std::string vertexSource = 
 		"#version 330 core\n"
@@ -206,6 +138,8 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 		m_materialSelectionCircle->SetColor(Color::GREEN);
 		m_materialSelectionCircle->SetIsLit(false);
 	}
+
+	// Create 3-axis lines mesh
 	{
 		std::vector<VertexPosCol> vertices;
 		std::vector<unsigned int> indices;
@@ -229,18 +163,28 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
+
+	m_resourceManager.AddMesh("axis_lines", m_meshAxisLines);
+	m_resourceManager.AddMesh("circle", m_meshSelectionCircle);
+	m_resourceManager.AddMesh("agent", m_agentMesh);
+	
+	m_resourceManager.AddMaterial("axis_lines", m_materialAxisLines);
+	m_resourceManager.AddMaterial("circle", m_materialSelectionCircle);
+	m_resourceManager.AddMaterial("agent", m_agentMaterial);
+	m_resourceManager.AddMaterial("world", m_worldMaterial);
+
 }
 
 SimulationRenderPanel::~SimulationRenderPanel()
 {
-	delete m_shader;
-	
-	delete m_agentMesh;
-	delete m_meshSelectionCircle;
-
-	delete m_worldMaterial;
-	delete m_agentMaterial;
-	delete m_materialSelectionCircle;
+//	delete m_shader;
+//	
+//	delete m_agentMesh;
+//	delete m_meshSelectionCircle;
+//
+//	delete m_worldMaterial;
+//	delete m_agentMaterial;
+//	delete m_materialSelectionCircle;
 };
 
 SimulationManager* SimulationRenderPanel::GetSimulationManager()
@@ -362,13 +306,14 @@ void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
 	Simulation* simulation = GetSimulation();
+	SimulationManager* simulationManager = GetSimulationManager();
 	ICamera* camera = GetSimulationManager()->GetCameraSystem()->GetActiveCamera();
 	Agent* selectedAgent = GetSimulationManager()->GetSelectedAgent();
 
 	float worldRadius = simulation->GetWorld()->GetRadius();
 
     // This is required even though dc is not used otherwise.
-    //wxPaintDC dc(this);
+    wxPaintDC dc(this);
 
     const wxSize clientSize = GetClientSize();
     OpenGLContext& canvas = wxGetApp().GetGLContext(this);
@@ -399,6 +344,12 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	m_renderer.SetCamera(camera);
 	m_renderer.SetShader(m_shader);
 
+	if (!simulationManager->IsLightingEnabled())
+	{
+		m_renderer.SetLightColor(Color::BLACK);
+		m_renderer.SetAmbientLight(Color::WHITE);
+	}
+
 	// Render the world.
 	Transform3f transform;
 	transform.SetIdentity();
@@ -410,32 +361,33 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float agentRadius = 0.016f;
 	float agentOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
+		m_renderer.SetShader(m_shader);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
-		// Create the agent transform and render it.
 		transform.pos = agent->GetPosition();
 		transform.pos.Normalize();
 		transform.pos *= worldRadius - agentOffset;
 		transform.rot = agent->GetOrientation();
 		transform.SetScale(agentRadius);
-		m_renderer.SetShader(m_shader);
 		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
 
-		// Draw the selection circle.
-		if (selectedAgent == agent)
-		{	
-			transform.scale *= 1.2f;
-			transform.pos.Normalize();
-			transform.pos *= worldRadius + 0.001f;
-			m_renderer.SetShader(m_shaderUnlitColored);
-			m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
-		}
+	}
+	
+	// Draw the selection circle.
+	if (selectedAgent != nullptr)
+	{	transform.pos = selectedAgent->GetPosition();
+		transform.pos.Normalize();
+		transform.pos *= worldRadius + 0.001f;
+		transform.rot = selectedAgent->GetOrientation();
+		transform.SetScale(agentRadius * 1.2f);
+		m_renderer.SetShader(m_shaderUnlitColored);
+		m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
 	}
 	
 	// Render the X/Y/Z axis lines.
 	transform.SetIdentity();
-	transform.SetScale(worldRadius * 20.0f);
+	transform.SetScale(worldRadius * 2.0f);
 	m_renderer.SetShader(m_shaderUnlitVertexColored);
 	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
 

@@ -15,7 +15,8 @@ SimulationManager::SimulationManager() :
 	  m_simulation(nullptr),
 	  m_selectedAgent(nullptr),
 	  m_isSimulationPaused(false),
-	  m_viewWireFrameMode(false)
+	  m_viewWireFrameMode(false),
+	  m_viewLighting(true)
 {
 }
 

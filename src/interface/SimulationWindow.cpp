@@ -1,16 +1,23 @@
 #include "SimulationWindow.h"
 #include "MainApplication.h"
 #include "SimulationRenderPanel.h"
+#include <sstream>
+#include <utilities/Timing.h>
 
 
 enum
 {
     NEW_STEREO_WINDOW = wxID_HIGHEST + 1,
+
 	PLAY_PAUSE_SIMULATION,
+
 	TOGGLE_CAMERA_TRACKING,
-	DEBUG_SPAWN_AGENTS,
-	UPDATE_TIMER,
 	VIEW_WIREFRAME_MODE,
+	VIEW_LIGHTING,
+	
+	DEBUG_SPAWN_AGENTS,
+	
+	UPDATE_TIMER,
 };
 
 
@@ -22,6 +29,7 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
 	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
+	EVT_MENU(VIEW_LIGHTING, SimulationWindow::OnMenuItem)
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
@@ -59,6 +67,7 @@ SimulationWindow::SimulationWindow() :
     menuBar->Append(menuView, wxT("&View"));
     menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Toggle Camera &Tracking\tT");
     menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
+    menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL")->Check(true);
 
 	// DEBUG
     wxMenu* menuDebug = new wxMenu;
@@ -71,13 +80,16 @@ SimulationWindow::SimulationWindow() :
     menuHelp->Append(wxID_ABOUT);
 
 	// Make a status bar
-    CreateStatusBar();
+    CreateStatusBar(3);
 	SetStatusText("Hello");
 
     SetClientSize(800, 600);
     Show();
 
-	m_updateTimer.Start(17);
+	//m_updateTimer.Start(17);
+	m_updateTimer.Start(8);
+	m_frameCounter = 0;
+	double lastFrameTimeStamp = Time::GetTime();
 
 	m_simulationManager.Initialize();
 }
@@ -116,6 +128,10 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		m_simulationManager.SetViewWireFrameMode(
 			!m_simulationManager.IsViewWireFrameMode());
 		break;
+	case VIEW_LIGHTING:
+		m_simulationManager.EnableLighting(
+			!m_simulationManager.IsLightingEnabled());
+		break;
 	case wxID_ABOUT:
 	{
 		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russel (2017)",
@@ -128,7 +144,25 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 {
 	m_simulationManager.Update();
+	
+	double timeStamp = Time::GetTime();
+	m_frameCounter++;
 
+	if (timeStamp > m_lastFrameTimeStamp + 1.0f)
+	{
+		m_lastFrameTimeStamp = timeStamp;
+		m_fps = m_frameCounter;
+		m_frameCounter = 0;
+	}
+
+	int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
+	std::stringstream ss;
+	ss << numAgents << " agents";
+	SetStatusText(ss.str(), 1);
+	ss.str("");
+	ss << (int) (m_fps + 0.5f) << " fps";
+	SetStatusText(ss.str(), 2);
+	
 	m_simulationPanel->Refresh(true);
 }
 
