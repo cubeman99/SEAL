@@ -44,6 +44,9 @@ private:
 
 	Mesh* m_agentMesh;
 	Mesh* m_meshSelectionCircle;
+	Material* m_worldMaterial;
+	Material* m_agentMaterial;
+	Material* m_materialSelectionCircle;
 };
 
 

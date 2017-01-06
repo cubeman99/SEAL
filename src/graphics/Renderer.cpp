@@ -116,13 +116,16 @@ namespace
 
 
 Renderer::Renderer() :
-	//m_modelMatrix(Matrix4f::IDENTITY),
-	//m_viewMatrix(Matrix4f::IDENTITY),
-	//m_projectionMatrix(Matrix4f::IDENTITY),
 	m_camera(nullptr),
 	m_activeShader(nullptr),
 	m_defaultShader(nullptr)
 {
+	m_lightDirection = Vector3f(-1, -1, -1);
+	m_lightColor = Color::GRAY;
+	m_ambientLight = Color::GRAY;
+	
+	m_lightColor = Color(255, 199, 0);
+	m_ambientLight = Color(33, 36, 63);
 }
 
 	
@@ -162,20 +165,21 @@ void Renderer::SetCamera(ICamera* camera)
 	m_camera = camera;
 }
 
-//void Renderer::SetColor(const Color& color)
-//{
-//	m_color = color.ToVector4f();
-//}
-//
-//void Renderer::SetColor(const Vector3f& color)
-//{
-//	m_color = Vector4f(color, 1.0f);
-//}
-//
-//void Renderer::SetColor(const Vector4f& color)
-//{
-//	m_color = color;
-//}
+void Renderer::SetLightColor(const Color& lightColor)
+{
+	m_lightColor = lightColor;
+}
+
+void Renderer::SetAmbientLight(const Vector4f& ambientLight)
+{
+	m_ambientLight = ambientLight;
+}
+
+void Renderer::SetLightDirection(const Vector3f& lightDir)
+{
+	m_lightDirection = lightDir;
+}
+
 
 void Renderer::UpdateUniforms()
 {
@@ -255,49 +259,41 @@ void Renderer::Clear()
 
 
 
-void Renderer::RenderMesh(Mesh* mesh, const Transform3f& transform)
+void Renderer::RenderMesh(Mesh* mesh, Material* material, const Transform3f& transform)
 {
-	RenderMesh(mesh, transform.GetMatrix());
+	RenderMesh(mesh, material, transform.GetMatrix());
 }
 
-void Renderer::RenderMesh(Mesh* mesh, const Matrix4f& modelMatrix)
+void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelMatrix)
 {
-
-
-	Vector3f m_lightDirection = Vector3f(-1, -1, -1);
-	Color m_lightColor = Color::GRAY;
-	Color m_ambientLight = Color::GRAY;
-	
-	m_lightColor = Color(255, 199, 0);
-	m_ambientLight = Color(33, 36, 63);
-
 	// Update uniforms.
 	if (m_activeShader != nullptr)
 	{
 		int uniformLocation = -1;
 		
+		// Material properties.
+		if (m_activeShader->GetUniformLocation("u_isLit", uniformLocation))
+			glUniform1i(uniformLocation, (int) material->IsLit());
+		if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
+			glUniform4fv(uniformLocation, 1, material->GetColor().ToVector4f().data());
+
+		// Lighting properties.
 		if (m_activeShader->GetUniformLocation("u_lightColor", uniformLocation))
 			glUniform3fv(uniformLocation, 1, m_lightColor.ToVector3f().data());
 		if (m_activeShader->GetUniformLocation("u_ambientLight", uniformLocation))
 			glUniform3fv(uniformLocation, 1, m_ambientLight.ToVector3f().data());
 		if (m_activeShader->GetUniformLocation("u_lightDir", uniformLocation))
 			glUniform3fv(uniformLocation, 1, m_lightDirection.data());
-		
-		// Color.
-		Vector4f m_color = Color::WHITE.ToVector4f();
-		if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
-			glUniform4fv(uniformLocation, 1, m_color.data());
 
-		// MVP matrix.
+		// Transform matrices.
 		Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
 		if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
 			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
-
-		// Model matrix.
 		if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
 			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
 	}
-
+	
+	// Send the draw call to the GPU.
 	glBindVertexArray(mesh->GetVertexData()->GetVertexBuffer()->m_glVertexArray);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->GetIndexData()->GetIndexBuffer()->m_glIndexBuffer);
 

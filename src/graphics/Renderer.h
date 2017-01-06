@@ -6,6 +6,7 @@
 #include <math/Vector3f.h>
 #include <math/Quaternion.h>
 #include <math/Transform3f.h>
+#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "ICamera.h"
@@ -35,23 +36,22 @@ public:
 	void SetDefaultShader(Shader* defaultShader);
 	void SetCamera(ICamera* camera);
 
-	//void SetColor(const Color& color);
-	//void SetColor(const Vector4f& color);
-	//void SetColor(const Vector3f& color);
+	void SetLightColor(const Color& lightColor);
+	void SetAmbientLight(const Vector4f& ambientLight);
+	void SetLightDirection(const Vector3f& lightDir);
 	void UpdateUniforms();
 
-	void RenderMesh(Mesh* mesh, const Transform3f& transform);
-	void RenderMesh(Mesh* mesh, const Matrix4f& modelMatrix);
+	void RenderMesh(Mesh* mesh, Material* material, const Transform3f& transform);
+	void RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelMatrix);
 
 private:
 	RenderParams	m_params;
 	Shader*			m_activeShader;
 	ICamera*		m_camera;
-
-	//Vector4f		m_color;
-	//Matrix4f		m_modelMatrix;
-	//Matrix4f		m_projectionMatrix;
-	//Matrix4f		m_viewMatrix;
+	
+	Vector3f		m_lightDirection;
+	Color			m_lightColor;
+	Color			m_ambientLight;
 
 	Shader*			m_defaultShader;
 };

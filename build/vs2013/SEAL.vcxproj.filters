@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\src\math\Transform3f.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\graphics\Material.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -265,6 +268,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\math\Transform3f.h">
       <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\Material.h">
+      <Filter>Source Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -146,10 +146,7 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 
 	// Compile and link the shader.
 	ShaderCompileError compileError;
-	if (!m_defaultShader->CompileAndLink(&compileError))
-	{
-		printf("ASDASD");
-	}
+	m_defaultShader->CompileAndLink(&compileError);
 	m_renderer.SetDefaultShader(m_defaultShader);
 
 	// Create agent mesh.
@@ -166,7 +163,7 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 		Vector3f n3 = Vector3f::BACK;
 		Vector3f n4 = Vector3f(-1.7f, 0, 0.7f).Normalize();
 
-		Vector4f color = Color::GREEN.ToVector4f();
+		Vector4f color = Color::WHITE.ToVector4f();
 		VertexPosNormCol vertices[] = {
 			VertexPosNormCol(v1, n1, color), // Top
 			VertexPosNormCol(v2, n1, color),
@@ -194,11 +191,14 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 		m_agentMesh = new Mesh();
 		m_agentMesh->GetVertexData()->BufferVertices(15, vertices);
 		m_agentMesh->GetIndexData()->BufferIndices(21, indices);
+
+		m_agentMaterial = new Material();
+		m_agentMaterial->SetColor(Color::GREEN);
 	}
 
 	// Create selection circle mesh.
 	{
-		Vector4f color = Color::GREEN.ToVector4f();
+		Vector4f color = Color::WHITE.ToVector4f();
 		std::vector<VertexPosNormCol> vertices;
 		std::vector<unsigned int> indices;
 
@@ -217,12 +217,26 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 		m_meshSelectionCircle->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
 		m_meshSelectionCircle->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
 		m_meshSelectionCircle->SetPrimitiveType(VertexPrimitiveType::LINE_LOOP);
+		
+		m_materialSelectionCircle = new Material();
+		m_materialSelectionCircle->SetColor(Color::GREEN);
+		m_materialSelectionCircle->SetIsLit(false);
 	}
+
+	m_worldMaterial = new Material();
+	m_worldMaterial->SetColor(Color::WHITE);
 }
 
 SimulationRenderPanel::~SimulationRenderPanel()
 {
 	delete m_shader;
+	
+	delete m_agentMesh;
+	delete m_meshSelectionCircle;
+
+	delete m_worldMaterial;
+	delete m_agentMaterial;
+	delete m_materialSelectionCircle;
 };
 
 SimulationManager* SimulationRenderPanel::GetSimulationManager()
@@ -403,7 +417,7 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	Transform3f worldTransform;
 	worldTransform.scale = Vector3f(worldRadius, worldRadius, worldRadius);
 	m_renderer.SetShader(m_shader);
-	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), worldTransform);
+	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, worldTransform);
 	
 	// Render the agents.
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
@@ -427,7 +441,7 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	
 		// Render the agent.
 		m_renderer.SetShader(m_shader);
-		m_renderer.RenderMesh(m_agentMesh, transform);
+		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
 
 		// Draw the selection circle.
 		if (selectedAgent == agent)
@@ -435,7 +449,7 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 			transform.scale *= 1.2f;
 			transform.pos.Normalize();
 			transform.pos *= worldRadius + 0.001f;
-			m_renderer.RenderMesh(m_meshSelectionCircle, transform);
+			m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
 		}
 	}
 	

@@ -10,12 +10,13 @@ out vec4 o_color;
 //uniform sampler2D s_texture;
 uniform vec4 u_color =  vec4(1,1,1,1);
 uniform vec3 u_ambientLight = vec3(0.5, 0.5, 0.5);
-
+uniform bool u_isLit;
 
 void main()
 {
 	//o_color = u_color;
 	o_color = v_color * u_color;
 	//o_color = texture2D(s_texture, v_texCoord) * u_color;
-	o_color.rgb *= v_lightColor + u_ambientLight;
+	if (u_isLit)
+		o_color.rgb *= v_lightColor + u_ambientLight;
 }
