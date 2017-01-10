@@ -23,6 +23,10 @@ public:
 	std::vector<Agent*>::iterator agents_end() { return m_agents.end(); }
 
 private:
+
+	void FlockAgent(Agent* agent);
+
+
 	std::vector<Agent*> m_agents;
 	Simulation* m_simulation;
 };

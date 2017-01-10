@@ -60,6 +60,8 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		agent->m_orientation.Rotate(agent->m_orientation.GetUp(),
 			agent->m_turnSpeed * timeDelta);
 
+		FlockAgent(agent);
+
 		// Move the agent forward linearly first.
 		Vector3f posPrev = agent->m_position;
 		agent->m_position += agent->m_orientation.GetForward() * agent->m_moveSpeed * timeDelta;
@@ -72,4 +74,109 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		float angle = Math::ACos(Vector3f::Normalize(agent->m_position).Dot(Vector3f::Normalize(posPrev)));
 		agent->m_orientation.Rotate(agent->m_orientation.GetRight(), angle);
 	}
+}
+
+void AgentSystem::FlockAgent(Agent* agent)
+{
+	Vector2f alignment = Vector2f::ZERO;
+	Vector2f cohesion = Vector2f::ZERO;
+	Vector2f separation = Vector2f::ZERO;
+	
+	Vector3f myDir = agent->GetOrientation().GetForward();
+	Vector3f myRight = agent->GetOrientation().GetRight();
+	Vector3f myForward = agent->GetOrientation().GetForward();
+	Vector3f myPos = agent->GetPosition();
+
+	int neighborCount = 0;
+	float cohesionAvgDist = 0.0f;
+
+	//float radius = m_simulation->GetWorld()->GetRadius() * 0.3f; 
+	//float radius = 0.016f * 3; 
+	float radius = 0.15f;
+	float maxRadius = 0.2f;
+	float minRadius = 0.1f;
+
+	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
+	{
+		Agent* other = *it;
+		if (agent != other)
+		{
+			Vector3f otherDir = other->GetOrientation().GetForward();
+			Vector3f otherPos = other->GetPosition();
+			
+			// Rotate the velocity into our space.
+			Vector2f vel(otherDir.Dot(myRight), otherDir.Dot(myForward));
+			Vector2f pos((otherPos - myPos).Dot(myRight), (otherPos - myPos).Dot(myForward));
+			float dist = pos.Length();
+
+			if (dist < maxRadius)// && dist > minRadius)
+			{
+
+				alignment += vel;
+				//if (dist > radius)
+					//cohesion += Vector2f::Normalize(pos) * (1 - Math::Cos((Math::TWO_PI * (dist - radius)) / (maxRadius - radius))) * 0.5f;
+				//else
+					//cohesion -= Vector2f::Normalize(pos) * ((radius - dist) / (radius - minRadius)) * 2;
+					//cohesion -= Vector2f::Normalize(pos) * (1 - Math::Cos((Math::TWO_PI * (radius - dist)) / (radius))) * 0.5f;
+				//cohesion += Vector2f::Normalize(pos) * ((dist - radius) / (maxRadius - radius));
+				cohesion += Vector2f::Normalize(pos) * (dist - radius) / (radius);
+				separation += Vector2f::Normalize(pos) / dist;
+				//cohesionAvgDist += (pos.Length() / 0.3f);
+
+				neighborCount++;
+			}
+		}
+	}
+
+	if (neighborCount == 0)
+		return;
+	float invNeighborCount = 1.0f / (float) neighborCount;
+
+
+
+	cohesionAvgDist *= invNeighborCount;
+
+	alignment *= invNeighborCount;
+	alignment.Normalize();
+	//cohesion *= invNeighborCount;
+	//cohesion *= 0.1f;
+	cohesion.Normalize();
+	separation *= -invNeighborCount;
+	separation.Normalize();
+
+	separation = Vector2f(
+		Random::NextFloatClamped() * 0.1f,
+		Random::NextFloatClamped() * 0.1f);
+	separation.Normalize();
+
+	float alignmentWeight = 1.0f;
+	float cohesionWeight = 1.0f;// / cohesionAvgDist;
+	float separationWeight = 0.0f;// * cohesionAvgDist;
+	separationWeight += neighborCount / 40.0f;
+	float weightSum = alignmentWeight + cohesionWeight + separationWeight;
+
+	Vector2f velocity = (alignment * alignmentWeight) +
+		(cohesion * cohesionWeight) +
+		(separation * separationWeight);
+	velocity /= weightSum;
+	velocity.Normalize();
+
+	/*velocity += Vector2f(
+		Random::NextFloatClamped() * 0.1f,
+		Random::NextFloatClamped() * 0.1f);
+	velocity.Normalize();*/
+
+	//Vector3f axis = Vector3f(0.0f, 1.0f, 0.0f).Cross(Vector3f(velocity.x, velocity.y, 0.0f));
+	float angle = Math::ACos(velocity.Dot(Vector2f(0.0f, 1.0f)));
+	if (velocity.x < 0)
+		angle *= -1.0f;
+	angle *= 0.1f;
+	Quaternion orientation = agent->GetOrientation();
+	orientation.Rotate(orientation.GetUp(), angle);
+
+	agent->m_orientation = orientation;
+
+	//agent->m_orientation = Quaternion::Lerp(agent->m_orientation, orientation, 0.5f, true);
+	agent->m_turnSpeed = 0.0f;
+	agent->m_moveSpeed = 0.2f;// / (1 + Math::Abs(angle) * 2);
 }

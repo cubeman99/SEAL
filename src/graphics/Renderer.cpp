@@ -274,7 +274,6 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelM
 	if (m_activeShader != nullptr)
 	{
 		int uniformLocation = -1;
-		m_isShaderChanged = false;
 		
 		// Material properties.
 		if (material != m_material || m_isShaderChanged)
@@ -303,6 +302,8 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelM
 			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
 		if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
 			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
+		
+		m_isShaderChanged = false;
 	}
 
 	// Bind the mesh.
