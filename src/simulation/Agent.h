@@ -5,6 +5,9 @@
 #include <math/Vector3f.h>
 
 
+//-----------------------------------------------------------------------------
+// Agent - A single being of the simulation with its own body and brain.
+//-----------------------------------------------------------------------------
 class Agent
 {
 	friend class AgentSystem;

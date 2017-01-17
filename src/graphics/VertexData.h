@@ -176,6 +176,11 @@ struct VertexPosNorm
 {
 	Vector3f	position;
 	Vector3f	normal;
+
+	VertexPosNorm(const Vector3f& position, const Vector3f& normal) :
+		position(position),
+		normal(normal)
+	{}
 	
 	DECLARE_VERTEX_TYPE(VertexType::POSITION | VertexType::NORMAL);
 };

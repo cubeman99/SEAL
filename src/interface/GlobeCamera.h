@@ -4,6 +4,10 @@
 #include <graphics/ICamera.h>
 
 
+//-----------------------------------------------------------------------------
+// GlobeCamera - Camera used to view a 3D globe with a control style similar
+//               to Google Earth.
+//-----------------------------------------------------------------------------
 class GlobeCamera : public ICamera
 {
 public:

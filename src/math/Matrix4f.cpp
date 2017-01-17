@@ -64,15 +64,6 @@ Matrix4f::Matrix4f(const Vector3f& vForward, const Vector3f& vLeft, const Vector
 		0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-// Create a 4x4 matrix from a 3x3 matrix.
-//Matrix4f::Matrix4f(const Matrix3f& m3x3)
-//{
-//	m[0][0] = m3x3.m[0][0];	m[0][1] = m3x3.m[0][1];	m[0][2] = m3x3.m[0][2]; m[0][3] = 0.0f;
-//	m[1][0] = m3x3.m[1][0];	m[1][1] = m3x3.m[1][1];	m[1][2] = m3x3.m[1][2]; m[1][3] = 0.0f;
-//	m[2][0] = m3x3.m[2][0];	m[2][1] = m3x3.m[2][1];	m[2][2] = m3x3.m[2][2]; m[2][3] = 0.0f;
-//	m[3][0] = 0.0f;			m[3][1] = 0.0f;			m[3][2] = 0.0f;			m[3][3] = 1.0f;
-//}
-
 
 
 //-----------------------------------------------------------------------------
@@ -198,21 +189,6 @@ Quaternion Matrix4f::GetRotation() const
 	out.Normalize();
 	return out;
 }
-
-// Return the upper-left 3x3 submatrix.
-//Matrix3f Matrix4f::Get3x3() const
-//{
-//	return Matrix3f(m[0][0], m[0][1], m[0][2],
-//					m[1][0], m[1][1], m[1][2],
-//					m[2][0], m[2][1], m[2][2]);
-//}
-
-//void Matrix4f::Set3x3(const Matrix3f& m3x3)
-//{
-//	m[0][0] = m3x3[0][0]; m[0][1] = m3x3[0][1]; m[0][2] = m3x3[0][2];
-//	m[1][0] = m3x3[1][0]; m[1][1] = m3x3[1][1]; m[1][2] = m3x3[1][2];
-//	m[2][0] = m3x3[2][0]; m[2][1] = m3x3[2][1]; m[2][2] = m3x3[2][2];
-//}
 
 
 

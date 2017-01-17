@@ -7,6 +7,10 @@
 #include <graphics/Mesh.h>
 
 
+//-----------------------------------------------------------------------------
+// World - The spherical planet where on the surface of which the simulation 
+//         components are situated.
+//-----------------------------------------------------------------------------
 class World
 {
 public:
@@ -14,18 +18,14 @@ public:
 	~World();
 
 	inline float GetRadius() { return m_radius; }
-	inline std::vector<Vector3f>& GetVertices() { return m_vertices; }
 	inline Mesh* GetMesh() { return m_mesh; }
 
 	bool CastRay(const Ray& ray, float& distance) const;
 
+
 private:
 	float m_radius;
-	
-
 	Mesh* m_mesh;
-
-	std::vector<Vector3f> m_vertices;
 };
 
 

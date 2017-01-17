@@ -5,7 +5,6 @@
 struct Vector3f;
 struct Vector4f;
 struct Quaternion;
-//struct Matrix3f;
 
 
 // A 4x4 floating-point matrix.
@@ -27,7 +26,6 @@ struct Matrix4f
 				float m30, float m31, float m32, float m33);
 	Matrix4f(const Vector3f& vForward, const Vector3f& vLeft, const Vector3f& vUp);
 	Matrix4f(const Vector3f& vForward, const Vector3f& vLeft, const Vector3f& vUp, const Vector3f& vTranslation);
-	//Matrix4f(const Matrix3f& m3x3);
 
 	// Component accessors.
 	float*			operator [](int row);
@@ -54,8 +52,6 @@ struct Matrix4f
 	void			SetTranslationColumn(const Vector3f& translation);
 	
 	// Affine 3x3 matrix.
-	//Matrix3f		Get3x3() const;
-	//void			Set3x3(const Matrix3f& m3x3);
 	Quaternion		GetRotation() const;
 	
 	// Mutators.

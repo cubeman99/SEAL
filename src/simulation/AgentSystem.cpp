@@ -60,7 +60,7 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		agent->m_orientation.Rotate(agent->m_orientation.GetUp(),
 			agent->m_turnSpeed * timeDelta);
 
-		FlockAgent(agent);
+		//FlockAgent(agent);
 
 		// Move the agent forward linearly first.
 		Vector3f posPrev = agent->m_position;

@@ -78,6 +78,11 @@ struct Vector2f
 Vector2f		operator *(float scalar, const Vector2f& v);
 Vector2f		operator /(float numerator, const Vector2f& v);
 std::ostream&	operator <<(std::ostream &out, const Vector2f& v);
-	
+
+
+typedef Vector2f Vector2;
+typedef Vector2f Vec2;
+typedef Vector2f Vec2f;
+
 
 #endif // _VECTOR_2F_H_

@@ -7,13 +7,16 @@
 #include <interface/SimulationManager.h>
 
 
-// Define a new frame type
+//-----------------------------------------------------------------------------
+// SimulationWindow - The main program window (there can be more than one).
+//-----------------------------------------------------------------------------
 class SimulationWindow : public wxFrame
 {
 public:
     SimulationWindow();
 
 	inline SimulationManager* GetSimulationManager() { return &m_simulationManager; }
+
 
 private:
     wxDECLARE_EVENT_TABLE();

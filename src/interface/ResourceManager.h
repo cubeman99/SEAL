@@ -8,6 +8,10 @@
 #include <map>
 
 
+//-----------------------------------------------------------------------------
+// ResourceManager - Handles resource loading, access, and memory management.
+//                   Resources are mapped by a name string.
+//-----------------------------------------------------------------------------
 class ResourceManager
 {
 public:
@@ -22,6 +26,7 @@ public:
 	Texture* LoadTexture(const std::string& name, const std::string& path);
 	Shader* LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
 
+	// Resource management
 	void AddTexture(const std::string& name, Texture* texture);
 	void AddMesh(const std::string& name, Mesh* mesh);
 	void AddMaterial(const std::string& name, Material* material);
@@ -33,8 +38,8 @@ public:
 	Material* GetMaterial(const std::string& name);
 	Shader* GetShader(const std::string& name);
 
-private:
 
+private:
 	typedef std::map<std::string, Texture*> TextureMap;
 	typedef std::map<std::string, Mesh*> MeshMap;
 	typedef std::map<std::string, Material*> MaterialMap;

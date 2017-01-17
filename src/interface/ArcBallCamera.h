@@ -4,6 +4,9 @@
 #include <graphics/ICamera.h>
 
 
+//-----------------------------------------------------------------------------
+// ArcBallCamera - Camera which can rotate around a point (3rd person camera).
+//-----------------------------------------------------------------------------
 class ArcBallCamera : public ICamera
 {
 public:

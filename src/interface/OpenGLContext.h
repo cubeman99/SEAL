@@ -6,11 +6,9 @@
 #include <wx/glcanvas.h>
 
 
-void CheckGLError();
-wxString glGetwxString(GLenum name);
-
-
-// the rendering context used by all GL canvases
+//-----------------------------------------------------------------------------
+// OpenGLContext - The rendering context used by all GL canvases
+//-----------------------------------------------------------------------------
 class OpenGLContext : public wxGLContext
 {
 public:

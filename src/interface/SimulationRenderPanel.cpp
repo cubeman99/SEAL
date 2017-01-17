@@ -9,7 +9,7 @@
 
 
 // ----------------------------------------------------------------------------
-// SimulationRenderPanel
+// Event Table
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(SimulationRenderPanel, wxGLCanvas)
@@ -23,6 +23,11 @@ wxBEGIN_EVENT_TABLE(SimulationRenderPanel, wxGLCanvas)
 	EVT_SIZE(SimulationRenderPanel::OnSize)
 wxEND_EVENT_TABLE()
 
+
+//-----------------------------------------------------------------------------
+// Constructor & destructor
+//-----------------------------------------------------------------------------
+
 SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
     // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
     // flag should always be set, because even making the canvas smaller should
@@ -30,24 +35,26 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
     // viewport settings.
     : wxGLCanvas(parent, wxID_ANY, attribList,
                  wxDefaultPosition, wxDefaultSize,
-                 wxFULL_REPAINT_ON_RESIZE),
-	m_shader(nullptr)
+                 wxFULL_REPAINT_ON_RESIZE)
 {
 	m_simulationWindow = (SimulationWindow*) parent;
 
 	// Force the OpenGL context to be created now.
 	wxGetApp().GetGLContext(this);
 
-	// Load resources.
-	m_shader = m_resourceManager.LoadShader("generic",
-		"../../assets/shaders/generic_vs.glsl",
-		"../../assets/shaders/generic_fs.glsl");
+	// Load shaders.
+	m_shaderLit = m_resourceManager.LoadShader("lit",
+		"../../assets/shaders/lit_colored_vs.glsl",
+		"../../assets/shaders/lit_colored_fs.glsl");
+	m_shaderLitVertexColored = m_resourceManager.LoadShader("lit_vertex_colored",
+		"../../assets/shaders/lit_vertex_colored_vs.glsl",
+		"../../assets/shaders/lit_vertex_colored_fs.glsl");
+	m_shaderUnlit = m_resourceManager.LoadShader("unlit",
+		"../../assets/shaders/unlit_colored_vs.glsl",
+		"../../assets/shaders/unlit_colored_fs.glsl");
 	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
 		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
 		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
-	m_shaderUnlitColored = m_resourceManager.LoadShader("unlit_colored",
-		"../../assets/shaders/unlit_colored_vs.glsl",
-		"../../assets/shaders/unlit_colored_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
@@ -71,37 +78,38 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
+	// TODO: Move this resource creation code somewhere else.
+
 	// Create agent mesh.
 	{
 		float h = 0.3f;
-		Vector3f v1(0, h, -1);
-		Vector3f v2(0.7f, h, 0.7f);
-		Vector3f v3(-0.7f, h, 0.7f);
-		Vector3f v4(0, 0, -1);
-		Vector3f v5(0.7f, 0, 0.7f);
-		Vector3f v6(-0.7f, 0, 0.7f);
-		Vector3f n1 = Vector3f::UP;
-		Vector3f n2 = Vector3f(1.7f, 0, 0.7f).Normalize();
-		Vector3f n3 = Vector3f::BACK;
-		Vector3f n4 = Vector3f(-1.7f, 0, 0.7f).Normalize();
+		Vector3f v1(0, h, -1);			// top front
+		Vector3f v2(0.7f, h, 0.7f);		// top back right
+		Vector3f v3(-0.7f, h, 0.7f);	// top back left
+		Vector3f v4(0, 0, -1);			// bottom front
+		Vector3f v5(0.7f, 0, 0.7f);		// bottom back right
+		Vector3f v6(-0.7f, 0, 0.7f);	// bottom back left
+		Vector3f n1 = Vector3f::UP;							// top
+		Vector3f n2 = Vector3f(1.7f, 0, 0.7f).Normalize();	// right
+		Vector3f n3 = Vector3f::BACK;						// back
+		Vector3f n4 = Vector3f(-1.7f, 0, 0.7f).Normalize(); // left
 
-		Vector4f color = Color::WHITE.ToVector4f();
-		VertexPosNormCol vertices[] = {
-			VertexPosNormCol(v1, n1, color), // Top
-			VertexPosNormCol(v2, n1, color),
-			VertexPosNormCol(v3, n1, color),
-			VertexPosNormCol(v2, n2, color), // Right
-			VertexPosNormCol(v1, n2, color),
-			VertexPosNormCol(v4, n2, color),
-			VertexPosNormCol(v5, n2, color),
-			VertexPosNormCol(v3, n3, color), // Back
-			VertexPosNormCol(v2, n3, color),
-			VertexPosNormCol(v5, n3, color),
-			VertexPosNormCol(v6, n3, color),
-			VertexPosNormCol(v1, n4, color), // Left
-			VertexPosNormCol(v3, n4, color),
-			VertexPosNormCol(v6, n4, color),
-			VertexPosNormCol(v4, n4, color),
+		VertexPosNorm vertices[] = {
+			VertexPosNorm(v1, n1), // Top
+			VertexPosNorm(v2, n1),
+			VertexPosNorm(v3, n1),
+			VertexPosNorm(v2, n2), // Right
+			VertexPosNorm(v1, n2),
+			VertexPosNorm(v4, n2),
+			VertexPosNorm(v5, n2),
+			VertexPosNorm(v3, n3), // Back
+			VertexPosNorm(v2, n3),
+			VertexPosNorm(v5, n3),
+			VertexPosNorm(v6, n3),
+			VertexPosNorm(v1, n4), // Left
+			VertexPosNorm(v3, n4),
+			VertexPosNorm(v6, n4),
+			VertexPosNorm(v4, n4),
 		};
 		unsigned int indices[] = {
 			0, 1, 2,
@@ -177,15 +185,13 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 
 SimulationRenderPanel::~SimulationRenderPanel()
 {
-//	delete m_shader;
-//	
-//	delete m_agentMesh;
-//	delete m_meshSelectionCircle;
-//
-//	delete m_worldMaterial;
-//	delete m_agentMaterial;
-//	delete m_materialSelectionCircle;
-};
+	// The resource manager will automatically delete our resources.
+}
+
+
+//-----------------------------------------------------------------------------
+// Getters
+//-----------------------------------------------------------------------------
 
 SimulationManager* SimulationRenderPanel::GetSimulationManager()
 {
@@ -197,6 +203,10 @@ Simulation* SimulationRenderPanel::GetSimulation()
 	return m_simulationWindow->GetSimulationManager()->GetSimulation();
 }
 
+
+//-----------------------------------------------------------------------------
+// UI Events
+//-----------------------------------------------------------------------------
 
 void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
 {
@@ -220,6 +230,7 @@ void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
 
 void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 {
+	// Left Mouse Button: Select agents.
 	if (e.LeftDown())
 	{
 		// Convert the screen coordinate to OpenGL clip space,
@@ -235,9 +246,10 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 		float distance;
 		if (GetSimulation()->GetWorld()->CastRay(ray, distance))
 		{
+			// Get the 3D point on the surface that was clicked.
 			Vector3f point = ray.GetPoint(distance);
 			
-			// Check for selecting agents.
+			// Find agents near that point on the surface.
 			AgentSystem* agentSystem = GetSimulation()->GetAgentSystem();
 			GetSimulationManager()->SetSelectedAgent(nullptr);
 			for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
@@ -254,7 +266,7 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 	}
 	else if (e.RightDown())
 	{
-
+		// (right mouse button is for camera controls)
 	}
 }
 
@@ -279,6 +291,7 @@ void SimulationRenderPanel::OnMouseMotion(wxMouseEvent& e)
 
 		ICamera* camera = GetSimulationManager()->GetActiveCamera();
 
+		// Perform different type of rotation whether the Ctrl key is down.
 		if (e.GetModifiers() & wxMOD_CONTROL)
 			camera->AltRotate(deltaX, deltaY);
 		else
@@ -290,16 +303,16 @@ void SimulationRenderPanel::OnMouseWheel(wxMouseEvent& e)
 {
 	float mouseDelta = (float) e.GetWheelRotation() / 120.0f;
 
-	// Adjust camera distance from surface.
+	// Mouse Wheel: Adjust camera distance from surface (zoom in/out).
 	ICamera* camera = GetSimulationManager()->GetActiveCamera();
 	camera->Zoom(mouseDelta);
 }
 
 void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 {
+	// On resize window: update camera aspect ratio.
 	const wxSize clientSize = GetClientSize();
 	float aspectRatio = (float) clientSize.x / (float) clientSize.y;
-
 	GetSimulationManager()->GetCameraSystem()->SetAspectRatio(aspectRatio);
 }
 
@@ -309,8 +322,8 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	SimulationManager* simulationManager = GetSimulationManager();
 	ICamera* camera = GetSimulationManager()->GetCameraSystem()->GetActiveCamera();
 	Agent* selectedAgent = GetSimulationManager()->GetSelectedAgent();
-
 	float worldRadius = simulation->GetWorld()->GetRadius();
+	Transform3f transform;
 
     // This is required even though dc is not used otherwise.
     wxPaintDC dc(this);
@@ -319,6 +332,7 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
     OpenGLContext& canvas = wxGetApp().GetGLContext(this);
     glViewport(0, 0, clientSize.x, clientSize.y);
 	
+	// Apply render parameters.
 	RenderParams renderParams;
 	renderParams.EnableDepthTest(true);
 	renderParams.EnableDepthBufferWrite(true);
@@ -342,7 +356,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	m_renderer.SetRenderParams(renderParams);
 	m_renderer.ApplyRenderSettings(true);
 	m_renderer.SetCamera(camera);
-	m_renderer.SetShader(m_shader);
 
 	if (!simulationManager->IsLightingEnabled())
 	{
@@ -351,17 +364,16 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	}
 
 	// Render the world.
-	Transform3f transform;
 	transform.SetIdentity();
 	transform.SetScale(worldRadius);
-	m_renderer.SetShader(m_shader);
+	m_renderer.SetShader(m_shaderLitVertexColored);
 	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
 	// Render the agents.
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
-	float agentRadius = 0.016f;
+	float agentRadius = 0.016f; // TODO: magic number agent radius.
 	float agentOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
-		m_renderer.SetShader(m_shader);
+		m_renderer.SetShader(m_shaderLit);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;
@@ -371,7 +383,6 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		transform.rot = agent->GetOrientation();
 		transform.SetScale(agentRadius);
 		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
-
 	}
 	
 	// Draw the selection circle.
@@ -381,7 +392,7 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 		transform.pos *= worldRadius + 0.001f;
 		transform.rot = selectedAgent->GetOrientation();
 		transform.SetScale(agentRadius * 1.2f);
-		m_renderer.SetShader(m_shaderUnlitColored);
+		m_renderer.SetShader(m_shaderUnlit);
 		m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
 	}
 	

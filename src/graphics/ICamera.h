@@ -6,6 +6,7 @@
 #include <math/Quaternion.h>
 
 
+// Interface for cameras.
 class ICamera
 {
 public:

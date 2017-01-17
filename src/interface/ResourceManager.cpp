@@ -2,6 +2,11 @@
 #include <wx/wx.h>
 
 
+//-----------------------------------------------------------------------------
+// Internal functions for generic resource management
+//-----------------------------------------------------------------------------
+
+// Retreive a resource from a resource map (or NULL if it doesn't exist).
 template <class T>
 static T* GetResource(std::map<std::string, T*>& map, const std::string& name)
 {
@@ -11,6 +16,7 @@ static T* GetResource(std::map<std::string, T*>& map, const std::string& name)
 	return nullptr;
 }
 
+// Add a resource to a resource map.
 template <class T>
 static void AddResource(std::map<std::string, T*>& map, const std::string& name, T* resource)
 {
@@ -18,6 +24,7 @@ static void AddResource(std::map<std::string, T*>& map, const std::string& name,
 	map[name] = resource;
 }
 
+// Delete a resource from a resource map.
 template <class T>
 static void FreeResources(std::map<std::string, T*>& map)
 {
@@ -26,25 +33,25 @@ static void FreeResources(std::map<std::string, T*>& map)
 	map.clear();
 }
 
+// Read the entirety of a text file into a string.
 static bool OpenAndGetContents(const std::string& fileName, std::string& out)
 {
+	// Open the file.
 	FILE* m_file = fopen(fileName.c_str(), "r");
-
 	if (m_file == nullptr)
 		return false;
 
+	// Determine the file size.
 	if (fseek(m_file, 0, SEEK_END) != 0)
 		return false;
-
 	long fileSize = ftell(m_file);
 	if (fileSize < 0)
 		return false;
-
 	rewind(m_file);
 
+	// Read the entire file into a character buffer.
 	const size_t fileSizeInclNull = fileSize + 1;
 	char* buffer = new char[fileSizeInclNull];
-
 	size_t result = fread(buffer, 1, fileSizeInclNull, m_file);
 	if (result == 0)
 	{
@@ -52,6 +59,7 @@ static bool OpenAndGetContents(const std::string& fileName, std::string& out)
 		return false;
 	}
 
+	// Finalize the buffer as the output string.
 	buffer[result] = '\0';
 	out.assign(buffer, buffer + result);
 
@@ -60,6 +68,9 @@ static bool OpenAndGetContents(const std::string& fileName, std::string& out)
 }
 
 
+//-----------------------------------------------------------------------------
+// Constructor & destructor
+//-----------------------------------------------------------------------------
 
 ResourceManager::ResourceManager()
 {
@@ -74,11 +85,20 @@ ResourceManager::~ResourceManager()
 	FreeResources(m_shaders);
 }
 
+
+//-----------------------------------------------------------------------------
+// Resource loading
+//-----------------------------------------------------------------------------
+
 Texture* ResourceManager::LoadTexture(const std::string& name, const std::string& path)
 {
-	// TODO:
-	assert(false);
-	return nullptr;
+	Texture* texture = Texture::LoadTexture(path);
+	
+	if (texture == nullptr)
+		return nullptr;
+
+	AddTexture(name, texture);
+	return texture;
 }
 
 Shader* ResourceManager::LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath)
@@ -86,6 +106,7 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	std::string vertexSource;
 	std::string fragmentSource;
 	
+	// Load the text file contents for the VS and FS.
 	if (!OpenAndGetContents(m_assetsPath + vertexPath, vertexSource))
 	{
 		wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
@@ -96,10 +117,9 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 		wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
 		return false;
 	}
-
-	Shader* shader = new Shader();
 	
-	// Add the two stages.
+	// Create the shader and add the fragment and vertex stages.
+	Shader* shader = new Shader();
 	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, vertexPath);
 	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, fragmentPath);
 
@@ -115,6 +135,11 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	AddShader(name, shader);
 	return shader;
 }
+
+
+//-----------------------------------------------------------------------------
+// Resource management
+//-----------------------------------------------------------------------------
 
 void ResourceManager::AddTexture(const std::string& name, Texture* texture)
 {
@@ -137,6 +162,10 @@ void ResourceManager::AddShader(const std::string& name, Shader* shader)
 }
 
 
+//-----------------------------------------------------------------------------
+// Resource loading
+//-----------------------------------------------------------------------------
+
 Texture* ResourceManager::GetTexture(const std::string& name)
 {
 	return GetResource(m_textures, name);
@@ -156,3 +185,4 @@ Shader* ResourceManager::GetShader(const std::string& name)
 {
 	return GetResource(m_shaders, name);
 }
+

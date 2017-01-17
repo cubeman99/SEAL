@@ -2,11 +2,12 @@
 #include "MainApplication.h"
 #include <graphics/Graphics.h>
 
-// ----------------------------------------------------------------------------
-// helper functions
-// ----------------------------------------------------------------------------
 
-void CheckGLError()
+//-----------------------------------------------------------------------------
+// Internal OpenGL helper functions
+//-----------------------------------------------------------------------------
+
+static void CheckGLError()
 {
     GLenum errLast = GL_NO_ERROR;
 
@@ -31,7 +32,7 @@ void CheckGLError()
     }
 }
 
-wxString glGetwxString(GLenum name)
+static wxString glGetwxString(GLenum name)
 {
     const GLubyte* v = glGetString(name);
     if (v == NULL)
@@ -47,9 +48,9 @@ wxString glGetwxString(GLenum name)
 }
 
 
-// ----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // OpenGLContext
-// ----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
              : wxGLContext(canvas)
@@ -72,7 +73,9 @@ OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
     //glLoadIdentity();
     //glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
 	
+	// Initialize GLEW.
 	glewInit();
 
     CheckGLError();
 }
+

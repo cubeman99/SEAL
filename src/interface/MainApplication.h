@@ -6,7 +6,9 @@
 #include "OpenGLContext.h"
 
 
-// Define a new application type
+//-----------------------------------------------------------------------------
+// MainApplication - The shared application class among all simulation windows.
+//-----------------------------------------------------------------------------
 class MainApplication : public wxApp
 {
 public:
@@ -19,6 +21,7 @@ public:
     // virtual wxApp methods
     virtual bool OnInit();
     virtual int OnExit();
+
 
 private:
     OpenGLContext *m_glContext;
