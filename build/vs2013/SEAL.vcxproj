@@ -36,10 +36,12 @@
     <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
+    <ClCompile Include="..\..\src\math\AABB.cpp" />
     <ClCompile Include="..\..\src\math\MathLib.cpp" />
     <ClCompile Include="..\..\src\math\Matrix4f.cpp" />
     <ClCompile Include="..\..\src\math\Quaternion.cpp" />
     <ClCompile Include="..\..\src\math\Ray.cpp" />
+    <ClCompile Include="..\..\src\math\Sphere.cpp" />
     <ClCompile Include="..\..\src\math\Transform3f.cpp" />
     <ClCompile Include="..\..\src\math\Vector2f.cpp" />
     <ClCompile Include="..\..\src\math\Vector3f.cpp" />
@@ -48,6 +50,7 @@
     <ClCompile Include="..\..\src\simulation\AgentSystem.cpp" />
     <ClCompile Include="..\..\src\simulation\OctTree.cpp" />
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
+    <ClCompile Include="..\..\src\simulation\SimulationObject.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
     <ClCompile Include="..\..\src\utilities\Timing.cpp" />
@@ -79,10 +82,12 @@
     <ClInclude Include="..\..\src\interface\SimulationManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
+    <ClInclude Include="..\..\src\math\AABB.h" />
     <ClInclude Include="..\..\src\math\MathLib.h" />
     <ClInclude Include="..\..\src\math\Matrix4f.h" />
     <ClInclude Include="..\..\src\math\Quaternion.h" />
     <ClInclude Include="..\..\src\math\Ray.h" />
+    <ClInclude Include="..\..\src\math\Sphere.h" />
     <ClInclude Include="..\..\src\math\Transform3f.h" />
     <ClInclude Include="..\..\src\math\Vector2f.h" />
     <ClInclude Include="..\..\src\math\Vector3f.h" />
@@ -91,6 +96,7 @@
     <ClInclude Include="..\..\src\simulation\AgentSystem.h" />
     <ClInclude Include="..\..\src\simulation\OctTree.h" />
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
+    <ClInclude Include="..\..\src\simulation\SimulationObject.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
     <ClInclude Include="..\..\src\utilities\Random.h" />
     <ClInclude Include="..\..\src\utilities\Timing.h" />

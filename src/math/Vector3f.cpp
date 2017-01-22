@@ -48,6 +48,12 @@ Vector3f::Vector3f(const Vector2f& vVec2, float z) :
 {
 }
 
+// Construct a vector with all components equal to the given value.
+Vector3f::Vector3f(float value) :
+	x(value), y(value), z(value)
+{
+}
+
 //Vector3f::Vector3f(const Point3i& p) :
 //	x((float) p.x), y((float) p.y), z((float) p.z)
 //{

@@ -183,23 +183,6 @@ void Renderer::SetLightDirection(const Vector3f& lightDir)
 }
 
 
-void Renderer::UpdateUniforms()
-{
-	if (m_activeShader != nullptr)
-	{
-		int uniformLocation = -1;
-		
-		// Color.
-		//if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
-		//	glUniform4fv(uniformLocation, 1, m_color.data());
-
-		// MVP matrix.
-		//Matrix4f mvp = GetMVP();
-		//if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
-		//	glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
-	}
-}
-
 void Renderer::ApplyRenderSettings(bool clear)
 {
 	// Depth.
@@ -260,6 +243,43 @@ void Renderer::Clear()
 //}
 
 
+void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
+{
+	if (m_activeShader == nullptr)
+		return;
+
+	int uniformLocation = -1;
+		
+	// Material properties.
+	if (material != m_material || m_isShaderChanged)
+	{
+		m_material = material;
+		if (m_activeShader->GetUniformLocation("u_isLit", uniformLocation))
+			glUniform1i(uniformLocation, (int) material->IsLit());
+		if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
+			glUniform4fv(uniformLocation, 1, material->GetColor().ToVector4f().data());
+	}
+
+	// Lighting properties.
+	if (m_isShaderChanged)
+	{
+		if (m_activeShader->GetUniformLocation("u_lightColor", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_lightColor.ToVector3f().data());
+		if (m_activeShader->GetUniformLocation("u_ambientLight", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_ambientLight.ToVector3f().data());
+		if (m_activeShader->GetUniformLocation("u_lightDir", uniformLocation))
+			glUniform3fv(uniformLocation, 1, m_lightDirection.data());
+	}
+
+	// Transform matrices.
+	Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
+	if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
+		glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
+	if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
+		glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
+		
+	m_isShaderChanged = false;
+}
 
 void Renderer::RenderMesh(Mesh* mesh, Material* material, const Transform3f& transform)
 {
@@ -270,41 +290,7 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelM
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Update uniforms.
-	if (m_activeShader != nullptr)
-	{
-		int uniformLocation = -1;
-		
-		// Material properties.
-		if (material != m_material || m_isShaderChanged)
-		{
-			m_material = material;
-			if (m_activeShader->GetUniformLocation("u_isLit", uniformLocation))
-				glUniform1i(uniformLocation, (int) material->IsLit());
-			if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
-				glUniform4fv(uniformLocation, 1, material->GetColor().ToVector4f().data());
-		}
-
-		// Lighting properties.
-		if (m_isShaderChanged)
-		{
-			if (m_activeShader->GetUniformLocation("u_lightColor", uniformLocation))
-				glUniform3fv(uniformLocation, 1, m_lightColor.ToVector3f().data());
-			if (m_activeShader->GetUniformLocation("u_ambientLight", uniformLocation))
-				glUniform3fv(uniformLocation, 1, m_ambientLight.ToVector3f().data());
-			if (m_activeShader->GetUniformLocation("u_lightDir", uniformLocation))
-				glUniform3fv(uniformLocation, 1, m_lightDirection.data());
-		}
-
-		// Transform matrices.
-		Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
-		if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
-			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
-		if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
-			glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
-		
-		m_isShaderChanged = false;
-	}
+	UpdateUniforms(material, modelMatrix);
 
 	// Bind the mesh.
 	if (m_mesh != mesh)

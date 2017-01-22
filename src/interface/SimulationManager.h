@@ -23,9 +23,11 @@ public:
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
-	void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
+	inline void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
+	inline void EnableLighting(bool enableLighting) { m_viewLighting = enableLighting; }
 	inline bool IsLightingEnabled() const { return m_viewLighting; }
-	void EnableLighting(bool enableLighting) { m_viewLighting = enableLighting; }
+	inline void SetShowOctTree(bool showOctTree) { m_showOctTree = showOctTree; }
+	inline bool GetShowOctTree() const { return m_showOctTree; }
 
 	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
@@ -43,6 +45,7 @@ private:
 	Agent* m_selectedAgent;
 	bool m_viewWireFrameMode;
 	bool m_viewLighting;
+	bool m_showOctTree;
 };
 
 

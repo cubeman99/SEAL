@@ -43,8 +43,9 @@ struct Vector3f
 
 	// Constructors.
 	Vector3f();
-	Vector3f(float x, float y, float z);
-	Vector3f(const Vector2f& vVec2, float z);
+	explicit Vector3f(float x, float y, float z);
+	explicit Vector3f(const Vector2f& vec2, float z);
+	explicit Vector3f(float value);
 	//Vector3f(const Point3i& p);
 
 	// Accessors.

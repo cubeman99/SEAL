@@ -316,16 +316,8 @@ void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 	GetSimulationManager()->GetCameraSystem()->SetAspectRatio(aspectRatio);
 }
 
-struct AABB
+void RenderOctreeNode(OctTree* octTree, OctTreeNode* node, const AABB& bounds, int depth)
 {
-	Vector3f mins;
-	Vector3f maxs;
-};
-
-void RenderOctreeNode(const AABB& bounds, int depth, int maxDepth)
-{
-	glLineWidth(1 + (maxDepth - depth));
-	glColor3f(1,1,0);
 	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
 	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
 	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
@@ -353,44 +345,13 @@ void RenderOctreeNode(const AABB& bounds, int depth, int maxDepth)
 	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
 	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
 
-	if (depth < maxDepth)
+	for (int sectorIndex = 0; sectorIndex < 8; sectorIndex++)
 	{
-		AABB childBounds;
-		Vector3f center = (bounds.mins + bounds.maxs) * 0.5f;
-
-		for (int index = 0; index < 8; index++)
-		{
-			for (int axis = 0; axis < 3; axis++)
-			{
-				if (index & (1 << axis))
-				{
-					childBounds.mins[axis] = center[axis];
-					childBounds.maxs[axis] = bounds.maxs[axis];
-				}
-				else
-				{
-					childBounds.mins[axis] = bounds.mins[axis];
-					childBounds.maxs[axis] = center[axis];
-				}
-			}
-
-			RenderOctreeNode(childBounds, depth + 1, maxDepth);
-		}
+		AABB childBounds = bounds;
+		OctTreeNode* childNode = octTree->TraverseIntoSector(node, sectorIndex, childBounds);
+		if (childNode != nullptr)
+			RenderOctreeNode(octTree, childNode, childBounds, depth + 1);
 	}
-}
-
-void RenderOctree(Renderer* renderer)
-{
-	AABB bounds;
-	bounds.mins = Vector3f(-1, -1, -1);
-	bounds.maxs = Vector3f(1, 1, 1);
-
-	bounds.mins *= 0.5f;
-	bounds.maxs *= 0.5f;
-
-	glBegin(GL_LINES);
-	RenderOctreeNode(bounds, 0, 2);
-	glEnd();
 }
 
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
@@ -478,10 +439,23 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	transform.SetScale(worldRadius * 2.0f);
 	m_renderer.SetShader(m_shaderUnlitVertexColored);
 	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
+	
+	// Render the OctTree
+	if (simulationManager->GetShowOctTree())
+	{
+		OctTree* octTree = simulation->GetOctTree();
 
+		Material octTreeMaterial;
+		octTreeMaterial.SetColor(Color::YELLOW);
+		octTreeMaterial.SetIsLit(false);
 
-	RenderOctree(&m_renderer);
+		m_renderer.SetShader(m_shaderUnlit);
+		m_renderer.UpdateUniforms(&octTreeMaterial, Matrix4f::IDENTITY);
 
+		glBegin(GL_LINES);
+			RenderOctreeNode(octTree, octTree->GetRootNode(), octTree->GetBounds(), 0);
+		glEnd();
+	}
 
     // Swap the display buffers.
     SwapBuffers();

@@ -45,6 +45,9 @@ Agent* AgentSystem::SpawnAgent()
 	agent->m_turnSpeed = 1.0f;
 
 	m_agents.push_back(agent);
+
+	m_simulation->GetOctTree()->InsertObject(agent);
+
 	return agent;
 }
 

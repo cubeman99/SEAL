@@ -4,6 +4,8 @@
 #include "World.h"
 #include "AgentSystem.h"
 #include "OctTree.h"
+#include "SimulationObject.h"
+
 
 
 //-----------------------------------------------------------------------------
@@ -14,10 +16,12 @@ class Simulation
 public:
 	Simulation();
 
+	void Initialize();
 	void Tick();
 	
 	AgentSystem* GetAgentSystem() { return &m_agentSystem; }
 	World* GetWorld() { return &m_world; }
+	OctTree* GetOctTree() { return &m_octTree; }
 
 	inline float GetTickRate() const { return m_tickRate; }
 	inline float GetTimeStep() const { return m_timeStep; }
@@ -28,6 +32,7 @@ private:
 
 	World m_world;
 	AgentSystem m_agentSystem;
+	OctTree m_octTree;
 };
 
 

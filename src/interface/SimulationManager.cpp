@@ -16,7 +16,8 @@ SimulationManager::SimulationManager() :
 	  m_selectedAgent(nullptr),
 	  m_isSimulationPaused(false),
 	  m_viewWireFrameMode(false),
-	  m_viewLighting(true)
+	  m_viewLighting(true),
+	  m_showOctTree(false)
 {
 }
 
@@ -28,7 +29,7 @@ SimulationManager::~SimulationManager()
 void SimulationManager::Initialize()
 {
 	m_simulation = new Simulation();
-
+	m_simulation->Initialize();
 	m_cameraSystem.Initialize(m_simulation);
 }
 		

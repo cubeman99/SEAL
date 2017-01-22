@@ -39,8 +39,8 @@ public:
 	void SetLightColor(const Color& lightColor);
 	void SetAmbientLight(const Color& ambientLight);
 	void SetLightDirection(const Vector3f& lightDir);
-	void UpdateUniforms();
 
+	void UpdateUniforms(Material* material, const Matrix4f& modelMatrix);
 	void RenderMesh(Mesh* mesh, Material* material, const Transform3f& transform);
 	void RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelMatrix);
 

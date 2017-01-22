@@ -159,6 +159,15 @@
     <ClCompile Include="..\..\src\simulation\OctTree.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\simulation\SimulationObject.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\Sphere.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\AABB.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -283,6 +292,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\OctTree.h">
       <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\SimulationObject.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Sphere.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\AABB.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
