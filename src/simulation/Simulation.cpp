@@ -2,8 +2,7 @@
 
 
 Simulation::Simulation() :
-	m_agentSystem(this),
-	m_octTree(AABB(Vector3f(-1,-1,-1), Vector3f(1,1,1)), 4)
+	m_agentSystem(this)
 {
 	m_tickRate = 60;
 	m_timeStep = 1 / m_tickRate;

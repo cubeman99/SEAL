@@ -46,6 +46,7 @@ Agent* AgentSystem::SpawnAgent()
 
 	m_agents.push_back(agent);
 
+	// Insert the agent into the oct-tree.
 	m_simulation->GetOctTree()->InsertObject(agent);
 
 	return agent;

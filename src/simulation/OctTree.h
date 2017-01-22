@@ -4,8 +4,10 @@
 #include "SimulationObject.h"
 #include <math/Vector3f.h>
 #include <vector>
+#include <map>
 
 
+/*
 enum OctTreeSector
 {
 	// bit 0: set = +X, clr = -X
@@ -23,15 +25,17 @@ enum OctTreeSector
 
 };
 
-
 enum OctTreeSectorBits
 {
 	k_x = 0x1,
 	k_y = 0x2,
 	k_z = 0x4,
-};
+};*/
 
 
+//-----------------------------------------------------------------------------
+// OctTreeNode
+//-----------------------------------------------------------------------------
 class OctTreeNode
 {
 public:
@@ -43,64 +47,71 @@ public:
 
 	bool HasAnyChildNodes() const;
 	bool IsLeafNode() const;
-	unsigned int GetChildIndex(const Vector3f& point) const;
 	unsigned int GetObjectCount() const;
-
 	object_list::iterator objects_begin();
 	object_list::iterator objects_end();
 
 private:
-	Vector3f m_position;
+	unsigned char m_sectorIndex;
+	OctTreeNode* m_parent;
 	OctTreeNode* m_children[8];
 	object_list m_objects;
 };
 
-// TODO: OctTree object iterator
 
-
+//-----------------------------------------------------------------------------
+// OctTree
+//-----------------------------------------------------------------------------
 class OctTree
 {
 public:
-	OctTree(const AABB& bounds, int maxDepth);
+	typedef SimulationObject	object_type;
+	typedef object_type*		object_pointer;
+	typedef std::map<object_pointer, OctTreeNode*> ObjectToNodeMap;
+
+public:
+	// Constructor/destructor
+	OctTree();
 	~OctTree();
 
-	typedef SimulationObject object_type;
-	typedef object_type* object_pointer;
-	typedef Sphere bounding_volume_type;
+	// Getters
+	inline const AABB& GetBounds() const { return m_bounds; }
+	inline const OctTreeNode* GetRootNode() const { return &m_root; }
+	inline OctTreeNode* GetRootNode() { return &m_root; }
+	unsigned int GetNumObjects() const;
 	
-	void Clear();
-	void InsertObject(object_pointer object);
-
-	//template <T>
-	//void QueryCollision(const Sphere& sphere);
-
-	//void QueryCollision(
-	
-
+	// Setters
 	inline void SetMaxDepth(unsigned int maxDepth) { m_maxDepth = maxDepth; }
 	inline void SetMaxObjectsPerNode(unsigned int maxObjectsPerNode) { m_maxObjectsPerNode = maxObjectsPerNode; }
 	inline void SetBounds(const AABB& bounds) { m_bounds = bounds; }
 
-	inline const AABB& GetBounds() const { return m_bounds; }
-	inline OctTreeNode* GetRootNode() { return &m_root; }
+	// Operations
+	void Clear();
+	void InsertObject(object_pointer object);
+	void RemoveObject(object_pointer object);
 	OctTreeNode* TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds);
 	
+	// Queries
+	//template <T>
+	//void QueryCollision(const Sphere& sphere);
+
+
 private:
-	
+
+	// Private functions
+	void DoGetNumObjects(const OctTreeNode* node, unsigned int& count) const;
 	void DoClear(OctTreeNode* node);
-
 	OctTreeNode* DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& bounds, unsigned int& depth);
-	OctTreeNode* DoInsertion(OctTreeNode* node, const Vector3f& point, const AABB& bounds, unsigned int depth);
-
 	unsigned int DoGetSectorIndex(const AABB& bounds, const Vector3f& point);
 	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point);
-
 	void SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex);
 
-	OctTreeNode m_root;
-	AABB m_bounds;
-	unsigned int m_maxDepth;
-	unsigned int m_maxObjectsPerNode; // max objects per node before a division happens
+
+	OctTreeNode		m_root;
+	AABB			m_bounds;
+	unsigned int	m_maxDepth;
+	unsigned int	m_maxObjectsPerNode; // max objects per node before a division happens
+	ObjectToNodeMap	m_objectToNodeMap;
 };
 
 	

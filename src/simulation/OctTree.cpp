@@ -1,15 +1,20 @@
 #include "OctTree.h"
 
 
-OctTreeNode::OctTreeNode()
+//-----------------------------------------------------------------------------
+// OctTreeNode
+//-----------------------------------------------------------------------------
+
+OctTreeNode::OctTreeNode() :
+	m_parent(nullptr)
 {
-	for (unsigned int i = 0; i < 8; i++)
+	for (unsigned int i = 0; i < 8; ++i)
 		m_children[i] = nullptr;
 }
 
 bool OctTreeNode::HasAnyChildNodes() const
 {
-	for (unsigned int i = 0; i < 8; i++)
+	for (unsigned int i = 0; i < 8; ++i)
 	{
 		if (m_children[i] != nullptr)
 			return true;
@@ -20,18 +25,6 @@ bool OctTreeNode::HasAnyChildNodes() const
 bool OctTreeNode::IsLeafNode() const
 {
 	return !HasAnyChildNodes();
-}
-
-unsigned int OctTreeNode::GetChildIndex(const Vector3f& point) const
-{
-	int index = 0;
-	if (point.x > m_position.x)
-		index |= 0x1;
-	if (point.y > m_position.y)
-		index |= 0x2;
-	if (point.z > m_position.z)
-		index |= 0x4;
-	return index;
 }
 
 unsigned int OctTreeNode::GetObjectCount() const
@@ -50,10 +43,13 @@ OctTreeNode::object_list::iterator OctTreeNode::objects_end()
 }
 
 
+//-----------------------------------------------------------------------------
+// OctTree constructor/destructor
+//-----------------------------------------------------------------------------
 
-OctTree::OctTree(const AABB& bounds, int maxDepth) :
-	m_bounds(bounds),
-	m_maxDepth(maxDepth),
+OctTree::OctTree() :
+	m_bounds(Vector3f(-1,-1,-1), Vector3f(1,1,1)),
+	m_maxDepth(4),
 	m_maxObjectsPerNode(2)
 {
 }
@@ -63,9 +59,27 @@ OctTree::~OctTree()
 	Clear();
 }
 
+
+//-----------------------------------------------------------------------------
+// OctTree getters
+//-----------------------------------------------------------------------------
+
+unsigned int OctTree::GetNumObjects() const
+{
+	unsigned int count = 0;
+	DoGetNumObjects(&m_root, count);
+	return count;
+}
+
+
+//-----------------------------------------------------------------------------
+// OctTree operations
+//-----------------------------------------------------------------------------
+
 void OctTree::Clear()
 {
 	DoClear(&m_root);
+	m_objectToNodeMap.clear();
 }
 
 void OctTree::InsertObject(object_pointer object)
@@ -80,22 +94,52 @@ void OctTree::InsertObject(object_pointer object)
 	if (depth < m_maxDepth && (node->HasAnyChildNodes() ||
 		node->GetObjectCount() >= m_maxObjectsPerNode))
 	{
-		unsigned int sectorIndex = DoGetSectorIndex(bounds, point);
+		// TEMP: put the new object into this node so the following code works.
+		node->m_objects.push_back(object);
 
-		// We may need to instantiate a new child node.
-		if (node->m_children[sectorIndex] == nullptr)
-			node->m_children[sectorIndex] = new OctTreeNode();
+		// Put the existing objects in this node into new child nodes.
+		for (auto it = node->objects_begin(); it != node->objects_end(); ++it)
+		{
+			object_pointer obj = *it;
+
+			unsigned int sectorIndex = DoGetSectorIndex(bounds, obj->GetPosition());
+
+			// We may need to instantiate a new child node.
+			if (node->m_children[sectorIndex] == nullptr)
+			{
+				node->m_children[sectorIndex] = new OctTreeNode();
+				node->m_children[sectorIndex]->m_parent = node;
+				node->m_children[sectorIndex]->m_sectorIndex = (unsigned char) sectorIndex;
+			}
 		
-		// Add the object to the child node.
-		node->m_children[sectorIndex]->m_objects.push_back(object);
+			// Add the object to the child node.
+			node->m_children[sectorIndex]->m_objects.push_back(obj);
+			m_objectToNodeMap[obj] = node->m_children[sectorIndex];
+		}
+		
+		node->m_objects.clear();
 	}
 	else
 	{
 		// Add the object to this node.
 		node->m_objects.push_back(object);
+		m_objectToNodeMap[object] = node;
 	}
 }
 
+void OctTree::RemoveObject(object_pointer object)
+{
+	OctTreeNode* node = m_objectToNodeMap[object];
+
+	// Delete the node if this is the only object in it.
+	if (node->GetObjectCount() == 1)
+	{
+		node->m_parent->m_children[node->m_sectorIndex] = nullptr;
+		delete node;
+	}
+
+	m_objectToNodeMap.erase(object);
+}
 
 OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds)
 {
@@ -108,6 +152,36 @@ OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node, unsigned int sectorI
 	{
 		return nullptr;
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+// OctTree private methods
+//-----------------------------------------------------------------------------
+
+void OctTree::DoGetNumObjects(const OctTreeNode* node, unsigned int& count) const
+{
+	count += node->GetObjectCount();
+
+	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
+	{
+		if (node->m_children[sectorIndex] != nullptr)
+			DoGetNumObjects(node->m_children[sectorIndex], count);
+	}
+}
+
+void OctTree::DoClear(OctTreeNode* node)
+{
+	// Clear each sector in this node.
+	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
+	{
+		if (node->m_children[sectorIndex] != nullptr)
+			DoClear(node->m_children[sectorIndex]);
+	}
+
+	// Delete the node itself (but not the root node).
+	if (node != &m_root)
+		delete node;
 }
 
 OctTreeNode* OctTree::DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& bounds, unsigned int& depth)
@@ -158,20 +232,5 @@ void OctTree::SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex)
 	}
 }
 
-
-
-void OctTree::DoClear(OctTreeNode* node)
-{
-	// Clear each sector in this node.
-	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
-	{
-		if (node->m_children[sectorIndex] != nullptr)
-			DoClear(node->m_children[sectorIndex]);
-	}
-
-	// Delete the node itself (but not the root node).
-	if (node != &m_root)
-		delete node;
-}
 
 
