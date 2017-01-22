@@ -89,6 +89,7 @@ public:
 	void Clear();
 	void InsertObject(object_pointer object);
 	void RemoveObject(object_pointer object);
+	void DynamicUpdate(object_pointer object);
 	OctTreeNode* TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds);
 	
 	// Queries
@@ -105,7 +106,7 @@ private:
 	unsigned int DoGetSectorIndex(const AABB& bounds, const Vector3f& point);
 	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point);
 	void SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex);
-
+	void DoRemoveNode(OctTreeNode* node);
 
 	OctTreeNode		m_root;
 	AABB			m_bounds;

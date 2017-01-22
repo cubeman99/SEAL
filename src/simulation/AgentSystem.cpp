@@ -77,6 +77,8 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		// Keep the orientation tangent to the world's surface.
 		float angle = Math::ACos(Vector3f::Normalize(agent->m_position).Dot(Vector3f::Normalize(posPrev)));
 		agent->m_orientation.Rotate(agent->m_orientation.GetRight(), angle);
+		
+		m_simulation->GetOctTree()->DynamicUpdate(agent);
 	}
 }
 

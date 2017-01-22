@@ -132,13 +132,40 @@ void OctTree::RemoveObject(object_pointer object)
 	OctTreeNode* node = m_objectToNodeMap[object];
 
 	// Delete the node if this is the only object in it.
-	if (node->GetObjectCount() == 1)
+	if (node->GetObjectCount() == 1 && node != &m_root)
 	{
-		node->m_parent->m_children[node->m_sectorIndex] = nullptr;
-		delete node;
+		node->m_objects.clear();
+		DoRemoveNode(node);
+	}
+	else
+	{
+		// Remove the object from the node.
+		auto it = std::find(node->m_objects.begin(), node->m_objects.end(), object);
+		if (it != node->m_objects.end())
+			node->m_objects.erase(it);
 	}
 
 	m_objectToNodeMap.erase(object);
+}
+
+void OctTree::DynamicUpdate(object_pointer object)
+{
+	// Get the object's current node.
+	OctTreeNode* currentNode = m_objectToNodeMap[object];
+	
+	// Determine the node for the object's updated position.
+	Vector3f point = object->GetPosition();
+	AABB bounds = m_bounds;
+	unsigned int depth = 0;
+	OctTreeNode* newNode = DoGetNode(&m_root, point, bounds, depth);
+
+	// Dynamically update the tree if the object has left its current node.
+	if (newNode != currentNode)
+	{
+		// TODO: this is pretty naive, find a more efficient way to do this.
+		RemoveObject(object);
+		InsertObject(object);
+	}
 }
 
 OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds)
@@ -229,6 +256,24 @@ void OctTree::SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex)
 			bounds.mins[axis] = center[axis];
 		else
 			bounds.maxs[axis] = center[axis];
+	}
+}
+
+void OctTree::DoRemoveNode(OctTreeNode* node)
+{
+	// Don't remove nodes that have child nodes.
+	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
+	{
+		if (node->m_children[sectorIndex] != nullptr)
+			return;
+	}
+	
+	// Only remove nodes that have no objects.
+	if (node->m_objects.empty())
+	{
+		node->m_parent->m_children[node->m_sectorIndex] = nullptr;
+		DoRemoveNode(node->m_parent);
+		delete node;
 	}
 }
 
