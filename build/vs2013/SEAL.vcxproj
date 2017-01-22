@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\src\math\Vector4f.cpp" />
     <ClCompile Include="..\..\src\simulation\Agent.cpp" />
     <ClCompile Include="..\..\src\simulation\AgentSystem.cpp" />
+    <ClCompile Include="..\..\src\simulation\OctTree.cpp" />
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="..\..\src\math\Vector4f.h" />
     <ClInclude Include="..\..\src\simulation\Agent.h" />
     <ClInclude Include="..\..\src\simulation\AgentSystem.h" />
+    <ClInclude Include="..\..\src\simulation\OctTree.h" />
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
     <ClInclude Include="..\..\src\utilities\Random.h" />

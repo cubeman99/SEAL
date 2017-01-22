@@ -316,6 +316,83 @@ void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 	GetSimulationManager()->GetCameraSystem()->SetAspectRatio(aspectRatio);
 }
 
+struct AABB
+{
+	Vector3f mins;
+	Vector3f maxs;
+};
+
+void RenderOctreeNode(const AABB& bounds, int depth, int maxDepth)
+{
+	glLineWidth(1 + (maxDepth - depth));
+	glColor3f(1,1,0);
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+
+	if (depth < maxDepth)
+	{
+		AABB childBounds;
+		Vector3f center = (bounds.mins + bounds.maxs) * 0.5f;
+
+		for (int index = 0; index < 8; index++)
+		{
+			for (int axis = 0; axis < 3; axis++)
+			{
+				if (index & (1 << axis))
+				{
+					childBounds.mins[axis] = center[axis];
+					childBounds.maxs[axis] = bounds.maxs[axis];
+				}
+				else
+				{
+					childBounds.mins[axis] = bounds.mins[axis];
+					childBounds.maxs[axis] = center[axis];
+				}
+			}
+
+			RenderOctreeNode(childBounds, depth + 1, maxDepth);
+		}
+	}
+}
+
+void RenderOctree(Renderer* renderer)
+{
+	AABB bounds;
+	bounds.mins = Vector3f(-1, -1, -1);
+	bounds.maxs = Vector3f(1, 1, 1);
+
+	bounds.mins *= 0.5f;
+	bounds.maxs *= 0.5f;
+
+	glBegin(GL_LINES);
+	RenderOctreeNode(bounds, 0, 2);
+	glEnd();
+}
+
 void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 {
 	Simulation* simulation = GetSimulation();
@@ -401,6 +478,10 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	transform.SetScale(worldRadius * 2.0f);
 	m_renderer.SetShader(m_shaderUnlitVertexColored);
 	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
+
+
+	RenderOctree(&m_renderer);
+
 
     // Swap the display buffers.
     SwapBuffers();

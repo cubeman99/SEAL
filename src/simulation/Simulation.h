@@ -3,6 +3,7 @@
 
 #include "World.h"
 #include "AgentSystem.h"
+#include "OctTree.h"
 
 
 //-----------------------------------------------------------------------------
