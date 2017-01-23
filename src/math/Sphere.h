@@ -3,6 +3,8 @@
 
 #include <math/Vector3f.h>
 
+struct Ray;
+
 
 struct Sphere
 {
@@ -16,6 +18,7 @@ public:
 
 	// Operations
 	bool Intersects(const Sphere& other) const;
+	bool CastRay(const Ray& ray, float& distance) const;
 
 
 private:

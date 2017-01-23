@@ -38,6 +38,7 @@ public:
 	bool CircleContains(const Vector2f& point) const;
 	bool SquareContains(const Vector2f& point) const;
 	bool SquareContainsSquare(const Bounds2D& bounds) const;
+	bool SquareIntersectsSquare(const Bounds2D& bounds) const;
 };
 
 
@@ -54,8 +55,8 @@ public:
 
 	// Rendering
 	void RenderOctTree(Renderer* renderer, OctTree* octTree);
-	void RenderWireFrame();
-	void RenderSurfaceContours();
+	void RenderWireFrame(const Color& color);
+	void RenderSurfaceContours(const Color& color);
 
 private:
 	// Private render methods

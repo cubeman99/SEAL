@@ -22,11 +22,6 @@ bool OctTreeNode::HasAnyChildNodes() const
 	return false;
 }
 
-bool OctTreeNode::IsLeafNode() const
-{
-	return !HasAnyChildNodes();
-}
-
 unsigned int OctTreeNode::GetObjectCount() const
 {
 	return m_objects.size();
@@ -236,6 +231,11 @@ unsigned int OctTree::DoGetSectorIndex(const AABB& bounds, const Vector3f& point
 
 unsigned int OctTree::DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point)
 {
+	// Sector indices are a bit map per axis.
+	// A set bit means positive on that axis.
+	// The axis bits are orded like so:
+	//   bit 0: X, bit 1: Y, bit 2: Z
+
 	int index = 0;
 	if (point.x > boundsCenter.x)
 		index |= 0x1;
@@ -243,6 +243,7 @@ unsigned int OctTree::DoGetSectorIndex(const Vector3f& boundsCenter, const Vecto
 		index |= 0x2;
 	if (point.z > boundsCenter.z)
 		index |= 0x4;
+
 	return index;
 }
 

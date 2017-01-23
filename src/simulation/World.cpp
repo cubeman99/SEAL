@@ -20,24 +20,8 @@ World::~World()
 // Perform a sphere-ray intersection.
 bool World::CastRay(const Ray& ray, float& distance) const
 {
-	Vector3f worldPos = Vector3f::ZERO;
-
-	// Setup a quadratic equation: ax^2 + bx + c.
-	float a = 1.0f;
-	float b = 2.0f * ray.direction.Dot(ray.origin - worldPos);
-	float c = worldPos.LengthSquared() + ray.origin.LengthSquared() -
-		(2.0f * worldPos.Dot(ray.origin)) - (m_radius * m_radius);
-
-	// Solve the quadratic equation.
-	float discriminant = b*b - 4*a*c;
-	if (discriminant < 0.0f)
-	{
-		return false;
-	}
-	else
-	{
-		distance = (-b - Math::Sqrt(discriminant)) / (2.0f * a);
-		return true;
-	}
+	Sphere sphere(Vector3f::ZERO, m_radius);
+	return sphere.CastRay(ray, distance);
 }
+
 

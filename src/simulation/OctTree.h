@@ -7,32 +7,6 @@
 #include <map>
 
 
-/*
-enum OctTreeSector
-{
-	// bit 0: set = +X, clr = -X
-	// bit 1: set = +Y, clr = -Y
-	// bit 2: set = +Z, clr = -Z
-
-	K_NX_NY_NZ = 0, // -X -Y -Z
-	K_PX_NY_NZ = 1, // +X -Y -Z
-	K_NX_PY_NZ = 2, // -X +Y -Z
-	K_PX_PY_NZ = 3, // +X +Y -Z
-	K_NX_NY_PZ = 4, // -X -Y +Z
-	K_PX_NY_PZ = 5, // +X -Y +Z
-	K_NX_PY_PZ = 6, // -X +Y +Z
-	K_PX_PY_PZ = 7, // +X +Y +Z
-
-};
-
-enum OctTreeSectorBits
-{
-	k_x = 0x1,
-	k_y = 0x2,
-	k_z = 0x4,
-};*/
-
-
 //-----------------------------------------------------------------------------
 // OctTreeNode
 //-----------------------------------------------------------------------------
@@ -46,7 +20,6 @@ public:
 	OctTreeNode();
 
 	bool HasAnyChildNodes() const;
-	bool IsLeafNode() const;
 	unsigned int GetObjectCount() const;
 	object_list::iterator objects_begin();
 	object_list::iterator objects_end();
@@ -93,7 +66,7 @@ public:
 	void DynamicUpdate(object_pointer object);
 	OctTreeNode* TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds);
 	
-	// Queries
+	// TODO: Queries
 	//template <T>
 	//void QueryCollision(const Sphere& sphere);
 
@@ -111,8 +84,8 @@ private:
 
 	OctTreeNode		m_root;
 	AABB			m_bounds;
-	unsigned int	m_maxDepth;
-	unsigned int	m_maxObjectsPerNode; // max objects per node before a division happens
+	unsigned int	m_maxDepth;				// Maximum number of subdivisions
+	unsigned int	m_maxObjectsPerNode;	// Max objects per node before a division happens
 	ObjectToNodeMap	m_objectToNodeMap;
 };
 

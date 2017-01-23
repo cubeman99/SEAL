@@ -4,12 +4,15 @@
 #include <vector>
 #include <math/Vector3f.h>
 #include <math/Ray.h>
+#include <math/Sphere.h>
 #include <graphics/Mesh.h>
 
 
 //-----------------------------------------------------------------------------
 // World - The spherical planet where on the surface of which the simulation 
 //         components are situated.
+//
+// NOTE: The world's center is positioned at the origin (0,0,0)
 //-----------------------------------------------------------------------------
 class World
 {

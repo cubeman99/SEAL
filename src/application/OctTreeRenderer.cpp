@@ -48,6 +48,14 @@ bool Bounds2D::SquareContainsSquare(const Bounds2D& bounds) const
 			bounds.center.y - bounds.radius >= center.y - radius &&
 			bounds.center.y + bounds.radius <= center.y + radius);
 }
+	
+bool Bounds2D::SquareIntersectsSquare(const Bounds2D& bounds) const
+{
+	return (bounds.center.x + bounds.radius > center.x - radius &&
+			center.x + radius > bounds.center.x - bounds.radius &&
+			bounds.center.y + bounds.radius > center.y - radius &&
+			center.y + radius > bounds.center.y - bounds.radius);
+}
 
 
 
@@ -86,21 +94,21 @@ void OctTreeRenderer::RenderOctTree(Renderer* renderer, OctTree* octTree)
 	m_octTree = octTree;
 
 	// Setup the renderer.
-	RenderParams renderParams = m_renderer->GetRenderParams();
-	renderParams.EnableCullFace(false);
-	m_renderer->SetRenderParams(renderParams);
-	m_renderer->ApplyRenderSettings(false);
+	//RenderParams renderParams = m_renderer->GetRenderParams();
+	//renderParams.EnableCullFace(false);
+	//m_renderer->SetRenderParams(renderParams);
+	//m_renderer->ApplyRenderSettings(false);
 
 	// Render the OctTree.
-	RenderWireFrame();
-	RenderSurfaceContours();
+	RenderWireFrame(Color::YELLOW * 0.5f);
+	RenderSurfaceContours(Color::YELLOW);
 }
 
-void OctTreeRenderer::RenderWireFrame()
+void OctTreeRenderer::RenderWireFrame(const Color& color)
 {
 	// Create a material to render with.
 	Material material;
-	material.SetColor(Color::YELLOW * 0.5f);
+	material.SetColor(color);
 	material.SetIsLit(false);
 	
 	// Render the wire frame of the oct-tree.
@@ -110,11 +118,11 @@ void OctTreeRenderer::RenderWireFrame()
 		m_octTree->GetBounds(), 0);
 }
 
-void OctTreeRenderer::RenderSurfaceContours()
+void OctTreeRenderer::RenderSurfaceContours(const Color& color)
 {
 	// Create a material to render with.
 	Material material;
-	material.SetColor(Color::YELLOW);
+	material.SetColor(color);
 	material.SetIsLit(false);
 		
 	// Render the intersection contours between the
@@ -358,6 +366,10 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 	
 	outNumContours = 0;
 
+	// Quickly check if the circle is not touching the square.
+	if (!square.SquareIntersectsSquare(circle))
+		return 0;
+
 	Vector2f corners[4];
 	bool circleContainsCorner[4];
 	bool squareContainsCorner[4];
@@ -397,7 +409,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 				ComputeIntersectionPoint(circle, i - 1, 1, corners));
 		}
 
-		// Opposite edge case.
+		// Opposite edges case.
 		if (squareContainsCorner[currCornerIndex] &&
 			squareContainsCorner[nextCornerIndex] &&
 			!squareContainsCorner[prevCornerIndex] &&
@@ -409,7 +421,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 				ComputeIntersectionPoint(circle, i + 1, 1, corners));
 		}
 
-		// Adjacent edge case.
+		// Adjacent edges case.
 		else if (squareContainsCorner[currCornerIndex] &&
 			((!squareContainsCorner[prevCornerIndex] || !onInside) &&
 				!circleContainsCorner[prevCornerIndex]) &&
