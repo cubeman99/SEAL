@@ -30,7 +30,10 @@ void SimulationManager::Initialize()
 {
 	m_simulation = new Simulation();
 	m_simulation->Initialize();
+
+	// Initialize systems.
 	m_cameraSystem.Initialize(m_simulation);
+	m_simulationRenderer.Initialize(this);
 }
 		
 void SimulationManager::ToggleCameraTracking()

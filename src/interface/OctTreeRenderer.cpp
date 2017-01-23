@@ -1,4 +1,5 @@
 #include "OctTreeRenderer.h"
+#include "SimulationManager.h"
 #include <graphics/OpenGLIncludes.h>
 #include <math/Matrix3f.h>
 

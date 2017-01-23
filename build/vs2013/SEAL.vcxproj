@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
+    <ClCompile Include="..\..\src\interface\SimulationRenderer.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
     <ClCompile Include="..\..\src\math\AABB.cpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\ResourceManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationManager.h" />
+    <ClInclude Include="..\..\src\interface\SimulationRenderer.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
     <ClInclude Include="..\..\src\math\AABB.h" />

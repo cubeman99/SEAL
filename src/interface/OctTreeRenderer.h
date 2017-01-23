@@ -5,7 +5,8 @@
 #include <graphics/Renderer.h>
 #include "ResourceManager.h"
 #include <math/MathLib.h>
-#include "SimulationManager.h"
+
+class SimulationManager;
 
 
 struct CircleContour

@@ -46,22 +46,6 @@ private:
 
 
 	SimulationWindow* m_simulationWindow;
-	Renderer m_renderer;
-	ResourceManager m_resourceManager;
-	OctTreeRenderer m_octTreeRenderer;
-
-	// Resources.
-	Mesh* m_agentMesh;
-	Mesh* m_meshSelectionCircle;
-	Mesh* m_meshAxisLines;
-	Material* m_worldMaterial;
-	Material* m_agentMaterial;
-	Material* m_materialSelectionCircle;
-	Material* m_materialAxisLines;
-	Shader* m_shaderLit;
-	Shader* m_shaderLitVertexColored;
-	Shader* m_shaderUnlit;
-	Shader* m_shaderUnlitVertexColored;
 };
 
 

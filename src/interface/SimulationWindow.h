@@ -26,21 +26,19 @@ private:
     void OnPlayPauseSimulation(wxCommandEvent& e);
     void OnToggleCameraTracking(wxCommandEvent& e);
     void OnSpawnAgents(wxCommandEvent& e);
-	
     void OnMenuItem(wxCommandEvent& e);
-
     void OnUpdateTimer(wxTimerEvent& e);
-
     void OnWindowClose(wxCloseEvent& e);
+
 	
 	SimulationManager m_simulationManager;
 
-    wxTimer m_updateTimer;
-	int m_frameCounter;
-	float m_fps;
-	double m_lastFrameTimeStamp;
-
 	SimulationRenderPanel* m_simulationPanel;
+
+    wxTimer	m_updateTimer;
+	int		m_frameCounter;
+	float	m_fps;
+	double	m_lastFrameTimeStamp;
 };
 
 

@@ -6,7 +6,7 @@
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
 #include <interface/CameraSystem.h>
-
+#include "SimulationRenderer.h"
 
 class SimulationManager
 {
@@ -21,6 +21,7 @@ public:
 	inline Agent* GetSelectedAgent() const { return m_selectedAgent; }
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
+	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
 	inline void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
@@ -39,6 +40,7 @@ public:
 	void Update();
 	
 private:
+	SimulationRenderer m_simulationRenderer;
 	Simulation* m_simulation;
 	CameraSystem m_cameraSystem;
 	bool m_isSimulationPaused;
@@ -46,6 +48,8 @@ private:
 	bool m_viewWireFrameMode;
 	bool m_viewLighting;
 	bool m_showOctTree;
+
+
 };
 
 
