@@ -20,8 +20,8 @@ void Simulation::Initialize()
 
 	m_octTree.Clear();
 	m_octTree.SetBounds(octTreeBounds);
-	m_octTree.SetMaxDepth(4);
-	m_octTree.SetMaxObjectsPerNode(2);
+	m_octTree.SetMaxDepth(5);
+	m_octTree.SetMaxObjectsPerNode(1);
 }
 
 void Simulation::Tick()

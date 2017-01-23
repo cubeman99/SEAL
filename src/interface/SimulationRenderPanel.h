@@ -62,7 +62,6 @@ private:
 	Shader* m_shaderLitVertexColored;
 	Shader* m_shaderUnlit;
 	Shader* m_shaderUnlitVertexColored;
-	Shader* m_shaderOctTree;
 };
 
 

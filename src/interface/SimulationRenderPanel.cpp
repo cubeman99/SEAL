@@ -55,9 +55,6 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
 		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
 		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
-	//m_shaderOctTree = m_resourceManager.LoadShader("octtree",
-	//	"../../assets/shaders/octtree_vs.glsl",
-	//	"../../assets/shaders/octtree_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
@@ -81,7 +78,7 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
-	m_octTreeRenderer.Initialize(&m_resourceManager);
+	m_octTreeRenderer.Initialize(&m_resourceManager, nullptr); // TODO: simulationManager
 
 	// TODO: Move this resource creation code somewhere else.
 

@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\src\interface\OctTreeRenderer.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\math\Matrix3f.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -307,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\OctTreeRenderer.h">
       <Filter>Source Files\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Matrix3f.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -79,6 +79,7 @@ public:
 	inline const OctTreeNode* GetRootNode() const { return &m_root; }
 	inline OctTreeNode* GetRootNode() { return &m_root; }
 	unsigned int GetNumObjects() const;
+	inline unsigned int GetMaxDepth() const { return m_maxDepth; }
 	
 	// Setters
 	inline void SetMaxDepth(unsigned int maxDepth) { m_maxDepth = maxDepth; }

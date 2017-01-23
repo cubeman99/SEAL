@@ -39,6 +39,7 @@
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
     <ClCompile Include="..\..\src\math\AABB.cpp" />
     <ClCompile Include="..\..\src\math\MathLib.cpp" />
+    <ClCompile Include="..\..\src\math\Matrix3f.cpp" />
     <ClCompile Include="..\..\src\math\Matrix4f.cpp" />
     <ClCompile Include="..\..\src\math\Quaternion.cpp" />
     <ClCompile Include="..\..\src\math\Ray.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
     <ClInclude Include="..\..\src\math\AABB.h" />
     <ClInclude Include="..\..\src\math\MathLib.h" />
+    <ClInclude Include="..\..\src\math\Matrix3f.h" />
     <ClInclude Include="..\..\src\math\Matrix4f.h" />
     <ClInclude Include="..\..\src\math\Quaternion.h" />
     <ClInclude Include="..\..\src\math\Ray.h" />
