@@ -8,11 +8,6 @@
 #include <math/Ray.h>
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
-#include <simulation/Simulation.h>
-#include <graphics/Shader.h>
-#include <graphics/Renderer.h>
-#include "ResourceManager.h"
-#include "OctTreeRenderer.h"
 
 class SimulationWindow;
 class SimulationManager;

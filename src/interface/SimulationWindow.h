@@ -1,10 +1,11 @@
 #ifndef _SIMULATION_WINDOW_H_
 #define _SIMULATION_WINDOW_H_
 
+#include <graphics/OpenGLIncludes.h>
 #include <wx/wx.h>
+#include <application/SimulationManager.h>
 #include <simulation/Simulation.h>
-#include <interface/SimulationRenderPanel.h>
-#include <interface/SimulationManager.h>
+#include "SimulationRenderPanel.h"
 
 
 //-----------------------------------------------------------------------------

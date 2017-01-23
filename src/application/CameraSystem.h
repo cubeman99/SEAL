@@ -2,11 +2,11 @@
 #define _CAMERA_SYSTEM_H_
 
 #include <graphics/ICamera.h>
-#include <interface/GlobeCamera.h>
-#include <interface/ArcBallCamera.h>
-#include <simulation/Simulation.h>
 #include <math/Ray.h>
 #include <math/Vector2f.h>
+#include <simulation/Simulation.h>
+#include "GlobeCamera.h"
+#include "ArcBallCamera.h"
 
 class Agent;
 

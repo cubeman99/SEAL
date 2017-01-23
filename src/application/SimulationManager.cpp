@@ -1,6 +1,4 @@
 #include "SimulationManager.h"
-#include "OpenGLContext.h"
-#include "MainApplication.h"
 #include <math/Matrix4f.h>
 #include <math/MathLib.h>
 #include <utilities/Random.h>

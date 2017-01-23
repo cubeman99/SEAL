@@ -46,7 +46,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
-	m_octTreeRenderer.Initialize(&m_resourceManager, nullptr); // TODO: simulationManager
+	m_octTreeRenderer.Initialize(&m_resourceManager, simulationManager);
 
 	// TODO: Move this resource creation code somewhere else.
 

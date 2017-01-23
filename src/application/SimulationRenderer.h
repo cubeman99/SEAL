@@ -1,6 +1,7 @@
 #ifndef _SIMULATION_RENDERER_H_
 #define _SIMULATION_RENDERER_H_	
 
+#include <graphics/OpenGLIncludes.h>
 #include <math/MathLib.h>
 #include "ResourceManager.h"
 #include "OctTreeRenderer.h"

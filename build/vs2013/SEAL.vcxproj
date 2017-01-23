@@ -11,6 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\application\ArcBallCamera.cpp" />
+    <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
+    <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
+    <ClCompile Include="..\..\src\application\OctTreeRenderer.cpp" />
+    <ClCompile Include="..\..\src\application\ResourceManager.cpp" />
+    <ClCompile Include="..\..\src\application\SimulationManager.cpp" />
+    <ClCompile Include="..\..\src\application\SimulationRenderer.cpp" />
     <ClCompile Include="..\..\src\graphics\Color.cpp" />
     <ClCompile Include="..\..\src\graphics\glew\GLEW.C" />
     <ClCompile Include="..\..\src\graphics\Graphics.cpp" />
@@ -27,15 +34,8 @@
     <ClCompile Include="..\..\src\graphics\Texture.cpp" />
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
     <ClCompile Include="..\..\src\graphics\VertexData.cpp" />
-    <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp" />
-    <ClCompile Include="..\..\src\interface\CameraSystem.cpp" />
-    <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
-    <ClCompile Include="..\..\src\interface\OctTreeRenderer.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
-    <ClCompile Include="..\..\src\interface\ResourceManager.cpp" />
-    <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
-    <ClCompile Include="..\..\src\interface\SimulationRenderer.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp" />
     <ClCompile Include="..\..\src\math\AABB.cpp" />
@@ -59,6 +59,13 @@
     <ClCompile Include="..\..\src\utilities\Timing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\application\ArcBallCamera.h" />
+    <ClInclude Include="..\..\src\application\CameraSystem.h" />
+    <ClInclude Include="..\..\src\application\GlobeCamera.h" />
+    <ClInclude Include="..\..\src\application\OctTreeRenderer.h" />
+    <ClInclude Include="..\..\src\application\ResourceManager.h" />
+    <ClInclude Include="..\..\src\application\SimulationManager.h" />
+    <ClInclude Include="..\..\src\application\SimulationRenderer.h" />
     <ClInclude Include="..\..\src\graphics\Color.h" />
     <ClInclude Include="..\..\src\graphics\glew\GLEW.H" />
     <ClInclude Include="..\..\src\graphics\Graphics.h" />
@@ -76,15 +83,8 @@
     <ClInclude Include="..\..\src\graphics\Texture.h" />
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
     <ClInclude Include="..\..\src\graphics\VertexData.h" />
-    <ClInclude Include="..\..\src\interface\ArcBallCamera.h" />
-    <ClInclude Include="..\..\src\interface\CameraSystem.h" />
-    <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
-    <ClInclude Include="..\..\src\interface\OctTreeRenderer.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
-    <ClInclude Include="..\..\src\interface\ResourceManager.h" />
-    <ClInclude Include="..\..\src\interface\SimulationManager.h" />
-    <ClInclude Include="..\..\src\interface\SimulationRenderer.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />
     <ClInclude Include="..\..\src\interface\SimulationWindow.h" />
     <ClInclude Include="..\..\src\math\AABB.h" />

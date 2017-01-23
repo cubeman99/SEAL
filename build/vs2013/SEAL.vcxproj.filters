@@ -34,8 +34,11 @@
     <Filter Include="Source Files\simulation">
       <UniqueIdentifier>{7a411772-be75-4845-88c7-8ad4f5fe5935}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\interface\camera">
-      <UniqueIdentifier>{fdfc6557-4d5e-4b15-a25f-ff2cf086a76a}</UniqueIdentifier>
+    <Filter Include="Source Files\application">
+      <UniqueIdentifier>{b588ea72-3301-4969-9383-31b0cba1b056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\application\camera">
+      <UniqueIdentifier>{42b02647-5f3d-4443-914a-1040e6b93391}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,18 +123,6 @@
     <ClCompile Include="..\..\src\simulation\Agent.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\SimulationManager.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\interface\ArcBallCamera.cpp">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\interface\GlobeCamera.cpp">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\interface\CameraSystem.cpp">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\Ray.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
@@ -153,9 +144,6 @@
     <ClCompile Include="..\..\src\graphics\Material.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\ResourceManager.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\simulation\OctTree.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
@@ -168,14 +156,29 @@
     <ClCompile Include="..\..\src\math\AABB.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\OctTreeRenderer.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\Matrix3f.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\SimulationRenderer.cpp">
-      <Filter>Source Files\interface</Filter>
+    <ClCompile Include="..\..\src\application\OctTreeRenderer.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\ResourceManager.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\SimulationManager.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\SimulationRenderer.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\ArcBallCamera.cpp">
+      <Filter>Source Files\application\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\CameraSystem.cpp">
+      <Filter>Source Files\application\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\GlobeCamera.cpp">
+      <Filter>Source Files\application\camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,18 +266,6 @@
     <ClInclude Include="..\..\src\simulation\Agent.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\SimulationManager.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interface\ArcBallCamera.h">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interface\GlobeCamera.h">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interface\CameraSystem.h">
-      <Filter>Source Files\interface\camera</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\Ray.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
@@ -296,9 +287,6 @@
     <ClInclude Include="..\..\src\graphics\Material.h">
       <Filter>Source Files\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\ResourceManager.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\simulation\OctTree.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
@@ -311,14 +299,29 @@
     <ClInclude Include="..\..\src\math\AABB.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\OctTreeRenderer.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\Matrix3f.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\SimulationRenderer.h">
-      <Filter>Source Files\interface</Filter>
+    <ClInclude Include="..\..\src\application\OctTreeRenderer.h">
+      <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\ResourceManager.h">
+      <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\SimulationManager.h">
+      <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\SimulationRenderer.h">
+      <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\ArcBallCamera.h">
+      <Filter>Source Files\application\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\CameraSystem.h">
+      <Filter>Source Files\application\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\GlobeCamera.h">
+      <Filter>Source Files\application\camera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

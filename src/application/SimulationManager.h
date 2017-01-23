@@ -1,12 +1,12 @@
 #ifndef _SIMULATION_MANAGER_H_
 #define _SIMULATION_MANAGER_H_
 
-#include <graphics/OpenGLIncludes.h>
 #include <math/Quaternion.h>
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
-#include <interface/CameraSystem.h>
+#include "CameraSystem.h"
 #include "SimulationRenderer.h"
+
 
 class SimulationManager
 {
