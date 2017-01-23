@@ -55,6 +55,9 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
 		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
 		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
+	//m_shaderOctTree = m_resourceManager.LoadShader("octtree",
+	//	"../../assets/shaders/octtree_vs.glsl",
+	//	"../../assets/shaders/octtree_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
@@ -77,6 +80,8 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
 	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
+
+	m_octTreeRenderer.Initialize(&m_resourceManager);
 
 	// TODO: Move this resource creation code somewhere else.
 
@@ -316,41 +321,73 @@ void SimulationRenderPanel::OnSize(wxSizeEvent& e)
 	GetSimulationManager()->GetCameraSystem()->SetAspectRatio(aspectRatio);
 }
 
-void RenderOctreeNode(OctTree* octTree, OctTreeNode* node, const AABB& bounds, int depth)
+void RenderOctreeNode(OctTree* octTree, OctTreeNode* node, const AABB& bounds, int depth, bool lines)
 {
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	if (lines)
+	{
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
 	
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
 		
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+	}
+	else
+	{
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z); // bottom
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z); // top
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z); // front
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z); // back
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z); // right
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z); // left
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	}
+
+	
 
 	for (int sectorIndex = 0; sectorIndex < 8; sectorIndex++)
 	{
 		AABB childBounds = bounds;
 		OctTreeNode* childNode = octTree->TraverseIntoSector(node, sectorIndex, childBounds);
 		if (childNode != nullptr)
-			RenderOctreeNode(octTree, childNode, childBounds, depth + 1);
+			RenderOctreeNode(octTree, childNode, childBounds, depth + 1, lines);
 	}
 }
 
@@ -442,21 +479,9 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
 	
 	// Render the OctTree
 	if (simulationManager->GetShowOctTree())
-	{
-		OctTree* octTree = simulation->GetOctTree();
-
-		Material octTreeMaterial;
-		octTreeMaterial.SetColor(Color::YELLOW);
-		octTreeMaterial.SetIsLit(false);
-
-		m_renderer.SetShader(m_shaderUnlit);
-		m_renderer.UpdateUniforms(&octTreeMaterial, Matrix4f::IDENTITY);
-
-		glBegin(GL_LINES);
-			RenderOctreeNode(octTree, octTree->GetRootNode(), octTree->GetBounds(), 0);
-		glEnd();
-	}
+		m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 
     // Swap the display buffers.
     SwapBuffers();
 }
+

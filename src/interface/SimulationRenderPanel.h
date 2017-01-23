@@ -8,9 +8,11 @@
 #include <math/Ray.h>
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
+#include <simulation/Simulation.h>
 #include <graphics/Shader.h>
 #include <graphics/Renderer.h>
 #include "ResourceManager.h"
+#include "OctTreeRenderer.h"
 
 class SimulationWindow;
 class SimulationManager;
@@ -46,6 +48,7 @@ private:
 	SimulationWindow* m_simulationWindow;
 	Renderer m_renderer;
 	ResourceManager m_resourceManager;
+	OctTreeRenderer m_octTreeRenderer;
 
 	// Resources.
 	Mesh* m_agentMesh;
@@ -59,6 +62,7 @@ private:
 	Shader* m_shaderLitVertexColored;
 	Shader* m_shaderUnlit;
 	Shader* m_shaderUnlitVertexColored;
+	Shader* m_shaderOctTree;
 };
 
 

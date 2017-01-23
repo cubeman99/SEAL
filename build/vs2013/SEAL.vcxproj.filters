@@ -168,6 +168,9 @@
     <ClCompile Include="..\..\src\math\AABB.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\interface\OctTreeRenderer.cpp">
+      <Filter>Source Files\interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -301,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\math\AABB.h">
       <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\OctTreeRenderer.h">
+      <Filter>Source Files\interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

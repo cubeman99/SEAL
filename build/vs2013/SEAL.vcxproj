@@ -31,6 +31,7 @@
     <ClCompile Include="..\..\src\interface\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\interface\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
+    <ClCompile Include="..\..\src\interface\OctTreeRenderer.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationManager.cpp" />
@@ -77,6 +78,7 @@
     <ClInclude Include="..\..\src\interface\CameraSystem.h" />
     <ClInclude Include="..\..\src\interface\GlobeCamera.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
+    <ClInclude Include="..\..\src\interface\OctTreeRenderer.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\ResourceManager.h" />
     <ClInclude Include="..\..\src\interface\SimulationManager.h" />
