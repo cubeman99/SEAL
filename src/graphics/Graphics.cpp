@@ -176,7 +176,7 @@ void Graphics::EnableDepthTest(bool depthTest)
 void Graphics::SetProjection(const Matrix4f& projection)
 {
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(projection.GetTranspose().data());
+    glLoadMatrixf(projection.data());
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -190,13 +190,13 @@ void Graphics::ResetTransform()
 void Graphics::SetTransform(const Matrix4f& transform)
 {
 	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(transform.GetTranspose().data());
+	glLoadMatrixf(transform.data());
 }
 
 void Graphics::Transform(const Matrix4f& transform)
 {
 	glMatrixMode(GL_MODELVIEW);
-	glMultMatrixf(transform.GetTranspose().data());
+	glMultMatrixf(transform.data());
 }
 
 void Graphics::Rotate(const Vector3f& axis, float angle)

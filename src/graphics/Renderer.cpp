@@ -274,9 +274,9 @@ void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
 	// Transform matrices.
 	Matrix4f mvp = m_camera->GetViewProjection() * modelMatrix;
 	if (m_activeShader->GetUniformLocation("u_mvp", uniformLocation))
-		glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, mvp.data());
+		glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, mvp.data());
 	if (m_activeShader->GetUniformLocation("u_model", uniformLocation))
-		glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelMatrix.data());
+		glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, modelMatrix.data());
 		
 	m_isShaderChanged = false;
 }
