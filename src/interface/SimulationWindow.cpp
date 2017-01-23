@@ -14,8 +14,9 @@ enum
 	TOGGLE_CAMERA_TRACKING,
 	VIEW_WIREFRAME_MODE,
 	VIEW_LIGHTING,
-	SHOW_OCT_TREE,
-	
+	SHOW_OCT_TREE_ON_SURFACE,
+	SHOW_OCT_TREE_WIRE_FRAME,
+
 	DEBUG_SPAWN_AGENTS,
 	
 	UPDATE_TIMER,
@@ -31,7 +32,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
 	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
 	EVT_MENU(VIEW_LIGHTING, SimulationWindow::OnMenuItem)
-	EVT_MENU(SHOW_OCT_TREE, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_OCT_TREE_ON_SURFACE, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_OCT_TREE_WIRE_FRAME, SimulationWindow::OnMenuItem)
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
@@ -70,7 +72,8 @@ SimulationWindow::SimulationWindow() :
     menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Toggle Camera &Tracking\tT");
     menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
     menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL")->Check(true);
-    menuView->AppendCheckItem(SHOW_OCT_TREE, "Show Oct-&Tree\tO")->Check(false);
+    menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO")->Check(false);
+    menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O")->Check(false);
 
 	// DEBUG
     wxMenu* menuDebug = new wxMenu;
@@ -133,8 +136,11 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	case VIEW_LIGHTING:
 		m_simulationManager.EnableLighting(e.IsChecked());
 		break;
-	case SHOW_OCT_TREE:
+	case SHOW_OCT_TREE_ON_SURFACE:
 		m_simulationManager.SetShowOctTree(e.IsChecked());
+		break;
+	case SHOW_OCT_TREE_WIRE_FRAME:
+		m_simulationManager.SetShowOctTreeWireFrame(e.IsChecked());
 		break;
 	case wxID_ABOUT:
 	{

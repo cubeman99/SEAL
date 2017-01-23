@@ -19,20 +19,20 @@ public:
 	void Initialize();
 	void Tick();
 	
-	AgentSystem* GetAgentSystem() { return &m_agentSystem; }
-	World* GetWorld() { return &m_world; }
-	OctTree* GetOctTree() { return &m_octTree; }
+	inline AgentSystem* GetAgentSystem() { return &m_agentSystem; }
+	inline World* GetWorld() { return &m_world; }
+	inline OctTree* GetOctTree() { return &m_octTree; }
 
 	inline float GetTickRate() const { return m_tickRate; }
 	inline float GetTimeStep() const { return m_timeStep; }
 
 private:
-	float m_tickRate; // How many ticks per second.
-	float m_timeStep; // Length of time in seconds to simulate for each tick.
+	float		m_tickRate; // How many ticks per second.
+	float		m_timeStep; // Length of time in seconds to simulate for each tick.
 
-	World m_world;
-	AgentSystem m_agentSystem;
-	OctTree m_octTree;
+	World		m_world;
+	AgentSystem	m_agentSystem;
+	OctTree		m_octTree;
 };
 
 

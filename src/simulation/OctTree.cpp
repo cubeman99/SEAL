@@ -45,7 +45,8 @@ OctTreeNode::object_list::iterator OctTreeNode::objects_end()
 OctTree::OctTree() :
 	m_bounds(Vector3f(-1,-1,-1), Vector3f(1,1,1)),
 	m_maxDepth(4),
-	m_maxObjectsPerNode(2)
+	m_maxObjectsPerNode(2),
+	m_largestObjectRadius(0.0f)
 {
 }
 
@@ -75,6 +76,7 @@ void OctTree::Clear()
 {
 	DoClear(&m_root);
 	m_objectToNodeMap.clear();
+	m_largestObjectRadius = 0.0f;
 }
 
 void OctTree::InsertObject(object_pointer object)
@@ -120,6 +122,10 @@ void OctTree::InsertObject(object_pointer object)
 		node->m_objects.push_back(object);
 		m_objectToNodeMap[object] = node;
 	}
+
+	// Keep track of the largest object radius in the tree.
+	if (object->GetRadius() > m_largestObjectRadius)
+		m_largestObjectRadius = object->GetRadius();
 }
 
 void OctTree::RemoveObject(object_pointer object)

@@ -15,7 +15,8 @@ SimulationManager::SimulationManager() :
 	  m_isSimulationPaused(false),
 	  m_viewWireFrameMode(false),
 	  m_viewLighting(true),
-	  m_showOctTree(false)
+	  m_showOctTree(false),
+	  m_showOctTreeWireFrame(false)
 {
 }
 

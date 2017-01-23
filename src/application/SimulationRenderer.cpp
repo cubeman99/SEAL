@@ -242,8 +242,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
 	
 	// Render the OctTree
-	if (m_simulationManager->GetShowOctTree())
-		m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
+	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 
 }
 

@@ -29,6 +29,8 @@ public:
 	inline bool IsLightingEnabled() const { return m_viewLighting; }
 	inline void SetShowOctTree(bool showOctTree) { m_showOctTree = showOctTree; }
 	inline bool GetShowOctTree() const { return m_showOctTree; }
+	inline void SetShowOctTreeWireFrame(bool showOctTreeWireFrame) { m_showOctTreeWireFrame = showOctTreeWireFrame; }
+	inline bool GetShowOctTreeWireFrame() const { return m_showOctTreeWireFrame; }
 
 	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
@@ -48,7 +50,7 @@ private:
 	bool m_viewWireFrameMode;
 	bool m_viewLighting;
 	bool m_showOctTree;
-
+	bool m_showOctTreeWireFrame;
 
 };
 

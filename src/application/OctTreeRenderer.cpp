@@ -5,29 +5,7 @@
 
 
 //-----------------------------------------------------------------------------
-// CircleContour - Contour helper structure
-//-----------------------------------------------------------------------------
-
-CircleContour::CircleContour() :
-	fullCircle(false)
-{
-}
-
-CircleContour::CircleContour(const Vector2f& startPoint,
-							const Vector2f& endPoint) :
-	startPoint(startPoint),
-	endPoint(endPoint),
-	fullCircle(false)
-{
-}
-
-CircleContour::CircleContour(bool fullCircle) :
-	fullCircle(fullCircle)
-{
-}
-
-//-----------------------------------------------------------------------------
-// Bounds2D - Contour helper structure
+// Bounds2D
 //-----------------------------------------------------------------------------
 
 bool Bounds2D::CircleContains(const Vector2f& point) const
@@ -55,6 +33,43 @@ bool Bounds2D::SquareIntersectsSquare(const Bounds2D& bounds) const
 			center.x + radius > bounds.center.x - bounds.radius &&
 			bounds.center.y + bounds.radius > center.y - radius &&
 			center.y + radius > bounds.center.y - bounds.radius);
+}
+
+
+//-----------------------------------------------------------------------------
+// SectorFace
+//-----------------------------------------------------------------------------
+
+Vector3f SectorFace::Get3DPoint(const Vector2f& pointOnFacePlane) const
+{
+	Vector3f point3d;
+	point3d[axis] = posOnAxis;
+	point3d[(axis + 1) % 3] = pointOnFacePlane.x;
+	point3d[(axis + 2) % 3] = pointOnFacePlane.y;
+	return point3d;
+}
+
+
+//-----------------------------------------------------------------------------
+// ContourCurve
+//-----------------------------------------------------------------------------
+
+ContourCurve::ContourCurve() :
+	fullCircle(false)
+{
+}
+
+ContourCurve::ContourCurve(const Vector2f& startPoint,
+							const Vector2f& endPoint) :
+	startPoint(startPoint),
+	endPoint(endPoint),
+	fullCircle(false)
+{
+}
+
+ContourCurve::ContourCurve(bool fullCircle) :
+	fullCircle(fullCircle)
+{
 }
 
 
@@ -100,8 +115,14 @@ void OctTreeRenderer::RenderOctTree(Renderer* renderer, OctTree* octTree)
 	//m_renderer->ApplyRenderSettings(false);
 
 	// Render the OctTree.
-	RenderWireFrame(Color::YELLOW * 0.5f);
-	RenderSurfaceContours(Color::YELLOW);
+
+	// Render the wireframe.
+	if (m_simulationManager->GetShowOctTreeWireFrame())
+		RenderWireFrame(Color::YELLOW * 0.5f);
+
+	// Render the surface contours.
+	if (m_simulationManager->GetShowOctTree())
+		RenderSurfaceContours(Color::YELLOW);
 }
 
 void OctTreeRenderer::RenderWireFrame(const Color& color)
@@ -130,7 +151,7 @@ void OctTreeRenderer::RenderSurfaceContours(const Color& color)
 	m_renderer->SetShader(m_shaderUnlit);
 	m_renderer->UpdateUniforms(&material,
 		Matrix4f::CreateScale(1.005f));
-	RenderSectorContours(m_octTree->GetRootNode(),
+	RenderContoursForSector(m_octTree->GetRootNode(),
 		m_octTree->GetBounds(), 0);
 	glLineWidth(1.0f);
 }
@@ -138,15 +159,15 @@ void OctTreeRenderer::RenderSurfaceContours(const Color& color)
 
 
 //-----------------------------------------------------------------------------
-// Private render methods
+// Wireframe rendering
 //-----------------------------------------------------------------------------
 
 void OctTreeRenderer::RenderSectorBoxes(OctTreeNode* node,
 										const AABB& sectorBounds,
 										int depth)
 {
-	// Render this sector box.
-	DrawSector(sectorBounds);
+	// Render this sector wireframe.
+	DrawSectorWireFrame(sectorBounds);
 
 	// Recursively render the child sectors.
 	for (int sectorIndex = 0; sectorIndex < 8; sectorIndex++)
@@ -159,13 +180,51 @@ void OctTreeRenderer::RenderSectorBoxes(OctTreeNode* node,
 	}
 }
 
-void OctTreeRenderer::RenderSectorContours(	OctTreeNode* node,
-											const AABB& sectorBounds,
-											int depth)
+// Render a wire-frame box for a sector.
+void OctTreeRenderer::DrawSectorWireFrame(const AABB& bounds)
 {
-	// Render the contour lines created from the intersection of
-	// this node's cube and the sphere.
+	glBegin(GL_LINES);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+	
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
+		glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
+		glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
+		glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+	glEnd();
+}
 
+
+
+//-----------------------------------------------------------------------------
+// Contour rendering
+//-----------------------------------------------------------------------------
+
+// Render the contour lines created from the intersection of
+// this node's cube and the sphere.
+void OctTreeRenderer::RenderContoursForSector(	OctTreeNode* node,
+												const AABB& sectorBounds,
+												int depth)
+{
 	Vector3f boundsCenter = sectorBounds.GetCenter();
 	float boundsRadius = (sectorBounds.maxs.x - sectorBounds.mins.x) * 0.5f;
 	
@@ -175,140 +234,102 @@ void OctTreeRenderer::RenderSectorContours(	OctTreeNode* node,
 	if (boundsCenter.DistToSqr(m_worldSphere.position) > radiusSum * radiusSum)
 		return;
 
-	// Create a list of 2D faces for their respective axes.
-	// Ordered by: axis (X, Y, Z), then side (+, -).
-	Bounds2D faces[6];
-	faces[0].center = boundsCenter.GetYZ(); // right	(X+)
-	faces[1].center = boundsCenter.GetYZ(); // left		(X-)
-	faces[2].center = boundsCenter.GetZX(); // top		(Y+)
-	faces[3].center = boundsCenter.GetZX(); // bottom	(Y-)
-	faces[4].center = boundsCenter.GetXY(); // back		(Z+)
-	faces[5].center = boundsCenter.GetXY(); // front	(Z-)
-		
-	CircleContour contours[6];
-	int numContours = 0;
-	bool hasContours = false;
-					
-	glLineWidth(1.0f + (float) (m_octTree->GetMaxDepth() - depth));
-
-	// Perform contour generation for each 2D face.
-	for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+	// Create a list of square faces for the sector cube.
+	// Faces are ordered by: axis (X, Y, Z), then side (+, -).
+	SectorFace sectorFaces[6];
+	for (int i = 0; i < 6; i++)
 	{
-		faces[faceIndex].radius = boundsRadius;
-		int axis = faceIndex / 2;
-		int xAxis = (axis + 1) % 3;
-		int yAxis = (axis + 2) % 3;
-		float posOnAxis = (faceIndex % 2 == 0 ?
-			sectorBounds.maxs[axis] : sectorBounds.mins[axis]);
-
-		if (Math::Abs(posOnAxis) < m_worldSphere.radius)
-		{
-			// Generate a list of contours.
-			Bounds2D circle;
-			circle.radius = Math::Sqrt((m_worldSphere.radius *
-				m_worldSphere.radius) - (posOnAxis * posOnAxis));
-			circle.center = Vector2f::ZERO;
-			PerformContour(circle, faces[faceIndex], contours, numContours);
-
-			if (numContours > 0)
-				hasContours = true;
-
-			// Render the contours.
-			for (int i = 0; i < numContours; i++)
-			{
-				Vector3f v;
-				v[axis] = posOnAxis;
-
-				// Render either a circle or arc contour.
-				if (contours[i].fullCircle)
-					DrawCircle(circle, axis, posOnAxis);
-				else
-					DrawArc(contours[i].endPoint, contours[i].startPoint, circle, axis, posOnAxis);
-			}
-		}
+		SectorFace& face = sectorFaces[i];
+		face.axis = i / 2;
+		face.posOnAxis = (i % 2 == 0 ?
+			sectorBounds.maxs[face.axis] : sectorBounds.mins[face.axis]);
+		face.rectOnFace.center.x = boundsCenter[(face.axis + 1) % 3];
+		face.rectOnFace.center.y = boundsCenter[(face.axis + 2) % 3];
+		face.rectOnFace.radius = boundsRadius;
 	}
+					
+	// Calculate and render the contours for each face.
+	unsigned int totalContours = 0;
+	glLineWidth(1.0f + (float) (m_octTree->GetMaxDepth() - depth));
+	for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+		totalContours += RenderContoursForFace(sectorFaces[faceIndex]);
 
 	// Draw the sector wire frame if it intersects the world sphere.
-	if (hasContours)
+	if (totalContours > 0 && m_simulationManager->GetShowOctTreeWireFrame())
 	{
 		glLineWidth(1.0f);
-		DrawSector(sectorBounds);
+		DrawSectorWireFrame(sectorBounds);
 	}
 
 	// Recursively render the child sectors.
 	for (int sectorIndex = 0; sectorIndex < 8; sectorIndex++)
 	{
 		AABB childBounds = sectorBounds;
-		OctTreeNode* childNode = m_octTree->TraverseIntoSector(node, sectorIndex, childBounds);
+		OctTreeNode* childNode = m_octTree->TraverseIntoSector(
+			node, sectorIndex, childBounds);
 		if (childNode != nullptr)
-			RenderSectorContours(childNode, childBounds, depth + 1);
+			RenderContoursForSector(childNode, childBounds, depth + 1);
 	}
 }
 
-void OctTreeRenderer::DrawSector(const AABB& bounds)
+unsigned int OctTreeRenderer::RenderContoursForFace(const SectorFace& face)
 {
-	// Render a wire-frame cube.
+	// Escape early if this face is not touching the world sphere.
+	if (Math::Abs(face.posOnAxis) > m_worldSphere.radius)
+		return 0;
 
-	glBegin(GL_LINES);
+	// Calculate the circle cross-section of the sphere on this face's plane;
+	Bounds2D circle;
+	circle.radius = Math::Sqrt((m_worldSphere.radius *
+		m_worldSphere.radius) - (face.posOnAxis * face.posOnAxis));
+	circle.center = Vector2f::ZERO;
 
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
-	
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
-		
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.mins.z);
-	glVertex3f(bounds.mins.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.mins.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.maxs.z);
-	glVertex3f(bounds.maxs.x, bounds.mins.y, bounds.mins.z);
-	glVertex3f(bounds.maxs.x, bounds.maxs.y, bounds.mins.z);
+	// Generate a list of contours between the square and circle.
+	ContourCurve contours[6];
+	unsigned int numContours = GenerateContours(
+		circle, face.rectOnFace, contours);
 
-	glEnd();
+	// Render each contour curve.
+	for (unsigned int i = 0; i < numContours; i++)
+		DrawContour(face, circle, contours[i]);
+
+	return numContours;
 }
 
-void OctTreeRenderer::DrawCircle(const Bounds2D& circle,
-								int axis, float posOnAxis)
+// Draw a single contour curve.
+void OctTreeRenderer::DrawContour(	const SectorFace& face,
+									const Bounds2D& circle,
+									const ContourCurve& contour)
 {
-	int xAxis = (axis + 1) % 3;
-	int yAxis = (axis + 2) % 3;
+	if (contour.fullCircle)
+		DrawCircleContour(face, circle);
+	else
+		DrawArcContour(face, circle, contour.endPoint, contour.startPoint);
+}
 
-	Vector3f vertex;
-	vertex[axis] = posOnAxis;
+// Draw a contour that is a full circle outline.
+void OctTreeRenderer::DrawCircleContour(const SectorFace& face,
+										const Bounds2D& circle)
+{
+	Vector2f v2;
 
-	// Render a circle contour.
+	// Render a circle outline.
 	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i < 20; i++)
+	for (unsigned int i = 0; i < 40; i++)
 	{
-		float angle = (i / 20.0f) * Math::TWO_PI;
-		vertex[xAxis] = circle.center.x + cos(angle) * circle.radius;
-		vertex[yAxis] = circle.center.y - sin(angle) * circle.radius;
-		glVertex3fv(vertex.data());
+		float angle = (i / 40.0f) * Math::TWO_PI;
+		v2.x = circle.center.x + cos(angle) * circle.radius;
+		v2.y = circle.center.y - sin(angle) * circle.radius;
+		glVertex3fv(face.Get3DPoint(v2).data());
 	}
 	glEnd();
 }
 
-void OctTreeRenderer::DrawArc(	Vector2f a, Vector2f b,
-								const Bounds2D& circle,
-								int axis, float posOnAxis)
+// Draw a contour that is an arc.
+void OctTreeRenderer::DrawArcContour(const SectorFace& face,
+									const Bounds2D& circle,
+									Vector2f a, Vector2f b)
 {
-	int xAxis = (axis + 1) % 3;
-	int yAxis = (axis + 2) % 3;
-
 	Vector2f aDir = (a - circle.center); aDir.Normalize();
 	Vector2f bDir = (b - circle.center); bDir.Normalize();
 	Vector2f normal = (b - a);
@@ -323,28 +344,15 @@ void OctTreeRenderer::DrawArc(	Vector2f a, Vector2f b,
 	Matrix3f rotation = Matrix3f::CreateRotation(circle.center, angleStep);
 	
 	// Draw the arc vertices.
-	Vector3f vertex;
-	vertex[axis] = posOnAxis;
-
 	glBegin(GL_LINE_STRIP);
-
+	glVertex3fv(face.Get3DPoint(a).data());
 	Vector2f v2 = a;
-	vertex[xAxis] = a.x;
-	vertex[yAxis] = a.y;
-	glVertex3fv(vertex.data());
-
 	for (int i = 0; i < numSteps; i++)
 	{
 		v2 = rotation.TransformVector(v2);
-		vertex[xAxis] = v2.x;
-		vertex[yAxis] = v2.y;
-		glVertex3fv(vertex.data());
+		glVertex3fv(face.Get3DPoint(v2).data());
 	}
-
-	vertex[xAxis] = b.x;
-	vertex[yAxis] = b.y;
-	glVertex3fv(vertex.data());
-
+	glVertex3fv(face.Get3DPoint(b).data());
 	glEnd();
 }
 	
@@ -353,18 +361,18 @@ void OctTreeRenderer::DrawArc(	Vector2f a, Vector2f b,
 // Contour calculation
 //-----------------------------------------------------------------------------
 
-int OctTreeRenderer::PerformContour(const Bounds2D& circle,
-		const Bounds2D& square, CircleContour* contours, int& outNumContours)
+unsigned int OctTreeRenderer::GenerateContours(	const Bounds2D& circle,
+												const Bounds2D& square,
+												ContourCurve* contours)
 {
 	// Check if the square fully contains the circle.
 	if (square.SquareContainsSquare(circle))
 	{
-		outNumContours = 1;
 		contours[0].fullCircle = true;
 		return 1;
 	}
 	
-	outNumContours = 0;
+	unsigned int numContours = 0;
 
 	// Quickly check if the circle is not touching the square.
 	if (!square.SquareIntersectsSquare(circle))
@@ -375,10 +383,14 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 	bool squareContainsCorner[4];
 
 	// Compute square corner locations.
-	corners[0] = Vector2f(square.center.x - square.radius, square.center.y - square.radius);
-	corners[1] = Vector2f(square.center.x - square.radius, square.center.y + square.radius);
-	corners[2] = Vector2f(square.center.x + square.radius, square.center.y + square.radius);
-	corners[3] = Vector2f(square.center.x + square.radius, square.center.y - square.radius);
+	corners[0] = Vector2f(	square.center.x - square.radius,
+							square.center.y - square.radius);
+	corners[1] = Vector2f(	square.center.x - square.radius,
+							square.center.y + square.radius);
+	corners[2] = Vector2f(	square.center.x + square.radius,
+							square.center.y + square.radius);
+	corners[3] = Vector2f(	square.center.x + square.radius,
+							square.center.y - square.radius);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -404,7 +416,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 			!circleContainsCorner[currCornerIndex] &&
 			onInside)
 		{
-			contours[outNumContours++] = CircleContour(
+			contours[numContours++] = ContourCurve(
 				ComputeIntersectionPoint(circle, i, 0, corners),
 				ComputeIntersectionPoint(circle, i - 1, 1, corners));
 		}
@@ -416,7 +428,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 			(onInside || (circleContainsCorner[currCornerIndex] &&
 				circleContainsCorner[nextCornerIndex])))
 		{
-			contours[outNumContours++] = CircleContour(
+			contours[numContours++] = ContourCurve(
 				ComputeIntersectionPoint(circle, i - 1, 0, corners),
 				ComputeIntersectionPoint(circle, i + 1, 1, corners));
 		}
@@ -430,13 +442,13 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 			!circleBoundsContainsSquare &&
 			(onInside || circleContainsCorner[currCornerIndex]))
 		{
-			contours[outNumContours++] = CircleContour(
+			contours[numContours++] = ContourCurve(
 				ComputeIntersectionPoint(circle, i - 1, 0, corners),
 				ComputeIntersectionPoint(circle, i, 1, corners));
 		}
 	}
 	
-	if (outNumContours == 0)
+	if (numContours == 0)
 	{
 		// Loop over edges.
 		for (int i = 0; i < 4; i++)
@@ -457,7 +469,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 				Math::Abs((circle.center - edgeCenter).Dot(normal)) < circle.radius &&
 				Math::Abs((circle.center - edgeCenter).Dot(tangent)) < square.radius)
 			{
-				contours[outNumContours++] = CircleContour(
+				contours[numContours++] = ContourCurve(
 					ComputeIntersectionPoint(circle, i, 0, corners),
 					ComputeIntersectionPoint(circle, i, 1, corners));
 				break;
@@ -465,7 +477,7 @@ int OctTreeRenderer::PerformContour(const Bounds2D& circle,
 		}
 	}
 
-	return outNumContours;
+	return numContours;
 }
 
 Vector2f OctTreeRenderer::ComputeIntersectionPoint(const Bounds2D& circle,
@@ -496,3 +508,4 @@ Vector2f OctTreeRenderer::ComputeIntersectionPoint(const Bounds2D& circle,
 
 	return point;
 }
+

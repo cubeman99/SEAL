@@ -87,6 +87,7 @@ private:
 	unsigned int	m_maxDepth;				// Maximum number of subdivisions
 	unsigned int	m_maxObjectsPerNode;	// Max objects per node before a division happens
 	ObjectToNodeMap	m_objectToNodeMap;
+	float			m_largestObjectRadius;	// Keeps track of the largest object radius in the tree.
 };
 
 	
