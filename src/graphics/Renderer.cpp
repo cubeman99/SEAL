@@ -290,7 +290,7 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelM
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	UpdateUniforms(material, modelMatrix);
+	UpdateUniforms(material, modelMatrix * mesh->GetTransformMatrix());
 
 	// Bind the mesh.
 	if (m_mesh != mesh)

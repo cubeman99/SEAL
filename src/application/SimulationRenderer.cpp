@@ -2,6 +2,7 @@
 #include "SimulationManager.h"
 
 
+
 SimulationRenderer::SimulationRenderer()
 {
 }
@@ -9,20 +10,21 @@ SimulationRenderer::SimulationRenderer()
 void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 {
 	m_simulationManager = simulationManager;
+	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: magic string
 
 	// Load shaders.
 	m_shaderLit = m_resourceManager.LoadShader("lit",
-		"../../assets/shaders/lit_colored_vs.glsl",
-		"../../assets/shaders/lit_colored_fs.glsl");
+		"shaders/lit_colored_vs.glsl",
+		"shaders/lit_colored_fs.glsl");
 	m_shaderLitVertexColored = m_resourceManager.LoadShader("lit_vertex_colored",
-		"../../assets/shaders/lit_vertex_colored_vs.glsl",
-		"../../assets/shaders/lit_vertex_colored_fs.glsl");
+		"shaders/lit_vertex_colored_vs.glsl",
+		"shaders/lit_vertex_colored_fs.glsl");
 	m_shaderUnlit = m_resourceManager.LoadShader("unlit",
-		"../../assets/shaders/unlit_colored_vs.glsl",
-		"../../assets/shaders/unlit_colored_fs.glsl");
+		"shaders/unlit_colored_vs.glsl",
+		"shaders/unlit_colored_fs.glsl");
 	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
-		"../../assets/shaders/unlit_vertex_colored_vs.glsl",
-		"../../assets/shaders/unlit_vertex_colored_fs.glsl");
+		"shaders/unlit_vertex_colored_vs.glsl",
+		"shaders/unlit_vertex_colored_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
@@ -88,13 +90,18 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 			11, 12, 13, 11, 13, 14,
 		};
 
-		m_agentMesh = new Mesh();
-		m_agentMesh->GetVertexData()->BufferVertices(15, vertices);
-		m_agentMesh->GetIndexData()->BufferIndices(21, indices);
+		//m_agentMesh = new Mesh();
+		//m_agentMesh->GetVertexData()->BufferVertices(15, vertices);
+		//m_agentMesh->GetIndexData()->BufferIndices(21, indices);
 
-		m_agentMaterial = new Material();
-		m_agentMaterial->SetColor(Color::BLUE);
+		//m_agentMaterial = new Material();
+		//m_agentMaterial->SetColor(Color::BLUE);
 	}
+
+	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/ae86.obj");
+	m_agentMesh->SetTransformMatrix(Matrix4f::CreateTranslation(0, 0.4f, 0));
+	m_agentMaterial = new Material();
+	m_agentMaterial->SetColor(Color::BLUE);
 	
 	// Create plant mesh.
 	{
@@ -143,7 +150,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 
 		m_plantMesh = new Mesh();
 		m_plantMesh->GetVertexData()->BufferVertices(20, vertices);
-		m_plantMesh->GetIndexData()->BufferIndices(1, indices); // <<<<<<<<<<<< Adjust indice count
+		m_plantMesh->GetIndexData()->BufferIndices(5, indices); // <<<<<<<<<<<< Adjust indice count
 
 		m_plantMaterial = new Material();
 		m_plantMaterial->SetColor(Color::GREEN);
@@ -234,9 +241,9 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	renderParams.EnableBlend(true);
 	renderParams.EnableLineSmooth(false);
 	renderParams.EnablePolygonSmooth(false);
-	renderParams.EnableCullFace(true);
+	renderParams.EnableCullFace(false);
 	renderParams.SetCullFace(CullFace::BACK);
-	renderParams.SetFrontFace(FrontFace::CLOCKWISE);
+	renderParams.SetFrontFace(FrontFace::CLOCKWISE); // TODO: meshes loaded from file have CCW front-face winding order ??
 	renderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT | ClearBits::DEPTH_BUFFER_BIT);
 	renderParams.SetClearColor(Color::BLACK);
 	renderParams.SetPolygonMode(PolygonMode::FILL);
@@ -255,6 +262,11 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	{
 		m_renderer.SetLightColor(Color::BLACK);
 		m_renderer.SetAmbientLight(Color::WHITE);
+	}
+	else
+	{
+		m_renderer.SetLightColor(Color(255, 220, 132));
+		m_renderer.SetAmbientLight(Color(33, 36, 63));
 	}
 
 	// Render the world.

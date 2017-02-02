@@ -5,6 +5,7 @@
 #include <graphics/Mesh.h>
 #include <graphics/Material.h>
 #include <graphics/Texture.h>
+#include <utilities/FileUtility.h>
 #include <map>
 
 
@@ -25,6 +26,7 @@ public:
 	// Resource loading
 	Texture* LoadTexture(const std::string& name, const std::string& path);
 	Shader* LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+	Mesh* LoadMesh(const std::string& name, const std::string& path);
 
 	// Resource management
 	void AddTexture(const std::string& name, Texture* texture);

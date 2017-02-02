@@ -58,6 +58,7 @@
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
     <ClCompile Include="..\..\src\simulation\SimulationObject.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
+    <ClCompile Include="..\..\src\utilities\FileUtility.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
     <ClCompile Include="..\..\src\utilities\Timing.cpp" />
   </ItemGroup>
@@ -110,6 +111,7 @@
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\SimulationObject.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
+    <ClInclude Include="..\..\src\utilities\FileUtility.h" />
     <ClInclude Include="..\..\src\utilities\Random.h" />
     <ClInclude Include="..\..\src\utilities\Timing.h" />
   </ItemGroup>

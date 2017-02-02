@@ -176,6 +176,9 @@ struct VertexPosNorm
 {
 	Vector3f	position;
 	Vector3f	normal;
+	
+	VertexPosNorm()
+	{}
 
 	VertexPosNorm(const Vector3f& position, const Vector3f& normal) :
 		position(position),

@@ -13,18 +13,24 @@ private:
 		~Mesh();
 	
 		// Accessors.
-		inline int					GetFirstIndex()		const { return m_firstIndex; }
-		inline int					GetNumIndices()		const { return m_numIndices; }
-		//inline const Bounds&		GetBounds()			const { return m_bounds; }
+		inline const Matrix4f&		GetTransformMatrix()	const { return m_transformMatrix; }
+		inline int					GetFirstIndex()			const { return m_firstIndex; }
+		inline int					GetNumIndices()			const { return m_numIndices; }
+		//inline const Bounds&		GetBounds()				const { return m_bounds; }
 		inline VertexPrimitiveType::value_type	GetPrimitiveType()	const { return m_primitiveType; }
 		
-		inline VertexData*	GetVertexData()	{ return &m_vertexData; }
-		inline IndexData*	GetIndexData()	{ return &m_indexData; }
+		inline VertexData*		GetVertexData()	{ return &m_vertexData; }
+		inline IndexData*		GetIndexData()	{ return &m_indexData; }
 
 		// Mutators.
 		inline void SetIndices(int firstIndex, int numIndices)	{ m_firstIndex = firstIndex; m_numIndices = numIndices; }
 		//inline void SetBounds(const Bounds& bounds)				{ m_bounds =  bounds; }
 		inline void SetPrimitiveType(VertexPrimitiveType::value_type type)	{ m_primitiveType = type; }
+		inline void SetTransformMatrix(const Matrix4f& transformMatrix)	{ m_transformMatrix = transformMatrix; }
+
+	public:
+		// Import a mesh from text formatted as an .obj file.
+		static Mesh* ImportFromOBJ(const std::string& objFileContents);
 
 	private:
 		// Prevent copying.
@@ -37,6 +43,8 @@ private:
 
 		VertexData	m_vertexData;
 		IndexData	m_indexData;
+
+		Matrix4f	m_transformMatrix;
 
 		VertexPrimitiveType::value_type m_primitiveType; // How the index buffer is organized into primitives.
 };

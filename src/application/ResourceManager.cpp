@@ -33,40 +33,6 @@ static void FreeResources(std::map<std::string, T*>& map)
 	map.clear();
 }
 
-// Read the entirety of a text file into a string.
-static bool OpenAndGetContents(const std::string& fileName, std::string& out)
-{
-	// Open the file.
-	FILE* m_file = fopen(fileName.c_str(), "r");
-	if (m_file == nullptr)
-		return false;
-
-	// Determine the file size.
-	if (fseek(m_file, 0, SEEK_END) != 0)
-		return false;
-	long fileSize = ftell(m_file);
-	if (fileSize < 0)
-		return false;
-	rewind(m_file);
-
-	// Read the entire file into a character buffer.
-	const size_t fileSizeInclNull = fileSize + 1;
-	char* buffer = new char[fileSizeInclNull];
-	size_t result = fread(buffer, 1, fileSizeInclNull, m_file);
-	if (result == 0)
-	{
-		delete buffer;
-		return false;
-	}
-
-	// Finalize the buffer as the output string.
-	buffer[result] = '\0';
-	out.assign(buffer, buffer + result);
-
-	delete buffer;
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 // Constructor & destructor
@@ -92,7 +58,7 @@ ResourceManager::~ResourceManager()
 
 Texture* ResourceManager::LoadTexture(const std::string& name, const std::string& path)
 {
-	Texture* texture = Texture::LoadTexture(path);
+	Texture* texture = Texture::LoadTexture(m_assetsPath + path);
 	
 	if (texture == nullptr)
 		return nullptr;
@@ -107,15 +73,15 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	std::string fragmentSource;
 	
 	// Load the text file contents for the VS and FS.
-	if (!OpenAndGetContents(m_assetsPath + vertexPath, vertexSource))
+	if (!FileUtility::OpenAndGetContents(m_assetsPath + vertexPath, vertexSource))
 	{
 		wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
-		return false;
+		return nullptr;
 	}
-	if (!OpenAndGetContents(m_assetsPath + fragmentPath, fragmentSource))
+	if (!FileUtility::OpenAndGetContents(m_assetsPath + fragmentPath, fragmentSource))
 	{
 		wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
-		return false;
+		return nullptr;
 	}
 	
 	// Create the shader and add the fragment and vertex stages.
@@ -134,6 +100,28 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 
 	AddShader(name, shader);
 	return shader;
+}
+
+Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path)
+{
+	std::string fileContents;
+
+	// Read the file contents.
+	if (!FileUtility::OpenAndGetContents(m_assetsPath + path, fileContents))
+	{
+		wxMessageBox("Error loading mesh file " + path, "File Error", wxICON_WARNING);
+		return nullptr;
+	}
+
+	// Import the mesh from the file contents.
+	Mesh* mesh = Mesh::ImportFromOBJ(fileContents);
+	if (mesh == nullptr)
+	{
+		wxMessageBox("Error parsing .obj data from mesh file " + path, "File Error", wxICON_WARNING);
+		return nullptr;
+	}
+
+	return mesh;
 }
 
 

@@ -189,6 +189,9 @@
     <ClCompile Include="..\..\src\simulation\Offshoot.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\utilities\FileUtility.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -340,6 +343,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\Offshoot.h">
       <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utilities\FileUtility.h">
+      <Filter>Source Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
