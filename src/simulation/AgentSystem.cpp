@@ -41,7 +41,7 @@ Agent* AgentSystem::SpawnAgent()
 	agent->m_orientation.Rotate(agent->m_orientation.GetUp(),
 		Random::NextFloat() * Math::TWO_PI);
 
-	agent->m_moveSpeed = 0.36f;
+	agent->m_moveSpeed = 0.1f;
 	agent->m_turnSpeed = 1.0f;
 
 	m_agents.push_back(agent);

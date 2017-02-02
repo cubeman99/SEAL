@@ -27,10 +27,12 @@ private:
 
 	// Resources.
 	Mesh* m_agentMesh;
+	Mesh* m_plantMesh;
 	Mesh* m_meshSelectionCircle;
 	Mesh* m_meshAxisLines;
 	Material* m_worldMaterial;
 	Material* m_agentMaterial;
+	Material* m_plantMaterial;
 	Material* m_materialSelectionCircle;
 	Material* m_materialAxisLines;
 	Shader* m_shaderLit;

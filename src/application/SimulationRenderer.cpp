@@ -93,7 +93,60 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 		m_agentMesh->GetIndexData()->BufferIndices(21, indices);
 
 		m_agentMaterial = new Material();
-		m_agentMaterial->SetColor(Color::GREEN);
+		m_agentMaterial->SetColor(Color::BLUE);
+	}
+	
+	// Create plant mesh.
+	{
+		float h = 0.1f * 10;
+		float l = 1.0f * 10;
+		Vector3f v1(-l, h, -l);			// top front left
+		Vector3f v2( l, h, -l);			// top front right
+		Vector3f v3(-l, h, l);			// top back left
+		Vector3f v4( l, h, l);			// top back right
+		Vector3f v5( -l, 0, -l);		// bottom front left
+		Vector3f v6( l, 0, -l);			// bottom front right
+		Vector3f v7( -l, 0, l);			// bottom back left
+		Vector3f v8( l, 0, l);			// bottom back right
+
+		Vector3f n1 = Vector3f::UP;		// top
+		Vector3f n2 = Vector3f::RIGHT;	// right
+		Vector3f n3 = Vector3f::BACK;	// back
+		Vector3f n4 = Vector3f::LEFT;	// left
+		Vector3f n5 = Vector3f::FORWARD;// front
+
+		VertexPosNorm vertices[] = {			// is this right?
+			VertexPosNorm(v1, n1), // Top
+			VertexPosNorm(v2, n1),
+			VertexPosNorm(v3, n1),
+			VertexPosNorm(v4, n1),
+			VertexPosNorm(v1, n5), // Front
+			VertexPosNorm(v2, n5),
+			VertexPosNorm(v5, n5),
+			VertexPosNorm(v6, n5),
+			VertexPosNorm(v3, n3), // Back
+			VertexPosNorm(v4, n3),
+			VertexPosNorm(v7, n3),
+			VertexPosNorm(v8, n3),
+			VertexPosNorm(v1, n4), // Left
+			VertexPosNorm(v3, n4),
+			VertexPosNorm(v5, n4),
+			VertexPosNorm(v7, n4),
+			VertexPosNorm(v2, n2), // Right
+			VertexPosNorm(v4, n2),
+			VertexPosNorm(v6, n2),
+			VertexPosNorm(v8, n2),
+		};
+		unsigned int indices[] = {			// this part I really wasn't sure
+			0, 1, 2, 3, 0,
+		};
+
+		m_plantMesh = new Mesh();
+		m_plantMesh->GetVertexData()->BufferVertices(20, vertices);
+		m_plantMesh->GetIndexData()->BufferIndices(1, indices); // <<<<<<<<<<<< Adjust indice count
+
+		m_plantMaterial = new Material();
+		m_plantMaterial->SetColor(Color::GREEN);
 	}
 
 	// Create selection circle mesh.
@@ -145,10 +198,12 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_resourceManager.AddMesh("axis_lines", m_meshAxisLines);
 	m_resourceManager.AddMesh("circle", m_meshSelectionCircle);
 	m_resourceManager.AddMesh("agent", m_agentMesh);
+	m_resourceManager.AddMesh("plant", m_plantMesh);
 	
 	m_resourceManager.AddMaterial("axis_lines", m_materialAxisLines);
 	m_resourceManager.AddMaterial("circle", m_materialSelectionCircle);
 	m_resourceManager.AddMaterial("agent", m_agentMaterial);
+	m_resourceManager.AddMaterial("plant", m_plantMaterial);
 	m_resourceManager.AddMaterial("world", m_worldMaterial);
 
 }
@@ -208,6 +263,27 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	m_renderer.SetShader(m_shaderLitVertexColored);
 	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
+	// Render the plants (meaning their offshoots)
+	PlantSystem* plantSystem = simulation->GetPlantSystem();
+	float plantRadius = 0.016f; // TODO: magic number plant radius?
+	float plantOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (plantRadius * plantRadius));
+	m_renderer.SetShader(m_shaderLit);
+	for (auto it = plantSystem->plants_begin(); it != plantSystem->plants_end(); it++)
+	{
+		Plant* plant = *it;
+
+		for (auto it = plant->offshoots_begin(); it != plant->offshoots_end(); it++)
+		{
+			Offshoot* offshoot = *it;
+			transform.pos = offshoot->GetPosition();
+			transform.pos.Normalize();
+			transform.pos *= worldRadius - plantOffset;
+			transform.rot = offshoot->GetOrientation();
+			transform.SetScale(plantRadius);
+			m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform); // TODO: finish plant "box" and change this line
+		}
+	}
+
 	// Render the agents.
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float agentRadius = 0.016f; // TODO: magic number agent radius.

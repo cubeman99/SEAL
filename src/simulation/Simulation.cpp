@@ -2,7 +2,8 @@
 
 
 Simulation::Simulation() :
-	m_agentSystem(this)
+	m_agentSystem(this),
+	m_plantSystem(this, 0.2f, 100.0f)
 {
 	m_tickRate = 60;
 	m_timeStep = 1 / m_tickRate;
@@ -27,5 +28,6 @@ void Simulation::Initialize()
 void Simulation::Tick()
 {
 	m_agentSystem.UpdateAgents(m_timeStep);
+	m_plantSystem.UpdatePlants(m_timeStep);
 }
 

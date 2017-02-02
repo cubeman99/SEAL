@@ -180,6 +180,15 @@
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp">
       <Filter>Source Files\application\camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\simulation\PlantSystem.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\simulation\Plant.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\simulation\Offshoot.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -322,6 +331,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\application\GlobeCamera.h">
       <Filter>Source Files\application\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\PlantSystem.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\Plant.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\Offshoot.h">
+      <Filter>Source Files\simulation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
