@@ -81,6 +81,7 @@ private:
 	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point);
 	void SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex);
 	void DoRemoveNode(OctTreeNode* node);
+	void DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node, const AABB& bounds, unsigned int depth);
 
 	OctTreeNode		m_root;
 	AABB			m_bounds;

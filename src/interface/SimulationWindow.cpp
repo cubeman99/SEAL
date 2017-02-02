@@ -86,7 +86,7 @@ SimulationWindow::SimulationWindow() :
     menuHelp->Append(wxID_ABOUT);
 
 	// Make a status bar
-    CreateStatusBar(3);
+    CreateStatusBar(5);
 	SetStatusText("Hello");
 
     SetClientSize(800, 600);
@@ -94,6 +94,7 @@ SimulationWindow::SimulationWindow() :
 
 	//m_updateTimer.Start(17);
 	m_updateTimer.Start(8);
+	m_updateTimer.Start(2);
 	m_frameCounter = 0;
 	double lastFrameTimeStamp = Time::GetTime();
 
@@ -153,11 +154,14 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 
 void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 {
+	double startTime = Time::GetTime(); // time the update.
+
+	// Update the simulation.
 	m_simulationManager.Update();
 	
+	// Update the FPS counter.
 	double timeStamp = Time::GetTime();
 	m_frameCounter++;
-
 	if (timeStamp > m_lastFrameTimeStamp + 1.0f)
 	{
 		m_lastFrameTimeStamp = timeStamp;
@@ -165,15 +169,37 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 		m_frameCounter = 0;
 	}
 
+	// Number of agents.
 	int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
 	std::stringstream ss;
 	ss << numAgents << " agents";
 	SetStatusText(ss.str(), 1);
+	
+	// FPS.
 	ss.str("");
 	ss << (int) (m_fps + 0.5f) << " fps";
 	SetStatusText(ss.str(), 2);
 	
-	m_simulationPanel->Refresh(true);
+	// Update time in milliseconds
+	double endTime = Time::GetTime();
+	double updateTimeMs = (endTime - startTime) * 1000.0;
+	double renderTimeMs = m_simulationManager.GetSimulationRenderer()->GetAverageRenderTime() * 1000.0;
+	ss.str("");
+	ss.setf(std::ios::fixed, std::ios::floatfield);
+	ss.precision(2);
+	ss << "Update time: " << updateTimeMs << " ms";
+	ss << " (total: " << (updateTimeMs + renderTimeMs) << " ms";
+	SetStatusText(ss.str(), 3);
+	
+	// Render time in milliseconds.
+	ss.str("");
+	ss.setf(std::ios::fixed, std::ios::floatfield);
+	ss.precision(2);
+	ss << "Render time: " << renderTimeMs << " ms";
+	SetStatusText(ss.str(), 4);
+	
+	// Tell the simulation panel to render.
+	m_simulationPanel->Refresh(false);
 }
 
 void SimulationWindow::OnWindowClose(wxCloseEvent& e)

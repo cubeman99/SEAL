@@ -166,7 +166,6 @@ void OctTreeRenderer::RenderSectorBoxes(OctTreeNode* node,
 										const AABB& sectorBounds,
 										int depth)
 {
-	// Render this sector wireframe.
 	DrawSectorWireFrame(sectorBounds);
 
 	// Recursively render the child sectors.

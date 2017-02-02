@@ -118,6 +118,9 @@ Mesh* Mesh::ImportFromOBJ(const std::string& objFileContents)
 	}
 
 	// Compile the vertex and face data into a list of vertices and indices.
+	bool hasNormals = (normals.size() > 0);
+	bool hasTexCoords = (texCoords.size() > 0);
+	bool hasColors = (texCoords.size() > 0);
 	std::vector<VertexPosNorm> vertices;
 	std::vector<unsigned int> indices;
 	for (unsigned int i = 0; i < faces.size(); i++)

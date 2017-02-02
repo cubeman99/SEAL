@@ -33,6 +33,12 @@ void SimulationManager::Initialize()
 	// Initialize systems.
 	m_cameraSystem.Initialize(m_simulation);
 	m_simulationRenderer.Initialize(this);
+
+	// DEBUG: spawn some plants.
+	for (int i = 0; i < 5; ++i)
+	{
+		m_simulation->GetPlantSystem()->SpawnPlant();
+	}
 }
 		
 void SimulationManager::ToggleCameraTracking()

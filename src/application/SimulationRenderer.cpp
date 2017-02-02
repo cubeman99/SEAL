@@ -1,6 +1,6 @@
 #include "SimulationRenderer.h"
 #include "SimulationManager.h"
-
+#include <utilities/Timing.h>
 
 
 SimulationRenderer::SimulationRenderer()
@@ -58,6 +58,11 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 
 	// Initialize the oct-tree renderer.
 	m_octTreeRenderer.Initialize(&m_resourceManager, simulationManager);
+	
+	// World model (ico-sphere).
+	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
+	m_worldMaterial = new Material();
+	m_worldMaterial->SetColor(Color::WHITE);
 
 	// Create selection circle mesh.
 	{
@@ -101,10 +106,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 		m_materialAxisLines->SetColor(Color::WHITE);
 		m_materialAxisLines->SetIsLit(false);
 	}
-
-	m_worldMaterial = new Material();
-	m_worldMaterial->SetColor(Color::WHITE);
-
+	
 	// Add the computationally generated meshes to the resource manager.
 	m_resourceManager.AddMesh("axis_lines", m_meshAxisLines);
 	m_resourceManager.AddMesh("circle", m_meshSelectionCircle);
@@ -120,11 +122,15 @@ SimulationRenderer::~SimulationRenderer()
 
 void SimulationRenderer::Render(const Vector2f& viewPortSize)
 {
+	double startTime = Time::GetTime();
+
 	Simulation* simulation = m_simulationManager->GetSimulation();
 	ICamera* camera = m_simulationManager->GetCameraSystem()->GetActiveCamera();
 	Agent* selectedAgent = m_simulationManager->GetSelectedAgent();
 	float worldRadius = simulation->GetWorld()->GetRadius();
 	Transform3f transform;
+	
+	Vector3f cameraForward = camera->GetOrientation().GetForward();
 
 	float aspectRatio = viewPortSize.x / viewPortSize.y;
     glViewport(0, 0, (int) viewPortSize.x, (int) viewPortSize.y);
@@ -170,8 +176,10 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	// Render the world.
 	transform.SetIdentity();
 	transform.SetScale(worldRadius);
-	m_renderer.SetShader(m_shaderLitVertexColored);
-	m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
+	m_renderer.SetShader(m_shaderLit);
+	m_renderer.RenderMesh(m_worldMesh, m_worldMaterial, transform);
+	//m_renderer.SetShader(m_shaderLitVertexColored);
+	//m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
 	// Render the plants (meaning their offshoots)
 	PlantSystem* plantSystem = simulation->GetPlantSystem();
@@ -210,7 +218,8 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	
 	// Draw the selection circle.
 	if (selectedAgent != nullptr)
-	{	transform.pos = selectedAgent->GetPosition();
+	{
+		transform.pos = selectedAgent->GetPosition();
 		transform.pos.Normalize();
 		transform.pos *= worldRadius + 0.001f;
 		transform.rot = selectedAgent->GetOrientation();
@@ -227,7 +236,9 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	
 	// Render the OctTree
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
-
+	
+	double endTime = Time::GetTime();
+	m_renderTime = (endTime - startTime);
 }
 
 

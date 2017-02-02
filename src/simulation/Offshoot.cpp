@@ -28,3 +28,4 @@ bool Offshoot::Update(float growth)
 		return true; // used up
 	}
 }
+

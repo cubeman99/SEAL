@@ -27,15 +27,18 @@ public:
 
 	inline float GetTickRate() const { return m_tickRate; }
 	inline float GetTimeStep() const { return m_timeStep; }
+	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
+
 
 private:
-	float		m_tickRate; // How many ticks per second.
-	float		m_timeStep; // Length of time in seconds to simulate for each tick.
+	float			m_tickRate; // How many ticks per second.
+	float			m_timeStep; // Length of time in seconds to simulate for each tick.
 
-	World		m_world;
-	AgentSystem	m_agentSystem;
-	PlantSystem m_plantSystem;
-	OctTree		m_octTree;
+	unsigned int	m_ageInTicks;
+	World			m_world;
+	AgentSystem		m_agentSystem;
+	PlantSystem		m_plantSystem;
+	OctTree			m_octTree;
 };
 
 

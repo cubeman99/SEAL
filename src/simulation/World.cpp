@@ -7,14 +7,15 @@
 
 
 World::World() :
-	m_radius(0.8f)
+	m_radius(0.8f),
+	m_mesh(nullptr)
 {
-	m_mesh = Primitives::CreateIcoSphere(1.0f, 6, true);
+	//m_mesh = Primitives::CreateIcoSphere(1.0f, 6, true);
 }
 
 World::~World()
 {
-	delete m_mesh;
+	//delete m_mesh;
 }
 
 // Perform a sphere-ray intersection.

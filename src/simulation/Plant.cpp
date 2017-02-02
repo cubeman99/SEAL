@@ -37,6 +37,8 @@ bool Plant::Update(float growth)
 		{
 			++it;
 		}
+
+		theSimulation->GetOctTree()->DynamicUpdate(offshoot);
 	}
 
 	return (GetNumOffshoots() == 0); // If all used up
@@ -65,7 +67,7 @@ Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
 	m_offshoots.push_back(offshoot);
 
 	// Insert the agent into the oct-tree.					TODO: make this not crash
-	//theSimulation->GetOctTree()->InsertObject(offshoot);
+	theSimulation->GetOctTree()->InsertObject(offshoot);
 
 	return offshoot;
 }

@@ -19,15 +19,20 @@ public:
 
 	void Render(const Vector2f& viewPortSize);
 
+	inline double GetAverageRenderTime() const { return m_renderTime; }
+
 private:
 	SimulationManager* m_simulationManager;
 	ResourceManager	m_resourceManager;
 	Renderer		m_renderer;
 	OctTreeRenderer	m_octTreeRenderer;
 
+	double			m_renderTime; // measured time of render (in seconds)
+
 	// Resources.
 	Mesh* m_agentMesh;
 	Mesh* m_plantMesh;
+	Mesh* m_worldMesh;
 	Mesh* m_meshSelectionCircle;
 	Mesh* m_meshAxisLines;
 	Material* m_worldMaterial;

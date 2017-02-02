@@ -9,10 +9,6 @@ PlantSystem::PlantSystem(Simulation* simulation, float growthRate, float maxEner
 	m_growthRate(growthRate),
 	m_maxEnergy(maxEnergy)
 {
-	for (int i = 0; i < 5; ++i)
-	{
-		SpawnPlant();
-	}
 }
 
 PlantSystem::~PlantSystem()
@@ -43,7 +39,7 @@ Plant* PlantSystem::SpawnPlant()
 	m_plants.push_back(plant);
 
 	// Insert the agent into the oct-tree.		// TODO: make this not crash
-	//m_simulation->GetOctTree()->InsertObject(plant);
+	m_simulation->GetOctTree()->InsertObject(plant);
 
 	return plant;
 }
