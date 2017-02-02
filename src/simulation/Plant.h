@@ -26,7 +26,7 @@ public:
 
 private:
 	std::vector<Offshoot*> m_offshoots;
-	Simulation* theSimulation;
+	Simulation* m_simulation;
 	float m_maxEnergy;
 };
 

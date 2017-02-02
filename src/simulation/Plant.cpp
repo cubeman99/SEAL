@@ -4,9 +4,10 @@
 #include <utilities/Random.h>
 
 Plant::Plant(Simulation* sim, float maxEnergy) :
-	theSimulation(sim),
+	m_simulation(sim),
 	m_maxEnergy(maxEnergy)
 {
+	// TODO: randomize a bit
 	for (int i = 0; i < 5; ++i)
 	{
 		SpawnOffshoot();
@@ -38,7 +39,7 @@ bool Plant::Update(float growth)
 			++it;
 		}
 
-		theSimulation->GetOctTree()->DynamicUpdate(offshoot);
+		m_simulation->GetOctTree()->DynamicUpdate(offshoot);
 	}
 
 	return (GetNumOffshoots() == 0); // If all used up
@@ -48,7 +49,7 @@ Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
 {
 	Offshoot* offshoot = new Offshoot(m_maxEnergy);
 
-	float worldRadius = theSimulation->GetWorld()->GetRadius();
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
 
 	// Randomize position (on world surface).
 	offshoot->m_position.x = Random::NextFloat(-1, 1);
@@ -66,8 +67,8 @@ Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
 
 	m_offshoots.push_back(offshoot);
 
-	// Insert the agent into the oct-tree.					TODO: make this not crash
-	theSimulation->GetOctTree()->InsertObject(offshoot);
+	// Insert the agent into the oct-tree.
+	m_simulation->GetOctTree()->InsertObject(offshoot);
 
 	return offshoot;
 }
