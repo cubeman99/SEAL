@@ -10,7 +10,7 @@ SimulationRenderer::SimulationRenderer()
 void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 {
 	m_simulationManager = simulationManager;
-	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: magic string
+	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: this must change when the executable is moved
 
 	// Load shaders.
 	m_shaderLit = m_resourceManager.LoadShader("lit",
@@ -32,129 +32,32 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 		"#version 330 core\n"
 		"in vec3 a_vertPos;\n"
 		"uniform mat4 u_mvp;\n"
-		"void main()\n"
-		"{\n"
-			"gl_Position = u_mvp * vec4(a_vertPos, 1);\n"
-		"}";
+		"void main() { gl_Position = u_mvp * vec4(a_vertPos, 1); }";
 	const std::string fragmentSource = 
 		"#version 330 core\n"
 		"out vec4 o_color;\n"
-		"void main()\n"
-		"{\n"
-			"o_color = vec4(1,0,1,1);\n" // default color = magenta
-		"}";
+		"void main() { o_color = vec4(1,0,1,1); }";
 	m_defaultShader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, "default_shader_vs");
 	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
-	m_octTreeRenderer.Initialize(&m_resourceManager, simulationManager);
-
 	// TODO: Move this resource creation code somewhere else.
 
-	// Create agent mesh.
-	{
-		float h = 0.3f;
-		Vector3f v1(0, h, -1);			// top front
-		Vector3f v2(0.7f, h, 0.7f);		// top back right
-		Vector3f v3(-0.7f, h, 0.7f);	// top back left
-		Vector3f v4(0, 0, -1);			// bottom front
-		Vector3f v5(0.7f, 0, 0.7f);		// bottom back right
-		Vector3f v6(-0.7f, 0, 0.7f);	// bottom back left
-		Vector3f n1 = Vector3f::UP;							// top
-		Vector3f n2 = Vector3f(1.7f, 0, 0.7f).Normalize();	// right
-		Vector3f n3 = Vector3f::BACK;						// back
-		Vector3f n4 = Vector3f(-1.7f, 0, 0.7f).Normalize(); // left
-
-		VertexPosNorm vertices[] = {
-			VertexPosNorm(v1, n1), // Top
-			VertexPosNorm(v2, n1),
-			VertexPosNorm(v3, n1),
-			VertexPosNorm(v2, n2), // Right
-			VertexPosNorm(v1, n2),
-			VertexPosNorm(v4, n2),
-			VertexPosNorm(v5, n2),
-			VertexPosNorm(v3, n3), // Back
-			VertexPosNorm(v2, n3),
-			VertexPosNorm(v5, n3),
-			VertexPosNorm(v6, n3),
-			VertexPosNorm(v1, n4), // Left
-			VertexPosNorm(v3, n4),
-			VertexPosNorm(v6, n4),
-			VertexPosNorm(v4, n4),
-		};
-		unsigned int indices[] = {
-			0, 1, 2,
-			3, 4, 5, 3, 5, 6,
-			7, 8, 9, 7, 9, 10,
-			11, 12, 13, 11, 13, 14,
-		};
-
-		//m_agentMesh = new Mesh();
-		//m_agentMesh->GetVertexData()->BufferVertices(15, vertices);
-		//m_agentMesh->GetIndexData()->BufferIndices(21, indices);
-
-		//m_agentMaterial = new Material();
-		//m_agentMaterial->SetColor(Color::BLUE);
-	}
-
-	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/ae86.obj");
-	m_agentMesh->SetTransformMatrix(Matrix4f::CreateTranslation(0, 0.4f, 0));
+	// Agent model.
+	//m_agentMesh = m_resourceManager.LoadMesh("agent", "models/ae86.obj");
+	//m_agentMesh->SetTransformMatrix(Matrix4f::CreateTranslation(0, 0.4f, 0));
+	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	
-	// Create plant mesh.
-	{
-		float h = 0.1f * 10;
-		float l = 1.0f * 10;
-		Vector3f v1(-l, h, -l);			// top front left
-		Vector3f v2( l, h, -l);			// top front right
-		Vector3f v3(-l, h, l);			// top back left
-		Vector3f v4( l, h, l);			// top back right
-		Vector3f v5( -l, 0, -l);		// bottom front left
-		Vector3f v6( l, 0, -l);			// bottom front right
-		Vector3f v7( -l, 0, l);			// bottom back left
-		Vector3f v8( l, 0, l);			// bottom back right
+	// Plant model.
+	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
+	m_plantMaterial = new Material();
+	m_plantMaterial->SetColor(Color::GREEN);
 
-		Vector3f n1 = Vector3f::UP;		// top
-		Vector3f n2 = Vector3f::RIGHT;	// right
-		Vector3f n3 = Vector3f::BACK;	// back
-		Vector3f n4 = Vector3f::LEFT;	// left
-		Vector3f n5 = Vector3f::FORWARD;// front
-
-		VertexPosNorm vertices[] = {			// is this right?
-			VertexPosNorm(v1, n1), // Top
-			VertexPosNorm(v2, n1),
-			VertexPosNorm(v3, n1),
-			VertexPosNorm(v4, n1),
-			VertexPosNorm(v1, n5), // Front
-			VertexPosNorm(v2, n5),
-			VertexPosNorm(v5, n5),
-			VertexPosNorm(v6, n5),
-			VertexPosNorm(v3, n3), // Back
-			VertexPosNorm(v4, n3),
-			VertexPosNorm(v7, n3),
-			VertexPosNorm(v8, n3),
-			VertexPosNorm(v1, n4), // Left
-			VertexPosNorm(v3, n4),
-			VertexPosNorm(v5, n4),
-			VertexPosNorm(v7, n4),
-			VertexPosNorm(v2, n2), // Right
-			VertexPosNorm(v4, n2),
-			VertexPosNorm(v6, n2),
-			VertexPosNorm(v8, n2),
-		};
-		unsigned int indices[] = {			// this part I really wasn't sure
-			0, 1, 2, 3, 0,
-		};
-
-		m_plantMesh = new Mesh();
-		m_plantMesh->GetVertexData()->BufferVertices(20, vertices);
-		m_plantMesh->GetIndexData()->BufferIndices(5, indices); // <<<<<<<<<<<< Adjust indice count
-
-		m_plantMaterial = new Material();
-		m_plantMaterial->SetColor(Color::GREEN);
-	}
+	// Initialize the oct-tree renderer.
+	m_octTreeRenderer.Initialize(&m_resourceManager, simulationManager);
 
 	// Create selection circle mesh.
 	{
@@ -202,17 +105,12 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
 
+	// Add the computationally generated meshes to the resource manager.
 	m_resourceManager.AddMesh("axis_lines", m_meshAxisLines);
 	m_resourceManager.AddMesh("circle", m_meshSelectionCircle);
-	m_resourceManager.AddMesh("agent", m_agentMesh);
-	m_resourceManager.AddMesh("plant", m_plantMesh);
-	
 	m_resourceManager.AddMaterial("axis_lines", m_materialAxisLines);
 	m_resourceManager.AddMaterial("circle", m_materialSelectionCircle);
-	m_resourceManager.AddMaterial("agent", m_agentMaterial);
-	m_resourceManager.AddMaterial("plant", m_plantMaterial);
 	m_resourceManager.AddMaterial("world", m_worldMaterial);
-
 }
 
 SimulationRenderer::~SimulationRenderer()
@@ -277,8 +175,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	
 	// Render the plants (meaning their offshoots)
 	PlantSystem* plantSystem = simulation->GetPlantSystem();
-	float plantRadius = 0.016f; // TODO: magic number plant radius?
-	float plantOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (plantRadius * plantRadius));
+	float plantRadius = 0.010f; // TODO: magic number plant radius.
 	m_renderer.SetShader(m_shaderLit);
 	for (auto it = plantSystem->plants_begin(); it != plantSystem->plants_end(); it++)
 	{
@@ -289,24 +186,23 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 			Offshoot* offshoot = *it;
 			transform.pos = offshoot->GetPosition();
 			transform.pos.Normalize();
-			transform.pos *= worldRadius - plantOffset;
+			transform.pos *= worldRadius;
 			transform.rot = offshoot->GetOrientation();
 			transform.SetScale(plantRadius);
-			m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform); // TODO: finish plant "box" and change this line
+			m_renderer.RenderMesh(m_plantMesh, m_plantMaterial, transform); // TODO: finish plant "box" and change this line
 		}
 	}
 
 	// Render the agents.
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float agentRadius = 0.016f; // TODO: magic number agent radius.
-	float agentOffset = worldRadius - Math::Sqrt((worldRadius * worldRadius) - (agentRadius * agentRadius));
-		m_renderer.SetShader(m_shaderLit);
+	m_renderer.SetShader(m_shaderLit);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
-		Agent* agent = *it;
+		Agent* agent = *it;agent->GetRadius();
 		transform.pos = agent->GetPosition();
 		transform.pos.Normalize();
-		transform.pos *= worldRadius - agentOffset;
+		transform.pos *= worldRadius;
 		transform.rot = agent->GetOrientation();
 		transform.SetScale(agentRadius);
 		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);

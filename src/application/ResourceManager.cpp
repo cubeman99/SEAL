@@ -121,6 +121,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 		return nullptr;
 	}
 
+	AddMesh(name, mesh);
 	return mesh;
 }
 
