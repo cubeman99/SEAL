@@ -18,6 +18,7 @@ public:
 	Agent* SpawnAgent();
 	void RemoveAllAgents();
 	void UpdateAgents(float timeDelta);
+	void UpdateAgentVision(Agent* agent);
 
 	inline int GetNumAgents() const { return (int) m_agents.size(); }
 

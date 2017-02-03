@@ -4,6 +4,12 @@
 
 Agent::Agent()
 {
+	m_fieldOfView = 0.9f;
+	m_maxViewDistance = 0.2f;
+	m_angleBetweenEyes = 0.5f;
+	m_resolutions[0] = 8;
+	m_resolutions[1] = 8;
+	m_resolutions[2] = 8;
 }
 
 Agent::~Agent()

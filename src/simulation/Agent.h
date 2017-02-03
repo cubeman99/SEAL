@@ -6,6 +6,14 @@
 #include "SimulationObject.h"
 
 
+class Retina
+{
+	float			m_fieldOfView; // in radians.
+	float			m_maxViewDistance;
+	unsigned int	m_resolutions[3];
+};
+
+
 //-----------------------------------------------------------------------------
 // Agent - A single being of the simulation with its own body and brain.
 //-----------------------------------------------------------------------------
@@ -26,6 +34,14 @@ private:
 	
 	float m_moveSpeed; // Distance units per second.
 	float m_turnSpeed; // Radians per second.
+
+
+
+	float			m_fieldOfView; // in radians.
+	float			m_maxViewDistance;
+	float			m_angleBetweenEyes; // in radians.
+	unsigned int	m_resolutions[3];
+
 };
 
 

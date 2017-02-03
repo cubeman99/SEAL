@@ -57,6 +57,8 @@ void AgentSystem::UpdateAgents(float timeDelta)
 	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
 	{
 		Agent* agent = *it;
+
+		UpdateAgentVision(agent);
 	
 		agent->UpdateBrain();
 
@@ -79,6 +81,33 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		agent->m_orientation.Rotate(agent->m_orientation.GetRight(), angle);
 		
 		m_simulation->GetOctTree()->DynamicUpdate(agent);
+	}
+}
+
+void AgentSystem::UpdateAgentVision(Agent* agent)
+{
+	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
+	{
+		Agent* obj = *it;
+		if (obj == agent)
+			continue;
+
+		Vector3f vecToObj = obj->m_position - agent->m_position;
+		float distSqr = vecToObj.LengthSquared();
+		if (distSqr > agent->m_maxViewDistance * agent->m_maxViewDistance)
+			continue;
+
+		// Get the distance to the object with respect to its forward and right vectors.
+		Vector3f forward = agent->m_orientation.GetForward();
+		Vector3f right = agent->m_orientation.GetRight();
+		Vector2f p(vecToObj.Dot(right), vecToObj.Dot(forward));
+		p.Normalize();
+
+		// Calculate the angle offset from the agent's forward vector.
+		float angleOffset = (Math::HALF_PI - Math::ASin(p.y)) * Math::Sin(p.x);
+		if (Math::Abs(angleOffset) > agent->m_fieldOfView)
+			continue;
+
 	}
 }
 
