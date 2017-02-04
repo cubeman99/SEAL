@@ -10,19 +10,22 @@ class ObjectManager;
 
 
 // TODO: start using this enum somehow
-enum SimulationObjectType : unsigned int
+enum SimulationObjectType : int
 {
+	INVALID = '?',
+
 	AGENT = 'AGNT',
-	PREDATOR_AGENT = 'PRED',
-	PREY_AGENT = 'PREY',
+	//PREDATOR_AGENT = 'PRED',
+	//PREY_AGENT = 'PREY',
 	FOOD,
 	PLANT = 'PLNT',
+	OFFSHOOT = 'OFST',
 	CARCASS = 'CARC',
-	PLANT_SOURCE = 'PSRC',
 };
 
 #define DECLARE_SIMULATION_OBJECT(_type) \
-	enum { k_objectType = _type };
+	enum { k_objectType = _type }; \
+	virtual SimulationObjectType GetObjectType() const override { return _type; }
 
 
 //-----------------------------------------------------------------------------
@@ -36,7 +39,13 @@ public:
 	SimulationObject();
 	virtual ~SimulationObject() {}
 	
+	virtual void OnSpawn() {}
+	virtual void OnDestroy() {}
 	virtual void Update(float timeDelta) {}
+	virtual SimulationObjectType GetObjectType() const { return SimulationObjectType::INVALID; }
+
+	template <class T_Object>
+	bool IsObjectType() const { return (GetObjectType() == T_Object::k_objectType); }
 
 	// Getters
 	inline void SetPosition(const Vector3f& position) { m_position = position; }

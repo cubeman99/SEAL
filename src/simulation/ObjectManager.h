@@ -7,6 +7,8 @@
 #include <vector>
 
 class Simulation;
+class Agent;
+class Plant;
 
 
 //-----------------------------------------------------------------------------
@@ -14,26 +16,61 @@ class Simulation;
 //-----------------------------------------------------------------------------
 class ObjectManager
 {
+	template <class T_Object>
+	friend class SimulationObjectIterator;
+
 public:
+	//-----------------------------------------------------------------------------
+	// Tnitialization & termination
+
 	ObjectManager(Simulation* simulation);
 	~ObjectManager();
 
+	// Initialize the object manager.
 	void Initialize();
+
+	//-----------------------------------------------------------------------------
+	// Accessors
+
+	inline OctTree* GetOctTree() { return &m_octTree; }
+
+	//-----------------------------------------------------------------------------
+	// Object management
+
+	// Update all objects.
 	void UpdateObjects(float timeDelta);
+
+	// Clear (delete) all objects from the simulation.
 	void ClearObjects();
 	
-	template <class T_Object>
-	T_Object* SpawnObject(const Vector3f& position, const Vector3f& forward);
+	// Spawn an object into the simulation.
+	void SpawnObject(SimulationObject* object);
 
+	// Construct and spawn an object into the simulation at a random position.
 	template <class T_Object>
 	T_Object* SpawnObjectRandom();
-	
-	std::vector<SimulationObject*>::iterator objects_begin() { return m_objects.begin(); }
-	std::vector<SimulationObject*>::iterator objects_end() { return m_objects.end(); }
-	
+
+	//-----------------------------------------------------------------------------
+	// Object iteration
+
+	inline std::vector<SimulationObject*>::iterator objects_begin() { return m_objects.begin(); }
+	inline std::vector<SimulationObject*>::iterator objects_end() { return m_objects.end(); }
+
+	SimulationObjectIterator<Agent> agents_begin();
+	SimulationObjectIterator<Agent> agents_end();
+	SimulationObjectIterator<Plant> plants_begin();
+	SimulationObjectIterator<Plant> plants_end();
+
+	//-----------------------------------------------------------------------------
+	// Object helper functions
+
+	// Move a simulation object forward by a given distance. This will adjust
+	// its position and orientation to be aligned on the world's surface.
 	void MoveObjectForward(SimulationObject* object, float distance) const;
-	void CreateRandomPositionAndOrientation(Vector3f& position, Quaternion& orientation) const;
-	//void CreateRandomOrientation(Vector3f& position, Quaternion& orientation) const;
+
+	// Create a random position and orientation on the world's surface.
+	void CreateRandomPositionAndOrientation(
+		Vector3f& position, Quaternion& orientation) const;
 
 
 private:
@@ -43,32 +80,65 @@ private:
 	std::vector<SimulationObject*> m_objects;
 };
 
-	
+
+//-----------------------------------------------------------------------------
+// SimulationObjectIterator - used to iterate all the objects of certain type
+//                            in a simulation.
+//-----------------------------------------------------------------------------
 template <class T_Object>
-T_Object* ObjectManager::SpawnObject(const Vector3f& position, const Vector3f& forward)
+class SimulationObjectIterator
 {
-	T_Object* object = new T_Object();
-	object->m_objectManager = this;
-	object->m_isDestroyed = false;
-	
-	// Orthoganalize the orientation to be tangent to the world's surface.
-	Vector3f basisUp = position;
-	basisUp.Normalize();
-	Vector3f basisRight = forward.Cross(basisUp);
-	basisRight.Normalize();
-	Vector3f basisForward = basisUp.Cross(basisRight);
-	//Quaternion orientation = Quaternion::FromMatrix(;
-	//object->SetOrientation(orientation);
+public:
+	typedef SimulationObjectIterator<T_Object> iterator;
+	typedef T_Object*		value_type;
+	typedef value_type&		reference;
+	typedef value_type*		pointer;
 
-	// Make sure postion is on world's surface.
-	object->SetPosition(basisUp * m_simulation->GetWorld()->GetRadius());
+	SimulationObjectIterator(unsigned int index, ObjectManager* objectManager) :
+		m_index(index),
+		m_objectManager(objectManager)
+	{
+		while (m_index < m_objectManager->m_objects.size() &&
+			m_objectManager->m_objects[m_index]->GetObjectType() != T_Object::k_objectType)
+		{
+			++m_index;
+		}
+	}
 
-	// Insert the object.
-	m_objects.push_back(object);
-	m_octTree.InsertObject(object);
-	return object;
-}
-	
+	SimulationObjectIterator(const iterator& copy) :
+		m_index(copy.m_index),
+		m_objectManager(copy.m_objectManager)
+	{}
+
+	iterator& operator=(const iterator& other) { m_index = other.m_index; m_objectManager = other.m_objectManager; }
+	bool operator==(const iterator& other) const { return (m_index == other.m_index); }
+	bool operator!=(const iterator& other) const { return (m_index != other.m_index); }
+
+	iterator& operator++()
+	{
+		++m_index;
+		while (m_index < m_objectManager->m_objects.size() &&
+			m_objectManager->m_objects[m_index]->GetObjectType() != T_Object::k_objectType)
+		{
+			++m_index;
+		}
+		return *this;
+	}
+
+	T_Object* operator*() const { return (T_Object*) m_objectManager->m_objects[m_index]; }
+	T_Object* operator->() const { return (T_Object*) m_objectManager->m_objects[m_index]; }
+
+private:
+	unsigned int m_index;
+	ObjectManager* m_objectManager;
+	SimulationObjectType m_objectType;
+};
+
+
+//-----------------------------------------------------------------------------
+// ObjectManager template method definitions
+//-----------------------------------------------------------------------------
+
 template <class T_Object>
 T_Object* ObjectManager::SpawnObjectRandom()
 {
@@ -78,12 +148,11 @@ T_Object* ObjectManager::SpawnObjectRandom()
 	
 	// Randomize the object's position and orientation.
 	CreateRandomPositionAndOrientation(object->m_position, object->m_orientation);
-
-	// Insert the object.
-	m_objects.push_back(object);
-	m_octTree.InsertObject(object);
+	
+	SpawnObject(object);
 	return object;
 }
+
 
 
 #endif // _OBJECT_MANAGER_H_

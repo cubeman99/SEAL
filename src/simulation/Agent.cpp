@@ -26,6 +26,7 @@ Agent::Agent()
 	m_color.x = Random::NextFloat();
 	m_color.y = Random::NextFloat();
 	m_color.z = Random::NextFloat();
+	m_radius = 0.016f; // TODO: magic number agent radius.
 	
 	m_moveSpeed = 0.1f;
 	m_turnSpeed = 1.0f;
@@ -75,10 +76,8 @@ void Agent::SeeObject(SimulationObject* object)
 	p.Normalize();
 
 	// Calculate the angle offset from the agent's forward vector.
-	float angleOffset = Math::ATan2(p.x, p.y);// * Math::Sign(p.x);
-	//if (Math::Abs(angleOffset) > m_fieldOfView)
-		//continue;
-
+	float angleOffset = Math::ATan2(p.x, p.y);
+	
 	float fov = GetFieldOfView();
 	float t1 = (angleOffset - GetAngleBetweenEyes() * 0.5f) / fov;
 	float t2 = (angleOffset + (GetAngleBetweenEyes() * 0.5f) + fov) / fov;

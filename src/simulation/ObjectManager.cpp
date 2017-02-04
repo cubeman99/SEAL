@@ -29,6 +29,11 @@ void ObjectManager::Initialize()
 	m_octTree.SetMaxObjectsPerNode(1);
 }
 
+
+//-----------------------------------------------------------------------------
+// Object management
+//-----------------------------------------------------------------------------
+
 void ObjectManager::ClearObjects()
 {
 	// Delete all objects.
@@ -59,6 +64,8 @@ void ObjectManager::UpdateObjects(float timeDelta)
 		// Update the object.
 		object->Update(timeDelta);
 
+		// Update the object in the cct-tree since the
+		// object's position probably changed.
 		m_octTree.DynamicUpdate(object);
 	}
 	
@@ -74,6 +81,13 @@ void ObjectManager::UpdateObjects(float timeDelta)
 			i--;
 		}
 	}
+}
+
+void ObjectManager::SpawnObject(SimulationObject* object)
+{
+	m_objects.push_back(object);
+	m_octTree.InsertObject(object);
+	object->OnSpawn();
 }
 
 void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) const
@@ -99,6 +113,36 @@ void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) 
 	//float angle = Math::ACos(Vector3f::Normalize(object->m_position).Dot(Vector3f::Normalize(posPrev)));
 	//object->m_orientation.Rotate(object->m_orientation.GetRight(), angle);
 }
+
+
+//-----------------------------------------------------------------------------
+// Object iteration
+//-----------------------------------------------------------------------------
+
+SimulationObjectIterator<Agent> ObjectManager::agents_begin()
+{
+	return SimulationObjectIterator<Agent>(0, this);
+}
+
+SimulationObjectIterator<Agent> ObjectManager::agents_end()
+{
+	return SimulationObjectIterator<Agent>(m_objects.size(), this);
+}
+
+SimulationObjectIterator<Plant> ObjectManager::plants_begin()
+{
+	return SimulationObjectIterator<Plant>(0, this);
+}
+
+SimulationObjectIterator<Plant> ObjectManager::plants_end()
+{
+	return SimulationObjectIterator<Plant>(m_objects.size(), this);
+}
+
+
+//-----------------------------------------------------------------------------
+// Object helper functions
+//-----------------------------------------------------------------------------
 
 void ObjectManager::CreateRandomPositionAndOrientation(
 	Vector3f& position, Quaternion& orientation) const

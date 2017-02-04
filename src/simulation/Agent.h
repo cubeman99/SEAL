@@ -15,6 +15,8 @@ class Agent : public SimulationObject
 	friend class AgentSystem;
 
 public:
+	DECLARE_SIMULATION_OBJECT(SimulationObjectType::AGENT);
+
 	Agent();
 	~Agent();
 

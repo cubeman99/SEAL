@@ -14,10 +14,15 @@ class Plant : public SimulationObject
 	friend class AgentSystem;
 
 public:
+	DECLARE_SIMULATION_OBJECT(SimulationObjectType::PLANT);
+
+	Plant();
 	Plant(Simulation* sim, float maxEnergy);
 	~Plant();
 
 	void Init();
+	void OnSpawn() override;
+	void Update(float timeDelta) override;
 	bool UpdateGrowth(float growth); // returns true if it needs to "respawn"
 	Offshoot* SpawnOffshoot();
 

@@ -3,6 +3,14 @@
 #include <math/MathLib.h>
 #include <utilities/Random.h>
 
+Plant::Plant()
+{
+	m_isVisible = true;
+	m_radius = 0.02f; // TODO: magic number plant radius.
+	m_color.Set(1.0f, 1.0f, 0.0f);
+}
+
+
 Plant::Plant(Simulation* sim, float maxEnergy) :
 	m_simulation(sim),
 	m_maxEnergy(maxEnergy)
@@ -22,6 +30,19 @@ void Plant::Init()
 	{
 		SpawnOffshoot();
 	}
+}
+
+void Plant::OnSpawn()
+{
+	// TODO: randomize a bit
+	for (int i = 0; i < 5; ++i)
+	{
+		SpawnOffshoot();
+	}
+}
+
+void Plant::Update(float timeDelta)
+{
 }
 
 bool Plant::UpdateGrowth(float growth)
@@ -53,10 +74,10 @@ bool Plant::UpdateGrowth(float growth)
 
 Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
 {
-	Offshoot* offshoot = new Offshoot(m_maxEnergy);
-
+	Offshoot* offshoot = new Offshoot(this, m_maxEnergy);
+	/*
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
-
+	
 	// Randomize position (on world surface).
 	offshoot->m_position.x = Random::NextFloat(-1, 1);
 	offshoot->m_position.y = Random::NextFloat(-1, 1);
@@ -69,12 +90,17 @@ Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
 	float angle = Math::ACos(Vector3f::Normalize(offshoot->m_position).Dot(Vector3f::UP));
 	offshoot->m_orientation = Quaternion(axis, angle);
 	offshoot->m_orientation.Rotate(offshoot->m_orientation.GetUp(),
-		Random::NextFloat() * Math::TWO_PI);
-
+		Random::NextFloat() * Math::TWO_PI);*/
+	
 	m_offshoots.push_back(offshoot);
 
+	// Spawn the offshoot.
+	m_objectManager->SpawnObject(offshoot);
+	m_objectManager->CreateRandomPositionAndOrientation(
+		offshoot->m_position, offshoot->m_orientation);
+
 	// Insert the agent into the oct-tree.
-	m_simulation->GetOctTree()->InsertObject(offshoot);
+	//m_simulation->GetOctTree()->InsertObject(offshoot);
 
 	return offshoot;
 }

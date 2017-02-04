@@ -181,6 +181,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	//m_renderer.SetShader(m_shaderLitVertexColored);
 	//m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
+	/*
 	// Render the plants (meaning their offshoots)
 	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float plantRadius = 0.010f; // TODO: magic number plant radius.
@@ -217,22 +218,31 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		material.SetColor(agent->GetColor());
 		//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
 		m_renderer.RenderMesh(m_agentMesh, &material, transform);
-	}
+	}*/
+
+	// Render all simulation objects.
+	Material material;
+	material.SetIsLit(true);
+	m_renderer.SetShader(m_shaderLit);
 	ObjectManager* objectManager = simulation->GetObjectManager();
 	for (auto it = objectManager->objects_begin(); it != objectManager->objects_end(); ++it)
 	{
 		SimulationObject* object = *it;
-		if (dynamic_cast<Agent*>(object))
-		{
-			transform.pos = object->GetPosition();
-			transform.pos.Normalize();
-			transform.pos *= worldRadius;
-			transform.rot = object->GetOrientation();
-			transform.SetScale(agentRadius);
-			material.SetColor(object->GetColor());
-			//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
+
+		transform.pos = object->GetPosition();
+		transform.pos.Normalize();
+		transform.pos *= worldRadius;
+		transform.rot = object->GetOrientation();
+		transform.SetScale(object->GetRadius());
+		material.SetColor(object->GetColor());
+		
+		// Render with the appropriate mesh.
+		if (object->IsObjectType<Agent>())
 			m_renderer.RenderMesh(m_agentMesh, &material, transform);
-		}
+		else if (object->IsObjectType<Plant>())
+			m_renderer.RenderMesh(m_plantMesh, &material, transform);
+		else if (object->IsObjectType<Offshoot>())
+			m_renderer.RenderMesh(m_plantMesh, &material, transform);
 	}
 
 	// Render agent vision.
@@ -241,19 +251,14 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		m_renderer.SetShader(nullptr);
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(camera->GetViewProjection().data());
-		for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+		//for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+		//{
+			//RenderAgentVisionArcs(*it);
+		//}
+
+		for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
 		{
 			RenderAgentVisionArcs(*it);
-		}
-
-		for (auto it = objectManager->objects_begin(); it != objectManager->objects_end(); ++it)
-		{
-			SimulationObject* object = *it;
-			Agent* agent = dynamic_cast<Agent*>(object);
-			if (agent)
-			{
-				RenderAgentVisionArcs(agent);
-			}
 		}
 	}
 	
@@ -264,7 +269,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		transform.pos.Normalize();
 		transform.pos *= worldRadius + 0.001f;
 		transform.rot = selectedAgent->GetOrientation();
-		transform.SetScale(agentRadius * 1.2f);
+		transform.SetScale(selectedAgent->GetRadius() * 1.2f);
 		m_renderer.SetShader(m_shaderUnlit);
 		m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
 	}
