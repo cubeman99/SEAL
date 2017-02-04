@@ -18,19 +18,17 @@ class Offshoot : public SimulationObject
 public:
 	DECLARE_SIMULATION_OBJECT(SimulationObjectType::OFFSHOOT);
 
-	Offshoot(Plant* plant, float maxEnergy);
+	Offshoot(Plant* plant);
 	~Offshoot();
-
 	
 	void OnDestroy() override;
 	void Update(float timeDelta) override;
-
-	bool UpdateGrowth(float growth); // returns true if used up
 
 private:
 	Plant* m_source;
 	float m_energy;
 	float m_maxEnergy;
+	float m_growthRate;
 };
 
 

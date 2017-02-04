@@ -11,12 +11,12 @@ Plant::Plant()
 }
 
 
-Plant::Plant(Simulation* sim, float maxEnergy) :
-	m_simulation(sim),
-	m_maxEnergy(maxEnergy)
-{
-	m_isVisible = false;
-}
+//Plant::Plant(Simulation* sim, float maxEnergy) :
+//	m_simulation(sim),
+//	m_maxEnergy(maxEnergy)
+//{
+//	m_isVisible = false;
+//}
 
 Plant::~Plant()
 {
@@ -33,66 +33,50 @@ void Plant::OnSpawn()
 
 void Plant::Update(float timeDelta)
 {
-}
-
-bool Plant::UpdateGrowth(float growth)
-{
 	// TODO: spawn offshoots if below capacity with random chance
 
-	for (auto it = m_offshoots.begin(); it != m_offshoots.end();)
+	if (GetNumOffshoots() > 0)
 	{
-		Offshoot* offshoot = *it;
-
-		bool isDead = offshoot->UpdateGrowth(growth);
-
-		if (isDead)
+		for (auto it = m_offshoots.begin(); it != m_offshoots.end(); ++it)
 		{
-			it = m_offshoots.erase(it);
+			Offshoot* offshoot = *it;
 
-			// TODO: remove from octree?
+			offshoot->Update(timeDelta);
 		}
-		else
-		{
-			++it;
-		}
-
-		m_simulation->GetOctTree()->DynamicUpdate(offshoot);
 	}
-
-	return (GetNumOffshoots() == 0); // If all used up
+	else
+	{
+		// Respawn with new offshoots
+		m_objectManager->CreateRandomPositionAndOrientation(
+			m_position, m_orientation);
+		OnSpawn();
+	}
 }
 
 Offshoot* Plant::SpawnOffshoot()
 {
-	Offshoot* offshoot = new Offshoot(this, m_maxEnergy);
-	/*
-	float worldRadius = m_simulation->GetWorld()->GetRadius();
-
-	// Fudge position away from plant source
-	float factor = 0.25f;
-	offshoot->m_position = m_position;
-	offshoot->m_position.x += Random::NextFloat(-1, 1) * factor;
-	offshoot->m_position.y += Random::NextFloat(-1, 1) * factor;
-	offshoot->m_position.z += Random::NextFloat(-1, 1) * factor;
-	offshoot->m_position.Normalize();
-	offshoot->m_position *= worldRadius;
-
-	// Randomize orientation (tangent to world surface).
-	Vector3f axis = offshoot->m_position.Cross(Vector3f::UP).Normalize();
-	float angle = Math::ACos(Vector3f::Normalize(offshoot->m_position).Dot(Vector3f::UP));
-	offshoot->m_orientation = Quaternion(axis, angle);
-	offshoot->m_orientation.Rotate(offshoot->m_orientation.GetUp(),
-		Random::NextFloat() * Math::TWO_PI);*/
+	Offshoot* offshoot = new Offshoot(this);
 	
 	m_offshoots.push_back(offshoot);
 
 	// Spawn the offshoot.
 	m_objectManager->SpawnObject(offshoot);
-	m_objectManager->CreateRandomPositionAndOrientation(
-		offshoot->m_position, offshoot->m_orientation);
-
-	// Insert the agent into the oct-tree.
-	//m_simulation->GetOctTree()->InsertObject(offshoot);
+	m_objectManager->CreateRelativeRandomPositionAndOrientation(
+		m_position, offshoot->m_position, 0.28f, offshoot->m_orientation);
 
 	return offshoot;
+}
+
+void Plant::NotifyOffshootDeath(Offshoot* toRemove)
+{
+	// Remove offshoot from my list, but allow ObjectManager to destroy it
+	bool foundIt = false;
+	for (unsigned int i = 0; i < m_offshoots.size() && !foundIt; ++i)
+	{
+		if (m_offshoots[i] == toRemove)
+		{
+			foundIt = true;
+			m_offshoots.erase(offshoots_begin() + i);
+		}
+	}
 }

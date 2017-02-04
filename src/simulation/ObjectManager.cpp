@@ -169,3 +169,23 @@ void ObjectManager::CreateRandomPositionAndOrientation(
 }
 
 
+void ObjectManager::CreateRelativeRandomPositionAndOrientation(Vector3f relativePosition,
+	Vector3f& newPosition, float randomFactor, Quaternion& orientation) const
+{
+	newPosition = relativePosition;
+	newPosition.x += Random::NextFloat(-1, 1) * randomFactor;
+	newPosition.y += Random::NextFloat(-1, 1) * randomFactor;
+	newPosition.z += Random::NextFloat(-1, 1) * randomFactor;
+	newPosition.Normalize();
+
+	// Randomize orientation (tangent to world surface).
+	Vector3f axis = newPosition.Cross(Vector3f::UP);
+	axis.Normalize();
+	float angle = Math::ACos(Vector3f::Normalize(newPosition).Dot(Vector3f::UP));
+	orientation = Quaternion(axis, angle);
+	orientation.Rotate(orientation.GetUp(),
+		Random::NextFloat() * Math::TWO_PI);
+
+	// Make sure postion is on world's surface.
+	newPosition *= m_simulation->GetWorld()->GetRadius();
+}
