@@ -201,7 +201,7 @@ void AgentSystem::SeeObject(Agent* agent, SimulationObject* object)
 			eye->SetSightValue(channel, index, objColor[channel]);
 		}
 	}
-	if (t1 >= 0.0f && t1 <= 1.0f)
+	if (t2 >= 0.0f && t2 <= 1.0f)
 	{
 		Retina* eye = agent->GetEye(1);
 		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
