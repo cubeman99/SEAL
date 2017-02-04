@@ -77,9 +77,19 @@ Plant* AgentSystem::SpawnPlant()
 	plant->m_position.Normalize();
 	plant->m_position *= worldRadius;
 
+	// Randomize orientation (tangent to world surface).
+	Vector3f axis = plant->m_position.Cross(Vector3f::UP).Normalize();
+	float angle = Math::ACos(Vector3f::Normalize(plant->m_position).Dot(Vector3f::UP));
+	plant->m_orientation = Quaternion(axis, angle);
+	plant->m_orientation.Rotate(plant->m_orientation.GetUp(),
+		Random::NextFloat() * Math::TWO_PI);
+
 	m_plants.push_back(plant);
 
-	// Insert the agent into the oct-tree.		// TODO: make this not crash
+	// Spawn offshoots
+	plant->OnSpawn();
+
+	// Insert the agent into the oct-tree.
 	m_simulation->GetOctTree()->InsertObject(plant);
 
 	return plant;
@@ -141,7 +151,7 @@ void AgentSystem::UpdatePlants(float timeDelta)
 			m_simulation->GetOctTree()->DynamicUpdate(plant);
 
 			// Regrow some offshoots
-			plant->Init();
+			plant->OnSpawn();
 		}
 	}
 }

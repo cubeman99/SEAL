@@ -17,7 +17,7 @@ public:
 	Plant(Simulation* sim, float maxEnergy);
 	~Plant();
 
-	void Init();
+	void OnSpawn();
 	bool Update(float growth); // returns true if it needs to "respawn"
 	Offshoot* SpawnOffshoot();
 

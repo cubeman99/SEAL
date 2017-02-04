@@ -8,17 +8,16 @@ Plant::Plant(Simulation* sim, float maxEnergy) :
 	m_maxEnergy(maxEnergy)
 {
 	m_isVisible = false;
-	Init();
 }
 
 Plant::~Plant()
 {
 }
 
-void Plant::Init()
+void Plant::OnSpawn()
 {
 	// TODO: randomize a bit
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
 		SpawnOffshoot();
 	}
@@ -51,16 +50,18 @@ bool Plant::Update(float growth)
 	return (GetNumOffshoots() == 0); // If all used up
 }
 
-Offshoot* Plant::SpawnOffshoot()	// TODO: Spawn only within radius of me
+Offshoot* Plant::SpawnOffshoot()
 {
 	Offshoot* offshoot = new Offshoot(m_maxEnergy);
 
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 
-	// Randomize position (on world surface).
-	offshoot->m_position.x = Random::NextFloat(-1, 1);
-	offshoot->m_position.y = Random::NextFloat(-1, 1);
-	offshoot->m_position.z = Random::NextFloat(-1, 1);
+	// Fudge position away from plant source
+	float factor = 0.25f;
+	offshoot->m_position = m_position;
+	offshoot->m_position.x += Random::NextFloat(-1, 1) * factor;
+	offshoot->m_position.y += Random::NextFloat(-1, 1) * factor;
+	offshoot->m_position.z += Random::NextFloat(-1, 1) * factor;
 	offshoot->m_position.Normalize();
 	offshoot->m_position *= worldRadius;
 
