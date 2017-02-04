@@ -66,7 +66,7 @@ Agent* AgentSystem::SpawnAgent()
 
 Plant* AgentSystem::SpawnPlant()
 {
-	Plant* plant = new Plant(m_simulation, m_plantMaxEnergy);
+	Plant* plant = new Plant();
 
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 
@@ -134,25 +134,6 @@ void AgentSystem::UpdatePlants(float timeDelta)
 	for (auto it = m_plants.begin(); it != m_plants.end(); ++it)
 	{
 		Plant* plant = *it;
-
-		usedUp = plant->UpdateGrowth(timeDelta * m_plantGrowthRate);
-
-		if (usedUp)
-		{
-			float worldRadius = m_simulation->GetWorld()->GetRadius();
-
-			// Randomize position (on world surface).
-			plant->m_position.x = Random::NextFloat(-1, 1);
-			plant->m_position.y = Random::NextFloat(-1, 1);
-			plant->m_position.z = Random::NextFloat(-1, 1);
-			plant->m_position.Normalize();
-			plant->m_position *= worldRadius;
-
-			m_simulation->GetOctTree()->DynamicUpdate(plant);
-
-			// Regrow some offshoots
-			plant->OnSpawn();
-		}
 	}
 }
 

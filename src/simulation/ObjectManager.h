@@ -76,6 +76,9 @@ public:
 	void CreateRandomPositionAndOrientation(
 		Vector3f& position, Quaternion& orientation) const;
 
+	// Create a random position relative to another, also orientation
+	void CreateRelativeRandomPositionAndOrientation( Vector3f relativePosition,
+		Vector3f& newPosition, float randomFactor, Quaternion& orientation) const;
 
 private:
 	Simulation*		m_simulation;

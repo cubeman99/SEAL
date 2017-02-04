@@ -2,11 +2,12 @@
 #include <simulation/Plant.h>
 
 
-Offshoot::Offshoot(Plant* plant, float maxEnergy) :
-	m_source(plant),
-	m_maxEnergy(maxEnergy)
+Offshoot::Offshoot(Plant* plant) :
+	m_source(plant)
 {
-	m_energy = maxEnergy / 2.0f;
+	m_maxEnergy = 100.0f;
+	m_energy = m_maxEnergy / 2.0f;
+	m_growthRate = 0.2f;
 	
 	m_isVisible = true;
 	m_radius = 0.010f; // TODO: magic number offshoot radius.
@@ -19,30 +20,22 @@ Offshoot::~Offshoot()
 
 void Offshoot::OnDestroy()
 {
-	// TODO: Notify the plant source ??
+	m_source->NotifyOffshootDeath(this);
 }
 
 void Offshoot::Update(float timeDelta)
 {
-	
-}
-
-bool Offshoot::UpdateGrowth(float growth)
-{
-	if (m_energy > 0)
+	if (m_energy > 0.0f)
 	{
-		m_energy += growth;
+		m_energy += m_growthRate * timeDelta;
 
 		if (m_energy > m_maxEnergy)
 		{
 			m_energy = m_maxEnergy;
 		}
-
-		return false; // not dead
 	}
 	else
 	{
-		return true; // used up
+		Destroy();
 	}
 }
-
