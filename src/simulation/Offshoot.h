@@ -16,7 +16,7 @@ public:
 	Offshoot(float maxEnergy);
 	~Offshoot();
 
-	bool Update(float growth); // returns true if used up
+	bool UpdateGrowth(float growth); // returns true if used up
 
 private:
 	float m_energy;

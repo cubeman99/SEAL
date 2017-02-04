@@ -208,7 +208,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	material.SetIsLit(true);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
-		Agent* agent = *it;agent->GetRadius();
+		Agent* agent = *it;
 		transform.pos = agent->GetPosition();
 		transform.pos.Normalize();
 		transform.pos *= worldRadius;
@@ -217,6 +217,22 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		material.SetColor(agent->GetColor());
 		//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
 		m_renderer.RenderMesh(m_agentMesh, &material, transform);
+	}
+	ObjectManager* objectManager = simulation->GetObjectManager();
+	for (auto it = objectManager->objects_begin(); it != objectManager->objects_end(); ++it)
+	{
+		SimulationObject* object = *it;
+		if (dynamic_cast<Agent*>(object))
+		{
+			transform.pos = object->GetPosition();
+			transform.pos.Normalize();
+			transform.pos *= worldRadius;
+			transform.rot = object->GetOrientation();
+			transform.SetScale(agentRadius);
+			material.SetColor(object->GetColor());
+			//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
+			m_renderer.RenderMesh(m_agentMesh, &material, transform);
+		}
 	}
 
 	// Render agent vision.
@@ -227,8 +243,17 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		glLoadMatrixf(camera->GetViewProjection().data());
 		for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 		{
-			if (m_simulationManager->GetShowAgentVision())
-				RenderAgentVisionArcs(*it);
+			RenderAgentVisionArcs(*it);
+		}
+
+		for (auto it = objectManager->objects_begin(); it != objectManager->objects_end(); ++it)
+		{
+			SimulationObject* object = *it;
+			Agent* agent = dynamic_cast<Agent*>(object);
+			if (agent)
+			{
+				RenderAgentVisionArcs(agent);
+			}
 		}
 	}
 	

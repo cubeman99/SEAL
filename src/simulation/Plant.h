@@ -18,7 +18,7 @@ public:
 	~Plant();
 
 	void Init();
-	bool Update(float growth); // returns true if it needs to "respawn"
+	bool UpdateGrowth(float growth); // returns true if it needs to "respawn"
 	Offshoot* SpawnOffshoot();
 
 	inline int GetNumOffshoots() const { return (int)m_offshoots.size(); }

@@ -125,7 +125,7 @@ void AgentSystem::UpdatePlants(float timeDelta)
 	{
 		Plant* plant = *it;
 
-		usedUp = plant->Update(timeDelta * m_plantGrowthRate);
+		usedUp = plant->UpdateGrowth(timeDelta * m_plantGrowthRate);
 
 		if (usedUp)
 		{

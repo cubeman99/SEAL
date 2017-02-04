@@ -210,7 +210,10 @@ void OctTree::DoClear(OctTreeNode* node)
 	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
 	{
 		if (node->m_children[sectorIndex] != nullptr)
+		{
 			DoClear(node->m_children[sectorIndex]);
+			node->m_children[sectorIndex] = nullptr;
+		}
 	}
 
 	// Delete the node itself (but not the root node).

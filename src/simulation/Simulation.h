@@ -1,11 +1,11 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
-#include "World.h"
-#include "AgentSystem.h"
-#include "OctTree.h"
-#include "SimulationObject.h"
-
+#include <simulation/World.h>
+#include <simulation/AgentSystem.h>
+#include <simulation/OctTree.h>
+#include <simulation/SimulationObject.h>
+#include <simulation/ObjectManager.h>
 
 
 //-----------------------------------------------------------------------------
@@ -20,6 +20,7 @@ public:
 	void Tick();
 	
 	inline AgentSystem* GetAgentSystem() { return &m_agentSystem; }
+	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return &m_octTree; }
 
@@ -36,6 +37,8 @@ private:
 	World			m_world;
 	AgentSystem		m_agentSystem;
 	OctTree			m_octTree;
+
+	ObjectManager	m_objectManager;
 };
 
 

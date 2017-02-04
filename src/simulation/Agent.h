@@ -18,7 +18,10 @@ public:
 	Agent();
 	~Agent();
 
+	void Update(float timeDelta);
+	void UpdateVision();
 	void UpdateBrain();
+	void SeeObject(SimulationObject* object);
 
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
@@ -43,7 +46,6 @@ private:
 	float			m_maxViewDistance;
 	float			m_angleBetweenEyes; // in radians.
 	unsigned int	m_resolutions[3];
-
 };
 
 

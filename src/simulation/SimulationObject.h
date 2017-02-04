@@ -34,7 +34,10 @@ class SimulationObject
 
 public:
 	SimulationObject();
+	virtual ~SimulationObject() {}
 	
+	virtual void Update(float timeDelta) {}
+
 	// Getters
 	inline void SetPosition(const Vector3f& position) { m_position = position; }
 	inline void SetOrientation(const Quaternion& orientation) { m_orientation = orientation; }

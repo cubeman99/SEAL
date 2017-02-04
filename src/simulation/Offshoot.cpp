@@ -12,7 +12,7 @@ Offshoot::~Offshoot()
 {
 }
 
-bool Offshoot::Update(float growth)
+bool Offshoot::UpdateGrowth(float growth)
 {
 	if (m_energy > 0)
 	{

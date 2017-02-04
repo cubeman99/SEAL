@@ -127,7 +127,8 @@ void SimulationWindow::OnToggleCameraTracking(wxCommandEvent& e)
 void SimulationWindow::OnSpawnAgents(wxCommandEvent& e)
 {
 	for (int i = 0; i < 10; i++)
-		m_simulationManager.GetSimulation()->GetAgentSystem()->SpawnAgent();
+		m_simulationManager.GetSimulation()->GetObjectManager()->SpawnObjectRandom<Agent>();
+		//m_simulationManager.GetSimulation()->GetAgentSystem()->SpawnAgent();
 }
 
 void SimulationWindow::OnMenuItem(wxCommandEvent& e)

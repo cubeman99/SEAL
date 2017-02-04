@@ -24,7 +24,7 @@ void Plant::Init()
 	}
 }
 
-bool Plant::Update(float growth)
+bool Plant::UpdateGrowth(float growth)
 {
 	// TODO: spawn offshoots if below capacity with random chance
 
@@ -32,7 +32,7 @@ bool Plant::Update(float growth)
 	{
 		Offshoot* offshoot = *it;
 
-		bool isDead = offshoot->Update(growth);
+		bool isDead = offshoot->UpdateGrowth(growth);
 
 		if (isDead)
 		{
