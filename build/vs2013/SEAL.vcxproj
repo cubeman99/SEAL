@@ -51,6 +51,7 @@
     <ClCompile Include="..\..\src\math\Vector4f.cpp" />
     <ClCompile Include="..\..\src\simulation\Agent.cpp" />
     <ClCompile Include="..\..\src\simulation\AgentSystem.cpp" />
+    <ClCompile Include="..\..\src\simulation\ObjectManager.cpp" />
     <ClCompile Include="..\..\src\simulation\OctTree.cpp" />
     <ClCompile Include="..\..\src\simulation\Offshoot.cpp" />
     <ClCompile Include="..\..\src\simulation\Plant.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="..\..\src\math\Vector4f.h" />
     <ClInclude Include="..\..\src\simulation\Agent.h" />
     <ClInclude Include="..\..\src\simulation\AgentSystem.h" />
+    <ClInclude Include="..\..\src\simulation\ObjectManager.h" />
     <ClInclude Include="..\..\src\simulation\OctTree.h" />
     <ClInclude Include="..\..\src\simulation\Offshoot.h" />
     <ClInclude Include="..\..\src\simulation\Plant.h" />

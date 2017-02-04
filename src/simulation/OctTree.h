@@ -69,7 +69,7 @@ public:
 	// TODO: Queries
 	//template <T>
 	//void QueryCollision(const Sphere& sphere);
-
+	
 
 private:
 

@@ -33,6 +33,7 @@ public:
 	std::vector<Plant*>::iterator plants_begin() { return m_plants.begin(); }
 	std::vector<Plant*>::iterator plants_end() { return m_plants.end(); }
 
+
 private:
 	void FlockAgent(Agent* agent);
 

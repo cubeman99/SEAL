@@ -16,6 +16,7 @@ enum
 	VIEW_LIGHTING,
 	SHOW_OCT_TREE_ON_SURFACE,
 	SHOW_OCT_TREE_WIRE_FRAME,
+	SHOW_AGENT_VISION,
 
 	DEBUG_SPAWN_AGENTS,
 	
@@ -34,6 +35,7 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(VIEW_LIGHTING, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_OCT_TREE_ON_SURFACE, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_OCT_TREE_WIRE_FRAME, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_AGENT_VISION, SimulationWindow::OnMenuItem)
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
@@ -74,6 +76,7 @@ SimulationWindow::SimulationWindow() :
     menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL")->Check(true);
     menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO")->Check(false);
     menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O")->Check(false);
+    menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA")->Check(false);
 
 	// DEBUG
     wxMenu* menuDebug = new wxMenu;
@@ -142,6 +145,9 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		break;
 	case SHOW_OCT_TREE_WIRE_FRAME:
 		m_simulationManager.SetShowOctTreeWireFrame(e.IsChecked());
+		break;
+	case SHOW_AGENT_VISION:
+		m_simulationManager.SetShowAgentVision(e.IsChecked());
 		break;
 	case wxID_ABOUT:
 	{

@@ -219,33 +219,17 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		m_renderer.RenderMesh(m_agentMesh, &material, transform);
 	}
 
-	// Render the agents.
-	m_renderer.SetShader(nullptr);
-	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+	// Render agent vision.
+	if (m_simulationManager->GetShowAgentVision())
 	{
-		Agent* agent = *it;agent->GetRadius();
-		transform.pos = agent->GetPosition();
-		transform.pos.Normalize();
-		transform.pos *= worldRadius;
-		transform.rot = agent->GetOrientation();
-		transform.SetScale(agentRadius);
-
+		m_renderer.SetShader(nullptr);
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(camera->GetViewProjection().data());
-
-		RenderAgentVisionArcs(agent);
-/*
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(transform.GetMatrix().data());
-
-		glDisable(GL_DEPTH_TEST);
-		glPointSize(8.0f);
-		glBegin(GL_LINES);
-			glColor3f(1,0,0);
-			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, -10.f);
-		glEnd();
-		glEnable(GL_DEPTH_TEST);*/
+		for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+		{
+			if (m_simulationManager->GetShowAgentVision())
+				RenderAgentVisionArcs(*it);
+		}
 	}
 	
 	// Draw the selection circle.
@@ -278,72 +262,51 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 {
 	Transform3f transform;
 	transform.pos = agent->GetPosition();
-	transform.pos.Normalize();
-	transform.pos *= m_simulationManager->GetSimulation()->GetWorld()->GetRadius();
 	transform.rot = agent->GetOrientation();
-
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadMatrixf(camera->GetViewProjection().data());
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(transform.GetMatrix().data());
 
-	float radius = agent->GetEye(0)->GetViewDistance();
-
-	float a1 = agent->GetAngleBetweenEyes() * 0.5f;
-	float a2 = a1 + agent->GetFieldOfView();
-	float x1 = Math::Sin(a1) * radius;
-	float z1 = -Math::Cos(a1) * radius;
-	float x2 = Math::Sin(a2) * radius;
-	float z2 = -Math::Cos(a2) * radius;
-
+	float angleBetweenEyes = agent->GetAngleBetweenEyes();
+	float viewDistance = agent->GetEye(0)->GetViewDistance();
+	float fov = agent->GetFieldOfView();
 	unsigned int numVertices = 20;
 
-	float angleBetweenEyes = agent->GetAngleBetweenEyes();
-	float viewDist = agent->GetMaxViewDistance();
-	float fov = agent->GetFieldOfView();
-
+	float red, green, blue;
+	float x, z, xPrev, zPrev;
+	
 	glBegin(GL_TRIANGLES);
-	/*	glVertex3f(0, 0, 0);
-		glVertex3f(x1, 0, z1);
-		glVertex3f(0, 0, 0);
-		glVertex3f(x2, 0, z2);
-		glVertex3f(0, 0, 0);
-		glVertex3f(-x1, 0, z1);
-		glVertex3f(0, 0, 0);
-		glVertex3f(-x2, 0, z2);*/
-		float xPrev;
-		float zPrev;
-		for (unsigned int i = 0; i < numVertices; i++)
-		{
-			float t = ((float) i / (float) (numVertices - 1));
-			float angle = (angleBetweenEyes * 0.5f);// + fov;
-			angle += t * fov;
-			float x = Math::Sin(angle) * radius;
-			float z = -Math::Cos(angle) * radius;
+	for (unsigned int i = 0; i < numVertices; i++)
+	{
+		float t = (((float) i + 0.5f) / (float) (numVertices - 1));
+		float angle = (angleBetweenEyes * 0.5f) + (t * fov);
+		x = Math::Sin(angle) * viewDistance;
+		z = -Math::Cos(angle) * viewDistance;
 
-			if (i > 0)
-			{
-				// Right eye
-				float red   = agent->GetEye(0)->GetSightValue(0, t);
-				float green = agent->GetEye(0)->GetSightValue(1, t);
-				float blue  = agent->GetEye(0)->GetSightValue(2, t);
-				glColor3f(red, green, blue);
-				glVertex3f(xPrev, 0, zPrev);
-				glVertex3f(x, 0, z);
-				glVertex3f(0, 0, 0);
+		if (i > 0)
+		{
+			// Right eye.
+			red   = agent->GetEye(0)->GetSightValue(0, t);
+			green = agent->GetEye(0)->GetSightValue(1, t);
+			blue  = agent->GetEye(0)->GetSightValue(2, t);
+			glColor3f(red, green, blue);
+			glVertex3f(xPrev, 0, zPrev);
+			glVertex3f(x, 0, z);
+			glVertex3f(0, 0, 0);
 				
-				// Left eye
-				red   = agent->GetEye(1)->GetSightValue(0, 1.0f - t);
-				green = agent->GetEye(1)->GetSightValue(1, 1.0f - t);
-				blue  = agent->GetEye(1)->GetSightValue(2, 1.0f - t);
-				glColor3f(red, green, blue);
-				glVertex3f(-xPrev, 0, zPrev);
-				glVertex3f(-x, 0, z);
-				glVertex3f(0, 0, 0);
-			}
-			xPrev = x;
-			zPrev = z;
+			// Left eye.
+			red   = agent->GetEye(1)->GetSightValue(0, 1.0f - t);
+			green = agent->GetEye(1)->GetSightValue(1, 1.0f - t);
+			blue  = agent->GetEye(1)->GetSightValue(2, 1.0f - t);
+			glColor3f(red, green, blue);
+			glVertex3f(-xPrev, 0, zPrev);
+			glVertex3f(-x, 0, z);
+			glVertex3f(0, 0, 0);
 		}
+
+		xPrev = x;
+		zPrev = z;
+	}
 	glEnd();
 }
 

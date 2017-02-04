@@ -16,7 +16,8 @@ SimulationManager::SimulationManager() :
 	  m_viewWireFrameMode(false),
 	  m_viewLighting(true),
 	  m_showOctTree(false),
-	  m_showOctTreeWireFrame(false)
+	  m_showOctTreeWireFrame(false),
+	  m_showAgentVision(false)
 {
 }
 

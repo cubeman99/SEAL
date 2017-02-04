@@ -1,7 +1,9 @@
 #include "SimulationObject.h"
 
 
-SimulationObject::SimulationObject()
+SimulationObject::SimulationObject() :
+	m_isVisible(true),
+	m_isDestroyed(false)
 {
 }
 

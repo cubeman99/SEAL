@@ -7,6 +7,7 @@ Plant::Plant(Simulation* sim, float maxEnergy) :
 	m_simulation(sim),
 	m_maxEnergy(maxEnergy)
 {
+	m_isVisible = false;
 	Init();
 }
 

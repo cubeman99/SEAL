@@ -192,6 +192,9 @@
     <ClCompile Include="..\..\src\simulation\Vision.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\simulation\ObjectManager.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -345,6 +348,9 @@
       <Filter>Source Files\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\Vision.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\ObjectManager.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
   </ItemGroup>

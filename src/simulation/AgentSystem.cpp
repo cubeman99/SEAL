@@ -38,6 +38,8 @@ Agent* AgentSystem::SpawnAgent()
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 	
 	// Randomize position (on world surface).
+	// NOTE: this is an uneven random distribution.
+	// Objects will be more populated around the extremes of the coorinate axes' 8 sectors.
 	agent->m_position.x = Random::NextFloat(-1, 1);
 	agent->m_position.y = Random::NextFloat(-1, 1);
 	agent->m_position.z = Random::NextFloat(-1, 1);
