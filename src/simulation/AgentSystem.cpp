@@ -89,7 +89,7 @@ void AgentSystem::UpdateAgents(float timeDelta)
 	{
 		Agent* agent = *it;
 
-		UpdateAgentVision(agent);
+		//UpdateAgentVision(agent);
 	
 		agent->UpdateBrain();
 
