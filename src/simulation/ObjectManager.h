@@ -32,7 +32,11 @@ public:
 	//-----------------------------------------------------------------------------
 	// Accessors
 
+	inline Simulation* GetSimulation() { return m_simulation; }
+
 	inline OctTree* GetOctTree() { return &m_octTree; }
+
+	inline unsigned int GetNumObjects() const { return m_objects.size(); }
 
 	//-----------------------------------------------------------------------------
 	// Object management
@@ -98,11 +102,7 @@ public:
 		m_index(index),
 		m_objectManager(objectManager)
 	{
-		while (m_index < m_objectManager->m_objects.size() &&
-			m_objectManager->m_objects[m_index]->GetObjectType() != T_Object::k_objectType)
-		{
-			++m_index;
-		}
+		MoveToValidObject();
 	}
 
 	SimulationObjectIterator(const iterator& copy) :
@@ -117,18 +117,32 @@ public:
 	iterator& operator++()
 	{
 		++m_index;
-		while (m_index < m_objectManager->m_objects.size() &&
-			m_objectManager->m_objects[m_index]->GetObjectType() != T_Object::k_objectType)
-		{
-			++m_index;
-		}
+		MoveToValidObject();
 		return *this;
+	}
+
+	iterator operator++(int)
+	{
+		iterator clone(*this);
+		++m_index;
+		MoveToValidObject();
+		return clone;
 	}
 
 	T_Object* operator*() const { return (T_Object*) m_objectManager->m_objects[m_index]; }
 	T_Object* operator->() const { return (T_Object*) m_objectManager->m_objects[m_index]; }
 
 private:
+	void MoveToValidObject() 
+	{
+		while (m_index < m_objectManager->m_objects.size() &&
+			(m_objectManager->m_objects[m_index]->GetObjectType() != T_Object::k_objectType ||
+			m_objectManager->m_objects[m_index]->IsDestroyed()))
+		{
+			++m_index;
+		}
+	}
+
 	unsigned int m_index;
 	ObjectManager* m_objectManager;
 	SimulationObjectType m_objectType;

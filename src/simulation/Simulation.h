@@ -19,10 +19,10 @@ public:
 	void Initialize();
 	void Tick();
 	
-	inline AgentSystem* GetAgentSystem() { return &m_agentSystem; }
+	//inline AgentSystem* GetAgentSystem() { return &m_agentSystem; }
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
-	inline OctTree* GetOctTree() { return &m_octTree; }
+	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }// &m_octTree; }
 
 	inline float GetTickRate() const { return m_tickRate; }
 	inline float GetTimeStep() const { return m_timeStep; }
@@ -35,8 +35,8 @@ private:
 
 	unsigned int	m_ageInTicks;
 	World			m_world;
-	AgentSystem		m_agentSystem;
-	OctTree			m_octTree;
+	//AgentSystem		m_agentSystem;
+	//OctTree			m_octTree;
 
 	ObjectManager	m_objectManager;
 };

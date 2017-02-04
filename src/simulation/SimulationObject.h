@@ -7,7 +7,12 @@
 #include <math/Quaternion.h>
 
 class ObjectManager;
+class Simulation;
 
+
+//-----------------------------------------------------------------------------
+// SimulationObjectType - Defines the types of simulation objects.
+//-----------------------------------------------------------------------------
 
 // TODO: start using this enum somehow
 enum SimulationObjectType : int
@@ -23,6 +28,7 @@ enum SimulationObjectType : int
 	CARCASS = 'CARC',
 };
 
+// Use this in a subclass of SimulationObject to declare its type.
 #define DECLARE_SIMULATION_OBJECT(_type) \
 	enum { k_objectType = _type }; \
 	virtual SimulationObjectType GetObjectType() const override { return _type; }
@@ -39,27 +45,39 @@ public:
 	SimulationObject();
 	virtual ~SimulationObject() {}
 	
+	// Virtual object methods
+
 	virtual void OnSpawn() {}
 	virtual void OnDestroy() {}
 	virtual void Update(float timeDelta) {}
-	virtual SimulationObjectType GetObjectType() const { return SimulationObjectType::INVALID; }
 
+	// Object type
+
+	virtual SimulationObjectType GetObjectType() const { return SimulationObjectType::INVALID; }
 	template <class T_Object>
 	bool IsObjectType() const { return (GetObjectType() == T_Object::k_objectType); }
 
-	// Getters
-	inline void SetPosition(const Vector3f& position) { m_position = position; }
-	inline void SetOrientation(const Quaternion& orientation) { m_orientation = orientation; }
+	// Object operations
 
+	void Destroy();
+
+	// Getters
+	
+	ObjectManager* GetObjectManager();
+	Simulation* GetSimulation();
+	Sphere GetBoundingSphere();
+	AABB GetBoundingBox();
 	inline const Vector3f& GetPosition() const { return m_position; }
 	inline const Quaternion& GetOrientation() const { return m_orientation; }
 	inline const Vector3f& GetColor() const { return m_color; }
 	inline float GetRadius() const { return m_radius; }
+	inline bool IsDestroyed() const { return m_isDestroyed; }
 	inline bool IsVisible() const { return m_isVisible; }
-	Sphere GetBoundingSphere();
-	AABB GetBoundingBox();
 
+	// Setters
 
+	inline void SetPosition(const Vector3f& position) { m_position = position; }
+	inline void SetOrientation(const Quaternion& orientation) { m_orientation = orientation; }
 
 protected:
 	bool		m_isVisible;

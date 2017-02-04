@@ -20,9 +20,9 @@ public:
 	Plant(Simulation* sim, float maxEnergy);
 	~Plant();
 
-	void Init();
 	void OnSpawn() override;
 	void Update(float timeDelta) override;
+
 	bool UpdateGrowth(float growth); // returns true if it needs to "respawn"
 	Offshoot* SpawnOffshoot();
 

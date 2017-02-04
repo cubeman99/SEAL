@@ -75,6 +75,7 @@ void ObjectManager::UpdateObjects(float timeDelta)
 		SimulationObject* object = m_objects[i];
 		if (object->m_isDestroyed)
 		{
+			object->OnDestroy();
 			m_objects.erase(m_objects.begin() + i);
 			m_octTree.RemoveObject(object);
 			delete object;

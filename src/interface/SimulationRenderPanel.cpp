@@ -110,9 +110,11 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 			Vector3f point = ray.GetPoint(distance);
 			
 			// Find agents near that point on the surface.
-			AgentSystem* agentSystem = GetSimulation()->GetAgentSystem();
+			//AgentSystem* agentSystem = GetSimulation()->GetAgentSystem();
 			GetSimulationManager()->SetSelectedAgent(nullptr);
-			for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+			ObjectManager* objectManager = GetSimulation()->GetObjectManager();
+			for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
+			//for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 			{
 				Agent* agent = *it;
 				if (agent->GetPosition().DistTo(point) < 0.1f)

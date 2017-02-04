@@ -177,9 +177,11 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 	}
 
 	// Number of agents.
-	int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
+	//int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
+	int numObjects = m_simulationManager.GetSimulation()->GetObjectManager()->GetNumObjects();
 	std::stringstream ss;
-	ss << numAgents << " agents";
+	//ss << numAgents << " agents";
+	ss << numObjects << " objects";
 	SetStatusText(ss.str(), 1);
 	
 	// FPS.

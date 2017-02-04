@@ -1,4 +1,5 @@
 #include "SimulationObject.h"
+#include <simulation/ObjectManager.h>
 
 
 SimulationObject::SimulationObject() :
@@ -7,6 +8,10 @@ SimulationObject::SimulationObject() :
 {
 }
 
+void SimulationObject::Destroy()
+{
+	m_isDestroyed = true;
+}
 
 Sphere SimulationObject::GetBoundingSphere()
 {
@@ -24,3 +29,12 @@ AABB SimulationObject::GetBoundingBox()
 	return aabb;
 }
 
+ObjectManager* SimulationObject::GetObjectManager()
+{
+	return m_objectManager;
+}
+
+Simulation* SimulationObject::GetSimulation()
+{
+	return m_objectManager->GetSimulation();
+}
