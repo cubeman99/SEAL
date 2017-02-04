@@ -162,6 +162,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	m_renderer.ApplyRenderSettings(true);
 	m_renderer.SetCamera(camera);
 
+	// Setup lighting properties.
 	if (!m_simulationManager->IsLightingEnabled())
 	{
 		m_renderer.SetLightColor(Color::BLACK);
@@ -178,48 +179,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	transform.SetScale(worldRadius);
 	m_renderer.SetShader(m_shaderLit);
 	m_renderer.RenderMesh(m_worldMesh, m_worldMaterial, transform);
-	//m_renderer.SetShader(m_shaderLitVertexColored);
-	//m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
-	/*
-	// Render the plants (meaning their offshoots)
-	AgentSystem* agentSystem = simulation->GetAgentSystem();
-	float plantRadius = 0.010f; // TODO: magic number plant radius.
-	m_renderer.SetShader(m_shaderLit);
-	for (auto it = agentSystem->plants_begin(); it != agentSystem->plants_end(); it++)
-	{
-		Plant* plant = *it;
-
-		for (auto it = plant->offshoots_begin(); it != plant->offshoots_end(); it++)
-		{
-			Offshoot* offshoot = *it;
-			transform.pos = offshoot->GetPosition();
-			transform.pos.Normalize();
-			transform.pos *= worldRadius;
-			transform.rot = offshoot->GetOrientation();
-			transform.SetScale(plantRadius);
-			m_renderer.RenderMesh(m_plantMesh, m_plantMaterial, transform); // TODO: finish plant "box" and change this line
-		}
-	}
-
-	// Render the agents.
-	float agentRadius = 0.016f; // TODO: magic number agent radius.
-	m_renderer.SetShader(m_shaderLit);
-	Material material;
-	material.SetIsLit(true);
-	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
-	{
-		Agent* agent = *it;
-		transform.pos = agent->GetPosition();
-		transform.pos.Normalize();
-		transform.pos *= worldRadius;
-		transform.rot = agent->GetOrientation();
-		transform.SetScale(agentRadius);
-		material.SetColor(agent->GetColor());
-		//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
-		m_renderer.RenderMesh(m_agentMesh, &material, transform);
-	}*/
-
 	// Render all simulation objects.
 	Material material;
 	material.SetIsLit(true);
@@ -251,11 +211,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		m_renderer.SetShader(nullptr);
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(camera->GetViewProjection().data());
-		//for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
-		//{
-			//RenderAgentVisionArcs(*it);
-		//}
-
+		
 		for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
 		{
 			RenderAgentVisionArcs(*it);
