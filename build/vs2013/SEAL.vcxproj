@@ -54,7 +54,6 @@
     <ClCompile Include="..\..\src\simulation\OctTree.cpp" />
     <ClCompile Include="..\..\src\simulation\Offshoot.cpp" />
     <ClCompile Include="..\..\src\simulation\Plant.cpp" />
-    <ClCompile Include="..\..\src\simulation\PlantSystem.cpp" />
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
     <ClCompile Include="..\..\src\simulation\SimulationObject.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
@@ -107,7 +106,6 @@
     <ClInclude Include="..\..\src\simulation\OctTree.h" />
     <ClInclude Include="..\..\src\simulation\Offshoot.h" />
     <ClInclude Include="..\..\src\simulation\Plant.h" />
-    <ClInclude Include="..\..\src\simulation\PlantSystem.h" />
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\SimulationObject.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />

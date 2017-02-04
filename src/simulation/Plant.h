@@ -11,12 +11,13 @@ class Simulation;
 //-----------------------------------------------------------------------------
 class Plant : public SimulationObject
 {
-	friend class PlantSystem;
+	friend class AgentSystem;
 
 public:
 	Plant(Simulation* sim, float maxEnergy);
 	~Plant();
 
+	void Init();
 	bool Update(float growth); // returns true if it needs to "respawn"
 	Offshoot* SpawnOffshoot();
 

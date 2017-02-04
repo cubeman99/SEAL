@@ -4,14 +4,17 @@
 #include <utilities/Random.h>
 
 
-AgentSystem::AgentSystem(Simulation* simulation) :
-	m_simulation(simulation)
+AgentSystem::AgentSystem(Simulation* simulation, float plantGrowthRate, float plantMaxEnergy) :
+	m_simulation(simulation),
+	m_plantGrowthRate(plantGrowthRate),
+	m_plantMaxEnergy(plantMaxEnergy)
 {
 }
 
 AgentSystem::~AgentSystem()
 {
 	RemoveAllAgents();
+	RemoveAllPlants();
 }
 
 void AgentSystem::RemoveAllAgents()
@@ -19,6 +22,13 @@ void AgentSystem::RemoveAllAgents()
 	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
 		delete *it;
 	m_agents.clear();
+}
+
+void AgentSystem::RemoveAllPlants()
+{
+	for (auto it = m_plants.begin(); it != m_plants.end(); ++it)
+		delete *it;
+	m_plants.clear();
 }
 
 Agent* AgentSystem::SpawnAgent()
@@ -52,6 +62,27 @@ Agent* AgentSystem::SpawnAgent()
 	return agent;
 }
 
+Plant* AgentSystem::SpawnPlant()
+{
+	Plant* plant = new Plant(m_simulation, m_plantMaxEnergy);
+
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
+
+	// Randomize position (on world surface).
+	plant->m_position.x = Random::NextFloat(-1, 1);
+	plant->m_position.y = Random::NextFloat(-1, 1);
+	plant->m_position.z = Random::NextFloat(-1, 1);
+	plant->m_position.Normalize();
+	plant->m_position *= worldRadius;
+
+	m_plants.push_back(plant);
+
+	// Insert the agent into the oct-tree.		// TODO: make this not crash
+	m_simulation->GetOctTree()->InsertObject(plant);
+
+	return plant;
+}
+
 void AgentSystem::UpdateAgents(float timeDelta)
 {
 	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
@@ -81,6 +112,35 @@ void AgentSystem::UpdateAgents(float timeDelta)
 		agent->m_orientation.Rotate(agent->m_orientation.GetRight(), angle);
 		
 		m_simulation->GetOctTree()->DynamicUpdate(agent);
+	}
+}
+
+void AgentSystem::UpdatePlants(float timeDelta)
+{
+	bool usedUp;
+
+	for (auto it = m_plants.begin(); it != m_plants.end(); ++it)
+	{
+		Plant* plant = *it;
+
+		usedUp = plant->Update(timeDelta * m_plantGrowthRate);
+
+		if (usedUp)
+		{
+			float worldRadius = m_simulation->GetWorld()->GetRadius();
+
+			// Randomize position (on world surface).
+			plant->m_position.x = Random::NextFloat(-1, 1);
+			plant->m_position.y = Random::NextFloat(-1, 1);
+			plant->m_position.z = Random::NextFloat(-1, 1);
+			plant->m_position.Normalize();
+			plant->m_position *= worldRadius;
+
+			m_simulation->GetOctTree()->DynamicUpdate(plant);
+
+			// Regrow some offshoots
+			plant->Init();
+		}
 	}
 }
 

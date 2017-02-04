@@ -3,7 +3,6 @@
 
 #include "World.h"
 #include "AgentSystem.h"
-#include "PlantSystem.h"
 #include "OctTree.h"
 #include "SimulationObject.h"
 
@@ -21,7 +20,6 @@ public:
 	void Tick();
 	
 	inline AgentSystem* GetAgentSystem() { return &m_agentSystem; }
-	inline PlantSystem* GetPlantSystem() { return &m_plantSystem; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return &m_octTree; }
 
@@ -37,7 +35,6 @@ private:
 	unsigned int	m_ageInTicks;
 	World			m_world;
 	AgentSystem		m_agentSystem;
-	PlantSystem		m_plantSystem;
 	OctTree			m_octTree;
 };
 

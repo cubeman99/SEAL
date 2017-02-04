@@ -37,7 +37,7 @@ void SimulationManager::Initialize()
 	// DEBUG: spawn some plants.
 	for (int i = 0; i < 5; ++i)
 	{
-		m_simulation->GetPlantSystem()->SpawnPlant();
+		m_simulation->GetAgentSystem()->SpawnPlant();
 	}
 }
 		

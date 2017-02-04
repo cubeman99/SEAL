@@ -7,15 +7,20 @@ Plant::Plant(Simulation* sim, float maxEnergy) :
 	m_simulation(sim),
 	m_maxEnergy(maxEnergy)
 {
+	Init();
+}
+
+Plant::~Plant()
+{
+}
+
+void Plant::Init()
+{
 	// TODO: randomize a bit
 	for (int i = 0; i < 5; ++i)
 	{
 		SpawnOffshoot();
 	}
-}
-
-Plant::~Plant()
-{
 }
 
 bool Plant::Update(float growth)

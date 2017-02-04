@@ -2,8 +2,7 @@
 #include <utilities/Timing.h>
 
 Simulation::Simulation() :
-	m_agentSystem(this),
-	m_plantSystem(this, 0.2f, 100.0f)
+	m_agentSystem(this, 0.25f, 100.0f)
 {
 	m_tickRate = 60;
 	m_timeStep = 1 / m_tickRate;
@@ -36,7 +35,7 @@ void Simulation::Tick()
 	// Update systems.
 	m_ageInTicks++;
 	m_agentSystem.UpdateAgents(m_timeStep);
-	m_plantSystem.UpdatePlants(m_timeStep);
+	m_agentSystem.UpdatePlants(m_timeStep);
 	
 	double endTime = Time::GetTime();
 	double elapsedTimeInMs = (endTime - startTime) * 1000.0;

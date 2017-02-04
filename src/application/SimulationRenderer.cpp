@@ -182,10 +182,10 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	//m_renderer.RenderMesh(simulation->GetWorld()->GetMesh(), m_worldMaterial, transform);
 	
 	// Render the plants (meaning their offshoots)
-	PlantSystem* plantSystem = simulation->GetPlantSystem();
+	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float plantRadius = 0.010f; // TODO: magic number plant radius.
 	m_renderer.SetShader(m_shaderLit);
-	for (auto it = plantSystem->plants_begin(); it != plantSystem->plants_end(); it++)
+	for (auto it = agentSystem->plants_begin(); it != agentSystem->plants_end(); it++)
 	{
 		Plant* plant = *it;
 
@@ -202,7 +202,6 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	}
 
 	// Render the agents.
-	AgentSystem* agentSystem = simulation->GetAgentSystem();
 	float agentRadius = 0.016f; // TODO: magic number agent radius.
 	m_renderer.SetShader(m_shaderLit);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
