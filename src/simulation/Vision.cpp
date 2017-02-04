@@ -37,6 +37,28 @@ float VisionChannel::GetSightValue(unsigned int index) const
 
 float VisionChannel::GetInterpolatedSightValue(float t) const
 {
+	if (m_resolution == 0)
+	{
+		return 0.0f;
+	}
+	else if (m_resolution == 1)
+	{
+		return m_buffer[0];
+	}
+	else
+	{
+		t = Math::Clamp(t, 0.0f, 1.0f);
+
+		float neuronIndex = (t * m_resolution) - 0.5f;
+		int index0 = Math::Max((int) neuronIndex + 0, 0);
+		int index1 = Math::Min((int) neuronIndex + 1, (int) m_resolution - 1);
+		float t = neuronIndex - (float) index0;
+
+		return Math::Lerp(GetSightValue(index0), GetSightValue(index1), t);
+	}
+
+
+
 	//assert(false); // TODO: GetInterpolatedSightValue()
 
 	t = Math::Clamp(t, 0.0f, 1.0f);
@@ -91,10 +113,12 @@ unsigned int Retina::GetResolution(unsigned int channel) const
 	return m_channels[channel].m_resolution;
 }
 
-float Retina::GetSightValue(unsigned int channel, unsigned int index) const
+float Retina::GetSightValue(unsigned int channel, float t) const
 {
 	assert(channel < m_numChannels);
-	return m_channels[channel].GetSightValue(index);
+	int index = (int) (m_channels[channel].m_resolution * t);
+	index = Math::Clamp(index, 0, (int) m_channels[channel].m_resolution - 1);
+	return m_channels[channel].GetSightValue((unsigned int) index);
 }
 
 float Retina::GetInterpolatedSightValue(unsigned int channel, float t) const

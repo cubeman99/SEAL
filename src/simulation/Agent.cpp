@@ -18,6 +18,11 @@ Agent::Agent()
 	resolutions[2] = 2;
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, m_resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, m_resolutions);
+	
+	m_color.Set(0, 0, 1.0f);
+	m_color.x = Random::NextFloat();
+	m_color.y = Random::NextFloat();
+	m_color.z = Random::NextFloat();
 }
 
 Agent::~Agent()

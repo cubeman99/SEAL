@@ -204,6 +204,8 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	// Render the agents.
 	float agentRadius = 0.016f; // TODO: magic number agent radius.
 	m_renderer.SetShader(m_shaderLit);
+	Material material;
+	material.SetIsLit(true);
 	for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
 	{
 		Agent* agent = *it;agent->GetRadius();
@@ -212,7 +214,9 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		transform.pos *= worldRadius;
 		transform.rot = agent->GetOrientation();
 		transform.SetScale(agentRadius);
-		m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
+		material.SetColor(agent->GetColor());
+		//m_renderer.RenderMesh(m_agentMesh, m_agentMaterial, transform);
+		m_renderer.RenderMesh(m_agentMesh, &material, transform);
 	}
 
 	// Render the agents.
@@ -320,22 +324,22 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 			if (i > 0)
 			{
 				// Right eye
-				float red   = agent->GetEye(0)->GetInterpolatedSightValue(0, t);
-				float green = agent->GetEye(0)->GetInterpolatedSightValue(1, t);
-				float blue  = agent->GetEye(0)->GetInterpolatedSightValue(2, t);
+				float red   = agent->GetEye(0)->GetSightValue(0, t);
+				float green = agent->GetEye(0)->GetSightValue(1, t);
+				float blue  = agent->GetEye(0)->GetSightValue(2, t);
 				glColor3f(red, green, blue);
 				glVertex3f(xPrev, 0, zPrev);
 				glVertex3f(x, 0, z);
 				glVertex3f(0, 0, 0);
 				
 				// Left eye
-				/*red   = agent->GetEye(1)->GetInterpolatedSightValue(0, t);
-				green = agent->GetEye(1)->GetInterpolatedSightValue(1, t);
-				blue  = agent->GetEye(1)->GetInterpolatedSightValue(2, t);
+				red   = agent->GetEye(1)->GetSightValue(0, 1.0f - t);
+				green = agent->GetEye(1)->GetSightValue(1, 1.0f - t);
+				blue  = agent->GetEye(1)->GetSightValue(2, 1.0f - t);
 				glColor3f(red, green, blue);
 				glVertex3f(-xPrev, 0, zPrev);
 				glVertex3f(-x, 0, z);
-				glVertex3f(0, 0, 0);*/
+				glVertex3f(0, 0, 0);
 			}
 			xPrev = x;
 			zPrev = z;

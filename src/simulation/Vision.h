@@ -42,7 +42,7 @@ public:
 	inline unsigned int GetNumChannels() const { return m_numChannels; }
 
 	unsigned int GetResolution(unsigned int channel) const;
-	float GetSightValue(unsigned int channel, unsigned int index) const;
+	float GetSightValue(unsigned int channel, float t) const;
 	float GetInterpolatedSightValue(unsigned int channel, float t) const;
 
 	void ClearSightValues();

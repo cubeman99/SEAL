@@ -29,6 +29,7 @@ public:
 	// Getters
 	inline const Vector3f& GetPosition() const { return m_position; }
 	inline const Quaternion& GetOrientation() const { return m_orientation; }
+	inline const Vector3f& GetColor() const { return m_color; }
 	inline float GetRadius() const { return m_radius; }
 	Sphere GetBoundingSphere();
 	AABB GetBoundingBox();
@@ -36,9 +37,10 @@ public:
 
 
 protected:
-	Vector3f m_position;
-	Quaternion m_orientation;
-	float m_radius;
+	Vector3f	m_color;
+	Vector3f	m_position;
+	Quaternion	m_orientation;
+	float		m_radius;
 };
 
 

@@ -251,7 +251,7 @@ void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
 	int uniformLocation = -1;
 		
 	// Material properties.
-	if (material != m_material || m_isShaderChanged)
+	//if (material != m_material || m_isShaderChanged)
 	{
 		m_material = material;
 		if (m_activeShader->GetUniformLocation("u_isLit", uniformLocation))

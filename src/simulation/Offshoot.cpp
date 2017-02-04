@@ -4,6 +4,8 @@ Offshoot::Offshoot(float maxEnergy)
 {
 	m_maxEnergy = maxEnergy;
 	m_energy = maxEnergy / 2.0f;
+	
+	m_color.Set(0.3f, 1, 0.1f);
 }
 
 Offshoot::~Offshoot()

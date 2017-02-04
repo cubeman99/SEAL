@@ -187,16 +187,24 @@ void AgentSystem::SeeObject(Agent* agent, SimulationObject* object)
 	float t1 = (angleOffset - agent->GetAngleBetweenEyes() * 0.5f) / fov;
 	float t2 = (angleOffset + (agent->GetAngleBetweenEyes() * 0.5f) + fov) / fov;
 
-	Vector3f objColor = Vector3f(0, 0, 1);
+	Vector3f objColor = object->GetColor();
 
 	if (t1 >= 0.0f && t1 <= 1.0f)
 	{
-		if (p.y < 0.0f)
-			float help = 1.0f;
 		Retina* eye = agent->GetEye(0);
 		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
 		{
 			unsigned int index = (unsigned int) (t1 * eye->GetResolution(channel));
+			index = Math::Min(index, eye->GetResolution(channel) - 1);
+			eye->SetSightValue(channel, index, objColor[channel]);
+		}
+	}
+	if (t1 >= 0.0f && t1 <= 1.0f)
+	{
+		Retina* eye = agent->GetEye(1);
+		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
+		{
+			unsigned int index = (unsigned int) (t2 * eye->GetResolution(channel));
 			index = Math::Min(index, eye->GetResolution(channel) - 1);
 			eye->SetSightValue(channel, index, objColor[channel]);
 		}
