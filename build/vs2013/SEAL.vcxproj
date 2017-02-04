@@ -56,6 +56,7 @@
     <ClCompile Include="..\..\src\simulation\Plant.cpp" />
     <ClCompile Include="..\..\src\simulation\Simulation.cpp" />
     <ClCompile Include="..\..\src\simulation\SimulationObject.cpp" />
+    <ClCompile Include="..\..\src\simulation\Vision.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
     <ClCompile Include="..\..\src\utilities\FileUtility.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="..\..\src\simulation\Plant.h" />
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\SimulationObject.h" />
+    <ClInclude Include="..\..\src\simulation\Vision.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
     <ClInclude Include="..\..\src\utilities\FileUtility.h" />
     <ClInclude Include="..\..\src\utilities\Random.h" />

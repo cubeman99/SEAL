@@ -147,11 +147,11 @@ void Renderer::SetShader(Shader* shader)
 		else
 			glUseProgram(0);
 	}
-	else if (m_defaultShader != nullptr && m_defaultShader->IsLinked())
-	{
-		m_activeShader = m_defaultShader;
-		glUseProgram(m_defaultShader->m_glProgram);
-	}
+	//else if (m_defaultShader != nullptr && m_defaultShader->IsLinked())
+	//{
+	//	m_activeShader = m_defaultShader;
+	//	glUseProgram(m_defaultShader->m_glProgram);
+	//}
 	else
 		glUseProgram(0);
 }

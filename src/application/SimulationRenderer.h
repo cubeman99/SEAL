@@ -7,6 +7,7 @@
 #include "OctTreeRenderer.h"
 
 class SimulationManager;
+class Agent;
 
 
 class SimulationRenderer
@@ -18,6 +19,8 @@ public:
 	void Initialize(SimulationManager* simulationManager);
 
 	void Render(const Vector2f& viewPortSize);
+
+	void RenderAgentVisionArcs(Agent* agent);
 
 	inline double GetAverageRenderTime() const { return m_renderTime; }
 

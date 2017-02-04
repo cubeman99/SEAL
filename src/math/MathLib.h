@@ -175,7 +175,7 @@ T Math::Abs(T x)
 template <typename T>
 T Math::Sign(T x)
 {
-	return (x > 0 ? 1 : (x < 0 ? -1 : 0));
+	return (x > T(0) ? T(1) : (x < T(0) ? T(-1) : T(0)));
 }
 		
 template <typename T>

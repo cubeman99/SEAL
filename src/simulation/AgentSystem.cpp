@@ -89,7 +89,7 @@ void AgentSystem::UpdateAgents(float timeDelta)
 	{
 		Agent* agent = *it;
 
-		//UpdateAgentVision(agent);
+		UpdateAgentVision(agent);
 	
 		agent->UpdateBrain();
 
@@ -146,28 +146,60 @@ void AgentSystem::UpdatePlants(float timeDelta)
 
 void AgentSystem::UpdateAgentVision(Agent* agent)
 {
+	agent->GetEye(0)->ClearSightValues();
+	agent->GetEye(1)->ClearSightValues();
+
 	for (auto it = m_agents.begin(); it != m_agents.end(); ++it)
 	{
 		Agent* obj = *it;
 		if (obj == agent)
 			continue;
+		SeeObject(agent, obj);
+	}
+	
+	for (auto it = m_plants.begin(); it != m_plants.end(); ++it)
+	{
+		Plant* plant = *it;
+		for (auto it2 = plant->m_offshoots.begin(); it2 != plant->offshoots_end(); ++it2)
+			SeeObject(agent, *it2);
+	}
+}
 
-		Vector3f vecToObj = obj->m_position - agent->m_position;
-		float distSqr = vecToObj.LengthSquared();
-		if (distSqr > agent->m_maxViewDistance * agent->m_maxViewDistance)
-			continue;
+void AgentSystem::SeeObject(Agent* agent, SimulationObject* object)
+{
+	Vector3f vecToObj = object->GetPosition() - agent->m_position;
+	float distSqr = vecToObj.LengthSquared();
+	if (distSqr > agent->m_maxViewDistance * agent->m_maxViewDistance)
+		return;
 
-		// Get the distance to the object with respect to its forward and right vectors.
-		Vector3f forward = agent->m_orientation.GetForward();
-		Vector3f right = agent->m_orientation.GetRight();
-		Vector2f p(vecToObj.Dot(right), vecToObj.Dot(forward));
-		p.Normalize();
+	// Get the distance to the object with respect to its forward and right vectors.
+	Vector3f forward = agent->m_orientation.GetForward();
+	Vector3f right = agent->m_orientation.GetRight();
+	Vector2f p(vecToObj.Dot(right), vecToObj.Dot(forward));
+	p.Normalize();
 
-		// Calculate the angle offset from the agent's forward vector.
-		float angleOffset = (Math::HALF_PI - Math::ASin(p.y)) * Math::Sin(p.x);
-		if (Math::Abs(angleOffset) > agent->m_fieldOfView)
-			continue;
+	// Calculate the angle offset from the agent's forward vector.
+	float angleOffset = Math::ATan2(p.x, p.y);// * Math::Sign(p.x);
+	//if (Math::Abs(angleOffset) > agent->m_fieldOfView)
+		//continue;
 
+	float fov = agent->GetFieldOfView();
+	float t1 = (angleOffset - agent->GetAngleBetweenEyes() * 0.5f) / fov;
+	float t2 = (angleOffset + (agent->GetAngleBetweenEyes() * 0.5f) + fov) / fov;
+
+	Vector3f objColor = Vector3f(0, 0, 1);
+
+	if (t1 >= 0.0f && t1 <= 1.0f)
+	{
+		if (p.y < 0.0f)
+			float help = 1.0f;
+		Retina* eye = agent->GetEye(0);
+		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
+		{
+			unsigned int index = (unsigned int) (t1 * eye->GetResolution(channel));
+			index = Math::Min(index, eye->GetResolution(channel) - 1);
+			eye->SetSightValue(channel, index, objColor[channel]);
+		}
 	}
 }
 

@@ -21,7 +21,9 @@ public:
 	void RemoveAllPlants();
 	void UpdateAgents(float timeDelta);
 	void UpdatePlants(float timeDelta);
+
 	void UpdateAgentVision(Agent* agent);
+	void SeeObject(Agent* agent, SimulationObject* object);
 
 	inline int GetNumAgents() const { return (int) m_agents.size(); }
 	inline int GetNumPlants() const { return (int) m_plants.size(); }
