@@ -189,20 +189,24 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	{
 		SimulationObject* object = *it;
 
-		transform.pos = object->GetPosition();
-		transform.pos.Normalize();
-		transform.pos *= worldRadius;
-		transform.rot = object->GetOrientation();
-		transform.SetScale(object->GetRadius());
+		Matrix4f modelMatrix = object->GetObjectToWorld() * 
+			Matrix4f::CreateScale(object->GetRadius());
+
+
+		//transform.pos = object->GetPosition();
+		//transform.pos.Normalize();
+		//transform.pos *= worldRadius;
+		//transform.rot = object->GetOrientation();
+		//transform.SetScale(object->GetRadius());
 		material.SetColor(object->GetColor());
 		
 		// Render with the appropriate mesh.
 		if (object->IsObjectType<Agent>())
-			m_renderer.RenderMesh(m_agentMesh, &material, transform);
+			m_renderer.RenderMesh(m_agentMesh, &material, modelMatrix);
 		else if (object->IsObjectType<Plant>())
-			m_renderer.RenderMesh(m_plantMesh, &material, transform);
+			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
 		else if (object->IsObjectType<Offshoot>())
-			m_renderer.RenderMesh(m_plantMesh, &material, transform);
+			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
 	}
 
 	// Render agent vision.

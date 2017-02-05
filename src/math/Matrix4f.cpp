@@ -526,7 +526,7 @@ Vector3f Matrix4f::Multiply4x3(const Vector3f& vVec) const
 // Multiply by a 3D vector (divides by w and assumes input w is 1)
 void Matrix4f::ApplyTransform(const Vector3f& inVec, Vector3f& outVec) const
 {
-	float rw = 1.0f / ((m[3] * inVec.x) + (m[7] * inVec.y) + (m[11] * inVec.z) + m[14]);
+	float rw = 1.0f / ((m[3] * inVec.x) + (m[7] * inVec.y) + (m[11] * inVec.z) + m[15]);
 	outVec.x = ((m[0] * inVec.x) + (m[4] * inVec.y) + (m[8]  * inVec.z) + m[12]) * rw;
 	outVec.y = ((m[1] * inVec.x) + (m[5] * inVec.y) + (m[9]  * inVec.z) + m[13]) * rw;
 	outVec.z = ((m[2] * inVec.x) + (m[6] * inVec.y) + (m[10] * inVec.z) + m[14]) * rw;

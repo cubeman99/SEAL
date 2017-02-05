@@ -1,6 +1,8 @@
 #ifndef _VISION_H_
 #define _VISION_H_
 
+#include <math/Matrix4f.h>
+
 
 //-----------------------------------------------------------------------------
 // VisionChannel
@@ -48,11 +50,15 @@ public:
 	void ClearSightValues();
 	void SetSightValue(unsigned int channel, unsigned int index, float sightValue);
 
+	inline const Matrix4f& GetWorldToEye() const { return m_worldToEye; }
+	inline void SetWorldToEye(const Matrix4f& worldToEye) { m_worldToEye = worldToEye; }
+
 private:
 	float			m_fieldOfView; // in radians.
 	float			m_viewDistance;
 	unsigned int	m_numChannels;
 	VisionChannel*	m_channels;
+	Matrix4f		m_worldToEye; // Converts points from world-space to eye-projection-space.
 };
 
 

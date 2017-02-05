@@ -73,6 +73,8 @@ public:
 	inline float GetRadius() const { return m_radius; }
 	inline bool IsDestroyed() const { return m_isDestroyed; }
 	inline bool IsVisible() const { return m_isVisible; }
+	inline const Matrix4f& GetObjectToWorld() const { return m_objectToWorld; }
+	inline const Matrix4f& GetWorldToObject() const { return m_worldToObject; }
 
 	// Setters
 

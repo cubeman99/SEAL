@@ -48,6 +48,16 @@ void Agent::Update(float timeDelta)
 
 void Agent::UpdateVision()
 {
+	// Update eye matrices.
+	float zNear = 0.01f;
+	float zFar = m_maxViewDistance;
+	float leftEyeCenterAngle = -(m_angleBetweenEyes + m_fieldOfView) * 0.5f;
+	Matrix4f eyePerspective = Matrix4f::CreatePerspective(m_eyes[0].GetFieldOfView(), 1.0f, 0.01f, m_maxViewDistance);
+	Matrix4f leftEyeRotation = Matrix4f::CreateRotation(Vector3f::UNITY, leftEyeCenterAngle);
+	Matrix4f rightEyeRotation = Matrix4f::CreateRotation(Vector3f::UNITY, -leftEyeCenterAngle);
+	m_eyes[0].SetWorldToEye(eyePerspective * leftEyeRotation * m_worldToObject);
+	m_eyes[1].SetWorldToEye(eyePerspective * rightEyeRotation * m_worldToObject);
+
 	// Clear all sight values.
 	m_eyes[0].ClearSightValues();
 	m_eyes[1].ClearSightValues();
@@ -63,59 +73,34 @@ void Agent::UpdateVision()
 			SeeObject(object);
 		}
 	});
-
-	// Attempt to see each object.
-	//for (auto it = m_objectManager->objects_begin(); it != m_objectManager->objects_end(); ++it)
-	//{
-	//	SimulationObject* object = *it;
-	//	if (object == this || !object->IsVisible())
-	//		continue;
-	//	SeeObject(object);
-	//}
 }
 
 void Agent::SeeObject(SimulationObject* object)
 {
-	// TODO: this can be greatly improved with matrices.
-
-	Vector3f vecToObj = object->GetPosition() - m_position;
-	float distSqr = vecToObj.LengthSquared();
-	if (distSqr > m_maxViewDistance * m_maxViewDistance)
+	// Discard objects that are too far away.
+	if (object->GetPosition().DistToSqr(m_position) >
+		m_maxViewDistance * m_maxViewDistance)
 		return;
 
-	// Get the distance to the object with respect to its forward and right vectors.
-	Vector3f forward = m_orientation.GetForward();
-	Vector3f right = m_orientation.GetRight();
-	Vector2f p(vecToObj.Dot(right), vecToObj.Dot(forward));
-	p.Normalize();
-
-	// Calculate the angle offset from the agent's forward vector.
-	float angleOffset = Math::ATan2(p.x, p.y);
-	
-	float fov = GetFieldOfView();
-	float t1 = (angleOffset - GetAngleBetweenEyes() * 0.5f) / fov;
-	float t2 = (angleOffset + (GetAngleBetweenEyes() * 0.5f) + fov) / fov;
-
-	Vector3f objColor = object->GetColor();
-
-	if (t1 >= 0.0f && t1 <= 1.0f)
+	// Update vision for each eye.
+	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
-		Retina* eye = &m_eyes[0];
-		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
+		Retina& eye = m_eyes[eyeIndex];
+
+		// Get the position of the object in the eye's perspective projection.
+		// Clip it if is outside the projection.
+		Vector3f posInEye = eye.GetWorldToEye().ApplyTransform(object->GetPosition());
+		if (posInEye.z <= -1.0f || posInEye.z >= 1.0f ||
+			posInEye.x <= -1.0f || posInEye.x >= 1.0f)
+			continue;
+		float t = (posInEye.x + 1.0f) * 0.5f;
+
+		// Update the individual channels based on the object's position and color.
+		for (unsigned int channel = 0; channel < eye.GetNumChannels(); channel++)
 		{
-			unsigned int index = (unsigned int) (t1 * eye->GetResolution(channel));
-			index = Math::Min(index, eye->GetResolution(channel) - 1);
-			eye->SetSightValue(channel, index, objColor[channel]);
-		}
-	}
-	if (t2 >= 0.0f && t2 <= 1.0f)
-	{
-		Retina* eye = &m_eyes[1];
-		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
-		{
-			unsigned int index = (unsigned int) (t2 * eye->GetResolution(channel));
-			index = Math::Min(index, eye->GetResolution(channel) - 1);
-			eye->SetSightValue(channel, index, objColor[channel]);
+			unsigned int index = (unsigned int) (t * eye.GetResolution(channel));
+			index = Math::Min(index, eye.GetResolution(channel) - 1);
+			eye.SetSightValue(channel, index, object->GetColor()[channel]);
 		}
 	}
 }
@@ -123,7 +108,6 @@ void Agent::SeeObject(SimulationObject* object)
 void Agent::UpdateBrain()
 {
 	// TEMP: random wandering turning.
-
 	
 	//float timeDelta = 0.01666667f;
 	float maxTurnSpeed = 6.0f;
