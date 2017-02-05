@@ -4,9 +4,9 @@
 #include <math/Matrix4f.h>
 #include <math/MathLib.h>
 #include <utilities/Random.h>
+#include <simulation/Agent.h>
 #include <simulation/Simulation.h>
 #include "SimulationWindow.h"
-
 
 // ----------------------------------------------------------------------------
 // Event Table

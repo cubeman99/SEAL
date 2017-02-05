@@ -2,7 +2,6 @@
 #define _SIMULATION_H_
 
 #include <simulation/World.h>
-#include <simulation/AgentSystem.h>
 #include <simulation/OctTree.h>
 #include <simulation/SimulationObject.h>
 #include <simulation/ObjectManager.h>

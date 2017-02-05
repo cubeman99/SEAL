@@ -1,5 +1,8 @@
 #include "SimulationRenderer.h"
 #include "SimulationManager.h"
+#include <simulation/Agent.h>
+#include <simulation/Offshoot.h>
+#include <simulation/Plant.h>
 #include <utilities/Timing.h>
 
 

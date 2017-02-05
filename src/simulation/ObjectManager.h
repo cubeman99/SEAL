@@ -4,6 +4,9 @@
 #include <math/Vector3f.h>
 #include <simulation/OctTree.h>
 #include <simulation/SimulationObject.h>
+#include <simulation/Agent.h>
+#include <simulation/Plant.h>
+#include <simulation/Offshoot.h>
 #include <vector>
 
 class Simulation;
