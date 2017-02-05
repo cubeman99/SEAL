@@ -1,4 +1,6 @@
 #include "AABB.h"
+#include "Sphere.h"
+#include "MathLib.h"
 
 
 AABB::AABB()
@@ -33,3 +35,14 @@ bool AABB::Intersects(const AABB& other) const
 			maxs.z > other.mins.z && other.maxs.z > mins.z);
 }
 
+bool AABB::Intersects(const Sphere& sphere) const
+{
+	// Clamp the sphere's position to the AABB bounds.
+	Vector3f p;
+	p.x = Math::Clamp(sphere.position.x, mins.x, maxs.x);
+	p.y = Math::Clamp(sphere.position.y, mins.y, maxs.y);
+	p.z = Math::Clamp(sphere.position.z, mins.z, maxs.z);
+
+	// Check if the clamped point is within the sphere's radius.
+	return (p.DistToSqr(sphere.position) < sphere.radius * sphere.radius);
+}

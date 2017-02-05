@@ -129,8 +129,6 @@ void AgentSystem::UpdateAgents(float timeDelta)
 
 void AgentSystem::UpdatePlants(float timeDelta)
 {
-	bool usedUp;
-
 	for (auto it = m_plants.begin(); it != m_plants.end(); ++it)
 	{
 		Plant* plant = *it;

@@ -10,17 +10,17 @@ Agent::Agent()
 	m_fieldOfView = 0.9f;
 	m_maxViewDistance = 0.2f;
 	m_angleBetweenEyes = 0.5f;
-	m_resolutions[0] = 14;
-	m_resolutions[1] = 8;
+	m_resolutions[0] = 8;
+	m_resolutions[1] = 13;
 	m_resolutions[2] = 2;
 
 	m_numEyes = 2;
 	unsigned int resolutions[3];
-	resolutions[0] = 8;
-	resolutions[1] = 13;
-	resolutions[2] = 2;
-	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, m_resolutions);
-	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, m_resolutions);
+	resolutions[0] = 16;
+	resolutions[1] = 16;
+	resolutions[2] = 16;
+	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
+	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	
 	m_color.Set(0, 0, 1.0f);
 	m_color.x = Random::NextFloat();
@@ -48,22 +48,36 @@ void Agent::Update(float timeDelta)
 
 void Agent::UpdateVision()
 {
-	// Clear sight.
+	// Clear all sight values.
 	m_eyes[0].ClearSightValues();
 	m_eyes[1].ClearSightValues();
 
-	// Attempt to see each object.
-	for (auto it = m_objectManager->objects_begin(); it != m_objectManager->objects_end(); ++it)
+	// Query the octtree for objects within vision range.
+	Sphere visionSphere(m_position, m_maxViewDistance);
+	m_objectManager->GetOctTree()->Query(visionSphere,
+		[=](SimulationObject* object)
 	{
-		SimulationObject* object = *it;
-		if (object == this || !object->IsVisible())
-			continue;
-		SeeObject(object);
-	}
+		if (object != this && object->IsVisible())
+		{
+			// Attempt to see the object.
+			SeeObject(object);
+		}
+	});
+
+	// Attempt to see each object.
+	//for (auto it = m_objectManager->objects_begin(); it != m_objectManager->objects_end(); ++it)
+	//{
+	//	SimulationObject* object = *it;
+	//	if (object == this || !object->IsVisible())
+	//		continue;
+	//	SeeObject(object);
+	//}
 }
 
 void Agent::SeeObject(SimulationObject* object)
 {
+	// TODO: this can be greatly improved with matrices.
+
 	Vector3f vecToObj = object->GetPosition() - m_position;
 	float distSqr = vecToObj.LengthSquared();
 	if (distSqr > m_maxViewDistance * m_maxViewDistance)

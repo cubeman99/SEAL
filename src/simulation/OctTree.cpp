@@ -87,51 +87,8 @@ void OctTree::InsertObject(object_pointer object)
 	unsigned int depth = 0;
 	OctTreeNode* node = DoGetNode(&m_root, point, bounds, depth);
 
+	// Insert the object recursively into the leaf node.
 	DoInsertObjectIntoNode(object, node, bounds, depth);
-
-	/*
-	// Check if we should create a new child node.
-	if (depth < m_maxDepth && (node->HasAnyChildNodes() ||
-		node->GetObjectCount() >= m_maxObjectsPerNode))
-	{
-		// TEMP: put the new object into this node so the following code works.
-		node->m_objects.push_back(object);
-
-		// FIXME: multiple objects can get placed into the same node here.
-
-		// Put the existing objects in this node into new child nodes.
-		for (auto it = node->objects_begin(); it != node->objects_end(); ++it)
-		{
-			object_pointer obj = *it;
-
-			unsigned int sectorIndex = DoGetSectorIndex(bounds, obj->GetPosition());
-
-			// We may need to instantiate a new child node.
-			if (node->m_children[sectorIndex] == nullptr)
-			{
-				node->m_children[sectorIndex] = new OctTreeNode();
-				node->m_children[sectorIndex]->m_parent = node;
-				node->m_children[sectorIndex]->m_sectorIndex = (unsigned char) sectorIndex;
-			}
-		
-			// Add the object to the child node.
-			node->m_children[sectorIndex]->m_objects.push_back(obj);
-			m_objectToNodeMap[obj] = node->m_children[sectorIndex];
-		}
-		
-		node->m_objects.clear();
-	}
-	else
-	{
-		// Add the object to this node.
-		node->m_objects.push_back(object);
-		m_objectToNodeMap[object] = node;
-	}
-
-	// Keep track of the largest object radius in the tree.
-	if (object->GetRadius() > m_largestObjectRadius)
-		m_largestObjectRadius = object->GetRadius();
-	*/
 }
 
 void OctTree::RemoveObject(object_pointer object)
@@ -175,7 +132,9 @@ void OctTree::DynamicUpdate(object_pointer object)
 	}
 }
 
-OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds)
+OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node,
+										unsigned int sectorIndex,
+										AABB& bounds)
 {
 	if (node->m_children[sectorIndex])
 	{
@@ -193,10 +152,12 @@ OctTreeNode* OctTree::TraverseIntoSector(OctTreeNode* node, unsigned int sectorI
 // OctTree private methods
 //-----------------------------------------------------------------------------
 
-void OctTree::DoGetNumObjects(const OctTreeNode* node, unsigned int& count) const
+void OctTree::DoGetNumObjects(	const OctTreeNode* node,
+								unsigned int& count) const
 {
 	count += node->GetObjectCount();
 
+	// Recursively count the child nodes.
 	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
 	{
 		if (node->m_children[sectorIndex] != nullptr)
@@ -206,7 +167,7 @@ void OctTree::DoGetNumObjects(const OctTreeNode* node, unsigned int& count) cons
 
 void OctTree::DoClear(OctTreeNode* node)
 {
-	// Clear each sector in this node.
+	// Recursively clear each child sector in this node.
 	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
 	{
 		if (node->m_children[sectorIndex] != nullptr)
@@ -216,12 +177,15 @@ void OctTree::DoClear(OctTreeNode* node)
 		}
 	}
 
-	// Delete the node itself (but not the root node).
+	// Delete this node itself (but not the root node).
 	if (node != &m_root)
 		delete node;
 }
 
-OctTreeNode* OctTree::DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& bounds, unsigned int& depth)
+OctTreeNode* OctTree::DoGetNode(OctTreeNode* node,
+								const Vector3f& point,
+								AABB& bounds,
+								unsigned int& depth)
 {
 	unsigned int sectorIndex = DoGetSectorIndex(bounds, point);
 
@@ -230,7 +194,8 @@ OctTreeNode* OctTree::DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& 
 		// Step into the child node.
 		depth += 1;
 		SplitBoundsBySector(bounds, sectorIndex);
-		return DoGetNode(node->m_children[sectorIndex], point, bounds, depth);
+		return DoGetNode(node->m_children[sectorIndex],
+			point, bounds, depth);
 	}
 	else
 	{
@@ -239,12 +204,14 @@ OctTreeNode* OctTree::DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& 
 	}
 }
 
-unsigned int OctTree::DoGetSectorIndex(const AABB& bounds, const Vector3f& point)
+unsigned int OctTree::DoGetSectorIndex(	const AABB& bounds,
+										const Vector3f& point)
 {
 	return DoGetSectorIndex(bounds.GetCenter(), point);
 }
 
-unsigned int OctTree::DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point)
+unsigned int OctTree::DoGetSectorIndex(	const Vector3f& boundsCenter,
+										const Vector3f& point)
 {
 	// Sector indices are a bit map per axis.
 	// A set bit means positive on that axis.
@@ -293,11 +260,13 @@ void OctTree::DoRemoveNode(OctTreeNode* node)
 	}
 }
 
-void OctTree::DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node, const AABB& bounds, unsigned int depth)
+void OctTree::DoInsertObjectIntoNode(object_pointer object,
+									OctTreeNode* node,
+									const AABB& bounds,
+									unsigned int depth)
 {
 	// Get the leaf node for the point.
 	Vector3f point = object->GetPosition();
-	//AABB bounds = m_bounds;
 
 	// Check if we should create a new child node.
 	if (depth < m_maxDepth && (node->HasAnyChildNodes() ||
@@ -306,13 +275,10 @@ void OctTree::DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node, c
 		// TEMP: put the new object into this node so the following code works.
 		node->m_objects.push_back(object);
 
-		// FIXME: multiple objects can get placed into the same node here.
-
 		// Put the existing objects in this node into new child nodes.
 		for (auto it = node->objects_begin(); it != node->objects_end(); ++it)
 		{
 			object_pointer obj = *it;
-
 			unsigned int sectorIndex = DoGetSectorIndex(bounds, obj->GetPosition());
 
 			// We may need to instantiate a new child node.
@@ -323,32 +289,23 @@ void OctTree::DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node, c
 				node->m_children[sectorIndex]->m_sectorIndex = (unsigned char) sectorIndex;
 			}
 		
-			// Recursively insert the object into the child node.
+			// Recursively insert the object into this child node.
 			AABB childBounds = bounds;
 			SplitBoundsBySector(childBounds, sectorIndex);
 			DoInsertObjectIntoNode(obj, node->m_children[sectorIndex], childBounds, depth + 1);
-			//node->m_children[sectorIndex]->m_objects.push_back(obj);
-			//m_objectToNodeMap[obj] = node->m_children[sectorIndex];
 		}
 		
 		node->m_objects.clear();
-		assert(node->m_objects.size() == 0);
 	}
 	else
 	{
 		// Add the object to this node.
 		node->m_objects.push_back(object);
 		m_objectToNodeMap[object] = node;
-		if (depth < m_maxDepth && node->GetObjectCount() > m_maxObjectsPerNode)
-		{
-			printf("ASD");
-		}
 	}
 
 	// Keep track of the largest object radius in the tree.
 	if (object->GetRadius() > m_largestObjectRadius)
 		m_largestObjectRadius = object->GetRadius();
 }
-
-
 

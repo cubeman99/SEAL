@@ -43,45 +43,104 @@ public:
 	typedef std::map<object_pointer, OctTreeNode*> ObjectToNodeMap;
 
 public:
+	//-------------------------------------------------------------------------
 	// Constructor/destructor
+
 	OctTree();
 	~OctTree();
 
+	//-------------------------------------------------------------------------
 	// Getters
+
 	inline const AABB& GetBounds() const { return m_bounds; }
 	inline const OctTreeNode* GetRootNode() const { return &m_root; }
 	inline OctTreeNode* GetRootNode() { return &m_root; }
-	unsigned int GetNumObjects() const;
 	inline unsigned int GetMaxDepth() const { return m_maxDepth; }
+	unsigned int GetNumObjects() const;
 	
+	//-------------------------------------------------------------------------
 	// Setters
-	inline void SetMaxDepth(unsigned int maxDepth) { m_maxDepth = maxDepth; }
-	inline void SetMaxObjectsPerNode(unsigned int maxObjectsPerNode) { m_maxObjectsPerNode = maxObjectsPerNode; }
-	inline void SetBounds(const AABB& bounds) { m_bounds = bounds; }
 
+	inline void SetMaxDepth(unsigned int maxDepth) { m_maxDepth = maxDepth; }
+	inline void SetMaxObjectsPerNode(unsigned int maxObjectsPerNode)
+		{ m_maxObjectsPerNode = maxObjectsPerNode; }
+	inline void SetBounds(const AABB& bounds) { m_bounds = bounds; }
+	
+	//-------------------------------------------------------------------------
 	// Operations
+
+	// Clear all objects from the octtree.
 	void Clear();
+
+	// Insert a new object into the octtree.
 	void InsertObject(object_pointer object);
+
+	// Remove an object from the octtree.
 	void RemoveObject(object_pointer object);
+
+	// Dynamically update the octtree for the given object, reshaping
+	// the tree structure if the object has moved.
 	void DynamicUpdate(object_pointer object);
-	OctTreeNode* TraverseIntoSector(OctTreeNode* node, unsigned int sectorIndex, AABB& bounds);
+
+	// TODO: describe this or rename it.
+	OctTreeNode* TraverseIntoSector(OctTreeNode* node,
+		unsigned int sectorIndex, AABB& bounds);
 	
-	// TODO: Queries
-	//template <T>
-	//void QueryCollision(const Sphere& sphere);
+	//-------------------------------------------------------------------------
+	// Queries
+
+	// Query for objects which are touching the given sphere,
+	// This needs a callback function that takes a single
+	// SimulationObject* as a parameter.
+	template <class T_QueryCallback>
+	void Query(const Sphere& sphere, T_QueryCallback callback);
 	
+	// Query for objects which are touching the given box,
+	// This needs a callback function that takes a single
+	// SimulationObject* as a parameter.
+	template <class T_QueryCallback>
+	void Query(const AABB& box, T_QueryCallback callback);
+
 
 private:
-
+	//-------------------------------------------------------------------------
 	// Private functions
+
 	void DoGetNumObjects(const OctTreeNode* node, unsigned int& count) const;
+	
 	void DoClear(OctTreeNode* node);
-	OctTreeNode* DoGetNode(OctTreeNode* node, const Vector3f& point, AABB& bounds, unsigned int& depth);
+	
+	OctTreeNode* DoGetNode(OctTreeNode* node, const Vector3f& point,
+		AABB& bounds, unsigned int& depth);
+	
 	unsigned int DoGetSectorIndex(const AABB& bounds, const Vector3f& point);
-	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter, const Vector3f& point);
+	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter,
+		const Vector3f& point);
+	
 	void SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex);
+	
 	void DoRemoveNode(OctTreeNode* node);
-	void DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node, const AABB& bounds, unsigned int depth);
+
+	void DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node,
+		const AABB& bounds, unsigned int depth);
+	
+	template <class T_QueryCallback>
+	void DoBoxQuery(OctTreeNode* sectorNode,
+					const AABB& sectorBounds,
+					const AABB& queryBounds,
+					const AABB& box,
+					T_QueryCallback callback);
+
+	template <class T_QueryCallback>
+	void DoSphereQuery(	OctTreeNode* sectorNode,
+						const AABB& sectorBounds,
+						const AABB& queryBounds,
+						const Sphere& sphere,
+						T_QueryCallback callback);
+
+private:
+	//-------------------------------------------------------------------------
+	// Member variables
 
 	OctTreeNode		m_root;
 	AABB			m_bounds;
@@ -91,52 +150,114 @@ private:
 	float			m_largestObjectRadius;	// Keeps track of the largest object radius in the tree.
 };
 
-	
-/*
-//typedef std::allocator<SimulationObject*> allocator_type;
-//typedef allocator_type::value_type value_type; 
-//typedef allocator_type::reference reference;
-//typedef allocator_type::const_reference const_reference;
-//typedef allocator_type::difference_type difference_type;
-//typedef allocator_type::size_type size_type;
 
-class iterator
+//-----------------------------------------------------------------------------
+// OctTree template method definitions
+//-----------------------------------------------------------------------------
+
+template <class T_QueryCallback>
+void OctTree::Query(const AABB& box, T_QueryCallback callback)
 {
-public:
-	typedef std::allocator<SimulationObject*> allocator_type;
-    typedef allocator_type::difference_type difference_type;
-    typedef allocator_type::value_type value_type;
-    typedef allocator_type::reference reference;
-    typedef allocator_type::pointer pointer;
-    //typedef std::random_access_iterator_tag iterator_category; //or another tag
+	// Create an AABB that represents the bounds were are querying with.
+	// Object positions must be contained within these bounds to pass the query.
+	AABB queryBounds = box;
+	Vector3f inflation(m_largestObjectRadius);
+	queryBounds.mins -= inflation;
+	queryBounds.maxs += inflation;
 
-	iterator();
-	iterator(const iterator&);
-	~iterator();
+	// Recursively perform the query.
+	DoBoxQuery(&m_root, m_bounds, queryBounds, box, callback);
+}
 
-	iterator& operator=(const iterator&);
-	bool operator==(const iterator&) const;
-	bool operator!=(const iterator&) const;
-	//bool operator<(const iterator&) const; //optional
-	//bool operator>(const iterator&) const; //optional
-	//bool operator<=(const iterator&) const; //optional
-	//bool operator>=(const iterator&) const; //optional
+template <class T_QueryCallback>
+void OctTree::Query(const Sphere& sphere, T_QueryCallback callback)
+{
+	// Create an AABB that represents the bounds were are querying with.
+	// Object positions must be contained within these bounds to pass the query.
+	AABB queryBounds;
+	Vector3f halfSize(sphere.radius + m_largestObjectRadius);
+	queryBounds.mins = sphere.position - halfSize;
+	queryBounds.maxs = sphere.position + halfSize;
 
-	iterator& operator++();
-	iterator operator++(int); //optional
-	//iterator& operator--(); //optional
-	//iterator operator--(int); //optional
-	//iterator& operator+=(size_type); //optional
-	//iterator operator+(size_type) const; //optional
-	//friend iterator operator+(size_type, const iterator&); //optional
-	//iterator& operator-=(size_type); //optional            
-	//iterator operator-(size_type) const; //optional
-	//difference_type operator-(iterator) const; //optional
+	// Recursively perform the query.
+	DoSphereQuery(&m_root, m_bounds, queryBounds, sphere, callback);
+}
 
-	reference operator*() const;
-	pointer operator->() const;
-	reference operator[](size_type) const; //optional
-};*/
+template <class T_QueryCallback>
+void OctTree::DoBoxQuery(OctTreeNode* sectorNode,
+							const AABB& sectorBounds,
+							const AABB& queryBounds,
+							const AABB& box,
+							T_QueryCallback callback)
+{
+	// Recursively query the child nodes.
+	for (unsigned char i = 0; i < 8; ++i)
+	{
+		if (sectorNode->m_children[i] != nullptr)
+		{
+			// Get the bounds for this child sector.
+			AABB childSectorBounds = sectorBounds;
+			SplitBoundsBySector(childSectorBounds, i);
+
+			// Make sure the object is touching this node.
+			if (queryBounds.Intersects(childSectorBounds))
+			{
+				DoBoxQuery(sectorNode->m_children[i],
+					childSectorBounds, queryBounds, box, callback);
+			}
+		}
+	}
+	
+	// Query the objects of this node.
+	for (unsigned int i = 0; i < sectorNode->m_objects.size(); ++i)
+	{
+		SimulationObject* object = sectorNode->m_objects[i];
+		Sphere objectSphere(object->GetPosition(), object->GetRadius());
+
+		if (box.Intersects(objectSphere))
+		{
+			callback(object);
+		}
+	}
+}
+
+template <class T_QueryCallback>
+void OctTree::DoSphereQuery(OctTreeNode* sectorNode,
+							const AABB& sectorBounds,
+							const AABB& queryBounds,
+							const Sphere& sphere,
+							T_QueryCallback callback)
+{
+	// Recursively query the child nodes.
+	for (unsigned char i = 0; i < 8; ++i)
+	{
+		if (sectorNode->m_children[i] != nullptr)
+		{
+			// Get the bounds for this child sector.
+			AABB childSectorBounds = sectorBounds;
+			SplitBoundsBySector(childSectorBounds, i);
+
+			// Make sure the object is touching this node.
+			if (queryBounds.Intersects(childSectorBounds))
+			{
+				DoSphereQuery(sectorNode->m_children[i],
+					childSectorBounds, queryBounds, sphere, callback);
+			}
+		}
+	}
+	
+	// Query the objects of this node.
+	for (unsigned int i = 0; i < sectorNode->m_objects.size(); ++i)
+	{
+		SimulationObject* object = sectorNode->m_objects[i];
+		Sphere objectSphere(object->GetPosition(), object->GetRadius());
+
+		if (sphere.Intersects(objectSphere))
+		{
+			callback(object);
+		}
+	}
+}
 
 
 #endif // _OCT_TREE_H_

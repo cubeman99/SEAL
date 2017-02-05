@@ -42,7 +42,6 @@ void SimulationManager::Initialize()
 	for (int i = 0; i < 5; ++i)
 	{
 		m_simulation->GetObjectManager()->SpawnObjectRandom<Plant>();
-		//m_simulation->GetAgentSystem()->SpawnPlant();
 	}
 }
 		

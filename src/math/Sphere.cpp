@@ -13,6 +13,11 @@ Sphere::Sphere(const Vector3f& position, float radius) :
 {
 }
 
+bool Sphere::Contains(const Vector3f& point) const
+{
+	return (point.DistToSqr(position) <= radius * radius);
+}
+
 bool Sphere::Intersects(const Sphere& other) const
 {
 	float distSqr = position.DistToSqr(other.position);

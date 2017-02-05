@@ -20,6 +20,7 @@ public:
 	Sphere(const Vector3f& position, float radius);
 
 	// Operations
+	bool Contains(const Vector3f& point) const;
 	bool Intersects(const Sphere& other) const;
 	bool CastRay(const Ray& ray, float& distance) const;
 

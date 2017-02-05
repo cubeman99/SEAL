@@ -3,6 +3,8 @@
 
 #include <math/Vector3f.h>
 
+struct Sphere;
+
 
 //-----------------------------------------------------------------------------
 // AABB - Axis Aligned Bounding Box
@@ -23,6 +25,7 @@ public:
 
 	// Operations
 	bool Intersects(const AABB& other) const;
+	bool Intersects(const Sphere& sphere) const;
 
 
 private:
