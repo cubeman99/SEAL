@@ -55,8 +55,10 @@ void Agent::UpdateVision()
 	Matrix4f eyePerspective = Matrix4f::CreatePerspective(m_eyes[0].GetFieldOfView(), 1.0f, 0.01f, m_maxViewDistance);
 	Matrix4f leftEyeRotation = Matrix4f::CreateRotation(Vector3f::UNITY, leftEyeCenterAngle);
 	Matrix4f rightEyeRotation = Matrix4f::CreateRotation(Vector3f::UNITY, -leftEyeCenterAngle);
-	m_eyes[0].SetWorldToEye(eyePerspective * leftEyeRotation * m_worldToObject);
-	m_eyes[1].SetWorldToEye(eyePerspective * rightEyeRotation * m_worldToObject);
+	m_eyes[0].SetEyeToProjection(eyePerspective);
+	m_eyes[1].SetEyeToProjection(eyePerspective);
+	m_eyes[0].SetWorldToEye(leftEyeRotation * m_worldToObject);
+	m_eyes[1].SetWorldToEye(rightEyeRotation * m_worldToObject);
 
 	// Clear all sight values.
 	m_eyes[0].ClearSightValues();
@@ -88,19 +90,33 @@ void Agent::SeeObject(SimulationObject* object)
 		Retina& eye = m_eyes[eyeIndex];
 
 		// Get the position of the object in the eye's perspective projection.
+		Matrix4f worldToEye = eye.GetWorldToEye();
+		Vector3f posInEye = worldToEye.ApplyTransform(object->GetPosition());
+		Matrix4f projection = eye.GetEyeToProjection();
+		Vector3f posInProj1 = projection.ApplyTransform(posInEye - Vector3f(object->GetRadius(), 0, 0));
+		Vector3f posInProj2 = projection.ApplyTransform(posInEye + Vector3f(object->GetRadius(), 0, 0));
+
 		// Clip it if is outside the projection.
-		Vector3f posInEye = eye.GetWorldToEye().ApplyTransform(object->GetPosition());
-		if (posInEye.z <= -1.0f || posInEye.z >= 1.0f ||
-			posInEye.x <= -1.0f || posInEye.x >= 1.0f)
+		if (posInProj1.z <= -1.0f || posInProj1.z >= 1.0f ||
+			(posInProj1.x <= -1.0f && posInProj2.x < -1.0f) ||
+			(posInProj1.x >= 1.0f && posInProj2.x >= 1.0f))
 			continue;
-		float t = (posInEye.x + 1.0f) * 0.5f;
+
+		float t1 = (posInProj1.x + 1.0f) * 0.5f;
+		float t2 = (posInProj2.x + 1.0f) * 0.5f;
 
 		// Update the individual channels based on the object's position and color.
 		for (unsigned int channel = 0; channel < eye.GetNumChannels(); channel++)
 		{
-			unsigned int index = (unsigned int) (t * eye.GetResolution(channel));
-			index = Math::Min(index, eye.GetResolution(channel) - 1);
-			eye.SetSightValue(channel, index, object->GetColor()[channel]);
+			int index1 = (int) (t1 * eye.GetResolution(channel));
+			int index2 = (int) (t2 * eye.GetResolution(channel));
+			index1 = Math::Clamp(index1, 0, (int) eye.GetResolution(channel) - 1);
+			index2 = Math::Clamp(index2, 0, (int) eye.GetResolution(channel) - 1);
+
+			for (int index = index1; index <= index2; index++)
+			{
+				eye.SetSightValue(channel, (unsigned int) index, object->GetColor()[channel]);
+			}
 		}
 	}
 }

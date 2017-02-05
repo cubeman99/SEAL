@@ -51,14 +51,17 @@ public:
 	void SetSightValue(unsigned int channel, unsigned int index, float sightValue);
 
 	inline const Matrix4f& GetWorldToEye() const { return m_worldToEye; }
+	inline const Matrix4f& GetEyeToProjection() const { return m_eyeToProjection; }
 	inline void SetWorldToEye(const Matrix4f& worldToEye) { m_worldToEye = worldToEye; }
+	inline void SetEyeToProjection(const Matrix4f& eyeToProjection) { m_eyeToProjection = eyeToProjection; }
 
 private:
 	float			m_fieldOfView; // in radians.
 	float			m_viewDistance;
 	unsigned int	m_numChannels;
 	VisionChannel*	m_channels;
-	Matrix4f		m_worldToEye; // Converts points from world-space to eye-projection-space.
+	Matrix4f		m_worldToEye; // Converts points from world-space to eye-space.
+	Matrix4f		m_eyeToProjection; // Converts points from eye-space to eye-projection-space.
 };
 
 
