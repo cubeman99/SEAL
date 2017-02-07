@@ -1,9 +1,9 @@
 #include "Agent.h"
 #include <utilities/Random.h>
 #include <simulation/ObjectManager.h>
+#include <simulation/Simulation.h>
 #include <math/MathLib.h>
 #include <math/Vector2f.h>
-
 
 Agent::Agent() :
 	m_wander(false),
@@ -42,7 +42,7 @@ Agent::~Agent()
 void Agent::OnSpawn()
 {
 	m_moveSpeed = 0.1f; // TEMP: start with some random motion.
-	m_turnSpeed = Random::NextFloatClamped();
+	m_turnSpeed = GetSimulation()->GetRandom().NextFloatClamped();
 }
 
 void Agent::Update(float timeDelta)
