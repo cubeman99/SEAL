@@ -21,6 +21,7 @@ public:
 	void Render(const Vector2f& viewPortSize);
 
 	void RenderAgentVisionArcs(Agent* agent);
+	void RenderAgentVisionStrips(Agent* agent);
 
 	inline double GetAverageRenderTime() const { return m_renderTime; }
 
@@ -31,6 +32,8 @@ private:
 	OctTreeRenderer	m_octTreeRenderer;
 
 	double			m_renderTime; // measured time of render (in seconds)
+
+	Vector2f		m_viewPortSize;
 
 	// Resources.
 	Mesh* m_agentMesh;

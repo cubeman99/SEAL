@@ -9,7 +9,8 @@
 //-----------------------------------------------------------------------------
 	
 VisionChannel::VisionChannel() :
-	m_buffer(nullptr),
+	m_colorBuffer(nullptr),
+	m_depthBuffer(nullptr),
 	m_resolution(0),
 	m_channelIndex(0)
 {
@@ -17,56 +18,52 @@ VisionChannel::VisionChannel() :
 
 VisionChannel::~VisionChannel()
 {
-	delete [] m_buffer;
-	m_buffer = nullptr;
+	delete [] m_colorBuffer;
+	m_colorBuffer = nullptr;
+	delete [] m_depthBuffer;
+	m_depthBuffer = nullptr;
 }
 
 void VisionChannel::Configure(unsigned int channelIndex, unsigned int resolution)
 {
-	delete [] m_buffer;
+	delete [] m_colorBuffer;
+	delete [] m_depthBuffer;
 	m_resolution = resolution;
 	m_channelIndex = channelIndex;
-	m_buffer = new float[m_resolution];
+	m_colorBuffer = new float[m_resolution];
+	m_depthBuffer = new float[m_resolution];
+}
+
+void VisionChannel::Clear()
+{
+	for (unsigned int i = 0; i < m_resolution; ++i)
+	{
+		m_colorBuffer[i] = 0.0f; // Clear sight value to 0 (black).
+		m_depthBuffer[i] = 1.0f; // Clear depth to max depth.
+	}
 }
 	
 float VisionChannel::GetSightValue(unsigned int index) const
 {
 	assert(index < m_resolution);
-	return m_buffer[index];
+	return m_colorBuffer[index];
 }
 
 float VisionChannel::GetInterpolatedSightValue(float t) const
 {
 	if (m_resolution == 0)
-	{
 		return 0.0f;
-	}
 	else if (m_resolution == 1)
-	{
-		return m_buffer[0];
-	}
-	else
-	{
-		t = Math::Clamp(t, 0.0f, 1.0f);
-
-		float neuronIndex = (t * m_resolution) - 0.5f;
-		int index0 = Math::Max((int) neuronIndex + 0, 0);
-		int index1 = Math::Min((int) neuronIndex + 1, (int) m_resolution - 1);
-		float t = neuronIndex - (float) index0;
-
-		return Math::Lerp(GetSightValue(index0), GetSightValue(index1), t);
-	}
-
-
-
-	//assert(false); // TODO: GetInterpolatedSightValue()
-
+		return m_colorBuffer[0];
+	
 	t = Math::Clamp(t, 0.0f, 1.0f);
-	unsigned int index = Math::Min((unsigned int) (t * m_resolution), m_resolution - 1);
 
-	return GetSightValue(index);
+	float neuronIndex = (t * m_resolution) - 0.5f;
+	int index0 = Math::Max((int) neuronIndex + 0, 0);
+	int index1 = Math::Min((int) neuronIndex + 1, (int) m_resolution - 1);
+	float lerpFactor = neuronIndex - (float) index0;
 
-	//return 0.0f;
+	return Math::Lerp(GetSightValue(index0), GetSightValue(index1), lerpFactor);
 }
 
 
@@ -113,6 +110,12 @@ unsigned int Retina::GetResolution(unsigned int channel) const
 	return m_channels[channel].m_resolution;
 }
 
+float Retina::GetSightValueAtIndex(unsigned int channel, unsigned int index) const
+{
+	assert(channel < m_numChannels);
+	return m_channels[channel].GetSightValue(index);
+}
+
 float Retina::GetSightValue(unsigned int channel, float t) const
 {
 	assert(channel < m_numChannels);
@@ -129,15 +132,20 @@ float Retina::GetInterpolatedSightValue(unsigned int channel, float t) const
 
 void Retina::ClearSightValues()
 {
+	// Clear each channel.
 	for (unsigned int i = 0; i < m_numChannels; ++i)
-	{
-		memset(m_channels[i].m_buffer, 0, m_channels[i].m_resolution * sizeof(float));
-	}
+		m_channels[i].Clear();
 }
 
-void Retina::SetSightValue(unsigned int channel, unsigned int index, float sightValue)
+void Retina::SetSightValue(unsigned int channel, unsigned int index, float sightValue, float depth)
 {
 	assert(channel < m_numChannels);
 	assert(index < m_channels[channel].m_resolution);
-	m_channels[channel].m_buffer[index] = sightValue;
+
+	// Perform a depth test.
+	if (depth < m_channels[channel].m_depthBuffer[index])
+	{
+		m_channels[channel].m_colorBuffer[index] = sightValue;
+		m_channels[channel].m_depthBuffer[index] = depth;
+	}
 }

@@ -17,13 +17,15 @@ public:
 
 	void Configure(unsigned int channelIndex, unsigned int resolution);
 
+	void Clear();
 	float GetSightValue(unsigned int index) const;
 	float GetInterpolatedSightValue(float t) const;
 	
 private:
 	unsigned int	m_channelIndex;
 	unsigned int	m_resolution;
-	float*			m_buffer;
+	float*			m_colorBuffer; // color values for each pixel
+	float*			m_depthBuffer; // depth values for each pixel. 0 = close, 1 = far.
 };
 
 
@@ -45,10 +47,11 @@ public:
 
 	unsigned int GetResolution(unsigned int channel) const;
 	float GetSightValue(unsigned int channel, float t) const;
+	float GetSightValueAtIndex(unsigned int channel, unsigned int index) const;
 	float GetInterpolatedSightValue(unsigned int channel, float t) const;
 
 	void ClearSightValues();
-	void SetSightValue(unsigned int channel, unsigned int index, float sightValue);
+	void SetSightValue(unsigned int channel, unsigned int index, float sightValue, float depth);
 
 	inline const Matrix4f& GetWorldToEye() const { return m_worldToEye; }
 	inline const Matrix4f& GetEyeToProjection() const { return m_eyeToProjection; }

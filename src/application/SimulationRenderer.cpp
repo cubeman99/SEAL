@@ -125,6 +125,8 @@ SimulationRenderer::~SimulationRenderer()
 
 void SimulationRenderer::Render(const Vector2f& viewPortSize)
 {
+	m_viewPortSize = viewPortSize;
+
 	double startTime = Time::GetTime();
 
 	Simulation* simulation = m_simulationManager->GetSimulation();
@@ -246,6 +248,22 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	// Render the OctTree
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
+	// Switch to orthographic to render the HUD.
+	Matrix4f orthographic = Matrix4f::CreateOrthographic(0.0f, m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(orthographic.data());
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	m_renderer.SetShader(0);
+
+	// Render the selected agent's vision strips.
+	if (selectedAgent != nullptr)
+	{
+		RenderAgentVisionStrips(selectedAgent);
+	}
+
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);
 }
@@ -302,4 +320,64 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 	}
 	glEnd();
 }
+
+
+
+void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
+{
+	float stripWidth = 240.0f;
+	float stripHeight = 60.0f;
+	float separation = 40.0f;
+	
+	Vector2f center(m_viewPortSize.x * 0.5f, m_viewPortSize.y - 30 - stripHeight);
+
+	Vector2f stripPos[2];
+	stripPos[0].Set(center.x - (separation * 0.5f) - stripWidth, center.y - (stripHeight * 0.5f));
+	stripPos[1].Set(center.x + (separation * 0.5f), center.y - (stripHeight * 0.5f));
+
+	Vector3f channelColor;
+	Color outlineColor(100, 100, 100);
+
+	// Draw each vision strip.
+	for (unsigned int eyeIndex = 0; eyeIndex < 2; eyeIndex++)
+	{
+		Retina* eye = agent->GetEye(eyeIndex);
+
+		// Render the vision strip for each channel.
+		for (unsigned int channel = 0; channel < eye->GetNumChannels(); channel++)
+		{
+			unsigned int resolution = eye->GetResolution(channel);
+			channelColor.SetZero();
+
+			Vector2f boxSize(stripWidth / resolution, stripHeight / eye->GetNumChannels());
+
+			// Render each pixel in the sight buffer for this channel.
+			for (unsigned int i = 0; i < resolution; i++)
+			{
+				float sightValue = eye->GetSightValueAtIndex(channel, i);
+				Vector2f boxPos = stripPos[eyeIndex] + Vector2f(boxSize.x * i, boxSize.y * channel);
+				Vector3f boxFillColor = channelColor * sightValue;
+
+				// Draw the filled box.
+				glBegin(GL_QUADS);
+					glColor3fv(channelColor.data());
+					glVertex2f(boxPos.x, boxPos.y);
+					glVertex2f(boxPos.x + boxSize.x, boxPos.y);
+					glVertex2f(boxPos.x + boxSize.x, boxPos.y + boxSize.y);
+					glVertex2f(boxPos.x, boxPos.y + boxSize.y);
+				glEnd();
+				
+				// Draw the box outline.
+				glBegin(GL_LINE_LOOP);
+					glColor4ubv(outlineColor.data());
+					glVertex2f(boxPos.x, boxPos.y);
+					glVertex2f(boxPos.x + boxSize.x, boxPos.y);
+					glVertex2f(boxPos.x + boxSize.x, boxPos.y + boxSize.y);
+					glVertex2f(boxPos.x, boxPos.y + boxSize.y);
+				glEnd();
+			}
+		}
+	}
+}
+
 

@@ -16,9 +16,12 @@ Agent::Agent()
 
 	m_numEyes = 2;
 	unsigned int resolutions[3];
-	resolutions[0] = 16;
-	resolutions[1] = 16;
-	resolutions[2] = 16;
+	resolutions[0] = Random::NextInt(1, 20);
+	resolutions[1] = Random::NextInt(1, 20);
+	resolutions[2] = Random::NextInt(1, 20);
+	resolutions[0] = 12;
+	resolutions[1] = 12;
+	resolutions[2] = 12;
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	
@@ -113,9 +116,14 @@ void Agent::SeeObject(SimulationObject* object)
 			index1 = Math::Clamp(index1, 0, (int) eye.GetResolution(channel) - 1);
 			index2 = Math::Clamp(index2, 0, (int) eye.GetResolution(channel) - 1);
 
+			float depth = posInProj1.z;
+			
 			for (int index = index1; index <= index2; index++)
 			{
-				eye.SetSightValue(channel, (unsigned int) index, object->GetColor()[channel]);
+				eye.SetSightValue(channel, (unsigned int) index,
+					object->GetColor()[channel], depth);
+				//eye.SetSightValue(channel, (unsigned int) index,
+					//depth, depth);
 			}
 		}
 	}
