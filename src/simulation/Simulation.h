@@ -5,7 +5,7 @@
 #include <simulation/OctTree.h>
 #include <simulation/SimulationObject.h>
 #include <simulation/ObjectManager.h>
-
+#include <utilities/Random.h>
 
 //-----------------------------------------------------------------------------
 // Simulation
@@ -27,6 +27,7 @@ public:
 	inline float GetTimeStep() const { return m_timeStep; }
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 
+	inline RandomNumberGenerator& GetRandom() { return m_random; }
 
 private:
 	float			m_tickRate; // How many ticks per second.
@@ -38,6 +39,8 @@ private:
 	//OctTree			m_octTree;
 
 	ObjectManager	m_objectManager;
+
+	RandomNumberGenerator	m_random;
 };
 
 

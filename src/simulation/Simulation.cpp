@@ -28,6 +28,8 @@ void Simulation::Initialize()
 
 	// TODO: initialize agent system and plant system.
 	m_objectManager.Initialize();
+
+	m_random.SeedTime();
 }
 
 void Simulation::Tick()
