@@ -348,6 +348,7 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 		{
 			unsigned int resolution = eye->GetResolution(channel);
 			channelColor.SetZero();
+			channelColor[channel] = 1.0f;
 
 			Vector2f boxSize(stripWidth / resolution, stripHeight / eye->GetNumChannels());
 
@@ -360,7 +361,7 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 
 				// Draw the filled box.
 				glBegin(GL_QUADS);
-					glColor3fv(channelColor.data());
+					glColor3fv(boxFillColor.data());
 					glVertex2f(boxPos.x, boxPos.y);
 					glVertex2f(boxPos.x + boxSize.x, boxPos.y);
 					glVertex2f(boxPos.x + boxSize.x, boxPos.y + boxSize.y);

@@ -5,7 +5,10 @@
 #include <math/Vector2f.h>
 
 
-Agent::Agent()
+Agent::Agent() :
+	m_wander(false),
+	m_moveSpeed(0.0f),
+	m_turnSpeed(0.0f)
 {
 	m_fieldOfView = 0.9f;
 	m_maxViewDistance = 0.2f;
@@ -30,13 +33,16 @@ Agent::Agent()
 	m_color.y = Random::NextFloat();
 	m_color.z = Random::NextFloat();
 	m_radius = 0.016f; // TODO: magic number agent radius.
-	
-	m_moveSpeed = 0.1f;
-	m_turnSpeed = 1.0f;
 }
 
 Agent::~Agent()
 {
+}
+
+void Agent::OnSpawn()
+{
+	m_moveSpeed = 0.1f; // TEMP: start with some random motion.
+	m_turnSpeed = Random::NextFloatClamped();
 }
 
 void Agent::Update(float timeDelta)
@@ -132,14 +138,15 @@ void Agent::SeeObject(SimulationObject* object)
 void Agent::UpdateBrain()
 {
 	// TEMP: random wandering turning.
+	if (m_wander)
+	{
+		//float timeDelta = 0.01666667f;
+		float maxTurnSpeed = 6.0f;
 	
-	//float timeDelta = 0.01666667f;
-	float maxTurnSpeed = 6.0f;
-	
-	float chance = ((Random::NextFloat() * 2) - 1) * maxTurnSpeed;
-	float acc = 1;
-	if (chance <= m_turnSpeed)
-		acc = -1;
-	m_turnSpeed += Random::NextFloat() * acc * maxTurnSpeed * 0.1f;
-	
+		float chance = ((Random::NextFloat() * 2) - 1) * maxTurnSpeed;
+		float acc = 1;
+		if (chance <= m_turnSpeed)
+			acc = -1;
+		m_turnSpeed += Random::NextFloat() * acc * maxTurnSpeed * 0.1f;
+	}
 }

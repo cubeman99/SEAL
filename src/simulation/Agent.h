@@ -20,7 +20,8 @@ public:
 	Agent();
 	~Agent();
 
-	void Update(float timeDelta);
+	void OnSpawn() override;
+	void Update(float timeDelta) override;
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
@@ -35,11 +36,20 @@ public:
 	inline unsigned int GetNumEyes() const { return m_numEyes; }
 	inline Retina* GetEye(unsigned int index) { return &m_eyes[index]; }
 	inline const Retina* GetEye(unsigned int index) const { return &m_eyes[index]; }
+	
+	inline void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
+	inline void SetTurnSpeed(float turnSpeed) { m_turnSpeed = turnSpeed; }
+	inline void EnableWandering(bool enableWander) { m_wander = enableWander; }
+
+public:
+	// enable/disable temporary wandering. This is for debug purposes,
+	// in case we want to control our selected agent manually.
+	bool m_wander;
 
 private:
-	
-	float m_moveSpeed; // Distance units per second.
-	float m_turnSpeed; // Radians per second.
+
+	float			m_moveSpeed; // Distance units per second.
+	float			m_turnSpeed; // Radians per second.
 	
 	unsigned int	m_numEyes;
 	Retina			m_eyes[2];

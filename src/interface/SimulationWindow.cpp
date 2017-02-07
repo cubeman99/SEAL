@@ -163,6 +163,47 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 {
 	double startTime = Time::GetTime(); // time the update.
 
+	// Update debug agent move keyboard controls.
+	Agent* agent = m_simulationManager.GetSelectedAgent();
+	if (agent != nullptr)
+	{
+		float timeDelta = 0.01667f;
+		float moveAmount = 0.3f * timeDelta;
+		float turnAmount = 4.0f * timeDelta;
+		Quaternion orientation = agent->GetOrientation();
+		bool moved = false;
+
+		// Update movement controls (arrow keys).
+		if (wxGetKeyState(WXK_RIGHT))
+		{
+			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), turnAmount));
+			moved = true;
+		}
+		if (wxGetKeyState(WXK_LEFT))
+		{
+			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), -turnAmount));
+			moved = true;
+		}
+		if (wxGetKeyState(WXK_UP))
+		{
+			agent->GetObjectManager()->MoveObjectForward(agent, moveAmount);
+			moved = true;
+		}
+		if (wxGetKeyState(WXK_DOWN))
+		{
+			agent->GetObjectManager()->MoveObjectForward(agent, -moveAmount);
+			moved = true;
+		}
+
+		// Disable wandering if the agent was moved manually.
+		if (moved)
+		{
+			agent->SetMoveSpeed(0.0f);
+			agent->SetTurnSpeed(0.0f);
+			agent->EnableWandering(false);
+		}
+	}
+
 	// Update the simulation.
 	m_simulationManager.Update();
 	
