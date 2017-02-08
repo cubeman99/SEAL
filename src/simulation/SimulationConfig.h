@@ -17,6 +17,7 @@ public:
 	struct
 	{
 		float	radius;
+		int		seed; // -1 means random seed.
 
 	} world;
 

@@ -28,7 +28,7 @@ void Plant::OnSpawn()
 	}
 }
 
-void Plant::Update(float timeDelta)
+void Plant::Update()
 {
 	// TODO: spawn offshoots if below capacity with random chance
 

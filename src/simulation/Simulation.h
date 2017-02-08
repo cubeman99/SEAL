@@ -27,15 +27,11 @@ public:
 	inline RandomNumberGenerator& GetRandom() { return m_random; }
 	inline const SimulationConfig& GetConfig() { return m_config; }
 
-	inline float GetTickRate() const { return m_tickRate; }
-	inline float GetTimeStep() const { return m_timeStep; }
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 
 
 private:
 	SimulationConfig		m_config;
-	float					m_tickRate; // How many ticks per second.
-	float					m_timeStep; // Length of time in seconds to simulate for each tick.
 	unsigned int			m_ageInTicks;
 	World					m_world;
 	ObjectManager			m_objectManager;

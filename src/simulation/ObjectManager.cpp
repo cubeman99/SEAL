@@ -44,7 +44,7 @@ void ObjectManager::ClearObjects()
 	m_octTree.Clear();
 }
 
-void ObjectManager::UpdateObjects(float timeDelta)
+void ObjectManager::UpdateObjects()
 {
 	// Update all objects.
 	for (unsigned int i = 0; i < m_objects.size(); ++i)
@@ -62,7 +62,7 @@ void ObjectManager::UpdateObjects(float timeDelta)
 			Matrix4f::CreateRotation(object->m_orientation);
 
 		// Update the object.
-		object->Update(timeDelta);
+		object->Update();
 
 		// Update the object in the cct-tree since the
 		// object's position probably changed.

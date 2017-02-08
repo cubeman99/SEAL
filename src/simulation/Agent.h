@@ -23,7 +23,7 @@ public:
 	~Agent();
 
 	void OnSpawn() override;
-	void Update(float timeDelta) override;
+	void Update() override;
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);

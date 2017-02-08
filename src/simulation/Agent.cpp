@@ -106,7 +106,7 @@ void Agent::OnSpawn()
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 }
 
-void Agent::Update(float timeDelta)
+void Agent::Update()
 {
 	UpdateVision();
 	UpdateBrain();

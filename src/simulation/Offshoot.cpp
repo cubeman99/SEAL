@@ -29,13 +29,12 @@ void Offshoot::OnSpawn()
 		config.plant.color[2]);
 }
 
-
 void Offshoot::OnDestroy()
 {
 	m_source->NotifyOffshootDeath(this);
 }
 
-void Offshoot::Update(float timeDelta)
+void Offshoot::Update()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 

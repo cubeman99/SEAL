@@ -23,7 +23,7 @@ public:
 	
 	void OnSpawn() override;
 	void OnDestroy() override;
-	void Update(float timeDelta) override;
+	void Update() override;
 
 	// Eat this plant offshoot. Returns the amount of energy eaten.
 	float Eat();

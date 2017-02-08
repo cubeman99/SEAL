@@ -8,7 +8,7 @@ SimulationConfig::SimulationConfig()
 
 
 	world.radius					= 160.0f; // gives a circumference of about 1000
-
+	world.seed						= -1;
 	plant.radius					= 2.5f;
 	plant.color[0]					= 0.3f;
 	plant.color[1]					= 1.0f; // TODO: change this color back to pure green.

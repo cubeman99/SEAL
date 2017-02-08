@@ -5,8 +5,6 @@
 Simulation::Simulation() :
 	m_objectManager(this)
 {
-	m_tickRate = 60.0f;
-	m_timeStep = 1.0f / m_tickRate;
 }
 
 Simulation::~Simulation()
@@ -17,27 +15,19 @@ Simulation::~Simulation()
 void Simulation::Initialize(const SimulationConfig& config)
 {
 	m_config = config;
-
-	m_world.Initialize(config.world.radius);
-
+	
 	// Initialize simulation state.
 	m_ageInTicks = 0;
 
-	// Setup the OctTree.
-	//AABB octTreeBounds;
-	//Vector3f worldPos = Vector3f::ZERO;
-	//Vector3f worldRadius(m_world.GetRadius() * 1.2f); // a bit larger than the world
-	//octTreeBounds.mins = worldPos - worldRadius;
-	//octTreeBounds.maxs = worldPos + worldRadius;
-	//m_octTree.Clear();
-	//m_octTree.SetBounds(octTreeBounds);
-	//m_octTree.SetMaxDepth(4);
-	//m_octTree.SetMaxObjectsPerNode(1);
-
-	// TODO: initialize agent system and plant system.
+	// Initialize systems.
+	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
 
-	m_random.SeedTime();
+	// Seed the random number generator.
+	if (config.world.seed < 0)
+		m_random.SeedTime();
+	else
+		m_random.SetSeed((unsigned long) config.world.seed);
 }
 
 void Simulation::Tick()
@@ -46,10 +36,9 @@ void Simulation::Tick()
 
 	// Update systems.
 	m_ageInTicks++;
-	m_objectManager.UpdateObjects(m_timeStep);
-	//m_agentSystem.UpdateAgents(m_timeStep);
-	//m_agentSystem.UpdatePlants(m_timeStep);
+	m_objectManager.UpdateObjects();
 	
+	// Measure elapsed time.
 	double endTime = Time::GetTime();
 	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
 }

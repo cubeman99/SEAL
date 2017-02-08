@@ -49,7 +49,7 @@ public:
 
 	virtual void OnSpawn() {}
 	virtual void OnDestroy() {}
-	virtual void Update(float timeDelta) {}
+	virtual void Update() {}
 
 	// Object type
 

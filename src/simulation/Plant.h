@@ -20,7 +20,7 @@ public:
 	~Plant();
 
 	void OnSpawn() override;
-	void Update(float timeDelta) override;
+	void Update() override;
 	Offshoot* SpawnOffshoot();
 	void NotifyOffshootDeath(Offshoot* toRemove);
 

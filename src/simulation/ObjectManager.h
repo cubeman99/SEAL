@@ -45,7 +45,7 @@ public:
 	// Object management
 
 	// Update all objects.
-	void UpdateObjects(float timeDelta);
+	void UpdateObjects();
 
 	// Clear (delete) all objects from the simulation.
 	void ClearObjects();
