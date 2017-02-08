@@ -122,7 +122,12 @@ public:
 	
 	template <typename T>
 	static T ATan2(T y, T x);
-
+	
+	template <typename T>
+	static T ToRadians(T degrees);
+	
+	template <typename T>
+	static T ToDegrees(T radians);
 };
 
 
@@ -308,6 +313,18 @@ template <typename T>
 T Math::ATan2(T y, T x)
 {
 	return (T) std::atan2(y, x);
+}
+
+template <typename T>
+T Math::ToRadians(T degrees)
+{
+	return (degrees * DEG_TO_RAD);
+}
+
+template <typename T>
+T Math::ToDegrees(T radians)
+{
+	return (degrees * RAD_TO_DEG);
 }
 
 

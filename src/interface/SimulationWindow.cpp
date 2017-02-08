@@ -96,11 +96,12 @@ SimulationWindow::SimulationWindow() :
     Show();
 
 	//m_updateTimer.Start(17);
-	m_updateTimer.Start(8);
+	//m_updateTimer.Start(8);
 	m_updateTimer.Start(2);
 	m_frameCounter = 0;
 	double lastFrameTimeStamp = Time::GetTime();
 
+	// Initialize a new simulation.
 	m_simulationManager.Initialize();
 }
 

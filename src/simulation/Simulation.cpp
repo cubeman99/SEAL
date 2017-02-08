@@ -1,17 +1,25 @@
 #include "Simulation.h"
 #include <utilities/Timing.h>
 
+
 Simulation::Simulation() :
-	//m_agentSystem(this, 0.25f, 100.0f),
 	m_objectManager(this)
 {
 	m_tickRate = 60.0f;
 	m_timeStep = 1.0f / m_tickRate;
 }
 
-
-void Simulation::Initialize()
+Simulation::~Simulation()
 {
+}
+
+
+void Simulation::Initialize(const SimulationConfig& config)
+{
+	m_config = config;
+
+	//m_world.Initialize(config.world.worldRadius);
+
 	// Initialize simulation state.
 	m_ageInTicks = 0;
 

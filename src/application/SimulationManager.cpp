@@ -28,8 +28,9 @@ SimulationManager::~SimulationManager()
 
 void SimulationManager::Initialize()
 {
+	SimulationConfig config; // TEMP: use default config values.
 	m_simulation = new Simulation();
-	m_simulation->Initialize();
+	m_simulation->Initialize(config);
 
 	// Initialize systems.
 	m_cameraSystem.Initialize(m_simulation);
