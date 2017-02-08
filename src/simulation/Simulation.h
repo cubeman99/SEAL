@@ -24,18 +24,18 @@ public:
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
-	inline RandomNumberGenerator& GetRandom() { return m_random; }
+	inline RNG& GetRandom() { return m_random; }
 	inline const SimulationConfig& GetConfig() { return m_config; }
 
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 
 
 private:
-	SimulationConfig		m_config;
-	unsigned int			m_ageInTicks;
-	World					m_world;
-	ObjectManager			m_objectManager;
-	RandomNumberGenerator	m_random;
+	SimulationConfig	m_config;
+	unsigned int		m_ageInTicks;
+	World				m_world;
+	ObjectManager		m_objectManager;
+	RNG					m_random;
 };
 
 

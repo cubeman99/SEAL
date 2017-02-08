@@ -232,11 +232,12 @@ void Agent::UpdateBrain()
 	// TEMP: random wandering turning.
 	if (m_wander)
 	{
+		RNG& random = GetSimulation()->GetRandom();
 		float maxTurnSpeed = 6.0f / 60.0f;
-		float chance = ((Random::NextFloat() * 2) - 1) * maxTurnSpeed;
+		float chance = ((random.NextFloat() * 2) - 1) * maxTurnSpeed;
 		float acc = 1;
 		if (chance <= m_turnSpeed)
 			acc = -1;
-		m_turnSpeed += Random::NextFloat() * acc * maxTurnSpeed * 0.1f;
+		m_turnSpeed += random.NextFloat() * acc * maxTurnSpeed * 0.1f;
 	}
 }

@@ -153,12 +153,14 @@ SimulationObjectIterator<Plant> ObjectManager::plants_end()
 void ObjectManager::CreateRandomPositionAndOrientation(
 	Vector3f& position, Quaternion& orientation) const
 {
+	RNG& random = m_simulation->GetRandom();
+
 	// Randomize position.
 	// NOTE: this is an uneven distribution for a sphere. Objects will be
 	// more populated around the extremes of the coorinate axes' 8 sectors.
-	position.x = Random::NextFloat(-1, 1);
-	position.y = Random::NextFloat(-1, 1);
-	position.z = Random::NextFloat(-1, 1);
+	position.x = random.NextFloat(-1, 1);
+	position.y = random.NextFloat(-1, 1);
+	position.z = random.NextFloat(-1, 1);
 	position.Normalize();
 
 	// Randomize orientation (tangent to world surface).
@@ -167,20 +169,23 @@ void ObjectManager::CreateRandomPositionAndOrientation(
 	float angle = Math::ACos(position.Dot(Vector3f::UP));
 	orientation = Quaternion(axis, angle);
 	orientation.Rotate(orientation.GetUp(),
-		Random::NextFloat() * Math::TWO_PI);
+		random.NextFloat() * Math::TWO_PI);
 	
 	// Make sure postion is on world's surface.
 	position *= m_simulation->GetWorld()->GetRadius();
 }
 
 
-void ObjectManager::CreateRelativeRandomPositionAndOrientation(Vector3f relativePosition,
-	Vector3f& newPosition, float randomFactor, Quaternion& orientation) const
+void ObjectManager::CreateRelativeRandomPositionAndOrientation(
+	Vector3f relativePosition, Vector3f& newPosition,
+	float randomFactor, Quaternion& orientation) const
 {
+	RNG& random = m_simulation->GetRandom();
+
 	newPosition = relativePosition;
-	newPosition.x += Random::NextFloat(-1, 1) * randomFactor;
-	newPosition.y += Random::NextFloat(-1, 1) * randomFactor;
-	newPosition.z += Random::NextFloat(-1, 1) * randomFactor;
+	newPosition.x += random.NextFloatClamped() * randomFactor;
+	newPosition.y += random.NextFloatClamped() * randomFactor;
+	newPosition.z += random.NextFloatClamped() * randomFactor;
 	newPosition.Normalize();
 
 	// Randomize orientation (tangent to world surface).
@@ -189,8 +194,9 @@ void ObjectManager::CreateRelativeRandomPositionAndOrientation(Vector3f relative
 	float angle = Math::ACos(newPosition.Dot(Vector3f::UP));
 	orientation = Quaternion(axis, angle);
 	orientation.Rotate(orientation.GetUp(),
-		Random::NextFloat() * Math::TWO_PI);
+		random.NextFloat() * Math::TWO_PI);
 
 	// Make sure postion is on world's surface.
 	newPosition *= m_simulation->GetWorld()->GetRadius();
 }
+
