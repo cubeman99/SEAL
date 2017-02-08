@@ -47,7 +47,7 @@ SimulationConfig::SimulationConfig()
 	genes.minChildren				= 1;
 	genes.maxChildren				= 2;
 	genes.minSightDistance			= 20;
-	genes.maxSightDistance			= 120;
+	genes.maxSightDistance			= 60;
 	genes.minFieldOfView			= Math::ToRadians<float>(10);
 	genes.maxFieldOfView			= Math::ToRadians<float>(120);
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);

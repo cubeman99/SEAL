@@ -94,7 +94,7 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 	if (e.LeftDown())
 	{
 		// Convert the screen coordinate to OpenGL clip space,
-		// then convert that to a ray based on the camera's state.
+		// then convert that to a ray based on the camera's view & projection.
 		Vector2f screenCoord((float) e.GetX(), (float) e.GetY());
 		const wxSize clientSize = GetClientSize();
 		screenCoord /= Vector2f((float) clientSize.x, (float) clientSize.y);
@@ -109,11 +109,12 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 		float distance;
 		float closestDistance;
 		
-		// Raycast onto the world sphere first (so we don't select
-		// objects on the other side of the world).
+		// Raycast onto the world sphere first to get the starting
+		// closest-distance (so we don't select objects on the other
+		// side of the world).
 		GetSimulation()->GetWorld()->CastRay(ray, closestDistance);
 
-		// Then raycast onto all simulation objects.
+		// Then, raycast onto all simulation objects.
 		for (auto it = objectManager->agents_begin();
 			it != objectManager->agents_end(); ++it)
 		{

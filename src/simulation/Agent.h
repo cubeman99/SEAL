@@ -58,7 +58,7 @@ private:
 	float			m_maxEnergy;
 		
 	unsigned int	m_numEyes;
-	Retina			m_eyes[2];
+	Retina			m_eyes[2]; // 0 = left eye, 1 = right eye.
 	float			m_fieldOfView; // in radians.
 	float			m_maxViewDistance;
 	float			m_angleBetweenEyes; // in radians.

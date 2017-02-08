@@ -132,9 +132,9 @@ void Agent::UpdateVision()
 	Matrix4f eyePerspective = Matrix4f::CreatePerspective(
 		m_eyes[0].GetFieldOfView(), 1.0f, m_radius * 0.1f, m_maxViewDistance);
 	Matrix4f leftEyeRotation = Matrix4f::CreateRotation(
-		Vector3f::UNITY, leftEyeCenterAngle);
-	Matrix4f rightEyeRotation = Matrix4f::CreateRotation(
 		Vector3f::UNITY, -leftEyeCenterAngle);
+	Matrix4f rightEyeRotation = Matrix4f::CreateRotation(
+		Vector3f::UNITY, leftEyeCenterAngle);
 	m_eyes[0].SetEyeToProjection(eyePerspective);
 	m_eyes[1].SetEyeToProjection(eyePerspective);
 	m_eyes[0].SetWorldToEye(leftEyeRotation * m_worldToObject);
