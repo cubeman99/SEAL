@@ -36,6 +36,16 @@ void ArcBallCamera::SetDistance(float distance)
 	m_distance = distance;
 }
 
+void ArcBallCamera::SetMinDistance(float minDistance)
+{
+	m_minDistance = minDistance;
+}
+
+void ArcBallCamera::SetMaxDistance(float maxDistance)
+{
+	m_maxDistance = maxDistance;
+}
+
 
 const Vector3f& ArcBallCamera::GetCenterPosition() const
 {
@@ -92,5 +102,5 @@ void ArcBallCamera::Zoom(float amount)
 {
 	m_distance = Math::Clamp(
 		m_distance * Math::Pow(1.1f, (float) -amount),
-		0.01f, 4.0f);
+		m_minDistance, m_maxDistance);
 }

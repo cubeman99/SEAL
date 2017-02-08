@@ -31,6 +31,8 @@ public:
 
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
+	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
+	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
 
 	inline float GetFieldOfView() const { return m_fieldOfView; }
 	inline float GetMaxViewDistance() const { return m_maxViewDistance; }

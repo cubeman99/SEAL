@@ -175,34 +175,46 @@ void Agent::EatPlant(Offshoot* plant)
 
 void Agent::SeeObject(SimulationObject* object)
 {
+	float distSqr = object->GetPosition().DistToSqr(m_position);
+
 	// Discard objects that are too far away.
-	if (object->GetPosition().DistToSqr(m_position) >
-		m_maxViewDistance * m_maxViewDistance)
+	if (distSqr > m_maxViewDistance * m_maxViewDistance)
 		return;
+
+	// Check if we are inside the object. If so, then the object's
+	// color should fill the entirety of our vision strip.
+	bool isInsideMe = (distSqr <= object->GetRadius() * object->GetRadius());
 
 	// Update vision for each eye.
 	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
 		Retina& eye = m_eyes[eyeIndex];
 
-		// Get the position of the object in the eye's perspective projection.
-		Matrix4f worldToEye = eye.GetWorldToEye();
-		Vector3f posInEye = worldToEye.ApplyTransform(object->GetPosition());
-		Matrix4f projection = eye.GetEyeToProjection();
-		Vector3f posInProj1 = projection.ApplyTransform(posInEye -
-			Vector3f(object->GetRadius(), 0, 0));
-		Vector3f posInProj2 = projection.ApplyTransform(posInEye +
-			Vector3f(object->GetRadius(), 0, 0));
+		float t1 = 0.0f;
+		float t2 = 1.0f;
+		float depth = 0.0f;
 
-		// Clip it if is outside the projection.
-		if (posInProj1.z <= -1.0f || posInProj1.z >= 1.0f ||
-			(posInProj1.x <= -1.0f && posInProj2.x < -1.0f) ||
-			(posInProj1.x >= 1.0f && posInProj2.x >= 1.0f))
-			continue;
+		if (!isInsideMe)
+		{
+			// Get the position of the object in the eye's perspective projection.
+			Matrix4f worldToEye = eye.GetWorldToEye();
+			Vector3f posInEye = worldToEye.ApplyTransform(object->GetPosition());
+			Matrix4f projection = eye.GetEyeToProjection();
+			Vector3f posInProj1 = projection.ApplyTransform(posInEye -
+				Vector3f(object->GetRadius(), 0, 0));
+			Vector3f posInProj2 = projection.ApplyTransform(posInEye +
+				Vector3f(object->GetRadius(), 0, 0));
 
-		float t1 = (posInProj1.x + 1.0f) * 0.5f;
-		float t2 = (posInProj2.x + 1.0f) * 0.5f;
-		float depth = posInProj1.z;
+			// Clip it if is outside the projection.
+			if (posInProj1.z <= -1.0f || posInProj1.z >= 1.0f ||
+				(posInProj1.x <= -1.0f && posInProj2.x < -1.0f) ||
+				(posInProj1.x >= 1.0f && posInProj2.x >= 1.0f))
+				continue;
+			
+			t1 = (posInProj1.x + 1.0f) * 0.5f;
+			t2 = (posInProj2.x + 1.0f) * 0.5f;
+			depth = posInProj1.z;
+		}
 
 		// Update the individual channels based on the object's position and color.
 		for (unsigned int channel = 0; channel < eye.GetNumChannels(); channel++)
@@ -225,8 +237,8 @@ void Agent::UpdateBrain()
 {
 	// TODO: Actually update brain and get its output values.
 	//float turnAmount = 0.0f; // output from brain
-	float moveAmount = 1.0f; // output from brain
-	m_moveSpeed = moveAmount * m_maxMoveSpeed;
+	//float moveAmount = 0.0f; // output from brain
+	//m_moveSpeed = moveAmount * m_maxMoveSpeed;
 	//m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
 
 	// TEMP: random wandering turning.
@@ -239,5 +251,6 @@ void Agent::UpdateBrain()
 		if (chance <= m_turnSpeed)
 			acc = -1;
 		m_turnSpeed += random.NextFloat() * acc * maxTurnSpeed * 0.1f;
+		m_moveSpeed = m_maxMoveSpeed;
 	}
 }

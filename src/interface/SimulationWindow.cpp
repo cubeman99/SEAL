@@ -168,9 +168,8 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 	Agent* agent = m_simulationManager.GetSelectedAgent();
 	if (agent != nullptr)
 	{
-		float timeDelta = 0.01667f;
-		float moveAmount = 0.3f * timeDelta;
-		float turnAmount = 4.0f * timeDelta;
+		float moveAmount = agent->GetMaxMoveSpeed();
+		float turnAmount = agent->GetMaxTurnSpeed() * 0.5f;
 		Quaternion orientation = agent->GetOrientation();
 		bool moved = false;
 

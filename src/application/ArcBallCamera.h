@@ -17,6 +17,8 @@ public:
 	void SetCenterPosition(const Vector3f& centerPosition);
 	void SetUpVector(const Vector3f& upVector);
 	void SetDistance(float distance);
+	void SetMinDistance(float minDistance);
+	void SetMaxDistance(float maxDistance);
 
 	const Vector3f& GetCenterPosition() const;
 
@@ -36,6 +38,8 @@ private:
 	float		m_distance;
 	Vector3f	m_centerPosition;
 	Vector3f	m_upVector;
+	float		m_minDistance;
+	float		m_maxDistance;
 
 	Quaternion	m_parentOrientation;
 };

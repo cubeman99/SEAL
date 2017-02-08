@@ -26,6 +26,8 @@ void CameraSystem::Initialize(Simulation* simulation)
 	m_globeCamera.SetSurfaceDistance(worldRadius * 0.8f);
 	m_globeCamera.SetSurfaceAngle(0.0f);
 
+	m_arcBallCamera.SetMinDistance(worldRadius * 0.01f);
+	m_arcBallCamera.SetMaxDistance(worldRadius * 6.0f);
 	m_arcBallCamera.SetDistance(worldRadius * 2.0f);
 	m_arcBallCamera.SetUpVector(Vector3f::UP);
 	m_arcBallCamera.SetCenterPosition(Vector3f::ZERO);
@@ -70,8 +72,7 @@ void CameraSystem::StartTrackingAgent(Agent* agent)
 	m_arcBallCamera.SetUpVector(Vector3f::UP);
 	m_arcBallCamera.SetCenterPosition(m_trackedAgent->GetPosition());
 
-	Quaternion orientation = Quaternion::IDENTITY;
-	orientation.Rotate(Vector3f::RIGHT, Math::HALF_PI * 0.5f);
+	Quaternion orientation = Quaternion(Vector3f::LEFT, Math::HALF_PI * 0.5f);
 	m_arcBallCamera.SetOrientation(orientation);
 }
 
