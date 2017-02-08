@@ -37,7 +37,7 @@ void CameraSystem::Initialize(Simulation* simulation)
 Ray CameraSystem::GetRay(const Vector2f& screenCoord)
 {
 	Vector3f direction = Vector3f::FORWARD;
-	direction.x = screenCoord.x;
+	direction.x = screenCoord.x * m_aspectRatio;
 	direction.y = screenCoord.y;
 	direction.z = -(1.0f / Math::Tan(m_fieldOfView * 0.5f));
 	direction.Rotate(m_camera->GetOrientation());

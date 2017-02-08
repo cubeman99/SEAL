@@ -102,26 +102,27 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 		screenCoord.y = -screenCoord.y;
 		Ray ray = GetSimulationManager()->GetCameraSystem()->GetRay(screenCoord);
 
-		// Cast the ray onto the world sphere.
+		// Cast rays onto the bounding spheres of all simulation objects.
+		// The closest, successful raycast will be the selected object.
+		ObjectManager* objectManager = GetSimulation()->GetObjectManager();
+		GetSimulationManager()->SetSelectedAgent(nullptr);
 		float distance;
-		if (GetSimulation()->GetWorld()->CastRay(ray, distance))
+		float closestDistance;
+		
+		// Raycast onto the world sphere first (so we don't select
+		// objects on the other side of the world).
+		GetSimulation()->GetWorld()->CastRay(ray, closestDistance);
+
+		// Then raycast onto all simulation objects.
+		for (auto it = objectManager->agents_begin();
+			it != objectManager->agents_end(); ++it)
 		{
-			// Get the 3D point on the surface that was clicked.
-			Vector3f point = ray.GetPoint(distance);
-			
-			// Find agents near that point on the surface.
-			//AgentSystem* agentSystem = GetSimulation()->GetAgentSystem();
-			GetSimulationManager()->SetSelectedAgent(nullptr);
-			ObjectManager* objectManager = GetSimulation()->GetObjectManager();
-			for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
-			//for (auto it = agentSystem->agents_begin(); it != agentSystem->agents_end(); it++)
+			Agent* agent = *it;
+			if (agent->GetBoundingSphere().CastRay(ray, distance) &&
+				distance < closestDistance)
 			{
-				Agent* agent = *it;
-				if (agent->GetPosition().DistTo(point) < 0.1f)
-				{
-					GetSimulationManager()->SetSelectedAgent(agent);
-					break;
-				}
+				closestDistance = distance;
+				GetSimulationManager()->SetSelectedAgent(agent);
 			}
 		}
 

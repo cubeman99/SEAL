@@ -28,16 +28,17 @@ bool Sphere::Intersects(const Sphere& other) const
 // Perform a sphere-ray intersection.
 bool Sphere::CastRay(const Ray& ray, float& distance) const
 {
-	Vector3f worldPos = Vector3f::ZERO;
+	// Algorithm obtained from:
+	// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 
-	// Setup a quadratic equation: ax^2 + bx + c.
-	float a = 1.0f;
-	float b = 2.0f * ray.direction.Dot(ray.origin - worldPos);
-	float c = worldPos.LengthSquared() + ray.origin.LengthSquared() -
-		(2.0f * worldPos.Dot(ray.origin)) - (radius * radius);
+	// Setup the coefficients for a quadratic equation.
+	Vector3f rayPos = ray.origin - position;
+	float a = ray.direction.LengthSquared();
+	float b = 2.0f * (ray.direction.Dot(rayPos));
+	float c = rayPos.LengthSquared() - (radius * radius);
 
 	// Solve the quadratic equation.
-	float discriminant = (b * b) - (4 * a * c);
+	float discriminant = (b * b) - (4.0f * a * c);
 	if (discriminant < 0.0f)
 	{
 		return false;
