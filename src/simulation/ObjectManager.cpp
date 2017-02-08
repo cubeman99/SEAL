@@ -95,12 +95,15 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 
 void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) const
 {
+	// Rotate the object's position and orientation around the 
+	// center point of the world sphere.
+
 	// Determine the axis and angle to rotate around the surface.
-	Vector3f axis = object->m_orientation.GetRight();
+	Vector3f axis = object->m_orientation.GetLeft();
 	float angle = distance / m_simulation->GetWorld()->GetRadius();
 	Quaternion rotation(axis, angle);
 
-	// Rotate the position AND orientation.
+	// Rotate the position and orientation.
 	rotation.RotateVector(object->m_position);
 	object->m_orientation.Rotate(rotation);
 
@@ -159,9 +162,9 @@ void ObjectManager::CreateRandomPositionAndOrientation(
 	position.Normalize();
 
 	// Randomize orientation (tangent to world surface).
-	Vector3f axis = position.Cross(Vector3f::UP);
+	Vector3f axis = Vector3f::UP.Cross(position);
 	axis.Normalize();
-	float angle = Math::ACos(Vector3f::Normalize(position).Dot(Vector3f::UP));
+	float angle = Math::ACos(position.Dot(Vector3f::UP));
 	orientation = Quaternion(axis, angle);
 	orientation.Rotate(orientation.GetUp(),
 		Random::NextFloat() * Math::TWO_PI);
@@ -181,9 +184,9 @@ void ObjectManager::CreateRelativeRandomPositionAndOrientation(Vector3f relative
 	newPosition.Normalize();
 
 	// Randomize orientation (tangent to world surface).
-	Vector3f axis = newPosition.Cross(Vector3f::UP);
+	Vector3f axis = Vector3f::UP.Cross(newPosition);
 	axis.Normalize();
-	float angle = Math::ACos(Vector3f::Normalize(newPosition).Dot(Vector3f::UP));
+	float angle = Math::ACos(newPosition.Dot(Vector3f::UP));
 	orientation = Quaternion(axis, angle);
 	orientation.Rotate(orientation.GetUp(),
 		Random::NextFloat() * Math::TWO_PI);

@@ -148,8 +148,6 @@ Quaternion& Quaternion::Set(float x, float y, float z, float w)
 // Set this quaternion from an axis-angle.
 Quaternion& Quaternion::Set(const Vector3f& vAxis, float angle)
 {
-	angle = -angle;
-
 	float sinHalfAngle = Math::Sin(angle * 0.5f);
 	x = vAxis.x * sinHalfAngle;
 	y = vAxis.y * sinHalfAngle;

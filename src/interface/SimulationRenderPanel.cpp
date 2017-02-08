@@ -157,9 +157,9 @@ void SimulationRenderPanel::OnMouseMotion(wxMouseEvent& e)
 
 		// Perform different type of rotation whether the Ctrl key is down.
 		if (e.GetModifiers() & wxMOD_CONTROL)
-			camera->AltRotate(deltaX, deltaY);
+			camera->AltRotate(-deltaX, -deltaY);
 		else
-			camera->Rotate(deltaX, deltaY);
+			camera->Rotate(-deltaX, -deltaY);
 	}
 }
 

@@ -177,12 +177,12 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 		// Update movement controls (arrow keys).
 		if (wxGetKeyState(WXK_RIGHT))
 		{
-			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), turnAmount));
+			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), -turnAmount));
 			moved = true;
 		}
 		if (wxGetKeyState(WXK_LEFT))
 		{
-			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), -turnAmount));
+			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), turnAmount));
 			moved = true;
 		}
 		if (wxGetKeyState(WXK_UP))

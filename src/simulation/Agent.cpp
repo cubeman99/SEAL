@@ -128,13 +128,13 @@ void Agent::UpdateVision()
 	// Update eye matrices.
 	float zNear = 0.01f;
 	float zFar = m_maxViewDistance;
-	float leftEyeCenterAngle = -(m_angleBetweenEyes + m_fieldOfView) * 0.5f;
+	float centerAngle = (m_angleBetweenEyes + m_fieldOfView) * 0.5f;
 	Matrix4f eyePerspective = Matrix4f::CreatePerspective(
 		m_eyes[0].GetFieldOfView(), 1.0f, m_radius * 0.1f, m_maxViewDistance);
 	Matrix4f leftEyeRotation = Matrix4f::CreateRotation(
-		Vector3f::UNITY, -leftEyeCenterAngle);
+		Vector3f::UNITY, -centerAngle);
 	Matrix4f rightEyeRotation = Matrix4f::CreateRotation(
-		Vector3f::UNITY, leftEyeCenterAngle);
+		Vector3f::UNITY, centerAngle);
 	m_eyes[0].SetEyeToProjection(eyePerspective);
 	m_eyes[1].SetEyeToProjection(eyePerspective);
 	m_eyes[0].SetWorldToEye(leftEyeRotation * m_worldToObject);

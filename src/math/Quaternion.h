@@ -8,6 +8,8 @@ struct Vector4f;
 
 
 // Half-angle quaternion (represents a 3D rotation).
+// For axis-angle rotations, the angle represents a counter-clockwise
+// rotation around the axis (if you are looking down at the axis).
 struct Quaternion
 {
 	float x, y, z, w;
