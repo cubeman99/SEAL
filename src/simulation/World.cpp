@@ -18,6 +18,12 @@ World::~World()
 	//delete m_mesh;
 }
 
+
+void World::Initialize(float radius)
+{
+	m_radius = radius;
+}
+
 // Perform a sphere-ray intersection.
 bool World::CastRay(const Ray& ray, float& distance) const
 {

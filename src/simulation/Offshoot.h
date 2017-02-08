@@ -21,9 +21,11 @@ public:
 	Offshoot(Plant* plant);
 	~Offshoot();
 	
+	void OnSpawn() override;
 	void OnDestroy() override;
 	void Update(float timeDelta) override;
 
+	// Eat this plant offshoot. Returns the amount of energy eaten.
 	float Eat();
 
 private:

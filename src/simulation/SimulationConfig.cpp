@@ -9,22 +9,30 @@ SimulationConfig::SimulationConfig()
 
 	world.radius					= 160.0f; // gives a circumference of about 1000
 
+	plant.radius					= 2.5f;
+	plant.color[0]					= 0.3f;
+	plant.color[1]					= 1.0f; // TODO: change this color back to pure green.
+	plant.color[2]					= 0.1f;
 	plant.numPlants					= 10;
 	plant.numOffshootsPerPlant		= 6;
-	plant.maxPlantOffshootEnergy	= 100.0f;
-	
+	plant.maxEnergy					= 100.0f;
+	plant.offshootSpawnRadius		= 40;
+	plant.growthRate				= 0.05f;
+	plant.eatEnergyDepletionRate	= 10.0f;
+
+	agent.radius					= 5.0f;
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 20;
 	agent.minPredatorAgents			= 10;
 	agent.minPredatorAgents			= 80;
 	agent.minPreyAgents				= 20; 
 	agent.maxPreyAgents				= 160;
-	agent.maxMoveSpeedAtMinStrength	= 2.0f;
-	agent.maxMoveSpeedAtMaxStrength	= 1.0f;
+	agent.maxMoveSpeedAtMinStrength	= 0.4f;
+	agent.maxMoveSpeedAtMaxStrength	= 0.2f;
 	agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
 	agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
-	agent.maxEnergyAtMinStrength	= 50.0f;
-	agent.maxEnergyAtMaxStrength	= 150.0f;
+	agent.maxEnergyAtMinStrength	= 20.0f;
+	agent.maxEnergyAtMaxStrength	= 80.0f;
 
 	energy.energyCostExist			= 0.0f;
 	energy.energyCostMove			= 0.0f;

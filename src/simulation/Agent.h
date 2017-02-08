@@ -45,13 +45,18 @@ public:
 	inline void EnableWandering(bool enableWander) { m_wander = enableWander; }
 
 private:
-
-	float			m_energy;
-	float			m_maxEnergy;
-
+	
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
-	
+	float			m_strength;
+	float			m_energy;
+	int				m_lifeSpan;
+	int				m_age;
+
+	float			m_maxMoveSpeed;
+	float			m_maxTurnSpeed;
+	float			m_maxEnergy;
+		
 	unsigned int	m_numEyes;
 	Retina			m_eyes[2];
 	float			m_fieldOfView; // in radians.

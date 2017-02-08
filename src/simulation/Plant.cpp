@@ -3,20 +3,10 @@
 #include <math/MathLib.h>
 #include <utilities/Random.h>
 
+
 Plant::Plant()
 {
-	m_isVisible = true;
-	m_radius = 0.02f; // TODO: magic number plant radius.
-	m_color.Set(1.0f, 1.0f, 0.0f);
 }
-
-
-//Plant::Plant(Simulation* sim, float maxEnergy) :
-//	m_simulation(sim),
-//	m_maxEnergy(maxEnergy)
-//{
-//	m_isVisible = false;
-//}
 
 Plant::~Plant()
 {
@@ -24,8 +14,15 @@ Plant::~Plant()
 
 void Plant::OnSpawn()
 {
-	// TODO: randomize a bit
-	for (int i = 0; i < 6; ++i)
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+	
+	// TEMP: make plant objects visible with a radius and color.
+	m_isVisible = true;
+	m_radius = 4;
+	m_color.Set(1.0f, 1.0f, 0.0f);
+
+	// Spawn offshoots. TODO: randomize a bit
+	for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
 	{
 		SpawnOffshoot();
 	}
@@ -35,16 +32,7 @@ void Plant::Update(float timeDelta)
 {
 	// TODO: spawn offshoots if below capacity with random chance
 
-	if (GetNumOffshoots() > 0)
-	{
-		for (auto it = m_offshoots.begin(); it != m_offshoots.end(); ++it)
-		{
-			Offshoot* offshoot = *it;
-
-			offshoot->Update(timeDelta);
-		}
-	}
-	else
+	if (GetNumOffshoots() == 0)
 	{
 		// Respawn with new offshoots
 		m_objectManager->CreateRandomPositionAndOrientation(
@@ -55,14 +43,17 @@ void Plant::Update(float timeDelta)
 
 Offshoot* Plant::SpawnOffshoot()
 {
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+
 	Offshoot* offshoot = new Offshoot(this);
-	
 	m_offshoots.push_back(offshoot);
 
-	// Spawn the offshoot.
+	// Spawn the offshoot within a radius around the plant.
 	m_objectManager->SpawnObject(offshoot);
 	m_objectManager->CreateRelativeRandomPositionAndOrientation(
-		m_position, offshoot->m_position, 0.28f, offshoot->m_orientation);
+		m_position, offshoot->m_position,
+		config.plant.offshootSpawnRadius,
+		offshoot->m_orientation);
 
 	return offshoot;
 }
@@ -80,3 +71,4 @@ void Plant::NotifyOffshootDeath(Offshoot* toRemove)
 		}
 	}
 }
+

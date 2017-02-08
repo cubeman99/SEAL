@@ -7,7 +7,7 @@ struct Vector2f;
 struct Matrix3f;
 struct Matrix4f;
 struct Quaternion;
-struct Point3i;
+//struct Point3i;
 
 
 // 3D floating-point vector.
@@ -30,16 +30,8 @@ struct Vector3f
 	static const Vector3f LEFT;		// -X
 	static const Vector3f UP;		// +Y
 	static const Vector3f DOWN;		// -Y
-	static const Vector3f BACK;		// +X
+	static const Vector3f BACK;		// +Z
 	static const Vector3f FORWARD;	// -Z
-	/*
-	static const Vector3f FORWARD;	// +X
-	static const Vector3f BACK;		// -X
-	static const Vector3f UP;		// +Z
-	static const Vector3f DOWN;		// -Z
-	static const Vector3f LEFT;		// +Y
-	static const Vector3f RIGHT;	// -Y
-	*/
 
 	// Constructors.
 	Vector3f();

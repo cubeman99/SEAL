@@ -163,8 +163,6 @@ template <class T_Object>
 T_Object* ObjectManager::SpawnObjectRandom()
 {
 	T_Object* object = new T_Object();
-	object->m_objectManager = this;
-	object->m_isDestroyed = false;
 	
 	// Randomize the object's position and orientation.
 	CreateRandomPositionAndOrientation(object->m_position, object->m_orientation);

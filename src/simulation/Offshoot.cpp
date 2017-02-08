@@ -1,23 +1,34 @@
 #include "Offshoot.h"
 #include <simulation/Plant.h>
 #include <math/MathLib.h>
+#include <simulation/Simulation.h>
 
 
 Offshoot::Offshoot(Plant* plant) :
 	m_source(plant)
 {
-	m_maxEnergy = 100.0f;
-	m_energy = m_maxEnergy / 2.0f;
-	m_growthRate = 0.2f;
-	
-	m_isVisible = true;
-	m_radius = 0.010f; // TODO: magic number offshoot radius.
-	m_color.Set(0.3f, 1, 0.1f);
 }
 
 Offshoot::~Offshoot()
 {
 }
+
+void Offshoot::OnSpawn()
+{
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+
+	m_maxEnergy = config.plant.maxEnergy;
+	m_growthRate = config.plant.growthRate; // energy per tick
+	m_energy = m_maxEnergy * 0.5f;
+
+	m_isVisible = true;
+	m_radius = config.plant.radius;
+	m_color = Vector3f(
+		config.plant.color[0],
+		config.plant.color[1],
+		config.plant.color[2]);
+}
+
 
 void Offshoot::OnDestroy()
 {
@@ -26,6 +37,8 @@ void Offshoot::OnDestroy()
 
 void Offshoot::Update(float timeDelta)
 {
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+
 	if (m_energy > 0.0f)
 	{
 		m_energy += m_growthRate;// * timeDelta;
@@ -43,17 +56,19 @@ void Offshoot::Update(float timeDelta)
 	// Scale radius based on energy percent.
 	float scale = m_energy / m_maxEnergy;
 	scale = (0.2f + 0.8f * scale);
-	m_radius = 0.010f * scale;
+	m_radius = config.plant.radius * scale;
 }
 
 float Offshoot::Eat()
 {
-	float amount = 10.0f;
-	float energy = Math::Max(m_energy, amount);
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+	float amount = config.plant.eatEnergyDepletionRate;
+	float energyEaten = Math::Max(m_energy, amount);
 
+	// Deplete the energy.
 	m_energy -= amount;
 	if (m_energy <= 0.0f)
 		Destroy();
 
-	return amount;
+	return energyEaten;
 }

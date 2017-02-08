@@ -95,7 +95,7 @@ void CameraSystem::Update()
 	if (m_isProjectionDirty)
 	{
 		Matrix4f projection = Matrix4f::CreatePerspective(
-			m_fieldOfView, m_aspectRatio, 0.01f, 100.0f);
+			m_fieldOfView, m_aspectRatio, 0.1f, m_simulation->GetWorld()->GetRadius() * 5.0f);
 		
 		m_arcBallCamera.SetProjection(projection);
 		m_globeCamera.SetProjection(projection);

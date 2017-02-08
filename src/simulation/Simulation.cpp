@@ -18,7 +18,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 {
 	m_config = config;
 
-	//m_world.Initialize(config.world.worldRadius);
+	m_world.Initialize(config.world.radius);
 
 	// Initialize simulation state.
 	m_ageInTicks = 0;

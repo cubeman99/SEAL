@@ -88,6 +88,8 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 {
 	m_objects.push_back(object);
 	m_octTree.InsertObject(object);
+	object->m_objectManager = this;
+	object->m_isDestroyed = false;
 	object->OnSpawn();
 }
 
@@ -95,7 +97,7 @@ void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) 
 {
 	// Determine the axis and angle to rotate around the surface.
 	Vector3f axis = object->m_orientation.GetRight();
-	float angle = distance * m_simulation->GetWorld()->GetRadius();
+	float angle = distance / m_simulation->GetWorld()->GetRadius();
 	Quaternion rotation(axis, angle);
 
 	// Rotate the position AND orientation.

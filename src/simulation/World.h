@@ -20,6 +20,8 @@ public:
 	World();
 	~World();
 
+	void Initialize(float radius);
+
 	inline float GetRadius() { return m_radius; }
 	inline Mesh* GetMesh() { return m_mesh; }
 

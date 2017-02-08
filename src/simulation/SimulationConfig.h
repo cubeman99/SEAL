@@ -25,6 +25,7 @@ public:
 	
 	struct
 	{
+		float	radius;
 		int		minPreyAgents;
 		int		maxPreyAgents;
 		int		minPredatorAgents;
@@ -46,9 +47,14 @@ public:
 	
 	struct
 	{
+		float	radius;
+		float	color[3];
 		int		numPlants;
 		int		numOffshootsPerPlant;
-		float	maxPlantOffshootEnergy;
+		float	maxEnergy;
+		float	offshootSpawnRadius;
+		float	growthRate; // energy per tick
+		float	eatEnergyDepletionRate;
 
 	} plant;
 
