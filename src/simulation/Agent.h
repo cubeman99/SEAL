@@ -6,6 +6,8 @@
 #include "SimulationObject.h"
 #include "Vision.h"
 
+class Offshoot;
+
 
 //-----------------------------------------------------------------------------
 // Agent - A single being of the simulation with its own body and brain.
@@ -25,6 +27,7 @@ public:
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
+	void EatPlant(Offshoot* plant);
 
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
@@ -41,23 +44,24 @@ public:
 	inline void SetTurnSpeed(float turnSpeed) { m_turnSpeed = turnSpeed; }
 	inline void EnableWandering(bool enableWander) { m_wander = enableWander; }
 
-public:
-	// enable/disable temporary wandering. This is for debug purposes,
-	// in case we want to control our selected agent manually.
-	bool m_wander;
-
 private:
+
+	float			m_energy;
+	float			m_maxEnergy;
 
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
 	
 	unsigned int	m_numEyes;
 	Retina			m_eyes[2];
-
 	float			m_fieldOfView; // in radians.
 	float			m_maxViewDistance;
 	float			m_angleBetweenEyes; // in radians.
-	unsigned int	m_resolutions[3];
+
+	
+	// TEMP: enable/disable temporary wandering. This is for debug
+	// purposes, in case we want to control our selected agent manually.
+	bool m_wander;
 };
 
 

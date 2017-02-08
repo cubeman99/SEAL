@@ -24,6 +24,8 @@ public:
 	void OnDestroy() override;
 	void Update(float timeDelta) override;
 
+	float Eat();
+
 private:
 	Plant* m_source;
 	float m_energy;

@@ -5,34 +5,12 @@
 #include <math/MathLib.h>
 #include <math/Vector2f.h>
 
-Agent::Agent() :
-	m_wander(false),
-	m_moveSpeed(0.0f),
-	m_turnSpeed(0.0f)
-{
-	m_fieldOfView = 0.9f;
-	m_maxViewDistance = 0.2f;
-	m_angleBetweenEyes = 0.5f;
-	m_resolutions[0] = 8;
-	m_resolutions[1] = 13;
-	m_resolutions[2] = 2;
 
-	m_numEyes = 2;
-	unsigned int resolutions[3];
-	resolutions[0] = Random::NextInt(1, 20);
-	resolutions[1] = Random::NextInt(1, 20);
-	resolutions[2] = Random::NextInt(1, 20);
-	resolutions[0] = 12;
-	resolutions[1] = 12;
-	resolutions[2] = 12;
-	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
-	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
-	
-	m_color.Set(0, 0, 1.0f);
-	m_color.x = Random::NextFloat();
-	m_color.y = Random::NextFloat();
-	m_color.z = Random::NextFloat();
-	m_radius = 0.016f; // TODO: magic number agent radius.
+Agent::Agent() :
+	m_moveSpeed(0.0f),
+	m_turnSpeed(0.0f),
+	m_numEyes(2)
+{
 }
 
 Agent::~Agent()
@@ -41,6 +19,28 @@ Agent::~Agent()
 
 void Agent::OnSpawn()
 {
+	m_energy	= 100.0f;
+	m_maxEnergy	= 100.0f;
+	
+	// Randomize vision parameters.
+	float worldRadius = GetSimulation()->GetWorld()->GetRadius();
+	m_angleBetweenEyes = Random::NextFloat(0, 90) * Math::DEG_TO_RAD;
+	m_fieldOfView = Random::NextFloat(20, 150) * Math::DEG_TO_RAD;
+	m_maxViewDistance = Random::NextFloat(0.05f, 0.44f) * worldRadius;
+	unsigned int resolutions[3];
+	resolutions[0] = Random::NextInt(1, 20);
+	resolutions[1] = Random::NextInt(1, 20);
+	resolutions[2] = Random::NextInt(1, 20);
+	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
+	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
+	
+	// Randomize color.
+	m_color.x = Random::NextFloat();
+	m_color.y = Random::NextFloat();
+	m_color.z = Random::NextFloat();
+	m_radius = 0.016f; // TODO: magic number agent radius.
+
+	m_wander = true;
 	m_moveSpeed = 0.1f; // TEMP: start with some random motion.
 	m_turnSpeed = GetSimulation()->GetRandom().NextFloatClamped();
 }
@@ -78,12 +78,27 @@ void Agent::UpdateVision()
 	m_objectManager->GetOctTree()->Query(visionSphere,
 		[=](SimulationObject* object)
 	{
-		if (object != this && object->IsVisible())
+		if (object != this)
 		{
+			// Check for collisions with food.
+			if (object->GetBoundingSphere().Intersects(GetBoundingSphere()))
+			{
+				if (object->GetObjectType() == SimulationObjectType::OFFSHOOT)
+					EatPlant((Offshoot*) object);
+			}
+
 			// Attempt to see the object.
-			SeeObject(object);
+			if (object->IsVisible())
+			{
+				SeeObject(object);
+			}
 		}
 	});
+}
+
+void Agent::EatPlant(Offshoot* plant)
+{
+	m_energy += plant->Eat();
 }
 
 void Agent::SeeObject(SimulationObject* object)

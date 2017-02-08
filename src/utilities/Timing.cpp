@@ -6,6 +6,11 @@
 static double g_freq;
 static bool g_timerInitialized = false;
 
+
+// Modified from:
+// https://github.com/BennyQBD/3DEngineCpp/blob/master/src/core/timing.cpp
+
+
 namespace Time
 {
 	double GetTime()

@@ -20,12 +20,12 @@ enum SimulationObjectType : int
 	INVALID = '?',
 
 	AGENT = 'AGNT',
-	//PREDATOR_AGENT = 'PRED',
-	//PREY_AGENT = 'PREY',
-	FOOD,
 	PLANT = 'PLNT',
 	OFFSHOOT = 'OFST',
-	CARCASS = 'CARC',
+	//CARCASS = 'CARC',
+	//PREDATOR_AGENT = 'PRED',
+	//PREY_AGENT = 'PREY',
+	//FOOD,
 };
 
 // Use this in a subclass of SimulationObject to declare its type.

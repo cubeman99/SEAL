@@ -1,5 +1,6 @@
 #include "Offshoot.h"
 #include <simulation/Plant.h>
+#include <math/MathLib.h>
 
 
 Offshoot::Offshoot(Plant* plant) :
@@ -27,7 +28,7 @@ void Offshoot::Update(float timeDelta)
 {
 	if (m_energy > 0.0f)
 	{
-		m_energy += m_growthRate * timeDelta;
+		m_energy += m_growthRate;// * timeDelta;
 
 		if (m_energy > m_maxEnergy)
 		{
@@ -38,4 +39,21 @@ void Offshoot::Update(float timeDelta)
 	{
 		Destroy();
 	}
+	
+	// Scale radius based on energy percent.
+	float scale = m_energy / m_maxEnergy;
+	scale = (0.2f + 0.8f * scale);
+	m_radius = 0.010f * scale;
+}
+
+float Offshoot::Eat()
+{
+	float amount = 10.0f;
+	float energy = Math::Max(m_energy, amount);
+
+	m_energy -= amount;
+	if (m_energy <= 0.0f)
+		Destroy();
+
+	return amount;
 }

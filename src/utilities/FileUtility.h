@@ -8,7 +8,7 @@ class FileUtility
 {
 public:
 	
-	// Open and an entire text file into a string.
+	// Open and read an entire text file into a string.
 	static bool OpenAndGetContents(const std::string& path, std::string& outContents);
 
 private:
