@@ -5,11 +5,22 @@
 #include <math/MathLib.h>
 #include <math/Vector2f.h>
 
-
+// Adam and Eve constructor
 Agent::Agent() :
 	m_moveSpeed(0.0f),
 	m_turnSpeed(0.0f),
-	m_numEyes(2)
+	m_numEyes(2),
+	m_genome(NULL)
+{
+}
+
+// Natural born constructor
+Agent::Agent(Genome* genome, float energy) :
+	m_moveSpeed(0.0f),
+	m_turnSpeed(0.0f),
+	m_numEyes(2),
+	m_genome(genome),
+	m_energy(energy)
 {
 }
 
@@ -17,93 +28,93 @@ Agent::~Agent()
 {
 }
 
-static float GeneLerp(float gene, float minValue, float maxValue)
-{
-	return Math::Lerp(minValue, maxValue, gene);
-}
-
-static int GeneLerp(float gene, int minValue, int maxValue)
-{
-	return (int) (Math::Lerp((float) minValue, (float) maxValue, gene) + 0.5f);
-}
-
 void Agent::OnSpawn()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
+	m_brain = new Brain();
+
+	// A sign that this is a first gen with no parents
+	if (m_genome == NULL)
+	{
+		m_genome = new Genome(GetSimulation(), true);
+		m_energy = 100.0f;
+	}
 
 	m_radius = config.agent.radius;
-	m_energy = 100.0f;
 	m_wander = true;
 	m_moveSpeed = 0.0f;
 	m_turnSpeed = 0.0f;
 	m_age = 0;
 
-	// Use some random gene values for now (all must be between 0 and 1).
-	RNG& random = GetSimulation()->GetRandom();
-	float geneStrength = random.NextFloat();
-	float geneLifeSpan = random.NextFloat();
-	float geneAngleBetweenEyes = random.NextFloat();
-	float geneFieldOfView = random.NextFloat();
-	float geneSightDistance = random.NextFloat();
-	float geneResolutionRed = random.NextFloat();
-	Vector3f geneResolutions(random.NextFloat(),
-		random.NextFloat(), random.NextFloat());
-	Vector3f geneColors(random.NextFloat(),
-		random.NextFloat(), random.NextFloat());
-
 	// Determine agent properties based on the gene values.
-	// The Genome class should have lerp functions for
-	// float/int genes just for this purpose.
-	m_strength = geneStrength;
-	m_lifeSpan = GeneLerp(geneLifeSpan,
+	m_strength = m_genome->GetGeneAsFloat(GenePosition::STRENGTH);
+	m_lifeSpan = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::LIFE_SPAN),
 		config.genes.minLifeSpan,
 		config.genes.maxLifeSpan);
-	m_angleBetweenEyes = GeneLerp(geneAngleBetweenEyes,
+	m_angleBetweenEyes = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::ANGLE_BETWEEN_EYES),
 		config.genes.minAngleBetweenEyes,
 		config.genes.maxAngleBetweenEyes);
-	m_maxViewDistance = GeneLerp(geneSightDistance,
+	m_maxViewDistance = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::VIEW_DISTANCE),
 		config.genes.minSightDistance,
 		config.genes.maxSightDistance);
-	m_fieldOfView = GeneLerp(geneAngleBetweenEyes, 
+	m_fieldOfView = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::FIELD_OF_VIEW),
 		config.genes.minFieldOfView,
 		config.genes.maxFieldOfView);
+
 	unsigned int resolutions[3];
-	resolutions[0] = GeneLerp(geneResolutions[0],
-			config.genes.minSightResolution,
-			config.genes.maxSightResolution);
-	resolutions[1] = GeneLerp(geneResolutions[1],
-			config.genes.minSightResolution,
-			config.genes.maxSightResolution);
-	resolutions[2] = GeneLerp(geneResolutions[2],
-			config.genes.minSightResolution,
-			config.genes.maxSightResolution);
-	m_color[0] = GeneLerp(geneColors[0],
-			config.genes.minBodyColor[0],
-			config.genes.maxBodyColor[0]);
-	m_color[1] = GeneLerp(geneColors[1],
-			config.genes.minBodyColor[1],
-			config.genes.maxBodyColor[1]);
-	m_color[2] = GeneLerp(geneColors[2],
-			config.genes.minBodyColor[2],
-			config.genes.maxBodyColor[2]);
+	resolutions[0] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_RED),
+		config.genes.minSightResolution,
+		config.genes.maxSightResolution);
+	resolutions[1] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_GREEN),
+		config.genes.minSightResolution,
+		config.genes.maxSightResolution);
+	resolutions[2] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_BLUE),
+		config.genes.minSightResolution,
+		config.genes.maxSightResolution);
+	m_color[0] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::COLOR_RED),
+		config.genes.minBodyColor[0],
+		config.genes.maxBodyColor[0]);
+	m_color[1] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::COLOR_GREEN),
+		config.genes.minBodyColor[1],
+		config.genes.maxBodyColor[1]);
+	m_color[2] = Genome::GeneLerp(
+		m_genome->GetGeneAsFloat(GenePosition::COLOR_BLUE),
+		config.genes.minBodyColor[2],
+		config.genes.maxBodyColor[2]);
 
 	// Derive values based on strength.
 	m_maxEnergy = Math::Lerp(
-						config.agent.maxEnergyAtMinStrength,
-						config.agent.maxEnergyAtMaxStrength,
-						m_strength);
+		config.agent.maxEnergyAtMinStrength,
+		config.agent.maxEnergyAtMaxStrength,
+		m_strength);
 	m_maxMoveSpeed = Math::Lerp(
-						config.agent.maxMoveSpeedAtMinStrength,
-						config.agent.maxMoveSpeedAtMaxStrength,
-						m_strength);
+		config.agent.maxMoveSpeedAtMinStrength,
+		config.agent.maxMoveSpeedAtMaxStrength,
+		m_strength);
 	m_maxTurnSpeed = Math::Lerp(
-						config.agent.maxTurnSpeedAtMinStrength,
-						config.agent.maxTurnSpeedAtMaxStrength,
-						m_strength);
+		config.agent.maxTurnSpeedAtMinStrength,
+		config.agent.maxTurnSpeedAtMaxStrength,
+		m_strength);
 
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
+}
+
+void Agent::OnDestroy()
+{
+	// Clean up my components
+	delete m_brain;
+	delete m_genome;
 }
 
 void Agent::Update()
@@ -170,7 +181,11 @@ void Agent::UpdateVision()
 
 void Agent::EatPlant(Offshoot* plant)
 {
-	m_energy += plant->Eat();
+	// TODO: uncomment when agents lose energy
+	//if (m_energy < m_maxEnergy)
+	//{
+		m_energy += plant->Eat();
+	//}
 }
 
 void Agent::SeeObject(SimulationObject* object)

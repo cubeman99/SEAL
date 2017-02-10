@@ -1,13 +1,48 @@
 #ifndef _GENOME_H_
 #define _GENOME_H_
 
+#include <vector>
+
+class Simulation;
+
+enum GenePosition
+{
+	// Vision
+	VIEW_DISTANCE = 0,
+	FIELD_OF_VIEW,
+	ANGLE_BETWEEN_EYES,
+	RESOLUTION_RED,
+	RESOLUTION_GREEN,
+	RESOLUTION_BLUE,
+
+	// Physiological
+	CHILD_COUNT,
+	LIFE_SPAN,
+	STRENGTH,
+	COLOR_RED,
+	COLOR_GREEN,
+	COLOR_BLUE,
+
+	// First index of nueron genes, also count of non-nueron genes
+	NUERON_GENES_BEGIN
+};
+
 class Genome
 {
 public:
-	Genome();
+	Genome(Simulation* theSimulation, bool randomized);
 	~Genome();
 
+	static Genome* SpawnChild(Genome* p1, Genome* p2);
+
+	static float GeneLerp(float gene, float minValue, float maxValue);
+	static int GeneLerp(float gene, int minValue, int maxValue);
+
+	float GetGeneAsFloat(GenePosition index); // 0 - 1
+
 private:
+	std::vector<unsigned char> m_genes; // A gene is 8 bites. 0 = 0%, 255 = 100%
+	Simulation* m_simulation;
 };
 
 

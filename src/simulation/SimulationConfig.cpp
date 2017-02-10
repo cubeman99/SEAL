@@ -10,13 +10,13 @@ SimulationConfig::SimulationConfig()
 	world.radius					= 160.0f; // gives a circumference of about 1000
 	world.seed						= -1;
 	plant.radius					= 2.5f;
-	plant.color[0]					= 0.3f;
-	plant.color[1]					= 1.0f; // TODO: change this color back to pure green.
-	plant.color[2]					= 0.1f;
+	plant.color[0]					= 0.0f;
+	plant.color[1]					= 1.0f;
+	plant.color[2]					= 0.0f;
 	plant.numPlants					= 10;
 	plant.numOffshootsPerPlant		= 6;
 	plant.maxEnergy					= 100.0f;
-	plant.offshootSpawnRadius		= 40;
+	plant.offshootSpawnRadius		= 60;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 10.0f;
 
@@ -54,6 +54,8 @@ SimulationConfig::SimulationConfig()
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
 	genes.maxSightResolution		= 16;
+	genes.maxInternalNeurons		= 128; // TODO: tinker
+
 	genes.minBodyColor[0]			= 0.0f;
 	genes.maxBodyColor[0]			= 1.0f;
 	genes.minBodyColor[1]			= 0.0f;

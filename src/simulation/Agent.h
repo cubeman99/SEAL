@@ -5,9 +5,10 @@
 #include <math/Vector3f.h>
 #include "SimulationObject.h"
 #include "Vision.h"
+#include "Genome.h"
+#include "Brain.h"
 
 class Offshoot;
-
 
 //-----------------------------------------------------------------------------
 // Agent - A single being of the simulation with its own body and brain.
@@ -19,11 +20,13 @@ class Agent : public SimulationObject
 public:
 	DECLARE_SIMULATION_OBJECT(SimulationObjectType::AGENT);
 
-	Agent();
+	Agent();							 // Adam and Eve constructor
+	Agent(Genome* genome, float energy); // Natural born constructor
 	~Agent();
 
 	void OnSpawn() override;
 	void Update() override;
+	void OnDestroy() override;
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
@@ -47,6 +50,9 @@ public:
 	inline void EnableWandering(bool enableWander) { m_wander = enableWander; }
 
 private:
+
+	Genome* m_genome;
+	Brain* m_brain;
 	
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
