@@ -10,7 +10,8 @@ Agent::Agent() :
 	m_moveSpeed(0.0f),
 	m_turnSpeed(0.0f),
 	m_numEyes(2),
-	m_genome(NULL)
+	m_genome(nullptr),
+	m_brain(nullptr)
 {
 }
 
@@ -114,7 +115,9 @@ void Agent::OnDestroy()
 {
 	// Clean up my components
 	delete m_brain;
+	m_brain = nullptr;
 	delete m_genome;
+	m_genome = nullptr;
 }
 
 void Agent::Update()
@@ -255,6 +258,14 @@ void Agent::UpdateBrain()
 	//float moveAmount = 0.0f; // output from brain
 	//m_moveSpeed = moveAmount * m_maxMoveSpeed;
 	//m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
+
+	// Set the input nerve activations.
+
+	// Update the brain's neural network.
+	m_brain->Update();
+
+	// Get the output nerve activations.
+
 
 	// TEMP: random wandering turning.
 	if (m_wander)
