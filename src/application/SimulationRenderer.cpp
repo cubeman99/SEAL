@@ -386,14 +386,19 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 void SimulationRenderer::RenderBrain(Agent* agent)
 {
 	Brain* brain = agent->GetBrain();
+	const SimulationConfig& config = m_simulationManager->GetSimulation()->GetConfig();
 
 	unsigned int numNeurons = brain->GetNumNeurons();
+	unsigned int numInputNeurons = brain->GetNumInputNeurons();
+	unsigned int numOutputNeurons = brain->GetNumOutputNeurons();
+	unsigned int numOutIntNeurons = brain->GetNumNeurons() - brain->GetNumInputNeurons();
 
 	Vector2f cellSize(8, 8);
 	Vector2f matrixTopLeft(100, 100);
 
 	Color outlineColor = Color::WHITE;
 
+	// Draw connection matrix.
 	for (unsigned int i = 0; i < numNeurons; ++i)
 	{
 		Neuron neuron = brain->GetNeuron(i);
@@ -405,17 +410,73 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 			Vector2f cellPos;
 			cellPos.x = matrixTopLeft.x + (cellSize.x * synapse.neuronFrom);
 			cellPos.y = matrixTopLeft.y + (cellSize.y * synapse.neuronTo);
-
 			
+			Vector3f weightColor(0, 0, 0);
+			if (synapse.weight > 0.0f)
+				weightColor[1] = 1.0f;
+			if (synapse.weight < 0.0f)
+				weightColor[0] = 1.0f;
+			weightColor *= Math::Abs(synapse.weight) / config.brain.maxWeight;
+			
+			glBegin(GL_QUADS);
+				glColor3fv(weightColor.data());
+				glVertex2f(cellPos.x, cellPos.y);
+				glVertex2f(cellPos.x + cellSize.x, cellPos.y);
+				glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
+				glVertex2f(cellPos.x, cellPos.y + cellSize.y);
+			glEnd();
+			/*
 			glBegin(GL_LINE_LOOP);
 				glColor4ubv(outlineColor.data());
 				glVertex2f(cellPos.x, cellPos.y);
 				glVertex2f(cellPos.x + cellSize.x, cellPos.y);
 				glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
 				glVertex2f(cellPos.x, cellPos.y + cellSize.y);
-			glEnd();
+			glEnd();*/
 		}
 	}
+
+	// Draw neuron activations.
+	for (unsigned int i = 0; i < numNeurons; ++i)
+	{
+		Neuron neuron = brain->GetNeuron(i);
+
+		Vector2f cellPos;
+		cellPos.x = matrixTopLeft.x + (cellSize.x * i);
+		cellPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1));
+			
+		Vector3f weightColor(1, 1, 1);
+		weightColor *= brain->GetNeuronActivation(i);
+			
+		glBegin(GL_QUADS);
+			glColor3fv(weightColor.data());
+			glVertex2f(cellPos.x, cellPos.y);
+			glVertex2f(cellPos.x + cellSize.x, cellPos.y);
+			glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
+			glVertex2f(cellPos.x, cellPos.y + cellSize.y);
+		glEnd();
+	}
+
+	Vector2f matrixBottomRight = matrixTopLeft + cellSize * Vector2f((float) numNeurons, (float) numOutIntNeurons);
+
+	// Draw lines.
+	glBegin(GL_LINES);
+	glColor3f(1,1,1);
+	glVertex2f(matrixTopLeft.x + cellSize.x * numInputNeurons, matrixTopLeft.y);
+	glVertex2f(matrixTopLeft.x + cellSize.x * numInputNeurons, matrixBottomRight.y);
+	glVertex2f(matrixTopLeft.x + cellSize.x * (numInputNeurons + numOutputNeurons), matrixTopLeft.y);
+	glVertex2f(matrixTopLeft.x + cellSize.x * (numInputNeurons + numOutputNeurons), matrixBottomRight.y);
+	glVertex2f(matrixTopLeft.x, matrixTopLeft.y + cellSize.y * numOutputNeurons);
+	glVertex2f(matrixBottomRight.x, matrixTopLeft.y + cellSize.y * numOutputNeurons);
+	glVertex2f(matrixTopLeft.x, matrixTopLeft.y);
+	glVertex2f(matrixTopLeft.x, matrixBottomRight.y);
+	glVertex2f(matrixBottomRight.x, matrixTopLeft.y);
+	glVertex2f(matrixBottomRight.x, matrixBottomRight.y);
+	glVertex2f(matrixTopLeft.x, matrixTopLeft.y);
+	glVertex2f(matrixBottomRight.x, matrixTopLeft.y);
+	glVertex2f(matrixTopLeft.x, matrixBottomRight.y);
+	glVertex2f(matrixBottomRight.x, matrixBottomRight.y);
+	glEnd();
 }
 
 

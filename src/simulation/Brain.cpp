@@ -26,6 +26,16 @@ Brain::~Brain()
 	m_synapses = nullptr;
 }
 
+void Brain::Initialize(const std::vector<Neuron>& neurons, const std::vector<Synapse>& synapses, float initialActivation)
+{
+	Initialize(neurons.size(), synapses.size(), initialActivation);
+	
+	for (unsigned int i = 0; i < neurons.size(); ++i)
+		m_neurons[i] = neurons[i];
+	for (unsigned int i = 0; i < synapses.size(); ++i)
+		m_synapses[i] = synapses[i];
+}
+
 void Brain::Initialize(unsigned int numNeurons, unsigned int numSynapses, float initialActivation)
 {
 	delete m_currNeuronActivations;
@@ -89,14 +99,15 @@ void Brain::Update()
 		// Add in the bias term.
 		float activation = m_neurons[i].bias;
 
-		// Sum up the inputs to this neuron times their synapse weights (efficacies).
-		for (k = m_neurons[i].synapsesBegin; k < m_neurons[i].synapsesEnd; k++)
+		// Sum up the input activations to this neuron multiplied
+		// by their synapse weights.
+		for (k = m_neurons[i].synapsesBegin; k < m_neurons[i].synapsesEnd; ++k)
 		{
 			activation += m_synapses[k].weight *
 				m_prevNeuronActivations[m_synapses[k].neuronFrom];
 		}
 
-		// Apply the sigmoid function to the resulting activation.
+		// Apply the sigmoid function to the resulting activation sum.
 		m_currNeuronActivations[i] = Sigmoid(activation, sigmoidSlope);
 	}
 	

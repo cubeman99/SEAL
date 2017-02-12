@@ -110,6 +110,7 @@ public:
 		float	sigmoidSlope;
 		float	maxWeight;
 		float	initMaxWeight;
+		float	weightLearningRate;
 		float	weightDecayRate;
 
 	} brain;

@@ -35,11 +35,14 @@ void Agent::OnSpawn()
 	m_brain = new Brain();
 
 	// A sign that this is a first gen with no parents
-	if (m_genome == NULL)
+	if (m_genome == nullptr)
 	{
 		m_genome = new Genome(GetSimulation(), true);
 		m_energy = 100.0f;
 	}
+
+	m_genome->GrowBrain(m_brain);
+
 
 	m_radius = config.agent.radius;
 	m_wander = true;
@@ -253,30 +256,60 @@ void Agent::SeeObject(SimulationObject* object)
 
 void Agent::UpdateBrain()
 {
-	// TODO: Actually update brain and get its output values.
-	//float turnAmount = 0.0f; // output from brain
-	//float moveAmount = 0.0f; // output from brain
-	//m_moveSpeed = moveAmount * m_maxMoveSpeed;
-	//m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+	RNG& random = GetSimulation()->GetRandom();
+	
 
+	//-------------------------------------------------------------------------
 	// Set the input nerve activations.
 
+	for (unsigned int i = 0; i < m_brain->GetNumInputNeurons(); ++i)
+		m_brain->SetNeuronActivation(i, 0.0f);
+
+	m_brain->SetNeuronActivation(0, m_energy / m_maxEnergy);
+	m_brain->SetNeuronActivation(1, random.NextFloat());
+	
+	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
+	{
+		Retina& eye = m_eyes[eyeIndex];
+		for (unsigned int channel = 0; channel < eye.GetNumChannels(); ++channel)
+		{
+			for (unsigned int i = 0; i < eye.GetResolution(channel); ++i)
+			{
+				unsigned int geneIndex = 2 + (((eyeIndex * 3) + channel) * config.genes.maxSightResolution) + i;
+				m_brain->SetNeuronActivation(geneIndex,
+					eye.GetSightValueAtIndex(channel, i));
+			}
+		}
+	}
+
+	//-------------------------------------------------------------------------
 	// Update the brain's neural network.
 	m_brain->Update();
 
+	//-------------------------------------------------------------------------
 	// Get the output nerve activations.
+
+	float moveAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 0);
+	float turnAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 1);
+	if (m_wander)
+	{
+		m_moveSpeed = moveAmount * m_maxMoveSpeed;
+		m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
+	}
 
 
 	// TEMP: random wandering turning.
-	if (m_wander)
-	{
-		RNG& random = GetSimulation()->GetRandom();
-		float maxTurnSpeed = 6.0f / 60.0f;
-		float chance = ((random.NextFloat() * 2) - 1) * maxTurnSpeed;
-		float acc = 1;
-		if (chance <= m_turnSpeed)
-			acc = -1;
-		m_turnSpeed += random.NextFloat() * acc * maxTurnSpeed * 0.1f;
-		m_moveSpeed = m_maxMoveSpeed;
-	}
+	//if (m_wander)
+	//{
+	//	RNG& random = GetSimulation()->GetRandom();
+	//	float maxTurnSpeed = 6.0f / 60.0f;
+	//	float chance = ((random.NextFloat() * 2) - 1) * maxTurnSpeed;
+	//	float acc = 1;
+	//	if (chance <= m_turnSpeed)
+	//		acc = -1;
+	//	m_turnSpeed += random.NextFloat() * acc * maxTurnSpeed * 0.1f;
+	//	m_moveSpeed = m_maxMoveSpeed;
+	//}
+
 }

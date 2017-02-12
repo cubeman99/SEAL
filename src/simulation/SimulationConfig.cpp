@@ -6,7 +6,6 @@ SimulationConfig::SimulationConfig()
 {
 	// Setup some default values for debug purposes.
 
-
 	world.radius					= 160.0f; // gives a circumference of about 1000
 	world.seed						= -1;
 	plant.radius					= 2.5f;
@@ -27,8 +26,8 @@ SimulationConfig::SimulationConfig()
 	agent.minPredatorAgents			= 80;
 	agent.minPreyAgents				= 20; 
 	agent.maxPreyAgents				= 160;
-	agent.maxMoveSpeedAtMinStrength	= 0.4f;
-	agent.maxMoveSpeedAtMaxStrength	= 0.2f;
+	agent.maxMoveSpeedAtMinStrength	= 0.7f;
+	agent.maxMoveSpeedAtMaxStrength	= 0.3f;
 	agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
 	agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
 	agent.maxEnergyAtMinStrength	= 20.0f;
@@ -53,15 +52,22 @@ SimulationConfig::SimulationConfig()
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
-	genes.maxSightResolution		= 16;
-	genes.maxInternalNeurons		= 128; // TODO: tinker
-
+	genes.maxSightResolution		= 8;
+	genes.maxInternalNeurons		= 20; // TODO: tinker
 	genes.minBodyColor[0]			= 0.0f;
 	genes.maxBodyColor[0]			= 1.0f;
 	genes.minBodyColor[1]			= 0.0f;
-	genes.maxBodyColor[1]			= 1.0f;
+	genes.maxBodyColor[1]			= 0.0f;
 	genes.minBodyColor[2]			= 0.0f;
 	genes.maxBodyColor[2]			= 1.0f;
+
+	brain.numPrebirthCycles			= 10;
+	brain.sigmoidSlope				= 1.0f;
+	brain.maxBias					= 1.0f;
+	brain.initMaxWeight				= 0.5f;
+	brain.maxWeight					= 1.0f;
+	brain.weightLearningRate		= 0.08f;
+	brain.weightDecayRate			= 0.99f;
 }
 
 

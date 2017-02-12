@@ -324,7 +324,7 @@ T Math::ToRadians(T degrees)
 template <typename T>
 T Math::ToDegrees(T radians)
 {
-	return (degrees * RAD_TO_DEG);
+	return (radians * RAD_TO_DEG);
 }
 
 
