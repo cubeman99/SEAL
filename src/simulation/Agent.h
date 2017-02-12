@@ -7,6 +7,7 @@
 #include "Vision.h"
 #include "Genome.h"
 #include "Brain.h"
+#include "Nerve.h"
 
 class Offshoot;
 
@@ -44,6 +45,8 @@ public:
 	inline unsigned int GetNumEyes() const { return m_numEyes; }
 	inline Retina* GetEye(unsigned int index) { return &m_eyes[index]; }
 	inline const Retina* GetEye(unsigned int index) const { return &m_eyes[index]; }
+	inline Brain* GetBrain() { return m_brain; }
+	inline Genome* GetGenome() { return m_genome; }
 	
 	inline void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
 	inline void SetTurnSpeed(float turnSpeed) { m_turnSpeed = turnSpeed; }
@@ -54,6 +57,12 @@ private:
 	Genome* m_genome;
 	Brain* m_brain;
 	
+	Nerve*			m_nerveVision[3];
+	Nerve*			m_nerveEnergy;
+	Nerve*			m_nerveRandom;
+	Nerve*			m_nerveMoveSpeed;
+	Nerve*			m_nerveTurnSpeed;
+
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
 	float			m_strength;

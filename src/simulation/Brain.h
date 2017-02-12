@@ -55,6 +55,13 @@ public:
 	void Update();
 
 
+	inline unsigned int GetNumNeurons() const { return m_numNeurons; }
+	inline unsigned int GetNumInputNeurons() const { return m_numInputNeurons; }
+	inline unsigned int GetNumOutputNeurons() const { return m_numOutputNeurons; }
+	inline unsigned int GetNumInternalNeurons() const { return (m_numNeurons - m_numInputNeurons - m_numOutputNeurons); }
+	inline const Neuron& GetNeuron(unsigned int index) const { return m_neurons[index]; }
+	inline const Synapse& GetSynapse(unsigned int index) const { return m_synapses[index]; }
+
 private:
 	static float Sigmoid(float x, float slope);
 
@@ -68,7 +75,6 @@ private:
 	unsigned int	m_numSynapses;
 	float*			m_prevNeuronActivations; // Activation values for each neuron.
 	float*			m_currNeuronActivations;
-	//float*			m_neuronActivations[2]; // Neuron activation values for the current [0] and previous [1] frames.
 };
 
 

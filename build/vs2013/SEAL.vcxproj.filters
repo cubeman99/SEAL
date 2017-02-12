@@ -201,6 +201,9 @@
     <ClCompile Include="..\..\src\simulation\SimulationConfig.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\simulation\Nerve.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -363,6 +366,9 @@
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\SimulationConfig.h">
+      <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\Nerve.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
   </ItemGroup>

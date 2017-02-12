@@ -262,6 +262,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	if (selectedAgent != nullptr)
 	{
 		RenderAgentVisionStrips(selectedAgent);
+		RenderBrain(selectedAgent);
 	}
 
 	double endTime = Time::GetTime();
@@ -377,6 +378,42 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 					glVertex2f(boxPos.x, boxPos.y + boxSize.y);
 				glEnd();
 			}
+		}
+	}
+}
+
+
+void SimulationRenderer::RenderBrain(Agent* agent)
+{
+	Brain* brain = agent->GetBrain();
+
+	unsigned int numNeurons = brain->GetNumNeurons();
+
+	Vector2f cellSize(8, 8);
+	Vector2f matrixTopLeft(100, 100);
+
+	Color outlineColor = Color::WHITE;
+
+	for (unsigned int i = 0; i < numNeurons; ++i)
+	{
+		Neuron neuron = brain->GetNeuron(i);
+
+		for (unsigned int k = neuron.synapsesBegin; k < neuron.synapsesEnd; ++k)
+		{
+			Synapse synapse = brain->GetSynapse(k);
+
+			Vector2f cellPos;
+			cellPos.x = matrixTopLeft.x + (cellSize.x * synapse.neuronFrom);
+			cellPos.y = matrixTopLeft.y + (cellSize.y * synapse.neuronTo);
+
+			
+			glBegin(GL_LINE_LOOP);
+				glColor4ubv(outlineColor.data());
+				glVertex2f(cellPos.x, cellPos.y);
+				glVertex2f(cellPos.x + cellSize.x, cellPos.y);
+				glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
+				glVertex2f(cellPos.x, cellPos.y + cellSize.y);
+			glEnd();
 		}
 	}
 }

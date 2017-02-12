@@ -22,6 +22,7 @@ public:
 
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
+	void RenderBrain(Agent* agent);
 
 	inline double GetAverageRenderTime() const { return m_renderTime; }
 
