@@ -77,6 +77,19 @@ void Brain::ConfigSynapse(unsigned int synapseIndex, float weight, float learnin
 	synapse.neuronTo = neuronTo;
 }
 
+void Brain::PreBirth(unsigned int numCycles, RNG& random)
+{
+	for (unsigned int i = 0; i < numCycles; ++i)
+	{
+		// 1. Randomize input neuron activations.
+		for (unsigned int k = 0; k < m_numInputNeurons; ++k)
+			m_currNeuronActivations[k] = random.NextFloat();
+
+		// 2. Update the entire network.
+		Update();
+	}
+}
+
 void Brain::Update()
 {
 	unsigned int i, k;

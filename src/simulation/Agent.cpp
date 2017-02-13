@@ -42,7 +42,8 @@ void Agent::OnSpawn()
 	}
 
 	m_genome->GrowBrain(m_brain);
-
+	m_brain->PreBirth(config.brain.numPrebirthCycles,
+		GetSimulation()->GetRandom());
 
 	m_radius = config.agent.radius;
 	m_manualOverride = false;

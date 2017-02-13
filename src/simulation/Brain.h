@@ -2,6 +2,7 @@
 #define _BRAIN_H_
 
 #include <vector>
+#include <utilities/Random.h>
 
 
 //-----------------------------------------------------------------------------
@@ -57,6 +58,7 @@ public:
 	void ConfigSynapse(unsigned int synapseIndex, float weight, float learningRate, unsigned int neuronFrom, unsigned int neuronTo);
 	
 	// Simulation
+	void PreBirth(unsigned int numCycles, RNG& random);
 	void Update();
 
 	// Getters
