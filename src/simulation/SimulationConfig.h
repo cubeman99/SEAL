@@ -96,11 +96,11 @@ public:
 	
 	struct
 	{
-		float	energyCostMove;
-		float	energyCostTurn;
+		float	energyCostExist; // energy per tick
+		float	energyCostMove; // energy per distance per tick.
+		float	energyCostTurn; // energy per radian per tick.
 		float	energyCostNeuron;
 		float	energyCostSynapse;
-		float	energyCostExist;
 
 	} energy;
 

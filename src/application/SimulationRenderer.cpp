@@ -412,7 +412,7 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 
 			Vector2f cellPos;
 			cellPos.x = matrixTopLeft.x + (cellSize.x * synapse.neuronFrom);
-			cellPos.y = matrixTopLeft.y + (cellSize.y * (synapse.neuronTo - numInputNeurons));
+			cellPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons - (synapse.neuronTo - numInputNeurons) - 1));
 			
 			Vector3f weightColor(0, 0, 0);
 			if (synapse.weight > 0.0f)
@@ -423,16 +423,10 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 			if (synapse.learningRate == 0.0f)
 				weightColor = Vector3f(0.3f, 0.3f, 0.3f);
 
+			// Fill synapse box with color.
 			m_graphics.FillRect(cellPos, cellSize, weightColor);
-
-			//glBegin(GL_QUADS);
-			//	glColor3fv(weightColor.data());
-			//	glVertex2f(cellPos.x, cellPos.y);
-			//	glVertex2f(cellPos.x + cellSize.x, cellPos.y);
-			//	glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
-			//	glVertex2f(cellPos.x, cellPos.y + cellSize.y);
-			//glEnd();
 			
+			// Draw synapse box outline.
 			if (synapse.learningRate != 0.0f)
 			{
 				weightColor.Set(0, 0, 0);
@@ -443,13 +437,6 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 				weightColor *= (Math::Abs(synapse.weight) / config.brain.maxWeight) + 0.2f;
 
 				m_graphics.DrawRect(cellPos, cellSize, weightColor);
-				/*glBegin(GL_LINE_LOOP);
-					glColor3fv(weightColor.data());
-					glVertex2f(cellPos.x, cellPos.y);
-					glVertex2f(cellPos.x + cellSize.x - 1, cellPos.y);
-					glVertex2f(cellPos.x + cellSize.x - 1, cellPos.y + cellSize.y - 1);
-					glVertex2f(cellPos.x, cellPos.y + cellSize.y - 1);
-				glEnd();*/
 			}
 		}
 	}
@@ -501,8 +488,8 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	glVertex2f(matrixTopLeft.x + cellSize.x * numInputNeurons, matrixBottomRight.y);
 	glVertex2f(matrixTopLeft.x + cellSize.x * (numInputNeurons + numOutputNeurons), matrixTopLeft.y);
 	glVertex2f(matrixTopLeft.x + cellSize.x * (numInputNeurons + numOutputNeurons), matrixBottomRight.y);
-	glVertex2f(matrixTopLeft.x, matrixTopLeft.y + cellSize.y * numOutputNeurons);
-	glVertex2f(matrixBottomRight.x, matrixTopLeft.y + cellSize.y * numOutputNeurons);
+	glVertex2f(matrixTopLeft.x, matrixBottomRight.y - cellSize.y * numOutputNeurons);
+	glVertex2f(matrixBottomRight.x, matrixBottomRight.y - cellSize.y * numOutputNeurons);
 	glVertex2f(matrixTopLeft.x, matrixTopLeft.y);
 	glVertex2f(matrixTopLeft.x, matrixBottomRight.y);
 	glVertex2f(matrixBottomRight.x, matrixTopLeft.y);

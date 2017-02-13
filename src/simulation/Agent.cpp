@@ -32,18 +32,6 @@ Agent::~Agent()
 void Agent::OnSpawn()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
-	m_brain = new Brain();
-
-	// A sign that this is a first gen with no parents
-	if (m_genome == nullptr)
-	{
-		m_genome = new Genome(GetSimulation(), true);
-		m_energy = 100.0f;
-	}
-
-	m_genome->GrowBrain(m_brain);
-	m_brain->PreBirth(config.brain.numPrebirthCycles,
-		GetSimulation()->GetRandom());
 
 	m_radius = config.agent.radius;
 	m_manualOverride = false;
@@ -51,52 +39,65 @@ void Agent::OnSpawn()
 	m_turnSpeed = 0.0f;
 	m_age = 0;
 
-	// Determine agent properties based on the gene values.
+	// If the genome is null, then create a randomized one.
+	// This is a sign that this agent is a first gen with no parents.
+	if (m_genome == nullptr)
+	{
+		m_genome = new Genome(GetSimulation(), true);
+		m_energy = 100.0f;
+	}
+
+	// Grow the brain from the genome.
+	m_brain = new Brain();
+	m_genome->GrowBrain(m_brain);
+	m_brain->PreBirth(config.brain.numPrebirthCycles,
+		GetSimulation()->GetRandom());
+
+	// Determine agent properties based on gene values.
 	m_strength = m_genome->GetGeneAsFloat(GenePosition::STRENGTH);
-	m_lifeSpan = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::LIFE_SPAN),
+	m_lifeSpan = m_genome->GetGeneAsInt(
+		GenePosition::LIFE_SPAN,
 		config.genes.minLifeSpan,
 		config.genes.maxLifeSpan);
-	m_angleBetweenEyes = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::ANGLE_BETWEEN_EYES),
+	m_angleBetweenEyes = m_genome->GetGeneAsFloat(
+		GenePosition::ANGLE_BETWEEN_EYES,
 		config.genes.minAngleBetweenEyes,
 		config.genes.maxAngleBetweenEyes);
-	m_maxViewDistance = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::VIEW_DISTANCE),
+	m_maxViewDistance = m_genome->GetGeneAsFloat(
+		GenePosition::VIEW_DISTANCE,
 		config.genes.minSightDistance,
 		config.genes.maxSightDistance);
-	m_fieldOfView = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::FIELD_OF_VIEW),
+	m_fieldOfView = m_genome->GetGeneAsFloat(
+		GenePosition::FIELD_OF_VIEW,
 		config.genes.minFieldOfView,
 		config.genes.maxFieldOfView);
-
 	unsigned int resolutions[3];
-	resolutions[0] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_RED),
+	resolutions[0] = m_genome->GetGeneAsInt(
+		GenePosition::RESOLUTION_RED,
 		config.genes.minSightResolution,
 		config.genes.maxSightResolution);
-	resolutions[1] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_GREEN),
+	resolutions[1] = m_genome->GetGeneAsInt(
+		GenePosition::RESOLUTION_GREEN,
 		config.genes.minSightResolution,
 		config.genes.maxSightResolution);
-	resolutions[2] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::RESOLUTION_BLUE),
+	resolutions[2] = m_genome->GetGeneAsInt(
+		GenePosition::RESOLUTION_BLUE,
 		config.genes.minSightResolution,
 		config.genes.maxSightResolution);
-	m_color[0] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::COLOR_RED),
+	m_color[0] = m_genome->GetGeneAsFloat(
+		GenePosition::COLOR_RED,
 		config.genes.minBodyColor[0],
 		config.genes.maxBodyColor[0]);
-	m_color[1] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::COLOR_GREEN),
+	m_color[1] = m_genome->GetGeneAsFloat(
+		GenePosition::COLOR_GREEN,
 		config.genes.minBodyColor[1],
 		config.genes.maxBodyColor[1]);
-	m_color[2] = Genome::GeneLerp(
-		m_genome->GetGeneAsFloat(GenePosition::COLOR_BLUE),
+	m_color[2] = m_genome->GetGeneAsFloat(
+		GenePosition::COLOR_BLUE,
 		config.genes.minBodyColor[2],
 		config.genes.maxBodyColor[2]);
 
-	// Derive values based on strength.
+	// Determine values derived from strength.
 	m_maxEnergy = Math::Lerp(
 		config.agent.maxEnergyAtMinStrength,
 		config.agent.maxEnergyAtMaxStrength,
@@ -130,6 +131,8 @@ void Agent::OnDestroy()
 
 void Agent::Update()
 {
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+
 	UpdateVision();
 	UpdateBrain();
 
@@ -143,6 +146,17 @@ void Agent::Update()
 	// Turn and move.
 	m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
 	m_objectManager->MoveObjectForward(this, m_moveSpeed);
+
+	// Update energy costs.
+	m_energy -= config.energy.energyCostExist;
+	m_energy -= config.energy.energyCostMove * m_moveSpeed;
+	m_energy -= config.energy.energyCostTurn * m_turnSpeed;
+
+	if (m_energy <= 0.0f)
+	{
+		// TODO: kill agent after energy depletion.
+		Destroy();
+	}
 }
 
 void Agent::UpdateVision()
@@ -264,7 +278,6 @@ void Agent::UpdateBrain()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 	RNG& random = GetSimulation()->GetRandom();
-	
 
 	//-------------------------------------------------------------------------
 	// Set the input nerve activations.
@@ -273,7 +286,7 @@ void Agent::UpdateBrain()
 		m_brain->SetNeuronActivation(i, 0.0f);
 
 	m_brain->SetNeuronActivation(0, m_energy / m_maxEnergy);
-	//m_brain->SetNeuronActivation(1, random.NextFloat());
+	m_brain->SetNeuronActivation(1, random.NextFloat());
 	
 	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
@@ -282,7 +295,8 @@ void Agent::UpdateBrain()
 		{
 			for (unsigned int i = 0; i < eye.GetResolution(channel); ++i)
 			{
-				unsigned int geneIndex = 2 + (((channel * 2) + eyeIndex) * config.genes.maxSightResolution) + i;
+				unsigned int geneIndex = 2 + (((channel * 2) + eyeIndex) *
+					config.genes.maxSightResolution) + i;
 				m_brain->SetNeuronActivation(geneIndex,
 					eye.GetSightValueAtIndex(channel, i));
 			}
@@ -291,6 +305,7 @@ void Agent::UpdateBrain()
 
 	//-------------------------------------------------------------------------
 	// Update the brain's neural network.
+
 	m_brain->Update();
 
 	//-------------------------------------------------------------------------
@@ -298,24 +313,11 @@ void Agent::UpdateBrain()
 
 	if (!m_manualOverride)
 	{
-		float moveAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 0);
-		float turnAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 1);
+		float moveAmount = m_brain->GetNeuronActivation(
+			m_brain->GetNumInputNeurons() + 0);
+		float turnAmount = m_brain->GetNeuronActivation(
+			m_brain->GetNumInputNeurons() + 1);
 		m_moveSpeed = moveAmount * m_maxMoveSpeed;
 		m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
 	}
-
-
-	// TEMP: random wandering turning.
-	//if (m_wander)
-	//{
-	//	RNG& random = GetSimulation()->GetRandom();
-	//	float maxTurnSpeed = 6.0f / 60.0f;
-	//	float chance = ((random.NextFloat() * 2) - 1) * maxTurnSpeed;
-	//	float acc = 1;
-	//	if (chance <= m_turnSpeed)
-	//		acc = -1;
-	//	m_turnSpeed += random.NextFloat() * acc * maxTurnSpeed * 0.1f;
-	//	m_moveSpeed = m_maxMoveSpeed;
-	//}
-
 }

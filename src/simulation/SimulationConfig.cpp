@@ -12,9 +12,9 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 12;
-	plant.numOffshootsPerPlant		= 14;
-	plant.maxEnergy					= 100.0f;
+	plant.numPlants					= 100;
+	plant.numOffshootsPerPlant		= 1;
+	plant.maxEnergy					= 20.0f;
 	plant.offshootSpawnRadius		= 100;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 10.0f;
@@ -32,12 +32,12 @@ SimulationConfig::SimulationConfig()
 	agent.maxMoveSpeedAtMaxStrength	= 0.3f;
 	agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
 	agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
-	agent.maxEnergyAtMinStrength	= 20.0f;
-	agent.maxEnergyAtMaxStrength	= 80.0f;
+	agent.maxEnergyAtMinStrength	= 50.0f;
+	agent.maxEnergyAtMaxStrength	= 100.0f;
 
-	energy.energyCostExist			= 0.0f;
-	energy.energyCostMove			= 0.0f;
-	energy.energyCostTurn			= 0.0f;
+	energy.energyCostExist			= 0.005f;
+	energy.energyCostMove			= 0.005f;
+	energy.energyCostTurn			= 0.005f;
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 

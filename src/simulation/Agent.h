@@ -11,13 +11,12 @@
 
 class Offshoot;
 
+
 //-----------------------------------------------------------------------------
 // Agent - A single being of the simulation with its own body and brain.
 //-----------------------------------------------------------------------------
 class Agent : public SimulationObject
 {
-	friend class AgentSystem;
-
 public:
 	DECLARE_SIMULATION_OBJECT(SimulationObjectType::AGENT);
 
@@ -25,23 +24,25 @@ public:
 	Agent(Genome* genome, float energy); // Natural born constructor
 	~Agent();
 
+	// Object methods
 	void OnSpawn() override;
 	void Update() override;
 	void OnDestroy() override;
+
+	// Agent methods
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
 	void EatPlant(Offshoot* plant);
 
+	// Getters
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
 	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
 	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
-
 	inline float GetFieldOfView() const { return m_fieldOfView; }
 	inline float GetMaxViewDistance() const { return m_maxViewDistance; }
 	inline float GetAngleBetweenEyes() const { return m_angleBetweenEyes; }
-
 	inline unsigned int GetNumEyes() const { return m_numEyes; }
 	inline Retina* GetEye(unsigned int index) { return &m_eyes[index]; }
 	inline const Retina* GetEye(unsigned int index) const { return &m_eyes[index]; }
@@ -56,9 +57,9 @@ public:
 
 private:
 
-	Genome* m_genome;
-	Brain* m_brain;
-	
+	Genome*			m_genome;
+	Brain*			m_brain;
+
 	Nerve*			m_nerveVision[3];
 	Nerve*			m_nerveEnergy;
 	Nerve*			m_nerveRandom;
@@ -67,14 +68,14 @@ private:
 
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
-	float			m_strength;
 	float			m_energy;
-	int				m_lifeSpan;
 	int				m_age;
 
+	float			m_strength;
 	float			m_maxMoveSpeed;
 	float			m_maxTurnSpeed;
 	float			m_maxEnergy;
+	int				m_lifeSpan;
 		
 	unsigned int	m_numEyes;
 	Retina			m_eyes[2]; // 0 = left eye, 1 = right eye.

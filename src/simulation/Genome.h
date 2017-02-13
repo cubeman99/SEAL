@@ -41,10 +41,9 @@ public:
 	static float GeneLerp(float gene, float minValue, float maxValue);
 	static int GeneLerp(float gene, int minValue, int maxValue);
 
-	float GetGeneAsFloat(GenePosition index); // 0 - 1
-	
-	int GetGeneAsInt(unsigned int index, int minValue, int maxValue) const;
+	float GetGeneAsFloat(unsigned int index) const;
 	float GetGeneAsFloat(unsigned int index, float minValue, float maxValue) const;
+	int GetGeneAsInt(unsigned int index, int minValue, int maxValue) const;
 	unsigned int GetGeneAsInt(unsigned int index, unsigned int minValue, unsigned int maxValue) const;
 
 	void GrowBrain(Brain* brain);

@@ -8,13 +8,13 @@
 
 
 //-----------------------------------------------------------------------------
-// OctTreeNode
+// OctTreeNode - A single node in an octtree
 //-----------------------------------------------------------------------------
 class OctTreeNode
 {
 public:
-	typedef std::vector<SimulationObject*> object_list;
 	friend class OctTree;
+	typedef std::vector<SimulationObject*> object_list;
 
 public:
 	OctTreeNode();
@@ -25,15 +25,16 @@ public:
 	object_list::iterator objects_end();
 
 private:
-	unsigned char m_sectorIndex;
-	OctTreeNode* m_parent;
-	OctTreeNode* m_children[8];
-	object_list m_objects;
+	unsigned char	m_sectorIndex;	// Which sector is this node in its parent?
+	OctTreeNode*	m_parent;		// The parent node
+	OctTreeNode*	m_children[8];	// The 8 child nodes
+	object_list		m_objects;		// The objects contained in this node (for leaf nodes)
 };
 
 
 //-----------------------------------------------------------------------------
-// OctTree
+// OctTree - Stores and sorts simulation objects by position in a box-volume
+//           tree heirerchery that is recursively subdivided into 8 sectors.
 //-----------------------------------------------------------------------------
 class OctTree
 {
@@ -88,49 +89,60 @@ public:
 	
 	//-------------------------------------------------------------------------
 	// Queries
-
-	// Query for objects which are touching the given sphere,
-	// This needs a callback function that takes a single
-	// SimulationObject* as a parameter.
-	template <class T_QueryCallback>
-	void Query(const Sphere& sphere, T_QueryCallback callback);
 	
-	// Query for objects which are touching the given box,
-	// This needs a callback function that takes a single
-	// SimulationObject* as a parameter.
+	// Query for objects which are touching the given box, This needs a
+	// callback function that takes a single SimulationObject* as a parameter.
 	template <class T_QueryCallback>
 	void Query(const AABB& box, T_QueryCallback callback);
+
+	// Query for objects which are touching the given sphere, This needs a
+	// callback function that takes a single SimulationObject* as a parameter.
+	template <class T_QueryCallback>
+	void Query(const Sphere& sphere, T_QueryCallback callback);
 
 
 private:
 	//-------------------------------------------------------------------------
 	// Private functions
 
+	// Recursively count the number of objects in a node and its children.
 	void DoGetNumObjects(const OctTreeNode* node, unsigned int& count) const;
 	
+	// Recursively remove a node and its objects, moving down the tree.
 	void DoClear(OctTreeNode* node);
 	
+	// Recursively remove a node if it has no objects, moving up the tree.
+	void DoRemoveNode(OctTreeNode* node);
+	
+	// Recursively find the leaf node that an object would fall into.
 	OctTreeNode* DoGetNode(OctTreeNode* node, const Vector3f& point,
 		AABB& bounds, unsigned int& depth);
 	
+	// Within the given bounds, return the sector index that a point
+	// woudld fall into.
 	unsigned int DoGetSectorIndex(const AABB& bounds, const Vector3f& point);
+
+	// Given the center point of a bounds, return the sector index that a
+	// point woudld fall into.
 	unsigned int DoGetSectorIndex(const Vector3f& boundsCenter,
 		const Vector3f& point);
 	
+	// Get the subdivided-bounds for a given sector index.
 	void SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex);
-	
-	void DoRemoveNode(OctTreeNode* node);
 
+	// Recursively insert an object into a node.
 	void DoInsertObjectIntoNode(object_pointer object, OctTreeNode* node,
 		const AABB& bounds, unsigned int depth);
 	
+	// Recursively perform a box query.
 	template <class T_QueryCallback>
 	void DoBoxQuery(OctTreeNode* sectorNode,
 					const AABB& sectorBounds,
 					const AABB& queryBounds,
 					const AABB& box,
 					T_QueryCallback callback);
-
+	
+	// Recursively perform a sphere query.
 	template <class T_QueryCallback>
 	void DoSphereQuery(	OctTreeNode* sectorNode,
 						const AABB& sectorBounds,
@@ -142,12 +154,12 @@ private:
 	//-------------------------------------------------------------------------
 	// Member variables
 
-	OctTreeNode		m_root;
-	AABB			m_bounds;
+	OctTreeNode		m_root;					// The root node of the tree
+	AABB			m_bounds;				// The entire space that this tree encompasses
 	unsigned int	m_maxDepth;				// Maximum number of subdivisions
-	unsigned int	m_maxObjectsPerNode;	// Max objects per node before a division happens
-	ObjectToNodeMap	m_objectToNodeMap;
-	float			m_largestObjectRadius;	// Keeps track of the largest object radius in the tree.
+	unsigned int	m_maxObjectsPerNode;	// Max number of objects per node before a sub-division happens (increasing depth)
+	ObjectToNodeMap	m_objectToNodeMap;		// Maps objects to the nodes in which they're contained
+	float			m_largestObjectRadius;	// Keeps track of the largest object radius in the tree
 };
 
 
@@ -155,6 +167,8 @@ private:
 // OctTree template method definitions
 //-----------------------------------------------------------------------------
 
+// Query for objects which are touching the given box, This needs a callback
+// function that takes a single SimulationObject* as a parameter.
 template <class T_QueryCallback>
 void OctTree::Query(const AABB& box, T_QueryCallback callback)
 {
@@ -169,6 +183,8 @@ void OctTree::Query(const AABB& box, T_QueryCallback callback)
 	DoBoxQuery(&m_root, m_bounds, queryBounds, box, callback);
 }
 
+// Query for objects which are touching the given sphere, This needs a
+// callback function that takes a single SimulationObject* as a parameter.
 template <class T_QueryCallback>
 void OctTree::Query(const Sphere& sphere, T_QueryCallback callback)
 {

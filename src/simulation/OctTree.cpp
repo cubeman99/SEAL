@@ -182,6 +182,24 @@ void OctTree::DoClear(OctTreeNode* node)
 		delete node;
 }
 
+void OctTree::DoRemoveNode(OctTreeNode* node)
+{
+	// Don't remove nodes that have child nodes.
+	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
+	{
+		if (node->m_children[sectorIndex] != nullptr)
+			return;
+	}
+	
+	// Only remove nodes that have no objects.
+	if (node->m_objects.empty())
+	{
+		node->m_parent->m_children[node->m_sectorIndex] = nullptr;
+		DoRemoveNode(node->m_parent);
+		delete node;
+	}
+}
+
 OctTreeNode* OctTree::DoGetNode(OctTreeNode* node,
 								const Vector3f& point,
 								AABB& bounds,
@@ -239,24 +257,6 @@ void OctTree::SplitBoundsBySector(AABB& bounds, unsigned int sectorIndex)
 			bounds.mins[axis] = center[axis];
 		else
 			bounds.maxs[axis] = center[axis];
-	}
-}
-
-void OctTree::DoRemoveNode(OctTreeNode* node)
-{
-	// Don't remove nodes that have child nodes.
-	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
-	{
-		if (node->m_children[sectorIndex] != nullptr)
-			return;
-	}
-	
-	// Only remove nodes that have no objects.
-	if (node->m_objects.empty())
-	{
-		node->m_parent->m_children[node->m_sectorIndex] = nullptr;
-		DoRemoveNode(node->m_parent);
-		delete node;
 	}
 }
 
