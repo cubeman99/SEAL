@@ -107,47 +107,48 @@ void Brain::Update()
 				m_prevNeuronActivations[m_synapses[k].neuronFrom];
 		}
 
-		// Apply the sigmoid function to the resulting activation sum.
-		m_currNeuronActivations[i] = Sigmoid(activation, sigmoidSlope);
+		if (m_neurons[i].synapsesBegin == m_neurons[i].synapsesEnd)
+			m_currNeuronActivations[i] = 0.0f;
+		else
+			// Apply the sigmoid function to the resulting activation sum.
+			m_currNeuronActivations[i] = Sigmoid(activation, sigmoidSlope);
 	}
 	
 	//-----------------------------------------------------------------------------
 	// Update learning for all synapses.
 
-	/*
-	for (k = 0; k < m_dimensions.numSynapses; ++k)
+	for (k = 0; k < m_numSynapses; ++k)
 	{
 		Synapse& synapse = m_synapses[k];
 
 		// Hebbian learning.
-		float efficacy = synapse.efficacy + synapse.learningRate
-			* (m_currNeuronActivations[synapse.toNeuron] - 0.5f)
-			* (m_prevNeuronActivations[synapse.fromNeuron] - 0.5f);
+		float efficacy = synapse.weight + synapse.learningRate
+			* (m_currNeuronActivations[synapse.neuronTo] - 0.5f)
+			* (m_prevNeuronActivations[synapse.neuronFrom] - 0.5f);
 				
-		// Gradually decay synapse efficacy.
-        if (Math::Abs(efficacy) > (0.5f * CONFIG.maxWeight))
-        {
-            efficacy *= 1.0f - (1.0f - CONFIG.decayRate) *
-                (Math::Abs(efficacy) - 0.5f * CONFIG.maxWeight) / (0.5f * CONFIG.maxWeight);
-            if (efficacy > CONFIG.maxWeight)
-                efficacy = CONFIG.maxWeight;
-            else if (efficacy < -CONFIG.maxWeight)
-                efficacy = -CONFIG.maxWeight;
-        }
-        else
-        {
-            // not strictly correct for this to be in an else clause,
-            // but if lrate is reasonable, efficacy should never change
-            // sign with a new magnitude greater than 0.5 * Brain::config.maxWeight
-            if (synapse.learningRate >= 0.0f)  // excitatory
-                efficacy = Math::Max(0.0f, efficacy);
-            if (synapse.learningRate < 0.0f)  // inhibitory
-                efficacy = Math::Min(-1.e-10f, efficacy);
-        }
-		
+		if (synapse.learningRate != 0.0f)
+		{
+			// Gradually decay synapse efficacy.
+			if (Math::Abs(efficacy) > (0.5f * m_maxWeight))
+			{
+				efficacy *= 1.0f - (1.0f - m_decayRate) *
+					(Math::Abs(efficacy) - 0.5f * m_maxWeight) / (0.5f * m_maxWeight);
+				efficacy = Math::Clamp(efficacy, -m_maxWeight, m_maxWeight);
+			}
+			else
+			{
+				// not strictly correct for this to be in an else clause,
+				// but if lrate is reasonable, efficacy should never change
+				// sign with a new magnitude greater than 0.5 * Brain::config.maxWeight
+				if (synapse.learningRate >= 0.0f)  // excitatory
+					efficacy = Math::Max(0.0f, efficacy);
+				if (synapse.learningRate < 0.0f)  // inhibitory
+					efficacy = Math::Min(-1e-10f, efficacy);
+			}
+		}
+
 		synapse.weight = efficacy;
 	}
-	*/
 }
 
 

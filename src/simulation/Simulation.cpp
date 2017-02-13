@@ -28,6 +28,10 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_random.SeedTime();
 	else
 		m_random.SetSeed((unsigned long) config.world.seed);
+	
+	// Spawn some plants.
+	for (int i = 0; i < m_config.plant.numPlants; ++i)
+		m_objectManager.SpawnObjectRandom<Plant>();
 }
 
 void Simulation::Tick()

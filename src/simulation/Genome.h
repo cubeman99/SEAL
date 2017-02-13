@@ -6,6 +6,7 @@
 class Simulation;
 class Brain;
 
+
 enum GenePosition
 {
 	// Vision
@@ -27,6 +28,7 @@ enum GenePosition
 	// First index of nueron genes, also count of non-nueron genes
 	NUERON_GENES_BEGIN
 };
+
 
 class Genome
 {

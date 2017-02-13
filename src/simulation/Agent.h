@@ -48,9 +48,11 @@ public:
 	inline Brain* GetBrain() { return m_brain; }
 	inline Genome* GetGenome() { return m_genome; }
 	
+	// Debug operations
 	inline void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
 	inline void SetTurnSpeed(float turnSpeed) { m_turnSpeed = turnSpeed; }
-	inline void EnableWandering(bool enableWander) { m_wander = enableWander; }
+	inline void SetManualOverride(bool manualOverride) { m_manualOverride = manualOverride; }
+	inline bool GetManualOverride() { return m_manualOverride; }
 
 private:
 
@@ -81,9 +83,9 @@ private:
 	float			m_angleBetweenEyes; // in radians.
 
 	
-	// TEMP: enable/disable temporary wandering. This is for debug
+	// DEBUG: enable/disable manual override. This is for debug
 	// purposes, in case we want to control our selected agent manually.
-	bool m_wander;
+	bool m_manualOverride;
 };
 
 

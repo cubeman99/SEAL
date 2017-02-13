@@ -45,7 +45,7 @@ void Agent::OnSpawn()
 
 
 	m_radius = config.agent.radius;
-	m_wander = true;
+	m_manualOverride = false;
 	m_moveSpeed = 0.0f;
 	m_turnSpeed = 0.0f;
 	m_age = 0;
@@ -107,6 +107,10 @@ void Agent::OnSpawn()
 	m_maxTurnSpeed = Math::Lerp(
 		config.agent.maxTurnSpeedAtMinStrength,
 		config.agent.maxTurnSpeedAtMaxStrength,
+		m_strength);
+	m_radius = Math::Lerp(
+		config.agent.radiusAtMinStrength,
+		config.agent.radiusAtMaxStrength,
 		m_strength);
 
 	// Configure eyes.
@@ -191,6 +195,7 @@ void Agent::EatPlant(Offshoot* plant)
 	//if (m_energy < m_maxEnergy)
 	//{
 		m_energy += plant->Eat();
+		m_energy = Math::Clamp(m_energy, 0.0f, m_maxEnergy);
 	//}
 }
 
@@ -267,7 +272,7 @@ void Agent::UpdateBrain()
 		m_brain->SetNeuronActivation(i, 0.0f);
 
 	m_brain->SetNeuronActivation(0, m_energy / m_maxEnergy);
-	m_brain->SetNeuronActivation(1, random.NextFloat());
+	//m_brain->SetNeuronActivation(1, random.NextFloat());
 	
 	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
@@ -276,7 +281,7 @@ void Agent::UpdateBrain()
 		{
 			for (unsigned int i = 0; i < eye.GetResolution(channel); ++i)
 			{
-				unsigned int geneIndex = 2 + (((eyeIndex * 3) + channel) * config.genes.maxSightResolution) + i;
+				unsigned int geneIndex = 2 + (((channel * 2) + eyeIndex) * config.genes.maxSightResolution) + i;
 				m_brain->SetNeuronActivation(geneIndex,
 					eye.GetSightValueAtIndex(channel, i));
 			}
@@ -290,10 +295,10 @@ void Agent::UpdateBrain()
 	//-------------------------------------------------------------------------
 	// Get the output nerve activations.
 
-	float moveAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 0);
-	float turnAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 1);
-	if (m_wander)
+	if (!m_manualOverride)
 	{
+		float moveAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 0);
+		float turnAmount = m_brain->GetNeuronActivation(m_brain->GetNumInputNeurons() + 1);
 		m_moveSpeed = moveAmount * m_maxMoveSpeed;
 		m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
 	}

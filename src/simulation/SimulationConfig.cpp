@@ -12,14 +12,16 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 10;
-	plant.numOffshootsPerPlant		= 6;
+	plant.numPlants					= 12;
+	plant.numOffshootsPerPlant		= 14;
 	plant.maxEnergy					= 100.0f;
-	plant.offshootSpawnRadius		= 60;
+	plant.offshootSpawnRadius		= 100;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 10.0f;
 
 	agent.radius					= 5.0f;
+	agent.radiusAtMinStrength		= 4.0f;
+	agent.radiusAtMaxStrength		= 6.0f;
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 20;
 	agent.minPredatorAgents			= 10;
@@ -39,6 +41,9 @@ SimulationConfig::SimulationConfig()
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 
+	genes.numCrossoverPoints		= 2;
+	genes.maxInternalNeurons		= 20; // TODO: tinker
+
 	genes.minLifeSpan				= 60 * 60;
 	genes.maxLifeSpan				= 60 * 200;
 	genes.minStrength				= 0.0f;
@@ -52,13 +57,13 @@ SimulationConfig::SimulationConfig()
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
-	genes.maxSightResolution		= 8;
-	genes.maxInternalNeurons		= 20; // TODO: tinker
+	genes.minSightResolution		= 6;
+	genes.maxSightResolution		= 6;
 	genes.minBodyColor[0]			= 0.0f;
-	genes.maxBodyColor[0]			= 1.0f;
+	genes.maxBodyColor[0]			= 0.0f;
 	genes.minBodyColor[1]			= 0.0f;
 	genes.maxBodyColor[1]			= 0.0f;
-	genes.minBodyColor[2]			= 0.0f;
+	genes.minBodyColor[2]			= 1.0f;
 	genes.maxBodyColor[2]			= 1.0f;
 
 	brain.numPrebirthCycles			= 10;
@@ -68,6 +73,9 @@ SimulationConfig::SimulationConfig()
 	brain.maxWeight					= 1.0f;
 	brain.weightLearningRate		= 0.08f;
 	brain.weightDecayRate			= 0.99f;
+
+	brain.weightLearningRate		= 0.08f;
+	brain.weightDecayRate			= 0.998f;
 }
 
 

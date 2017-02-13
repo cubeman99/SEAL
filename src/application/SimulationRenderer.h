@@ -2,6 +2,7 @@
 #define _SIMULATION_RENDERER_H_	
 
 #include <graphics/OpenGLIncludes.h>
+#include <graphics/Graphics.h>
 #include <math/MathLib.h>
 #include "ResourceManager.h"
 #include "OctTreeRenderer.h"
@@ -29,7 +30,8 @@ public:
 private:
 	SimulationManager* m_simulationManager;
 	ResourceManager	m_resourceManager;
-	Renderer		m_renderer;
+	Renderer		m_renderer; // Used to render 3d meshes
+	Graphics		m_graphics; // used to draw 2d shapes
 	OctTreeRenderer	m_octTreeRenderer;
 
 	double			m_renderTime; // measured time of render (in seconds)

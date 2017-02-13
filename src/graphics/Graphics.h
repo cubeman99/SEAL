@@ -67,14 +67,17 @@ public:
 
 	void DrawLine(float x1, float y1, float x2, float y2, const Color& color);
 	void DrawLine(const Vector2f& from, const Vector2f& to, const Color& color);
+	
 	void DrawRect(const Viewport& rect, const Color& color);
 	void DrawRect(const Vector2f& pos, const Vector2f& size, const Color& color);
 	void DrawRect(float x, float y, float width, float height, const Color& color);
 	void FillRect(const Vector2f& pos, const Vector2f& size, const Color& color);
 	void FillRect(const Viewport& rect, const Color& color);
 	void FillRect(float x, float y, float width, float height, const Color& color);
+	
 	void DrawCircle(const Vector2f& pos, float radius, const Color& color, int numEdges = 20);
 	void FillCircle(const Vector2f& pos, float radius, const Color& color, int numEdges = 20);
+
 	void DrawString(SpriteFont* font, const char* text, const Vector2f& pos, const Color& color, float scale = 1.0f);
 
 	

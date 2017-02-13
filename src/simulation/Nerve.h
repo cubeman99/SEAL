@@ -12,7 +12,7 @@ enum class NerveType
 
 
 //-----------------------------------------------------------------------------
-// Nerve
+// Nerve - input/output neurons. NOTE: this is currently unused
 //-----------------------------------------------------------------------------
 class Nerve
 {

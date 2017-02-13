@@ -31,12 +31,16 @@ public:
 	inline void SetShowOctTree(bool showOctTree) { m_showOctTree = showOctTree; }
 	inline void SetShowOctTreeWireFrame(bool showOctTreeWireFrame) { m_showOctTreeWireFrame = showOctTreeWireFrame; }
 	inline void SetShowAgentVision(bool showAgentVision) { m_showAgentVision = showAgentVision; }
+	inline void SetShowAgentBrain(bool showAgentBrain) { m_showAgentBrain = showAgentBrain; }
+	inline void SetShowInvisibleObjects(bool showInvisibleObjects) { m_showInvisibleObjects = showInvisibleObjects; }
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
 	inline bool IsLightingEnabled() const { return m_viewLighting; }
 	inline bool GetShowOctTree() const { return m_showOctTree; }
 	inline bool GetShowOctTreeWireFrame() const { return m_showOctTreeWireFrame; }
 	inline bool GetShowAgentVision() const { return m_showAgentVision; }
+	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
+	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 
 	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
 
@@ -60,6 +64,8 @@ private:
 	bool m_showOctTree;
 	bool m_showOctTreeWireFrame;
 	bool m_showAgentVision;
+	bool m_showAgentBrain;
+	bool m_showInvisibleObjects;
 };
 
 

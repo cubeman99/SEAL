@@ -7,6 +7,11 @@ Graphics::Graphics()
 {
 }
 
+
+//-----------------------------------------------------------------------------
+// General graphics operations
+//-----------------------------------------------------------------------------
+
 void Graphics::Clear(const Color& color)
 {
 	Vector4f c = color.ToVector4f();
@@ -24,6 +29,11 @@ void Graphics::SetViewport(const Viewport& viewport, bool scissor)
 		glScissor(viewport.x, y, viewport.width, viewport.height);
 	}
 }
+
+
+//-----------------------------------------------------------------------------
+// Shape drawing
+//-----------------------------------------------------------------------------
 
 void Graphics::DrawLine(float x1, float y1, float x2, float y2, const Color& color)
 {
@@ -45,57 +55,32 @@ void Graphics::DrawLine(const Vector2f& from, const Vector2f& to, const Color& c
 
 void Graphics::DrawRect(const Viewport& rect, const Color& color)
 {
-	glBegin(GL_LINE_LOOP);
-	gl_Color(color);
-	glVertex2i(rect.x, rect.y);
-	glVertex2i(rect.x + rect.width, rect.y);
-	glVertex2i(rect.x + rect.width, rect.y + rect.height);
-	glVertex2i(rect.x, rect.y + rect.height);
-	glEnd();
+	DrawRect((float) rect.x, (float) rect.y,
+		(float) rect.width, (float) rect.height, color);
 }
 
 void Graphics::DrawRect(const Vector2f& pos, const Vector2f& size, const Color& color)
 {
-	glBegin(GL_LINE_LOOP);
-	gl_Color(color);
-	glVertex2f(pos.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y + size.y);
-	glVertex2f(pos.x, pos.y + size.y);
-	glEnd();
+	DrawRect(pos.x, pos.y, size.x, size.y, color);
 }
 
 void Graphics::DrawRect(float x, float y, float width, float height, const Color& color)
 {
-	glBegin(GL_LINE_LOOP);
-	gl_Color(color);
-	glVertex2f(x, y);
-	glVertex2f(x + width, y);
-	glVertex2f(x + width, y + height);
-	glVertex2f(x, y + height);
-	glEnd();
+	FillRect(x, y, 1, height, color);
+	FillRect(x + width - 1, y, 1, height, color);
+	FillRect(x, y, width, 1, color);
+	FillRect(x, y + height - 1, width, 1, color);
 }
 
 void Graphics::FillRect(const Vector2f& pos, const Vector2f& size, const Color& color)
 {
-	glBegin(GL_QUADS);
-	gl_Color(color);
-	glVertex2f(pos.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y);
-	glVertex2f(pos.x + size.x, pos.y + size.y);
-	glVertex2f(pos.x, pos.y + size.y);
-	glEnd();
+	FillRect(pos.x, pos.y, size.x, size.y, color);
 }
 
 void Graphics::FillRect(const Viewport& rect, const Color& color)
 {
-	glBegin(GL_QUADS);
-	gl_Color(color);
-	glVertex2i(rect.x, rect.y);
-	glVertex2i(rect.x + rect.width, rect.y);
-	glVertex2i(rect.x + rect.width, rect.y + rect.height);
-	glVertex2i(rect.x, rect.y + rect.height);
-	glEnd();
+	FillRect((float) rect.x, (float) rect.y,
+		(float) rect.width, (float) rect.height, color);
 }
 
 void Graphics::FillRect(float x, float y, float width, float height, const Color& color)
@@ -117,7 +102,9 @@ void Graphics::DrawCircle(const Vector2f& pos, float radius, const Color& color,
 	for (int i = 0; i < numEdges; i++)
 	{
 		float angle = (i / (float) numEdges) * Math::TWO_PI;
-		Vector2f v = pos + Vector2f(Math::Cos(angle) * radius, Math::Sin(angle) * radius);
+		Vector2f v;
+		v.x = pos.x + (Math::Cos(angle) * radius);
+		v.y = pos.y + (Math::Sin(angle) * radius);
 		glVertex2fv(v.data());
 	}
 	glEnd();
@@ -142,20 +129,9 @@ void Graphics::DrawString(SpriteFont* font, const char* text, const Vector2f& po
 }
 
 
-void Graphics::gl_Vertex(const Vector2f& v)
-{
-	glVertex2fv(v.data());
-}
-
-void Graphics::gl_Vertex(const Vector3f& v)
-{
-	glVertex3fv(v.data());
-}
-
-void Graphics::gl_Color(const Color& color)
-{
-	glColor4ubv(color.data());
-}
+//-----------------------------------------------------------------------------
+// Render settings
+//-----------------------------------------------------------------------------
 
 void Graphics::EnableCull(bool cull)
 {
@@ -173,6 +149,11 @@ void Graphics::EnableDepthTest(bool depthTest)
 		glDisable(GL_DEPTH_TEST);
 }
 
+
+//-----------------------------------------------------------------------------
+// Projection
+//-----------------------------------------------------------------------------
+
 void Graphics::SetProjection(const Matrix4f& projection)
 {
     glMatrixMode(GL_PROJECTION);
@@ -180,12 +161,16 @@ void Graphics::SetProjection(const Matrix4f& projection)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+
+//-----------------------------------------------------------------------------
+// Transformations
+//-----------------------------------------------------------------------------
+
 void Graphics::ResetTransform()
 {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
-
 
 void Graphics::SetTransform(const Matrix4f& transform)
 {
@@ -233,3 +218,24 @@ void Graphics::Scale(const Vector3f& scale)
 	glMatrixMode(GL_MODELVIEW);
 	glScalef(scale.x, scale.y, scale.z);
 }
+
+
+//-----------------------------------------------------------------------------
+// OpenGL wrappers
+//-----------------------------------------------------------------------------
+
+void Graphics::gl_Vertex(const Vector2f& v)
+{
+	glVertex2fv(v.data());
+}
+
+void Graphics::gl_Vertex(const Vector3f& v)
+{
+	glVertex3fv(v.data());
+}
+
+void Graphics::gl_Color(const Color& color)
+{
+	glColor4ubv(color.data());
+}
+

@@ -49,7 +49,7 @@ void GlobeCamera::RotateSurfaceCamera(float horizontal, float vertical)
 	float rotateSpeed = Math::TWO_PI * 1.0f;
 
 	m_globeOrientation.Rotate(m_globeOrientation.GetForward(), -horizontal * rotateSpeed);
-	m_surfaceAngle -= vertical * rotateSpeed * 0.5f;
+	m_surfaceAngle += vertical * rotateSpeed * 0.5f;
 	m_surfaceAngle = Math::Clamp(m_surfaceAngle, 0.0f, Math::HALF_PI);
 }
 
@@ -85,7 +85,7 @@ float GlobeCamera::GetAdjustedSurfaceAngle() const
 Vector3f GlobeCamera::GetViewPosition() const
 {
 	Vector3f pos = m_globeOrientation.GetBack() * m_surfaceDistance;
-	pos.Rotate(m_globeOrientation.GetRight(), -GetAdjustedSurfaceAngle());
+	pos.Rotate(m_globeOrientation.GetRight(), GetAdjustedSurfaceAngle());
 	pos += m_globeOrientation.GetBack() * m_globeRadius;
 	pos += m_globePosition;
 	return pos;
@@ -94,7 +94,7 @@ Vector3f GlobeCamera::GetViewPosition() const
 Quaternion GlobeCamera::GetOrientation() const
 {
 	Quaternion orientation = m_globeOrientation;
-	orientation.Rotate(orientation.GetRight(), -GetAdjustedSurfaceAngle());
+	orientation.Rotate(orientation.GetRight(), GetAdjustedSurfaceAngle());
 	return orientation;
 }
 	

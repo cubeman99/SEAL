@@ -34,6 +34,8 @@ public:
 		int		initialPreyCount;
 		int		initialPredatorCount;
 
+		float	radiusAtMinStrength;
+		float	radiusAtMaxStrength;
 		float	maxEnergyAtMinStrength;
 		float	maxEnergyAtMaxStrength;
 		float	maxMoveSpeedAtMinStrength;
@@ -64,6 +66,8 @@ public:
 	
 	struct
 	{
+		int		numCrossoverPoints;
+
 		// Physiological genes
 		float	minStrength;
 		float	maxStrength;

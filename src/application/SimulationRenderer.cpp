@@ -194,15 +194,12 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	{
 		SimulationObject* object = *it;
 
+		// Don't render invisible objects.
+		if (!object->IsVisible() && !m_simulationManager->GetShowInvisibleObjects())
+			continue;
+
 		Matrix4f modelMatrix = object->GetObjectToWorld() * 
 			Matrix4f::CreateScale(object->GetRadius());
-
-
-		//transform.pos = object->GetPosition();
-		//transform.pos.Normalize();
-		//transform.pos *= worldRadius;
-		//transform.rot = object->GetOrientation();
-		//transform.SetScale(object->GetRadius());
 		material.SetColor(object->GetColor());
 		
 		// Render with the appropriate mesh.
@@ -248,7 +245,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	// Render the OctTree
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
-	// Switch to orthographic to render the HUD.
+	// Switch to orthographic mode to render the HUD.
 	Matrix4f orthographic = Matrix4f::CreateOrthographic(0.0f, m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(orthographic.data());
@@ -257,12 +254,18 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	m_renderer.SetShader(0);
+	orthographic = Matrix4f::CreateOrthographic(0.5f,
+		m_viewPortSize.x + 0.5f, m_viewPortSize.y + 0.5f, 0.5f, -1.0f, 1.0f);
+	m_graphics.SetProjection(orthographic);
 
-	// Render the selected agent's vision strips.
 	if (selectedAgent != nullptr)
 	{
+		// Render the selected agent's vision strips.
 		RenderAgentVisionStrips(selectedAgent);
-		RenderBrain(selectedAgent);
+
+		// Render brain.
+		if (m_simulationManager->GetShowAgentBrain())
+			RenderBrain(selectedAgent);
 	}
 
 	double endTime = Time::GetTime();
@@ -393,7 +396,7 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	unsigned int numOutputNeurons = brain->GetNumOutputNeurons();
 	unsigned int numOutIntNeurons = brain->GetNumNeurons() - brain->GetNumInputNeurons();
 
-	Vector2f cellSize(8, 8);
+	Vector2f cellSize(10, 10);
 	Vector2f matrixTopLeft(100, 100);
 
 	Color outlineColor = Color::WHITE;
@@ -409,7 +412,7 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 
 			Vector2f cellPos;
 			cellPos.x = matrixTopLeft.x + (cellSize.x * synapse.neuronFrom);
-			cellPos.y = matrixTopLeft.y + (cellSize.y * synapse.neuronTo);
+			cellPos.y = matrixTopLeft.y + (cellSize.y * (synapse.neuronTo - numInputNeurons));
 			
 			Vector3f weightColor(0, 0, 0);
 			if (synapse.weight > 0.0f)
@@ -417,22 +420,37 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 			if (synapse.weight < 0.0f)
 				weightColor[0] = 1.0f;
 			weightColor *= Math::Abs(synapse.weight) / config.brain.maxWeight;
+			if (synapse.learningRate == 0.0f)
+				weightColor = Vector3f(0.3f, 0.3f, 0.3f);
+
+			m_graphics.FillRect(cellPos, cellSize, weightColor);
+
+			//glBegin(GL_QUADS);
+			//	glColor3fv(weightColor.data());
+			//	glVertex2f(cellPos.x, cellPos.y);
+			//	glVertex2f(cellPos.x + cellSize.x, cellPos.y);
+			//	glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
+			//	glVertex2f(cellPos.x, cellPos.y + cellSize.y);
+			//glEnd();
 			
-			glBegin(GL_QUADS);
-				glColor3fv(weightColor.data());
-				glVertex2f(cellPos.x, cellPos.y);
-				glVertex2f(cellPos.x + cellSize.x, cellPos.y);
-				glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
-				glVertex2f(cellPos.x, cellPos.y + cellSize.y);
-			glEnd();
-			/*
-			glBegin(GL_LINE_LOOP);
-				glColor4ubv(outlineColor.data());
-				glVertex2f(cellPos.x, cellPos.y);
-				glVertex2f(cellPos.x + cellSize.x, cellPos.y);
-				glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
-				glVertex2f(cellPos.x, cellPos.y + cellSize.y);
-			glEnd();*/
+			if (synapse.learningRate != 0.0f)
+			{
+				weightColor.Set(0, 0, 0);
+				if (synapse.learningRate > 0.0f)
+					weightColor[1] = 1.0f;
+				if (synapse.learningRate < 0.0f)
+					weightColor[0] = 1.0f;
+				weightColor *= (Math::Abs(synapse.weight) / config.brain.maxWeight) + 0.2f;
+
+				m_graphics.DrawRect(cellPos, cellSize, weightColor);
+				/*glBegin(GL_LINE_LOOP);
+					glColor3fv(weightColor.data());
+					glVertex2f(cellPos.x, cellPos.y);
+					glVertex2f(cellPos.x + cellSize.x - 1, cellPos.y);
+					glVertex2f(cellPos.x + cellSize.x - 1, cellPos.y + cellSize.y - 1);
+					glVertex2f(cellPos.x, cellPos.y + cellSize.y - 1);
+				glEnd();*/
+			}
 		}
 	}
 
@@ -446,16 +464,33 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 		cellPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1));
 			
 		Vector3f weightColor(1, 1, 1);
+
+		if (i == 0)
+			weightColor.Set(1, 1, 0);
+		else if (i == 1)
+			weightColor.Set(1, 0, 1);
+		else if ((int) i < 2 + (config.genes.maxSightResolution * 2))
+			weightColor.Set(1, 0, 0);
+		else if ((int) i < 2 + (config.genes.maxSightResolution * 4))
+			weightColor.Set(0, 1, 0);
+		else if ((int) i < 2 + (config.genes.maxSightResolution * 6))
+			weightColor.Set(0, 0, 1);
+
 		weightColor *= brain->GetNeuronActivation(i);
 			
-		glBegin(GL_QUADS);
-			glColor3fv(weightColor.data());
-			glVertex2f(cellPos.x, cellPos.y);
-			glVertex2f(cellPos.x + cellSize.x, cellPos.y);
-			glVertex2f(cellPos.x + cellSize.x, cellPos.y + cellSize.y);
-			glVertex2f(cellPos.x, cellPos.y + cellSize.y);
-		glEnd();
+		m_graphics.FillRect(cellPos, cellSize, weightColor);
 	}
+	
+	Vector2f activationsPos;
+	activationsPos.x = matrixTopLeft.x;
+	activationsPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1));
+	m_graphics.DrawRect(
+		matrixTopLeft.x,
+		matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1)),
+		cellSize.x * numNeurons,
+		cellSize.y,
+		outlineColor);
+
 
 	Vector2f matrixBottomRight = matrixTopLeft + cellSize * Vector2f((float) numNeurons, (float) numOutIntNeurons);
 

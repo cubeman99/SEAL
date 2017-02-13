@@ -17,6 +17,8 @@ enum
 	SHOW_OCT_TREE_ON_SURFACE,
 	SHOW_OCT_TREE_WIRE_FRAME,
 	SHOW_AGENT_VISION,
+	SHOW_AGENT_BRAIN,
+	SHOW_INVISIBLE_OBJECTS,
 
 	DEBUG_SPAWN_AGENTS,
 	
@@ -36,6 +38,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_OCT_TREE_ON_SURFACE, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_OCT_TREE_WIRE_FRAME, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_AGENT_VISION, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_AGENT_BRAIN, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
     EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
@@ -77,6 +81,8 @@ SimulationWindow::SimulationWindow() :
     menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO")->Check(false);
     menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O")->Check(false);
     menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA")->Check(false);
+    menuView->AppendCheckItem(SHOW_AGENT_BRAIN, "Show Agent &Brain\tB")->Check(false);
+    menuView->AppendCheckItem(SHOW_INVISIBLE_OBJECTS, "Show &Invisible Objects\tI")->Check(false);
 
 	// DEBUG
     wxMenu* menuDebug = new wxMenu;
@@ -103,6 +109,8 @@ SimulationWindow::SimulationWindow() :
 
 	// Initialize a new simulation.
 	m_simulationManager.Initialize();
+
+	m_controlledAgent = nullptr;
 }
 
 void SimulationWindow::OnClose(wxCommandEvent& e)
@@ -128,8 +136,10 @@ void SimulationWindow::OnToggleCameraTracking(wxCommandEvent& e)
 void SimulationWindow::OnSpawnAgents(wxCommandEvent& e)
 {
 	for (int i = 0; i < 10; i++)
-		m_simulationManager.GetSimulation()->GetObjectManager()->SpawnObjectRandom<Agent>();
-		//m_simulationManager.GetSimulation()->GetAgentSystem()->SpawnAgent();
+	{
+		m_simulationManager.GetSimulation()->
+			GetObjectManager()->SpawnObjectRandom<Agent>();
+	}
 }
 
 void SimulationWindow::OnMenuItem(wxCommandEvent& e)
@@ -151,6 +161,12 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	case SHOW_AGENT_VISION:
 		m_simulationManager.SetShowAgentVision(e.IsChecked());
 		break;
+	case SHOW_AGENT_BRAIN:
+		m_simulationManager.SetShowAgentBrain(e.IsChecked());
+		break;
+	case SHOW_INVISIBLE_OBJECTS:
+		m_simulationManager.SetShowInvisibleObjects(e.IsChecked());
+		break;
 	case wxID_ABOUT:
 	{
 		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russel (2017)",
@@ -166,41 +182,30 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 
 	// Update debug agent move keyboard controls.
 	Agent* agent = m_simulationManager.GetSelectedAgent();
+	if (agent != m_controlledAgent && m_controlledAgent != nullptr)
+		m_controlledAgent->SetManualOverride(false);
+	m_controlledAgent = agent;
 	if (agent != nullptr)
 	{
-		float moveAmount = agent->GetMaxMoveSpeed();
-		float turnAmount = agent->GetMaxTurnSpeed() * 0.5f;
-		Quaternion orientation = agent->GetOrientation();
-		bool moved = false;
+		int moveAmount = 0;
+		int turnAmount = 0;
 
 		// Update movement controls (arrow keys).
-		if (wxGetKeyState(WXK_RIGHT))
-		{
-			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), -turnAmount));
-			moved = true;
-		}
 		if (wxGetKeyState(WXK_LEFT))
-		{
-			agent->SetOrientation(orientation.Rotate(orientation.GetUp(), turnAmount));
-			moved = true;
-		}
+			turnAmount++;
+		if (wxGetKeyState(WXK_RIGHT))
+			turnAmount--;
 		if (wxGetKeyState(WXK_UP))
-		{
-			agent->GetObjectManager()->MoveObjectForward(agent, moveAmount);
-			moved = true;
-		}
+			moveAmount++;
 		if (wxGetKeyState(WXK_DOWN))
-		{
-			agent->GetObjectManager()->MoveObjectForward(agent, -moveAmount);
-			moved = true;
-		}
+			moveAmount--;
 
 		// Disable wandering if the agent was moved manually.
-		if (moved)
+		if (agent->GetManualOverride() || moveAmount != 0 || turnAmount != 0)
 		{
-			agent->SetMoveSpeed(0.0f);
-			agent->SetTurnSpeed(0.0f);
-			agent->EnableWandering(false);
+			agent->SetTurnSpeed(turnAmount * agent->GetMaxTurnSpeed() * 0.5f);
+			agent->SetMoveSpeed(moveAmount * agent->GetMaxMoveSpeed());
+			agent->SetManualOverride(true);
 		}
 	}
 

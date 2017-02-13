@@ -10,7 +10,7 @@ Genome::Genome(Simulation* theSimulation, bool randomized)	:
 {
 	const SimulationConfig& config = theSimulation->GetConfig();
 	
-	// Initialize the genome size.
+	// Determine the genome size.
 	unsigned int numOutputNeurons = 2;
 	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2);
 	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
@@ -73,6 +73,9 @@ void Genome::GrowBrain(Brain* brain)
 	const SimulationConfig& config = m_simulation->GetConfig();
 	RNG& random = m_simulation->GetRandom();
 
+	//-------------------------------------------------------------------------
+	// Count up the input and output neurons.
+
 	unsigned int resRed = GetGeneAsInt(RESOLUTION_RED,
 		config.genes.minSightResolution, config.genes.maxSightResolution);
 	unsigned int resGreen = GetGeneAsInt(RESOLUTION_GREEN,
@@ -92,7 +95,9 @@ void Genome::GrowBrain(Brain* brain)
 	std::vector<Neuron> neurons;
 	std::vector<Synapse> synapses;
 
+	//-------------------------------------------------------------------------
 	// Parse neuron bias genes.
+
 	for (unsigned int i = 0; i < maxNeurons; ++i)
 	{
 		Neuron neuron;
@@ -114,31 +119,55 @@ void Genome::GrowBrain(Brain* brain)
 		neurons.push_back(neuron);
 	}
 
+	//-------------------------------------------------------------------------
 	// Parse synapse weight genes.
+
 	for (unsigned int i = 0; i < maxSynapses; ++i)
 	{
 		Synapse synapse;
 		synapse.neuronFrom = i % maxNeurons;
-		synapse.neuronTo = i / maxNeurons;
-		synapse.learningRate = config.brain.weightLearningRate;
-		
+		synapse.neuronTo = (i / maxNeurons) + maxInputNeurons;
+
 		// Randomize synapse weight.
 		// Positive for excitatory, negative for inhibitory.
-		float gene = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, 0.0f, 3.0f);
-		if (gene > 2.0f)
+		float gene = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, 0.0f, 1.0f);
+		if (gene > 0.8f)
+		{
 			synapse.weight = random.NextFloat(1e-10f, config.brain.initMaxWeight);
-		else if (gene < 1.0f)
+			synapse.learningRate = config.brain.weightLearningRate;
+		}
+		else if (gene < 0.2f)
+		{
 			synapse.weight = random.NextFloat(-config.brain.initMaxWeight, -1e-10f);
+			synapse.learningRate = -config.brain.weightLearningRate;
+		}
 		else
+		{
 			synapse.weight = 0.0f;
+			synapse.learningRate = 0.0f;
+		}
+		
+		if (synapse.neuronFrom == synapse.neuronTo)
+		{
+			synapse.weight = 0.0f;
+			synapse.learningRate = 0.0f;
+		}
 
 		synapses.push_back(synapse);
 	}
-	
+
+	//-------------------------------------------------------------------------
 	// Initialize the brain with the neurons and synapses.
+
 	brain->Initialize(neurons, synapses, 0.1f);
 	brain->SetNumInputNeurons(maxInputNeurons);
 	brain->SetNumOutputNeurons(numOutputNeurons);
+	brain->SetMaxWeight(config.brain.maxWeight);
+	brain->SetDecayRate(config.brain.weightDecayRate);
 
+	// TODO: prune the network of redundencies.
+	// If an input neuron is not used (vision neuron), then remove it.
+	// If an internal neuron has no incoming connections, then remove it.
+	// If an internal neuron has no outgoing connections, then remove it.
 }
 

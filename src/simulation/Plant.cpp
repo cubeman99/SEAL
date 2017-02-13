@@ -16,8 +16,7 @@ void Plant::OnSpawn()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 	
-	// TEMP: make plant objects visible with a radius and color.
-	m_isVisible = true;
+	m_isVisible = false;
 	m_radius = 4;
 	m_color.Set(1.0f, 1.0f, 0.0f);
 

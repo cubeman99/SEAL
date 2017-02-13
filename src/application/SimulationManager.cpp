@@ -17,7 +17,9 @@ SimulationManager::SimulationManager() :
 	  m_viewLighting(true),
 	  m_showOctTree(false),
 	  m_showOctTreeWireFrame(false),
-	  m_showAgentVision(false)
+	  m_showAgentVision(false),
+	  m_showAgentBrain(false),
+	  m_showInvisibleObjects(false)
 {
 }
 
@@ -38,12 +40,6 @@ void SimulationManager::Initialize()
 	
 	// Seed rand with current time
 	Random::SeedTime();
-
-	// DEBUG: spawn some plants.
-	for (int i = 0; i < 5; ++i)
-	{
-		m_simulation->GetObjectManager()->SpawnObjectRandom<Plant>();
-	}
 }
 		
 void SimulationManager::ToggleCameraTracking()
