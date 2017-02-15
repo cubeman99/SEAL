@@ -5,6 +5,10 @@
 #include <utilities/Random.h>
 
 
+//-----------------------------------------------------------------------------
+// Constructor & destructor
+//-----------------------------------------------------------------------------
+
 Genome::Genome(Simulation* theSimulation, bool randomized)	:
 	m_simulation(theSimulation)
 {
@@ -18,17 +22,25 @@ Genome::Genome(Simulation* theSimulation, bool randomized)	:
 		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
 	m_genes.resize(numGenes);
 	
-	// Push back random values.
+	// Randomize all genes.
 	if (randomized)
-	{
-		RNG& random = theSimulation->GetRandom();
-		for (unsigned int i = 0; i < numGenes; ++i)
-			m_genes[i] = (unsigned char) (random.NextInt() % 256);
-	}
+		Randomize();
 }
 
 Genome::~Genome()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+// Genome operations
+//-----------------------------------------------------------------------------
+
+void Genome::Randomize()
+{
+	RNG& random = m_simulation->GetRandom();
+	for (unsigned int i = 0; i < m_genes.size(); ++i)
+		m_genes[i] = (unsigned char) (random.NextInt() % 256);
 }
 
 Genome* Genome::SpawnChild(Genome* p1, Genome* p2)
@@ -37,15 +49,9 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2)
 	return p1;
 }
 
-float Genome::GeneLerp(float gene, float minValue, float maxValue)
-{
-	return Math::Lerp(minValue, maxValue, gene);
-}
-
-int Genome::GeneLerp(float gene, int minValue, int maxValue)
-{
-	return (int)(Math::Lerp((float)minValue, (float)maxValue, gene) + 0.5f);
-}
+//-----------------------------------------------------------------------------
+// Gene access
+//-----------------------------------------------------------------------------
 
 float Genome::GetGeneAsFloat(unsigned int index) const
 {
@@ -66,6 +72,11 @@ unsigned int Genome::GetGeneAsInt(unsigned int index, unsigned int minValue, uns
 {
 	return (unsigned int) (Math::Lerp((float) minValue, (float) maxValue, m_genes[index] / 255.0f) + 0.5f);
 }
+
+
+//-----------------------------------------------------------------------------
+// Neurogenetics
+//-----------------------------------------------------------------------------
 
 void Genome::GrowBrain(Brain* brain)
 {

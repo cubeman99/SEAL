@@ -33,20 +33,34 @@ enum GenePosition
 class Genome
 {
 public:
+	//-------------------------------------------------------------------------
+	// Constructor & destructor
+
 	Genome(Simulation* theSimulation, bool randomized);
 	~Genome();
+	
+	//-------------------------------------------------------------------------
+	// Genome operations
+
+	// Randomize all gene values.
+	void Randomize();
 
 	static Genome* SpawnChild(Genome* p1, Genome* p2);
-
-	static float GeneLerp(float gene, float minValue, float maxValue);
-	static int GeneLerp(float gene, int minValue, int maxValue);
+	
+	//-------------------------------------------------------------------------
+	// Gene access
 
 	float GetGeneAsFloat(unsigned int index) const;
 	float GetGeneAsFloat(unsigned int index, float minValue, float maxValue) const;
 	int GetGeneAsInt(unsigned int index, int minValue, int maxValue) const;
 	unsigned int GetGeneAsInt(unsigned int index, unsigned int minValue, unsigned int maxValue) const;
+	
+	//-------------------------------------------------------------------------
+	// Neurogenetics
 
+	// Create a brain from the encoding in the neurological genes.
 	void GrowBrain(Brain* brain);
+
 
 private:
 	std::vector<unsigned char> m_genes; // A gene is 1 byte. 0 = 0%, 255 = 100%

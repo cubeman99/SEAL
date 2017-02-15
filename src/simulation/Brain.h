@@ -35,8 +35,8 @@ struct Neuron
 //-----------------------------------------------------------------------------
 struct Synapse
 {
-	float			weight; // > 0 for excitatory, < 0 for inhibitory
-	float			learningRate; // > 0 for excitatory, < 0 for inhibitory
+	float			weight;			// > 0 for excitatory, < 0 for inhibitory
+	float			learningRate;	// > 0 for excitatory, < 0 for inhibitory
 	unsigned int	neuronFrom;
 	unsigned int	neuronTo;
 };
@@ -48,20 +48,40 @@ struct Synapse
 class Brain
 {
 public:
+	//-------------------------------------------------------------------------
+	// Constructor & destructor
+
 	Brain();
 	~Brain();
 
+	//-------------------------------------------------------------------------
 	// Initialization
-	void Initialize(const std::vector<Neuron>& neurons, const std::vector<Synapse>& synapses, float initialActivation);
-	void Initialize(unsigned int numNeurons, unsigned int numSynapses, float initialActivation);
-	void ConfigNeuron(unsigned int neuronIndex, float bias, unsigned int synapsesBegin, unsigned int synapsesEnd);
-	void ConfigSynapse(unsigned int synapseIndex, float weight, float learningRate, unsigned int neuronFrom, unsigned int neuronTo);
+
+	void Initialize(const std::vector<Neuron>& neurons,
+		const std::vector<Synapse>& synapses, float initialActivation);
+
+	void Initialize(unsigned int numNeurons,
+		unsigned int numSynapses, float initialActivation);
+
+	void ConfigNeuron(unsigned int neuronIndex, float bias,
+		unsigned int synapsesBegin, unsigned int synapsesEnd);
+
+	void ConfigSynapse(unsigned int synapseIndex, float weight,
+		float learningRate, unsigned int neuronFrom, unsigned int neuronTo);
 	
+	//-------------------------------------------------------------------------
 	// Simulation
+
+	// Update the neural network for a number of cycles, while sending
+	// random signals to the input neurons.
 	void PreBirth(unsigned int numCycles, RNG& random);
+	
+	// Update the neural network for one tick.
 	void Update();
 
+	//-------------------------------------------------------------------------
 	// Getters
+
 	inline unsigned int GetNumNeurons() const { return m_numNeurons; }
 	inline unsigned int GetNumInputNeurons() const { return m_numInputNeurons; }
 	inline unsigned int GetNumOutputNeurons() const { return m_numOutputNeurons; }
@@ -72,7 +92,9 @@ public:
 	inline float GetNeuronActivation(unsigned int index) const { return m_currNeuronActivations[index]; }
 	inline float GetPrevNeuronActivation(unsigned int index) const { return m_prevNeuronActivations[index]; }
 
+	//-------------------------------------------------------------------------
 	// Setters
+
 	inline void SetNumInputNeurons(unsigned int numInputNeurons) { m_numInputNeurons = numInputNeurons; }
 	inline void SetNumOutputNeurons(unsigned int numOutputNeurons) { m_numOutputNeurons = numOutputNeurons; }
 	inline void SetDecayRate(float decayRate) { m_decayRate = decayRate; }
@@ -80,7 +102,13 @@ public:
 	inline void SetNeuronActivation(unsigned int index, float activation) { m_currNeuronActivations[index] = activation; }
 
 private:
+	//-------------------------------------------------------------------------
 	// Static functions
+
+	// Compute the sigmoid function with the given slope, used to 
+	// normalize activation values back into the range of 0 to 1.
+	// Positive x-values will yield y-values between 0.5 and 1
+	// Negative x-values will yield y-values between 0 and 0.5
 	static float Sigmoid(float x, float slope);
 
 private:

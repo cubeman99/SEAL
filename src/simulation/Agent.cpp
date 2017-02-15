@@ -38,6 +38,7 @@ void Agent::OnSpawn()
 	m_moveSpeed = 0.0f;
 	m_turnSpeed = 0.0f;
 	m_age = 0;
+	m_fitness = 0.0f;
 
 	// If the genome is null, then create a randomized one.
 	// This is a sign that this agent is a first gen with no parents.
@@ -115,6 +116,8 @@ void Agent::OnSpawn()
 		config.agent.radiusAtMaxStrength,
 		m_strength);
 
+	m_energy = m_maxEnergy * 0.8f;
+
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
@@ -122,7 +125,7 @@ void Agent::OnSpawn()
 
 void Agent::OnDestroy()
 {
-	// Clean up my components
+	// Clean up my components.
 	delete m_brain;
 	m_brain = nullptr;
 	delete m_genome;
@@ -154,8 +157,10 @@ void Agent::Update()
 
 	if (m_energy <= 0.0f)
 	{
+		m_energy = 0.0f;
+
 		// TODO: kill agent after energy depletion.
-		Destroy();
+		//Destroy();
 	}
 }
 
@@ -209,9 +214,13 @@ void Agent::EatPlant(Offshoot* plant)
 	// TODO: uncomment when agents lose energy
 	//if (m_energy < m_maxEnergy)
 	//{
-		m_energy += plant->Eat();
+
+	float energyAmount = plant->Eat();
+		m_energy += energyAmount;
 		m_energy = Math::Clamp(m_energy, 0.0f, m_maxEnergy);
+		m_fitness += energyAmount;
 	//}
+
 }
 
 void Agent::SeeObject(SimulationObject* object)

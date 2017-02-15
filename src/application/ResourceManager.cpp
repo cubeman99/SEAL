@@ -75,12 +75,12 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	// Load the text file contents for the VS and FS.
 	if (!FileUtility::OpenAndGetContents(m_assetsPath + vertexPath, vertexSource))
 	{
-		wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
+		//wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
 		return nullptr;
 	}
 	if (!FileUtility::OpenAndGetContents(m_assetsPath + fragmentPath, fragmentSource))
 	{
-		wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
+		//wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
 		return nullptr;
 	}
 	
@@ -93,7 +93,7 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	ShaderCompileError compileError;
 	if (!shader->CompileAndLink(&compileError))
 	{
-		wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
+		//wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
 		delete shader;
 		return nullptr;
 	}
@@ -109,7 +109,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	// Read the file contents.
 	if (!FileUtility::OpenAndGetContents(m_assetsPath + path, fileContents))
 	{
-		wxMessageBox("Error loading mesh file " + path, "File Error", wxICON_WARNING);
+		//wxMessageBox("Error loading mesh file " + path, "File Error", wxICON_WARNING);
 		return nullptr;
 	}
 
@@ -117,7 +117,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	Mesh* mesh = Mesh::ImportFromOBJ(fileContents);
 	if (mesh == nullptr)
 	{
-		wxMessageBox("Error parsing .obj data from mesh file " + path, "File Error", wxICON_WARNING);
+		//wxMessageBox("Error parsing .obj data from mesh file " + path, "File Error", wxICON_WARNING);
 		return nullptr;
 	}
 

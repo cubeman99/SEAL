@@ -20,22 +20,38 @@ class Agent : public SimulationObject
 public:
 	DECLARE_SIMULATION_OBJECT(SimulationObjectType::AGENT);
 
-	Agent();							 // Adam and Eve constructor
-	Agent(Genome* genome, float energy); // Natural born constructor
+	//-------------------------------------------------------------------------
+	// Constructors & destructor
+
+	// Adam and Eve constructor
+	Agent();
+	
+	// Natural born constructor
+	Agent(Genome* genome, float energy);
+
 	~Agent();
 
-	// Object methods
-	void OnSpawn() override;
-	void Update() override;
-	void OnDestroy() override;
+	//-------------------------------------------------------------------------
+	// Simulation object methods
 
+	void OnSpawn() override;
+	void OnDestroy() override;
+	void Update() override;
+
+	//-------------------------------------------------------------------------
 	// Agent methods
+
 	void UpdateVision();
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
 	void EatPlant(Offshoot* plant);
 
+	//-------------------------------------------------------------------------
 	// Getters
+
+	inline float GetEnergy() const { return m_energy; }
+	inline float GetEnergyPercent() const { return (m_energy / m_maxEnergy); }
+	inline float GetFitness() const { return m_fitness; }
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
 	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
@@ -49,11 +65,14 @@ public:
 	inline Brain* GetBrain() { return m_brain; }
 	inline Genome* GetGenome() { return m_genome; }
 	
+	//-------------------------------------------------------------------------
 	// Debug operations
+
 	inline void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
 	inline void SetTurnSpeed(float turnSpeed) { m_turnSpeed = turnSpeed; }
 	inline void SetManualOverride(bool manualOverride) { m_manualOverride = manualOverride; }
 	inline bool GetManualOverride() { return m_manualOverride; }
+
 
 private:
 
@@ -70,6 +89,8 @@ private:
 	float			m_turnSpeed; // Radians per second.
 	float			m_energy;
 	int				m_age;
+
+	float			m_fitness;
 
 	float			m_strength;
 	float			m_maxMoveSpeed;
