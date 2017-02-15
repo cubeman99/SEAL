@@ -66,7 +66,13 @@ public:
 	
 	struct
 	{
-		int		numCrossoverPoints;
+		// Reproduction genes
+		float	minMutationRate;
+		float	maxMutationRate; // Chance pre gene that a bit will flip
+		float	minCrossoverRate;
+		float	maxCrossoverRate; // Chance per gene that the parent being transcribed will swap
+		int		minChildren;
+		int		maxChildren;
 
 		// Physiological genes
 		float	minStrength;
@@ -75,8 +81,6 @@ public:
 		int		maxLifeSpan;
 		float	minBodyColor[3]; // [R, G, B]
 		float	maxBodyColor[3]; // [R, G, B]
-		int		minChildren;
-		int		maxChildren;
 		float	minFieldOfView;
 		float	maxFieldOfView;
 		float	minAngleBetweenEyes;

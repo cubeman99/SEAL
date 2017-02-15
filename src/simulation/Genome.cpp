@@ -16,7 +16,7 @@ Genome::Genome(Simulation* theSimulation, bool randomized)	:
 	
 	// Determine the genome size.
 	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2);
+	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
 	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
 	unsigned int numGenes = GenePosition::NUERON_GENES_BEGIN +
 		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
@@ -31,6 +31,66 @@ Genome::~Genome()
 {
 }
 
+Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
+{
+	const SimulationConfig& config = theSimulation->GetConfig();
+	RNG& random = theSimulation->GetRandom();
+
+	// Given to the Agent class of the new agent to destroy when needed.
+	Genome* child = new Genome(theSimulation, false);
+	Genome* currentParent = p1;
+
+	// TODO: Parents have different mutation and crossover rates, how best to reconcile?
+	// For now, going to average them because that seems most fair.
+
+	// Get average mutation and crossover rates
+	float p1MutationRate = p1->GetGeneAsFloat(GenePosition::MUTATION_RATE,
+		config.genes.minMutationRate,
+		config.genes.maxMutationRate);
+	float p2MutationRate = p2->GetGeneAsFloat(GenePosition::MUTATION_RATE,
+		config.genes.minMutationRate,
+		config.genes.maxMutationRate);
+	float averageMutationRate = (p1MutationRate + p2MutationRate) / 2.0f;
+
+	float p1CrossoverRate = p1->GetGeneAsFloat(GenePosition::CROSSOVER_RATE,
+		config.genes.minCrossoverRate,
+		config.genes.maxCrossoverRate);
+	float p2CrossoverRate = p2->GetGeneAsFloat(GenePosition::CROSSOVER_RATE,
+		config.genes.minCrossoverRate,
+		config.genes.maxCrossoverRate);
+	float averageCrossoverRate = (p1CrossoverRate + p2CrossoverRate) / 2.0f;
+
+	// TODO: This loop assumes the size of a genome is always maximum, is that correct?
+
+	for (unsigned int i = 0; i < p1->m_genes.size(); ++i)
+	{
+		// Check for crossover
+		if (random.NextFloat() < averageCrossoverRate)
+		{
+			if (currentParent == p1)
+			{
+				currentParent = p2;
+			}
+			else
+			{
+				currentParent = p1;
+			}
+		}
+
+		// Transcribe gene
+		child->m_genes.push_back(currentParent->m_genes[i]);
+
+		// Check for mutation
+		if (random.NextFloat() <= averageMutationRate)
+		{
+			// XOR the gene with an empty byte that has a 1 randomly placed inside,
+			// effectively flipping a random bit. TODO: is this working correctly?
+			child->m_genes[i] ^= (1u << random.NextInt() % 8);
+		}
+	}
+
+	return child;
+}
 
 //-----------------------------------------------------------------------------
 // Genome operations
@@ -41,12 +101,6 @@ void Genome::Randomize()
 	RNG& random = m_simulation->GetRandom();
 	for (unsigned int i = 0; i < m_genes.size(); ++i)
 		m_genes[i] = (unsigned char) (random.NextInt() % 256);
-}
-
-Genome* Genome::SpawnChild(Genome* p1, Genome* p2)
-{
-	// TODO: mutation and crossover
-	return p1;
 }
 
 //-----------------------------------------------------------------------------

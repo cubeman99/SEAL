@@ -17,8 +17,12 @@ enum GenePosition
 	RESOLUTION_GREEN,
 	RESOLUTION_BLUE,
 
-	// Physiological
+	// Reproduction
+	MUTATION_RATE,
+	CROSSOVER_RATE,
 	CHILD_COUNT,
+
+	// Physiological
 	LIFE_SPAN,
 	STRENGTH,
 	COLOR_RED,
@@ -45,7 +49,7 @@ public:
 	// Randomize all gene values.
 	void Randomize();
 
-	static Genome* SpawnChild(Genome* p1, Genome* p2);
+	static Genome* SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation);
 	
 	//-------------------------------------------------------------------------
 	// Gene access
@@ -63,7 +67,7 @@ public:
 
 
 private:
-	std::vector<unsigned char> m_genes; // A gene is 1 byte. 0 = 0%, 255 = 100%
+	std::vector<unsigned char> m_genes; // A gene is 1 byte. 0 = minimum value, 255 = maximum
 	Simulation* m_simulation;
 };
 
