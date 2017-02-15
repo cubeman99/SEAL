@@ -41,15 +41,19 @@ SimulationConfig::SimulationConfig()
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 
-	genes.numCrossoverPoints		= 2;
-	genes.maxInternalNeurons		= 20; // TODO: tinker
+	genes.minChildren				= 1;
+	genes.maxChildren				= 4;
+	genes.minMutationRate			= 0.001f;	// 1 in 1000 genes mutate. TODO: tinker
+	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
+	genes.minCrossoverRate			= 0.01f;	// 1 in 100 genes swap source. TODO: tinker
+	genes.maxCrossoverRate			= 0.1f;		// 1 in 10 genes swap source. TODO: tinker
+
+	genes.maxInternalNeurons		= 20;		// TODO: tinker
 
 	genes.minLifeSpan				= 60 * 60;
 	genes.maxLifeSpan				= 60 * 200;
 	genes.minStrength				= 0.0f;
 	genes.maxStrength				= 1.0f;
-	genes.minChildren				= 1;
-	genes.maxChildren				= 2;
 	genes.minSightDistance			= 20;
 	genes.maxSightDistance			= 60;
 	genes.minFieldOfView			= Math::ToRadians<float>(10);
