@@ -19,7 +19,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize simulation state.
 	m_ageInTicks = 0;
 	m_generationAge = 0;
-	m_generationDuration = 60 * 10;
+	m_generationDuration = 60 * 30;
 
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
@@ -59,10 +59,6 @@ void Simulation::NextGeneration()
 {
 	m_generationAge = 0;
 
-	// Find the 
-
-
-	
 	// Count the number of agents.
 	unsigned int numAgents = 0;
 	for (auto it = m_objectManager.agents_begin();
@@ -80,12 +76,11 @@ void Simulation::NextGeneration()
 		Agent* daddy = SelectAgent();
 
 		// Mate the two agents to create a child agent.
-		//Genome* childGenome;
-		//mommy->GetGenome()
-			//Genome::SpawnChild(
-		//Agent* child = new Agent(;
+		Genome* childGenome = Genome::SpawnChild(
+			mommy->GetGenome(), daddy->GetGenome(), this);
+		Agent* child = new Agent(childGenome, 100.0f);
 
-		//newPopulation.push_back(child);
+		newPopulation.push_back(child);
 	}
 	
 	// Remove the old agents.
@@ -99,8 +94,14 @@ void Simulation::NextGeneration()
 	for (unsigned int i = 0; i < newPopulation.size(); ++i)
 	{
 		Agent* agent = newPopulation[i];
+
+		Vector3f position;
+		Quaternion orientation;
+		m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
+		agent->SetPosition(position);
+		agent->SetOrientation(orientation);
+		
 		m_objectManager.SpawnObject(agent);
-		// TODO: Randomize position.
 	}
 }
 
@@ -108,22 +109,31 @@ Agent* Simulation::SelectAgent()
 {
 	// Count the total fitness among all agents.
 	float totalFitness = 0.0f;
+	std::vector<Agent*> agents;
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
-		//totalFitness += it->GetFitness();
+		totalFitness += it->GetFitness();
+		agents.push_back(*it);
+	}
+
+	if (agents.empty())
+		return nullptr;
+
+	if (totalFitness == 0.0f)
+	{
+		return agents[m_random.NextInt() % agents.size()];
 	}
 
 	// Select the agent randomly, weighted by fitness.
 	float random = m_random.NextFloat();
 	float counter = 0.0f;
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
+	for (unsigned int i = 0; i < agents.size(); ++i)
 	{
-		//counter += it->GetFitness();
+		counter += agents[i]->GetFitness() / totalFitness;
 		if (random <= counter)
-			return *it;
+			return agents[i];
 	}
 
-	return nullptr;
+	return agents.back();
 }

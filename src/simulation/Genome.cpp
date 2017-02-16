@@ -78,7 +78,7 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 		}
 
 		// Transcribe gene
-		child->m_genes.push_back(currentParent->m_genes[i]);
+		child->m_genes[i] = currentParent->m_genes[i];
 
 		// Check for mutation
 		if (random.NextFloat() <= averageMutationRate)
