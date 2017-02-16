@@ -20,7 +20,9 @@ public:
 
 	void Initialize(const SimulationConfig& config);
 	void Tick();
-	
+	void NextGeneration();
+	Agent* SelectAgent();
+
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
@@ -29,13 +31,15 @@ public:
 
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 
-
 private:
 	SimulationConfig	m_config;
 	unsigned int		m_ageInTicks;
 	World				m_world;
 	ObjectManager		m_objectManager;
 	RNG					m_random;
+
+	unsigned int		m_generationAge;
+	unsigned int		m_generationDuration;
 };
 
 

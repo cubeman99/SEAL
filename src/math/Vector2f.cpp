@@ -36,11 +36,11 @@ Vector2f::Vector2f(float x, float y) :
 }
 	
 // Construct a vector with all components equal to the given value.
-//Vector2f::Vector2f(float value) :
-//	x(value),
-//	y(value)
-//{
-//}
+Vector2f::Vector2f(float value) :
+	x(value),
+	y(value)
+{
+}
 
 
 

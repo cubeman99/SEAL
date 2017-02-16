@@ -396,8 +396,14 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	unsigned int numOutputNeurons = brain->GetNumOutputNeurons();
 	unsigned int numOutIntNeurons = brain->GetNumNeurons() - brain->GetNumInputNeurons();
 
-	Vector2f cellSize(10, 10);
-	Vector2f matrixTopLeft(100, 100);
+
+	// Fit the brain to the width of the window.
+	Vector2f cellSize = Vector2f((m_viewPortSize.x * 0.7f) / numNeurons);
+	cellSize.y = cellSize.x;
+	
+	Vector2f matrixTopLeft;
+	matrixTopLeft.x = (m_viewPortSize.x - (cellSize.x * numNeurons)) * 0.5f;
+	matrixTopLeft.y = 100;
 
 	Color outlineColor = Color::WHITE;
 
