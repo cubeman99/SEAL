@@ -14,7 +14,7 @@ SimulationConfig::SimulationConfig()
 	plant.color[2]					= 0.0f;
 	plant.numPlants					= 100;
 	plant.numOffshootsPerPlant		= 1;
-	plant.maxEnergy					= 20.0f;
+	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 100;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 10.0f;
@@ -36,20 +36,24 @@ SimulationConfig::SimulationConfig()
 	agent.maxEnergyAtMaxStrength	= 100.0f;
 
 	energy.energyCostExist			= 0.005f;
-	energy.energyCostMove			= 0.005f;
-	energy.energyCostTurn			= 0.005f;
+	energy.energyCostMove			= 0.01f;
+	energy.energyCostTurn			= 0.01f;
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 
-	genes.numCrossoverPoints		= 2;
-	genes.maxInternalNeurons		= 20; // TODO: tinker
+	genes.minChildren				= 1;
+	genes.maxChildren				= 4;
+	genes.minMutationRate			= 0.001f;	// 1 in 1000 genes mutate. TODO: tinker
+	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
+	genes.minCrossoverRate			= 0.01f;	// 1 in 100 genes swap source. TODO: tinker
+	genes.maxCrossoverRate			= 0.1f;		// 1 in 10 genes swap source. TODO: tinker
+
+	genes.maxInternalNeurons		= 20;		// TODO: tinker
 
 	genes.minLifeSpan				= 60 * 60;
 	genes.maxLifeSpan				= 60 * 200;
 	genes.minStrength				= 0.0f;
 	genes.maxStrength				= 1.0f;
-	genes.minChildren				= 1;
-	genes.maxChildren				= 2;
 	genes.minSightDistance			= 20;
 	genes.maxSightDistance			= 60;
 	genes.minFieldOfView			= Math::ToRadians<float>(10);
@@ -57,13 +61,13 @@ SimulationConfig::SimulationConfig()
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
-	genes.minSightResolution		= 6;
+	//genes.minSightResolution		= 6;
 	genes.maxSightResolution		= 6;
 	genes.minBodyColor[0]			= 0.0f;
-	genes.maxBodyColor[0]			= 0.0f;
+	genes.maxBodyColor[0]			= 1.0f;
 	genes.minBodyColor[1]			= 0.0f;
-	genes.maxBodyColor[1]			= 0.0f;
-	genes.minBodyColor[2]			= 1.0f;
+	genes.maxBodyColor[1]			= 1.0f;
+	genes.minBodyColor[2]			= 0.0f;
 	genes.maxBodyColor[2]			= 1.0f;
 
 	brain.numPrebirthCycles			= 10;

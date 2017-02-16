@@ -14,7 +14,6 @@ class Simulation;
 // SimulationObjectType - Defines the types of simulation objects.
 //-----------------------------------------------------------------------------
 
-// TODO: start using this enum somehow
 enum SimulationObjectType : int
 {
 	INVALID = '?',
@@ -42,25 +41,32 @@ class SimulationObject
 	friend class ObjectManager;
 
 public:
+	//-------------------------------------------------------------------------
+	// Constructor & destructor
+
 	SimulationObject();
 	virtual ~SimulationObject() {}
 	
+	//-------------------------------------------------------------------------
 	// Virtual object methods
 
 	virtual void OnSpawn() {}
 	virtual void OnDestroy() {}
 	virtual void Update() {}
 
+	//-------------------------------------------------------------------------
 	// Object type
 
 	virtual SimulationObjectType GetObjectType() const { return SimulationObjectType::INVALID; }
 	template <class T_Object>
 	bool IsObjectType() const { return (GetObjectType() == T_Object::k_objectType); }
 
+	//-------------------------------------------------------------------------
 	// Object operations
 
 	void Destroy();
 
+	//-------------------------------------------------------------------------
 	// Getters
 	
 	ObjectManager* GetObjectManager();
@@ -76,24 +82,27 @@ public:
 	inline const Matrix4f& GetObjectToWorld() const { return m_objectToWorld; }
 	inline const Matrix4f& GetWorldToObject() const { return m_worldToObject; }
 
+	//-------------------------------------------------------------------------
 	// Setters
 
 	inline void SetPosition(const Vector3f& position) { m_position = position; }
 	inline void SetOrientation(const Quaternion& orientation) { m_orientation = orientation; }
 
-protected:
-	bool		m_isVisible;
-	Vector3f	m_color;
-	Vector3f	m_position;
-	Quaternion	m_orientation;
-	float		m_radius;
-
-	bool		m_isDestroyed;
-
-	ObjectManager* m_objectManager;
 
 protected:
-	// Derived data.
+	bool			m_isVisible;
+	Vector3f		m_color;
+	Vector3f		m_position;
+	Quaternion		m_orientation;
+	float			m_radius;
+	bool			m_isDestroyed;
+	ObjectManager*	m_objectManager;
+
+
+protected:
+	//-------------------------------------------------------------------------
+	// Derived data (set by object manager)
+
 	Matrix4f	m_objectToWorld;
 	Matrix4f	m_worldToObject;
 };

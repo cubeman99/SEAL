@@ -2,6 +2,10 @@
 #include <math/MathLib.h>
 
 
+//-----------------------------------------------------------------------------
+// Constructor & destructor
+//-----------------------------------------------------------------------------
+
 Brain::Brain() :
 	m_currNeuronActivations(nullptr),
 	m_prevNeuronActivations(nullptr),
@@ -26,7 +30,13 @@ Brain::~Brain()
 	m_synapses = nullptr;
 }
 
-void Brain::Initialize(const std::vector<Neuron>& neurons, const std::vector<Synapse>& synapses, float initialActivation)
+
+//-----------------------------------------------------------------------------
+// Initialization
+//-----------------------------------------------------------------------------
+
+void Brain::Initialize(const std::vector<Neuron>& neurons,
+	const std::vector<Synapse>& synapses, float initialActivation)
 {
 	Initialize(neurons.size(), synapses.size(), initialActivation);
 	
@@ -36,7 +46,8 @@ void Brain::Initialize(const std::vector<Neuron>& neurons, const std::vector<Syn
 		m_synapses[i] = synapses[i];
 }
 
-void Brain::Initialize(unsigned int numNeurons, unsigned int numSynapses, float initialActivation)
+void Brain::Initialize(unsigned int numNeurons,
+	unsigned int numSynapses, float initialActivation)
 {
 	delete m_currNeuronActivations;
 	delete m_prevNeuronActivations;
@@ -60,7 +71,8 @@ void Brain::Initialize(unsigned int numNeurons, unsigned int numSynapses, float 
 	}
 }
 
-void Brain::ConfigNeuron(unsigned int neuronIndex, float bias, unsigned int synapsesBegin, unsigned int synapsesEnd)
+void Brain::ConfigNeuron(unsigned int neuronIndex, float bias,
+	unsigned int synapsesBegin, unsigned int synapsesEnd)
 {
 	Neuron& neuron = m_neurons[neuronIndex];
 	neuron.bias = bias;
@@ -68,7 +80,8 @@ void Brain::ConfigNeuron(unsigned int neuronIndex, float bias, unsigned int syna
 	neuron.synapsesEnd = synapsesEnd;
 }
 
-void Brain::ConfigSynapse(unsigned int synapseIndex, float weight, float learningRate, unsigned int neuronFrom, unsigned int neuronTo)
+void Brain::ConfigSynapse(unsigned int synapseIndex, float weight,
+	float learningRate, unsigned int neuronFrom, unsigned int neuronTo)
 {
 	Synapse& synapse = m_synapses[synapseIndex];
 	synapse.weight = weight;
@@ -76,6 +89,11 @@ void Brain::ConfigSynapse(unsigned int synapseIndex, float weight, float learnin
 	synapse.neuronFrom = neuronFrom;
 	synapse.neuronTo = neuronTo;
 }
+
+
+//-----------------------------------------------------------------------------
+// Simulation
+//-----------------------------------------------------------------------------
 
 void Brain::PreBirth(unsigned int numCycles, RNG& random)
 {
@@ -97,14 +115,14 @@ void Brain::Update()
 	int firstOutputNeuron = m_numInputNeurons;
 	float sigmoidSlope = 1.0f;
 
-	//-----------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	// Swap the previous and current neuron activation buffers.
 
 	float* tempActivations = m_currNeuronActivations;
 	m_currNeuronActivations = m_prevNeuronActivations;
 	m_prevNeuronActivations = tempActivations;
 
-	//-----------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	// Compute the updated activation values for the internal and output neurons.
 
 	for (i = firstOutputNeuron; i < m_numNeurons; ++i)
@@ -127,43 +145,42 @@ void Brain::Update()
 			m_currNeuronActivations[i] = Sigmoid(activation, sigmoidSlope);
 	}
 	
-	//-----------------------------------------------------------------------------
-	// Update learning for all synapses.
+	//-------------------------------------------------------------------------
+	// Update Hebbian learning for all synapses.
+
+	float halfMaxWeight = 0.5f * m_maxWeight;
 
 	for (k = 0; k < m_numSynapses; ++k)
 	{
 		Synapse& synapse = m_synapses[k];
+		if (synapse.learningRate == 0.0f)
+			continue;
 
-		// Hebbian learning.
-		float efficacy = synapse.weight + synapse.learningRate
+		// Increase weight based on activation values of connected neurons.
+		synapse.weight += synapse.learningRate
 			* (m_currNeuronActivations[synapse.neuronTo] - 0.5f)
 			* (m_prevNeuronActivations[synapse.neuronFrom] - 0.5f);
-				
-		if (synapse.learningRate != 0.0f)
+
+		// Gradually decay synapse weights which are above half of max-weight.
+		// The higher weight is above half max-weight, the quicker it will decay.
+		if (Math::Abs(synapse.weight) > halfMaxWeight)
 		{
-			// Gradually decay synapse efficacy.
-			if (Math::Abs(efficacy) > (0.5f * m_maxWeight))
-			{
-				efficacy *= 1.0f - (1.0f - m_decayRate) *
-					(Math::Abs(efficacy) - 0.5f * m_maxWeight) / (0.5f * m_maxWeight);
-				efficacy = Math::Clamp(efficacy, -m_maxWeight, m_maxWeight);
-			}
-			else
-			{
-				// not strictly correct for this to be in an else clause,
-				// but if lrate is reasonable, efficacy should never change
-				// sign with a new magnitude greater than 0.5 * Brain::config.maxWeight
-				if (synapse.learningRate >= 0.0f)  // excitatory
-					efficacy = Math::Max(0.0f, efficacy);
-				if (synapse.learningRate < 0.0f)  // inhibitory
-					efficacy = Math::Min(-1e-10f, efficacy);
-			}
+			synapse.weight *= 1.0f - (1.0f - m_decayRate) *
+				((Math::Abs(synapse.weight) - halfMaxWeight) / halfMaxWeight);
 		}
 
-		synapse.weight = efficacy;
+		// Clamp weight (sign depending on learning rate).
+		if (synapse.learningRate >= 0.0f)
+			synapse.weight = Math::Clamp(synapse.weight, 0.0f, m_maxWeight);
+		if (synapse.learningRate < 0.0f) 
+			synapse.weight = Math::Clamp(synapse.weight, -m_maxWeight, -1e-10f);
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+// Static functions
+//-----------------------------------------------------------------------------
 
 float Brain::Sigmoid(float x, float slope)
 {

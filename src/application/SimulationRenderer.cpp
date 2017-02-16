@@ -342,6 +342,16 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 	Vector3f channelColor;
 	Color outlineColor(100, 100, 100);
 
+	Vector2f barSize(stripHeight * 0.3f, stripHeight);
+	Vector2f barPos = stripPos[0] - Vector2f(separation + barSize.x, 0.0f);
+	m_graphics.DrawRect(barPos, barSize, Color::YELLOW);
+	if (agent->GetEnergyPercent() > 0.0f)
+	{
+		barPos.y += (1.0f - agent->GetEnergyPercent()) * barSize.y;
+		barSize.y -= (1.0f - agent->GetEnergyPercent()) * barSize.y;
+		m_graphics.FillRect(barPos, barSize, Color::YELLOW);
+	}
+
 	// Draw each vision strip.
 	for (unsigned int eyeIndex = 0; eyeIndex < 2; eyeIndex++)
 	{
@@ -388,23 +398,24 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 
 void SimulationRenderer::RenderBrain(Agent* agent)
 {
+	const SimulationConfig& config =
+		m_simulationManager->GetSimulation()->GetConfig();
 	Brain* brain = agent->GetBrain();
-	const SimulationConfig& config = m_simulationManager->GetSimulation()->GetConfig();
 
 	unsigned int numNeurons = brain->GetNumNeurons();
 	unsigned int numInputNeurons = brain->GetNumInputNeurons();
 	unsigned int numOutputNeurons = brain->GetNumOutputNeurons();
-	unsigned int numOutIntNeurons = brain->GetNumNeurons() - brain->GetNumInputNeurons();
-
-
+	unsigned int numOutIntNeurons = numNeurons - numInputNeurons;
+	
 	// Fit the brain to the width of the window.
 	Vector2f cellSize = Vector2f((m_viewPortSize.x * 0.7f) / numNeurons);
 	cellSize.y = cellSize.x;
-	
-	Vector2f matrixTopLeft;
-	matrixTopLeft.x = (m_viewPortSize.x - (cellSize.x * numNeurons)) * 0.5f;
-	matrixTopLeft.y = 100;
 
+	Vector2f center(m_viewPortSize.x * 0.5f, 100);
+	Vector2f matrixSize(cellSize.x * numNeurons, cellSize.y * numOutIntNeurons);
+	Vector2f matrixTopLeft(center.x - (matrixSize.x * 0.5f), 100);
+	Vector2f matrixBottomRight = matrixTopLeft + cellSize *
+		Vector2f((float) numNeurons, (float) numOutIntNeurons);
 	Color outlineColor = Color::WHITE;
 
 	// Draw connection matrix.
@@ -418,7 +429,8 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 
 			Vector2f cellPos;
 			cellPos.x = matrixTopLeft.x + (cellSize.x * synapse.neuronFrom);
-			cellPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons - (synapse.neuronTo - numInputNeurons) - 1));
+			cellPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons -
+				(synapse.neuronTo - numInputNeurons) - 1));
 			
 			Vector3f weightColor(0, 0, 0);
 			if (synapse.weight > 0.0f)
@@ -451,6 +463,7 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	for (unsigned int i = 0; i < numNeurons; ++i)
 	{
 		Neuron neuron = brain->GetNeuron(i);
+		float activation = brain->GetNeuronActivation(i);
 
 		Vector2f cellPos;
 		cellPos.x = matrixTopLeft.x + (cellSize.x * i);
@@ -458,6 +471,7 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 			
 		Vector3f weightColor(1, 1, 1);
 
+		// Colorize input neurons.
 		if (i == 0)
 			weightColor.Set(1, 1, 0);
 		else if (i == 1)
@@ -469,25 +483,14 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 		else if ((int) i < 2 + (config.genes.maxSightResolution * 6))
 			weightColor.Set(0, 0, 1);
 
-		weightColor *= brain->GetNeuronActivation(i);
-			
-		m_graphics.FillRect(cellPos, cellSize, weightColor);
+		// Fill box color.
+		m_graphics.FillRect(cellPos, cellSize, weightColor * activation);
+		
+		// Draw box outline.
+		m_graphics.DrawRect(cellPos, cellSize, weightColor * (activation + 0.2f));
 	}
-	
-	Vector2f activationsPos;
-	activationsPos.x = matrixTopLeft.x;
-	activationsPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1));
-	m_graphics.DrawRect(
-		matrixTopLeft.x,
-		matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1)),
-		cellSize.x * numNeurons,
-		cellSize.y,
-		outlineColor);
 
-
-	Vector2f matrixBottomRight = matrixTopLeft + cellSize * Vector2f((float) numNeurons, (float) numOutIntNeurons);
-
-	// Draw lines.
+	// Draw neuron group seperation lines.
 	glBegin(GL_LINES);
 	glColor3f(1,1,1);
 	glVertex2f(matrixTopLeft.x + cellSize.x * numInputNeurons, matrixTopLeft.y);
@@ -496,15 +499,24 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	glVertex2f(matrixTopLeft.x + cellSize.x * (numInputNeurons + numOutputNeurons), matrixBottomRight.y);
 	glVertex2f(matrixTopLeft.x, matrixBottomRight.y - cellSize.y * numOutputNeurons);
 	glVertex2f(matrixBottomRight.x, matrixBottomRight.y - cellSize.y * numOutputNeurons);
-	glVertex2f(matrixTopLeft.x, matrixTopLeft.y);
-	glVertex2f(matrixTopLeft.x, matrixBottomRight.y);
-	glVertex2f(matrixBottomRight.x, matrixTopLeft.y);
-	glVertex2f(matrixBottomRight.x, matrixBottomRight.y);
-	glVertex2f(matrixTopLeft.x, matrixTopLeft.y);
-	glVertex2f(matrixBottomRight.x, matrixTopLeft.y);
-	glVertex2f(matrixTopLeft.x, matrixBottomRight.y);
-	glVertex2f(matrixBottomRight.x, matrixBottomRight.y);
 	glEnd();
+		
+	// Draw activations strip outline.
+	Vector2f activationsPos;
+	activationsPos.x = matrixTopLeft.x;
+	activationsPos.y = matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1));
+	m_graphics.DrawRect(
+		matrixTopLeft.x - 1,
+		matrixTopLeft.y + (cellSize.y * (numOutIntNeurons + 1)) - 1,
+		cellSize.x * numNeurons + 2,
+		cellSize.y + 2,
+		outlineColor);
+
+	// Draw connection matrix outlines.
+	Vector2f one(1, 1);
+	Vector2f two(2, 2);
+	m_graphics.DrawRect(matrixTopLeft - one, matrixBottomRight -
+		matrixTopLeft + two, outlineColor);
 }
 
 
