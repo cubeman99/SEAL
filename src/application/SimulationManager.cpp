@@ -11,6 +11,7 @@
 
 SimulationManager::SimulationManager() :
 	  m_simulation(nullptr),
+	  m_selectedAgentId(-1),
 	  m_selectedAgent(nullptr),
 	  m_isSimulationPaused(false),
 	  m_viewWireFrameMode(false),
@@ -44,20 +45,20 @@ void SimulationManager::Initialize()
 		
 void SimulationManager::ToggleCameraTracking()
 {
-	if (m_cameraSystem.IsTrackingAgent())
-		m_cameraSystem.StopTrackingAgent();
-	else if (m_selectedAgent != NULL)
-		m_cameraSystem.StartTrackingAgent(m_selectedAgent);
+	if (m_cameraSystem.IsTrackingObject())
+		m_cameraSystem.StopTrackingObject();
+	else if (m_selectedAgentId >= 0)
+		m_cameraSystem.StartTrackingObject(m_selectedAgent);
 }
 		
 void SimulationManager::StartCameraTracking()
 {
-	m_cameraSystem.StartTrackingAgent(m_selectedAgent);
+	m_cameraSystem.StartTrackingObject(m_selectedAgent);
 }
 
 void SimulationManager::StopCameraTracking()
 {
-	m_cameraSystem.StopTrackingAgent();
+	m_cameraSystem.StopTrackingObject();
 }
 
 void SimulationManager::PauseSimulation()
@@ -70,6 +71,16 @@ void SimulationManager::Update()
 	// Update simulation.
 	if (!m_isSimulationPaused)
 		m_simulation->Tick();
+	
+	// Check if our selected agent has died.
+	// TODO: make an event queue for simultaion (for births and deaths)
+	if (m_selectedAgent != nullptr && m_simulation->
+		GetObjectManager()->GetObj(m_selectedAgentId) == nullptr)
+	{
+		m_selectedAgent = nullptr;
+		m_selectedAgentId = 0;
+		m_cameraSystem.StopTrackingObject();
+	}
 
 	// Update camera system.
 	m_cameraSystem.Update();

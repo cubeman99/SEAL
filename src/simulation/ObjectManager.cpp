@@ -17,6 +17,8 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::Initialize()
 {
+	m_objectIdCounter = 1;
+
 	// Setup the OctTree.
 	AABB octTreeBounds;
 	Vector3f worldPos = Vector3f::ZERO;
@@ -27,6 +29,18 @@ void ObjectManager::Initialize()
 	m_octTree.SetBounds(octTreeBounds);
 	m_octTree.SetMaxDepth(4);
 	m_octTree.SetMaxObjectsPerNode(1);
+}
+
+//-----------------------------------------------------------------------------
+// Accessors
+//-----------------------------------------------------------------------------
+
+SimulationObject* ObjectManager::GetObj(int objectId)
+{
+	auto it = m_idToObjectMap.find(objectId);
+	if (it != m_idToObjectMap.end())
+		return it->second;
+	return nullptr;
 }
 
 
@@ -40,7 +54,7 @@ void ObjectManager::ClearObjects()
 	for (unsigned int i = 0; i < m_objects.size(); ++i)
 		delete m_objects[i];
 	m_objects.clear();
-
+	m_idToObjectMap.clear();
 	m_octTree.Clear();
 }
 
@@ -78,6 +92,7 @@ void ObjectManager::UpdateObjects()
 			object->OnDestroy();
 			m_objects.erase(m_objects.begin() + i);
 			m_octTree.RemoveObject(object);
+			m_idToObjectMap.erase(object->m_objectId);
 			delete object;
 			i--;
 		}
@@ -87,7 +102,10 @@ void ObjectManager::UpdateObjects()
 void ObjectManager::SpawnObject(SimulationObject* object)
 {
 	m_objects.push_back(object);
+	m_idToObjectMap[m_objectIdCounter] = object;
 	m_octTree.InsertObject(object);
+	
+	object->m_objectId = m_objectIdCounter++;
 	object->m_objectManager = this;
 	object->m_isDestroyed = false;
 	object->OnSpawn();

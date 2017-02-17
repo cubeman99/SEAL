@@ -20,21 +20,21 @@ public:
 
 	inline ICamera* GetActiveCamera() const { return m_camera; }
 	inline Matrix4f GetViewProjectionMatrix() const { return m_camera->GetViewProjection(); }
-	inline bool IsTrackingAgent() const { return m_cameraTracking; }
+	inline bool IsTrackingObject() const { return m_cameraTracking; }
 
 	Ray GetRay(const Vector2f& screenCoord);
 
 	void SetFieldOfView(float fieldOfView);
 	void SetAspectRatio(float aspectRatio);
-	void StartTrackingAgent(Agent* agent);
-	void StopTrackingAgent();
+	void StartTrackingObject(SimulationObject* object);
+	void StopTrackingObject();
 
 	void Update();
 
 private:
 
 	bool m_cameraTracking;
-	Agent* m_trackedAgent;
+	SimulationObject* m_trackedObject;
 	Simulation* m_simulation;
 	
 	ICamera* m_camera; // The currently-active camera.

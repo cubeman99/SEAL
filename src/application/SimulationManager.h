@@ -18,7 +18,7 @@ public:
 
 	inline Simulation* GetSimulation() { return m_simulation; }
 	inline bool IsSimulationPuased() const { return m_isSimulationPaused; }
-	inline Agent* GetSelectedAgent() const { return m_selectedAgent; }
+	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
@@ -42,7 +42,13 @@ public:
 	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 
-	inline void SetSelectedAgent(Agent* agent) { m_selectedAgent = agent; }
+	inline void SetSelectedAgent(Agent* agent) {
+		m_selectedAgent = agent;
+		if (agent == nullptr)
+			m_selectedAgentId = -1;
+		else
+			m_selectedAgentId = agent->GetId();
+	}
 
 	void ToggleCameraTracking();
 	void StartCameraTracking();
@@ -56,7 +62,9 @@ private:
 	Simulation* m_simulation;
 	CameraSystem m_cameraSystem;
 	bool m_isSimulationPaused;
+	int m_selectedAgentId;
 	Agent* m_selectedAgent;
+
 
 	// Render options.
 	bool m_viewWireFrameMode;

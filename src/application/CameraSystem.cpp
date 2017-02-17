@@ -6,7 +6,7 @@
 CameraSystem::CameraSystem() :
 	m_simulation(nullptr),
 	m_cameraTracking(false),
-	m_trackedAgent(nullptr),
+	m_trackedObject(nullptr),
 	m_aspectRatio(1.0f),
 	m_fieldOfView(1.4f),
 	m_isProjectionDirty(true)
@@ -60,36 +60,36 @@ void CameraSystem::SetAspectRatio(float aspectRatio)
 	m_isProjectionDirty = true;
 }
 
-void CameraSystem::StartTrackingAgent(Agent* agent)
+void CameraSystem::StartTrackingObject(SimulationObject* object)
 {
 	m_cameraTracking = true;
-	m_trackedAgent = agent;
+	m_trackedObject = object;
 	m_camera = &m_arcBallCamera;
 
 	float worldRadius = m_simulation->GetWorld()->GetRadius();
 
 	m_arcBallCamera.SetDistance(worldRadius * 0.5f);
 	m_arcBallCamera.SetUpVector(Vector3f::UP);
-	m_arcBallCamera.SetCenterPosition(m_trackedAgent->GetPosition());
+	//m_arcBallCamera.SetCenterPosition(agent->GetPosition());
 
 	Quaternion orientation = Quaternion(Vector3f::LEFT, Math::HALF_PI * 0.5f);
 	m_arcBallCamera.SetOrientation(orientation);
 }
 
-void CameraSystem::StopTrackingAgent()
+void CameraSystem::StopTrackingObject()
 {
 	m_cameraTracking = false;
-	m_trackedAgent = nullptr;
+	m_trackedObject = nullptr;
 	m_camera = &m_globeCamera;
 }
 
 void CameraSystem::Update()
 {
 	// Update camera tracking.
-	if (m_cameraTracking && m_trackedAgent != nullptr)
+	if (m_cameraTracking && m_trackedObject != nullptr)
 	{
-		m_arcBallCamera.SetCenterPosition(m_trackedAgent->GetPosition());
-		m_arcBallCamera.SetParentOrientation(m_trackedAgent->GetOrientation());
+		m_arcBallCamera.SetCenterPosition(m_trackedObject->GetPosition());
+		m_arcBallCamera.SetParentOrientation(m_trackedObject->GetOrientation());
 	}
 	
 	// Update camera projection.

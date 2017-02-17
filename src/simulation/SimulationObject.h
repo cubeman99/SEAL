@@ -81,6 +81,7 @@ public:
 	inline bool IsVisible() const { return m_isVisible; }
 	inline const Matrix4f& GetObjectToWorld() const { return m_objectToWorld; }
 	inline const Matrix4f& GetWorldToObject() const { return m_worldToObject; }
+	inline int GetId() const { return m_objectId; }
 
 	//-------------------------------------------------------------------------
 	// Setters
@@ -97,7 +98,7 @@ protected:
 	float			m_radius;
 	bool			m_isDestroyed;
 	ObjectManager*	m_objectManager;
-
+	int				m_objectId;
 
 protected:
 	//-------------------------------------------------------------------------

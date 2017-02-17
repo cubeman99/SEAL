@@ -41,6 +41,8 @@ public:
 
 	inline unsigned int GetNumObjects() const { return m_objects.size(); }
 
+	SimulationObject* GetObj(int objectId);
+
 	//-----------------------------------------------------------------------------
 	// Object management
 
@@ -86,8 +88,9 @@ public:
 private:
 	Simulation*		m_simulation;
 	OctTree			m_octTree;
-	unsigned int	m_objectIdCounter;
+	int				m_objectIdCounter;
 	std::vector<SimulationObject*> m_objects;
+	std::map<int, SimulationObject*> m_idToObjectMap;
 };
 
 
