@@ -39,11 +39,9 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 	// Given to the Agent class of the new agent to destroy when needed.
 	Genome* child = new Genome(theSimulation, false);
 	Genome* currentParent = p1;
+	const int GENOME_SIZE = (int)p1->m_genes.size();
 
-	// TODO: Parents have different mutation and crossover rates, how best to reconcile?
-	// For now, going to average them because that seems most fair.
-
-	// Get average mutation and crossover rates
+	// Get average mutation and crossover data from parents
 	float p1MutationRate = p1->GetGeneAsFloat(GenePosition::MUTATION_RATE,
 		config.genes.minMutationRate,
 		config.genes.maxMutationRate);
@@ -52,21 +50,80 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 		config.genes.maxMutationRate);
 	float averageMutationRate = (p1MutationRate + p2MutationRate) / 2.0f;
 
-	float p1CrossoverRate = p1->GetGeneAsFloat(GenePosition::CROSSOVER_RATE,
-		config.genes.minCrossoverRate,
-		config.genes.maxCrossoverRate);
-	float p2CrossoverRate = p2->GetGeneAsFloat(GenePosition::CROSSOVER_RATE,
-		config.genes.minCrossoverRate,
-		config.genes.maxCrossoverRate);
-	float averageCrossoverRate = (p1CrossoverRate + p2CrossoverRate) / 2.0f;
+	int p1CrossoverPoints = p1->GetGeneAsInt(GenePosition::CROSSOVER_POINTS,
+		config.genes.minCrossoverPoints,
+		config.genes.maxCrossoverPoints);
+	int p2CrossoverPoints = p2->GetGeneAsInt(GenePosition::CROSSOVER_POINTS,
+		config.genes.minCrossoverPoints,
+		config.genes.maxCrossoverPoints);
+	int averageCrossoverPoints = (p1CrossoverPoints + p2CrossoverPoints) / 2;
 
-	// TODO: This loop assumes the size of a genome is always maximum, is that correct?
+	// If the average was between integers, half chance to round up instead
+	if ((p1CrossoverPoints + p2CrossoverPoints) % 2 == 1 && random.NextFloat() > 0.5f)
+	{
+		++averageCrossoverPoints;
+	}
 
-	for (unsigned int i = 0; i < p1->m_genes.size(); ++i)
+	// Assign crossover points. (They apply once to physiological
+	// genes and then again to Neurological genes).
+	std::vector<int> crossoverPoints;
+	int candidatePoint;
+	bool onNeurologicals = false;
+	bool foundDuplicate = false;
+	int i;
+	int j;
+
+	for (i = averageCrossoverPoints; i > 0; --i)
+	{
+		foundDuplicate = false;
+
+		if (onNeurologicals)
+		{
+			candidatePoint = (random.NextInt() % (GENOME_SIZE - GenePosition::NUERON_GENES_BEGIN)) 
+				+ GenePosition::NUERON_GENES_BEGIN;
+		}
+		else
+		{
+			candidatePoint = random.NextInt() % GenePosition::NUERON_GENES_BEGIN;
+		}
+
+		// Find ordered spot for candidate (Largest to smallest).
+		// This way there are much fewer checks required of the crossover list.
+		for (j = 0; j < (int)crossoverPoints.size() && candidatePoint <= crossoverPoints[j]; ++j)
+		{
+			if (candidatePoint == crossoverPoints[j])
+			{
+				foundDuplicate = true;
+			}
+		}
+
+		if (!foundDuplicate)
+		{
+			crossoverPoints.insert(crossoverPoints.begin() + j, candidatePoint);
+
+			// Done with physiological genes? Now for the neurological
+			if (i == 1 && !onNeurologicals)
+			{
+				i = averageCrossoverPoints + 1; // Acounting for the next --i;
+				onNeurologicals = true;
+			}
+		}
+		else
+		{
+			// Keep trying
+			++i;
+		}
+	}
+
+	// Transcribe and perform genetic algorithms
+	for (int i = 0; i < GENOME_SIZE; ++i)
 	{
 		// Check for crossover
-		if (random.NextFloat() < averageCrossoverRate)
+		if (crossoverPoints.size() > 0 && i == crossoverPoints[crossoverPoints.size() - 1])
 		{
+			// Remove lowest crossover index
+			crossoverPoints.pop_back();
+
 			if (currentParent == p1)
 			{
 				currentParent = p2;
@@ -84,7 +141,7 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 		if (random.NextFloat() <= averageMutationRate)
 		{
 			// XOR the gene with an empty byte that has a 1 randomly placed inside,
-			// effectively flipping a random bit. TODO: is this working correctly?
+			// effectively flipping a random bit.
 			child->m_genes[i] ^= (1u << random.NextInt() % 8);
 		}
 	}

@@ -19,7 +19,7 @@ enum GenePosition
 
 	// Reproduction
 	MUTATION_RATE,
-	CROSSOVER_RATE,
+	CROSSOVER_POINTS,
 	CHILD_COUNT,
 
 	// Physiological

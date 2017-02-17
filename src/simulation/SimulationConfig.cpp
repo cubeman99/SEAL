@@ -45,8 +45,8 @@ SimulationConfig::SimulationConfig()
 	genes.maxChildren				= 4;
 	genes.minMutationRate			= 0.001f;	// 1 in 1000 genes mutate. TODO: tinker
 	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
-	genes.minCrossoverRate			= 0.01f;	// 1 in 100 genes swap source. TODO: tinker
-	genes.maxCrossoverRate			= 0.1f;		// 1 in 10 genes swap source. TODO: tinker
+	genes.minCrossoverPoints		= 1;
+	genes.maxCrossoverPoints		= 4;
 
 	genes.maxInternalNeurons		= 20;		// TODO: tinker
 
@@ -61,7 +61,7 @@ SimulationConfig::SimulationConfig()
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
-	//genes.minSightResolution		= 6;
+	//genes.minSightResolution		= 6; // For debugging sight
 	genes.maxSightResolution		= 6;
 	genes.minBodyColor[0]			= 0.0f;
 	genes.maxBodyColor[0]			= 1.0f;

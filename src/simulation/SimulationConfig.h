@@ -67,10 +67,10 @@ public:
 	struct
 	{
 		// Reproduction genes
-		float	minMutationRate;
-		float	maxMutationRate; // Chance pre gene that a bit will flip
-		float	minCrossoverRate;
-		float	maxCrossoverRate; // Chance per gene that the parent being transcribed will swap
+		float	minMutationRate;	// Chance pre gene that a bit will flip
+		float	maxMutationRate; 
+		int		minCrossoverPoints;	// The points in which crossover will occur. 
+		int		maxCrossoverPoints;	// Apply once to phys genes and again for neurological genes.
 		int		minChildren;
 		int		maxChildren;
 
