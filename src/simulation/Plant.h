@@ -21,8 +21,12 @@ public:
 
 	void OnSpawn() override;
 	void Update() override;
+	void Read(std::ifstream& fileIn) override;
+	void Write(std::ofstream& fileOut) override;
+
 	Offshoot* SpawnOffshoot();
 	void NotifyOffshootDeath(Offshoot* toRemove);
+	void NotifyOffshootChild(Offshoot* toAdd); // For serialization purposes
 
 	inline int GetNumOffshoots() const { return (int) m_offshoots.size(); }
 	std::vector<Offshoot*>::iterator offshoots_begin() { return m_offshoots.begin(); }

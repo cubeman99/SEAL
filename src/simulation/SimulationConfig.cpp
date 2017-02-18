@@ -17,7 +17,7 @@ SimulationConfig::SimulationConfig()
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
-	plant.eatEnergyDepletionRate	= 10.0f;
+	plant.eatEnergyDepletionRate	= 2.0f;
 
 	agent.radius					= 5.0f;
 	agent.radiusAtMinStrength		= 4.0f;

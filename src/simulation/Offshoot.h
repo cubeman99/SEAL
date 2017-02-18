@@ -24,6 +24,8 @@ public:
 	void OnSpawn() override;
 	void OnDestroy() override;
 	void Update() override;
+	void Read(std::ifstream& fileIn) override;
+	void Write(std::ofstream& fileOut) override;
 
 	// Eat this plant offshoot. Returns the amount of energy eaten.
 	float Eat();

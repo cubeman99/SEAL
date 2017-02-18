@@ -35,10 +35,15 @@ void Agent::OnSpawn()
 
 	m_radius = config.agent.radius;
 	m_manualOverride = false;
-	m_moveSpeed = 0.0f;
-	m_turnSpeed = 0.0f;
-	m_age = 0;
-	m_fitness = 0.0f;
+
+	// Don't ovverwrite these values if they've already been read in
+	if (!m_isSerialized)
+	{
+		m_moveSpeed = 0.0f;
+		m_turnSpeed = 0.0f;
+		m_age = 0;
+		m_fitness = 0.0f;
+	}
 
 	// If the genome is null, then create a randomized one.
 	// This is a sign that this agent is a first gen with no parents.
@@ -164,6 +169,46 @@ void Agent::Update()
 	}
 }
 
+void Agent::Read(std::ifstream& fileIn)	// TODO: determine if this will be valid, and complete
+{
+	m_isSerialized = true;
+
+	fileIn >> m_objectId
+		>> m_position.x
+		>> m_position.y
+		>> m_position.z
+		>> m_orientation.x
+		>> m_orientation.y
+		>> m_orientation.z
+		>> m_orientation.w
+		>> m_moveSpeed
+		>> m_turnSpeed
+		>> m_energy
+		>> m_age
+		>> m_fitness;
+}
+
+void Agent::Write(std::ofstream& fileOut)
+{
+	if (!m_isDestroyed)
+	{
+		fileOut << GetObjectType()
+			<< m_objectId
+			<< m_position.x
+			<< m_position.y
+			<< m_position.z
+			<< m_orientation.x
+			<< m_orientation.y
+			<< m_orientation.z
+			<< m_orientation.w
+			<< m_moveSpeed
+			<< m_turnSpeed
+			<< m_energy
+			<< m_age
+			<< m_fitness;
+	}
+}
+
 void Agent::UpdateVision()
 {
 	// Update eye matrices.
@@ -211,15 +256,13 @@ void Agent::UpdateVision()
 
 void Agent::EatPlant(Offshoot* plant)
 {
-	// TODO: uncomment when agents lose energy
-	//if (m_energy < m_maxEnergy)
-	//{
-
-	float energyAmount = plant->Eat();
+	if (m_energy < m_maxEnergy)
+	{
+		float energyAmount = plant->Eat();
 		m_energy += energyAmount;
 		m_energy = Math::Clamp(m_energy, 0.0f, m_maxEnergy);
 		m_fitness += energyAmount;
-	//}
+	}
 
 }
 

@@ -4,7 +4,8 @@
 
 SimulationObject::SimulationObject() :
 	m_isVisible(true),
-	m_isDestroyed(false)
+	m_isDestroyed(false),
+	m_isSerialized(false)
 {
 }
 
