@@ -42,7 +42,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
-    EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
+    EVT_IDLE(SimulationWindow::OnIdle)
+    //EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
 	
 wxEND_EVENT_TABLE()
@@ -103,7 +104,7 @@ SimulationWindow::SimulationWindow() :
 
 	//m_updateTimer.Start(17);
 	//m_updateTimer.Start(8);
-	m_updateTimer.Start(2);
+	//m_updateTimer.Start(2);
 	m_frameCounter = 0;
 	double lastFrameTimeStamp = Time::GetTime();
 
@@ -176,7 +177,8 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	}
 }
 
-void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
+
+void SimulationWindow::OnIdle(wxIdleEvent& e)
 {
 	double startTime = Time::GetTime(); // time the update.
 
@@ -255,6 +257,89 @@ void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 	
 	// Tell the simulation panel to render.
 	m_simulationPanel->Refresh(false);
+}
+
+void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
+{
+	/*
+	double startTime = Time::GetTime(); // time the update.
+
+	// Update debug agent move keyboard controls.
+	Agent* agent = m_simulationManager.GetSelectedAgent();
+	if (agent != m_controlledAgent && m_controlledAgent != nullptr)
+		m_controlledAgent->SetManualOverride(false);
+	m_controlledAgent = agent;
+	if (agent != nullptr)
+	{
+		int moveAmount = 0;
+		int turnAmount = 0;
+
+		// Update movement controls (arrow keys).
+		if (wxGetKeyState(WXK_LEFT))
+			turnAmount++;
+		if (wxGetKeyState(WXK_RIGHT))
+			turnAmount--;
+		if (wxGetKeyState(WXK_UP))
+			moveAmount++;
+		if (wxGetKeyState(WXK_DOWN))
+			moveAmount--;
+
+		// Disable wandering if the agent was moved manually.
+		if (agent->GetManualOverride() || moveAmount != 0 || turnAmount != 0)
+		{
+			agent->SetTurnSpeed(turnAmount * agent->GetMaxTurnSpeed() * 0.5f);
+			agent->SetMoveSpeed(moveAmount * agent->GetMaxMoveSpeed());
+			agent->SetManualOverride(true);
+		}
+	}
+
+	// Update the simulation.
+	m_simulationManager.Update();
+	
+	// Update the FPS counter.
+	double timeStamp = Time::GetTime();
+	m_frameCounter++;
+	if (timeStamp > m_lastFrameTimeStamp + 1.0f)
+	{
+		m_lastFrameTimeStamp = timeStamp;
+		m_fps = m_frameCounter;
+		m_frameCounter = 0;
+	}
+
+	// Number of agents.
+	//int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
+	int numObjects = m_simulationManager.GetSimulation()->GetObjectManager()->GetNumObjects();
+	std::stringstream ss;
+	//ss << numAgents << " agents";
+	ss << numObjects << " objects";
+	SetStatusText(ss.str(), 1);
+	
+	// FPS.
+	ss.str("");
+	ss << (int) (m_fps + 0.5f) << " fps";
+	SetStatusText(ss.str(), 2);
+	
+	// Update time in milliseconds
+	double endTime = Time::GetTime();
+	double updateTimeMs = (endTime - startTime) * 1000.0;
+	double renderTimeMs = m_simulationManager.GetSimulationRenderer()->GetAverageRenderTime() * 1000.0;
+	ss.str("");
+	ss.setf(std::ios::fixed, std::ios::floatfield);
+	ss.precision(2);
+	ss << "Update time: " << updateTimeMs << " ms";
+	ss << " (total: " << (updateTimeMs + renderTimeMs) << " ms";
+	SetStatusText(ss.str(), 3);
+	
+	// Render time in milliseconds.
+	ss.str("");
+	ss.setf(std::ios::fixed, std::ios::floatfield);
+	ss.precision(2);
+	ss << "Render time: " << renderTimeMs << " ms";
+	SetStatusText(ss.str(), 4);
+	
+	// Tell the simulation panel to render.
+	m_simulationPanel->Refresh(false);
+	*/
 }
 
 void SimulationWindow::OnWindowClose(wxCloseEvent& e)

@@ -21,7 +21,7 @@ public:
     // virtual wxApp methods
     virtual bool OnInit();
     virtual int OnExit();
-
+	virtual int OnRun();
 
 private:
     OpenGLContext *m_glContext;

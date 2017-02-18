@@ -28,6 +28,16 @@ int MainApplication::OnExit()
     return wxApp::OnExit();
 }
 
+int MainApplication::OnRun()
+{
+    // generate an initial idle event to start things
+    //wxIdleEvent event;
+    //event.SetEventObject(&frame->getPanel());
+    //frame->getPanel().AddPendingEvent(event);
+
+    return wxApp::OnRun();
+}
+
 OpenGLContext& MainApplication::GetGLContext(wxGLCanvas* canvas)
 {
     if (m_glContext == NULL)

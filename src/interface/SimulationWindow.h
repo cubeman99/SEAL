@@ -18,7 +18,6 @@ public:
 
 	inline SimulationManager* GetSimulationManager() { return &m_simulationManager; }
 
-
 private:
     wxDECLARE_EVENT_TABLE();
 
@@ -28,6 +27,7 @@ private:
     void OnToggleCameraTracking(wxCommandEvent& e);
     void OnSpawnAgents(wxCommandEvent& e);
     void OnMenuItem(wxCommandEvent& e);
+	void OnIdle(wxIdleEvent& e);
     void OnUpdateTimer(wxTimerEvent& e);
     void OnWindowClose(wxCloseEvent& e);
 

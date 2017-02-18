@@ -172,14 +172,13 @@ void ObjectManager::CreateRandomPositionAndOrientation(
 	Vector3f& position, Quaternion& orientation) const
 {
 	RNG& random = m_simulation->GetRandom();
-
-	// Randomize position.
-	// NOTE: this is an uneven distribution for a sphere. Objects will be
-	// more populated around the extremes of the coorinate axes' 8 sectors.
-	position.x = random.NextFloat(-1, 1);
-	position.y = random.NextFloat(-1, 1);
-	position.z = random.NextFloat(-1, 1);
-	position.Normalize();
+	
+	// Randomize position (this should be a uniform distribution for a sphere).
+	float pitchAngle = Math::ASin(random.NextFloat(-1.0f, 1.0f));
+	float yawAngle = random.NextFloat(0.0f, Math::TWO_PI);
+	position = Vector3f::NEG_UNITZ;
+	position.Rotate(Vector3f::UNITX, pitchAngle);
+	position.Rotate(Vector3f::UNITY, yawAngle);
 
 	// Randomize orientation (tangent to world surface).
 	Vector3f axis = Vector3f::UP.Cross(position);
@@ -200,10 +199,25 @@ void ObjectManager::CreateRelativeRandomPositionAndOrientation(
 {
 	RNG& random = m_simulation->GetRandom();
 
+	// Find the tangent and bitangent axes.
+	Vector3f tangent;
+	if (Math::Abs(relativePosition.x) < Math::Abs(relativePosition.y))
+		tangent = relativePosition.Cross(Vector3f::UNITX);
+	else
+		tangent = relativePosition.Cross(Vector3f::UNITY);
+	tangent.Normalize();
+	Vector3f bitangent = tangent.Cross(relativePosition);
+	bitangent.Normalize();
+
+	// Randomly offset the position in a circular area around the
+	// relative position that's tangent to the world surface.
+	// Modified from: http://stackoverflow.com/questions/5837572/generate-a-random-point-within-a-circle-uniformly
+    float theta = Math::TWO_PI * random.NextFloat();
+    float u = random.NextFloat() + random.NextFloat();
+	float radius = (u > 1 ? 2 - u : u) * randomFactor;
 	newPosition = relativePosition;
-	newPosition.x += random.NextFloatClamped() * randomFactor;
-	newPosition.y += random.NextFloatClamped() * randomFactor;
-	newPosition.z += random.NextFloatClamped() * randomFactor;
+	newPosition += tangent * radius * Math::Cos(theta);
+	newPosition += bitangent * radius * Math::Sin(theta);
 	newPosition.Normalize();
 
 	// Randomize orientation (tangent to world surface).
