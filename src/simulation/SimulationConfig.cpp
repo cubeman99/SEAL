@@ -15,7 +15,7 @@ SimulationConfig::SimulationConfig()
 	plant.numPlants					= 20;
 	plant.numOffshootsPerPlant		= 5;
 	plant.maxEnergy					= 16.0f;
-	plant.offshootSpawnRadius		= 100;
+	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 2.0f;
 
