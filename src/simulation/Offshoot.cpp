@@ -19,7 +19,11 @@ void Offshoot::OnSpawn()
 
 	m_maxEnergy = config.plant.maxEnergy;
 	m_growthRate = config.plant.growthRate; // energy per tick
-	m_energy = m_maxEnergy * 0.5f;
+
+	if (!m_isSerialized)
+	{
+		m_energy = m_maxEnergy * 0.5f;
+	}
 
 	m_isVisible = true;
 	m_radius = config.plant.radius;
@@ -61,6 +65,7 @@ void Offshoot::Update()
 void Offshoot::Read(std::ifstream& fileIn)
 {
 	int sourceID;
+	m_isSerialized = true;
 
 	fileIn >> m_objectId
 		>> sourceID

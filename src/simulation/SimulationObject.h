@@ -95,6 +95,7 @@ public:
 
 protected:
 	bool			m_isVisible;
+	bool			m_isSerialized; // Necessary for constructing certain serialized objects
 	Vector3f		m_color;
 	Vector3f		m_position;
 	Quaternion		m_orientation;

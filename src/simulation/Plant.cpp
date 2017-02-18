@@ -14,17 +14,19 @@ Plant::~Plant()
 
 void Plant::OnSpawn()
 {
-	//const SimulationConfig& config = GetSimulation()->GetConfig();
+	const SimulationConfig& config = GetSimulation()->GetConfig();
 
 	m_isVisible = false;
 	m_radius = 4;
 	m_color.Set(1.0f, 1.0f, 0.0f);
 
-	// Must not be here when loading timelines is a thing
-	//for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
-	//{
-	//	SpawnOffshoot();
-	//}
+	if (!m_isSerialized)
+	{
+		for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
+		{
+			SpawnOffshoot();
+		}
+	}
 }
 
 void Plant::Update()
@@ -51,6 +53,8 @@ void Plant::Update()
 
 void Plant::Read(std::ifstream& fileIn)
 {
+	m_isSerialized = true;
+
 	fileIn >> m_objectId
 		>> m_position.x
 		>> m_position.y
