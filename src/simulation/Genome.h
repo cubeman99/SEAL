@@ -49,6 +49,7 @@ public:
 	// Randomize all gene values.
 	void Randomize();
 
+	static int DetermineGenomeSize(Simulation* theSimulation);
 	static Genome* SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation);
 	
 	//-------------------------------------------------------------------------
@@ -65,6 +66,7 @@ public:
 	// Create a brain from the encoding in the neurological genes.
 	void GrowBrain(Brain* brain);
 
+	friend class Agent;
 
 private:
 	std::vector<unsigned char> m_genes; // A gene is 1 byte. 0 = minimum value, 255 = maximum

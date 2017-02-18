@@ -11,20 +11,14 @@
 
 Genome::Genome(Simulation* theSimulation, bool randomized)	:
 	m_simulation(theSimulation)
-{
-	const SimulationConfig& config = theSimulation->GetConfig();
-	
-	// Determine the genome size.
-	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
-	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
-	unsigned int numGenes = GenePosition::NUERON_GENES_BEGIN +
-		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
-	m_genes.resize(numGenes);
+{	
+	m_genes.resize(DetermineGenomeSize(theSimulation));
 	
 	// Randomize all genes.
 	if (randomized)
+	{
 		Randomize();
+	}
 }
 
 Genome::~Genome()
@@ -147,6 +141,17 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 	}
 
 	return child;
+}
+
+int Genome::DetermineGenomeSize(Simulation* theSimulation)
+{
+	const SimulationConfig& config = theSimulation->GetConfig();
+
+	unsigned int numOutputNeurons = 2;
+	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
+	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
+	return GenePosition::NUERON_GENES_BEGIN +
+		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
 }
 
 //-----------------------------------------------------------------------------

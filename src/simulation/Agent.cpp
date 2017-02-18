@@ -169,9 +169,12 @@ void Agent::Update()
 	}
 }
 
-void Agent::Read(std::ifstream& fileIn)	// TODO: determine if this will be valid, and complete
+void Agent::Read(std::ifstream& fileIn)	// TODO: determine if this will be valid
 {
+	const SimulationConfig& config = GetSimulation()->GetConfig();
 	m_isSerialized = true;
+	m_genome = new Genome(GetSimulation(), false);
+	unsigned char gene;
 
 	fileIn >> m_objectId
 		>> m_position.x
@@ -186,6 +189,15 @@ void Agent::Read(std::ifstream& fileIn)	// TODO: determine if this will be valid
 		>> m_energy
 		>> m_age
 		>> m_fitness;
+
+	// Read in genome
+	for (unsigned int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
+	{
+		fileIn >> gene;
+		m_genome->m_genes.push_back(gene);
+	}
+
+	// TODO:: Brain + synapses?
 }
 
 void Agent::Write(std::ofstream& fileOut)
@@ -206,6 +218,12 @@ void Agent::Write(std::ofstream& fileOut)
 			<< m_energy
 			<< m_age
 			<< m_fitness;
+
+		// Write genome
+		for (unsigned int i = 0; i < m_genome->m_genes.size(); ++i)
+		{
+			fileOut << m_genome->m_genes[i];
+		}
 	}
 }
 
