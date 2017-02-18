@@ -58,6 +58,44 @@ void Offshoot::Update()
 	m_radius = config.plant.radius * scale;
 }
 
+void Offshoot::Read(std::ifstream& fileIn)
+{
+	int sourceID;
+
+	fileIn >> m_objectId
+		>> sourceID
+		>> m_energy
+		>> m_position.x
+		>> m_position.y
+		>> m_position.z
+		>> m_orientation.x
+		>> m_orientation.y
+		>> m_orientation.z
+		>> m_orientation.w;
+
+	// Find my Plant source and let it know it's a daddy
+	m_source = (Plant*)GetSimulation()->GetObjectManager()->GetObj(sourceID);
+	m_source->NotifyOffshootChild(this);
+}
+
+void Offshoot::Write(std::ofstream& fileOut)
+{
+	if (!m_isDestroyed)
+	{
+		fileOut << GetObjectType()
+			<< m_objectId
+			<< m_source->GetId()
+			<< m_energy
+			<< m_position.x
+			<< m_position.y
+			<< m_position.z
+			<< m_orientation.x
+			<< m_orientation.y
+			<< m_orientation.z
+			<< m_orientation.w;
+	}
+}
+
 float Offshoot::Eat()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();

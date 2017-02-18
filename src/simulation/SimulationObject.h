@@ -5,6 +5,7 @@
 #include <math/AABB.h>
 #include <math/Matrix4f.h>
 #include <math/Quaternion.h>
+#include <fstream>
 
 class ObjectManager;
 class Simulation;
@@ -53,6 +54,8 @@ public:
 	virtual void OnSpawn() {}
 	virtual void OnDestroy() {}
 	virtual void Update() {}
+	virtual void Read(std::ifstream& fileIn) {}
+	virtual void Write(std::ofstream& fileOut) {}
 
 	//-------------------------------------------------------------------------
 	// Object type

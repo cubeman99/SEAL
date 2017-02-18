@@ -14,29 +14,66 @@ Plant::~Plant()
 
 void Plant::OnSpawn()
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
-	
+	//const SimulationConfig& config = GetSimulation()->GetConfig();
+
 	m_isVisible = false;
 	m_radius = 4;
 	m_color.Set(1.0f, 1.0f, 0.0f);
 
-	// Spawn offshoots. TODO: randomize a bit
-	for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
-	{
-		SpawnOffshoot();
-	}
+	// Must not be here when loading timelines is a thing
+	//for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
+	//{
+	//	SpawnOffshoot();
+	//}
 }
 
 void Plant::Update()
 {
-	// TODO: spawn offshoots if below capacity with random chance
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+	RNG& random = GetSimulation()->GetRandom();
 
 	if (GetNumOffshoots() == 0)
 	{
 		// Respawn with new offshoots
 		m_objectManager->CreateRandomPositionAndOrientation(
 			m_position, m_orientation);
-		OnSpawn();
+		SpawnOffshoot();
+	}
+	else if (GetNumOffshoots() < config.plant.numOffshootsPerPlant)
+	{
+		// Spawn offshoot if below capacity with random chance
+		if (random.NextInt() % 1000 < 3)
+		{
+			SpawnOffshoot();
+		}
+	}
+}
+
+void Plant::Read(std::ifstream& fileIn)
+{
+	fileIn >> m_objectId
+		>> m_position.x
+		>> m_position.y
+		>> m_position.z
+		>> m_orientation.x
+		>> m_orientation.y
+		>> m_orientation.z
+		>> m_orientation.w;
+}
+
+void Plant::Write(std::ofstream& fileOut)
+{
+	if (!m_isDestroyed)
+	{
+		fileOut << GetObjectType()
+			<< m_objectId
+			<< m_position.x
+			<< m_position.y
+			<< m_position.z
+			<< m_orientation.x
+			<< m_orientation.y
+			<< m_orientation.z
+			<< m_orientation.w;
 	}
 }
 
@@ -71,3 +108,8 @@ void Plant::NotifyOffshootDeath(Offshoot* toRemove)
 	}
 }
 
+void Plant::NotifyOffshootChild(Offshoot* toAdd)
+{
+	// For serialization purposes, linking them back together
+	m_offshoots.push_back(toAdd);
+}

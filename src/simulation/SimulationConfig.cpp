@@ -12,8 +12,8 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 100;
-	plant.numOffshootsPerPlant		= 1;
+	plant.numPlants					= 20;
+	plant.numOffshootsPerPlant		= 5;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 100;
 	plant.growthRate				= 0.05f;
