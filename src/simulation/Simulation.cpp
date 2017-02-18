@@ -27,9 +27,15 @@ void Simulation::Initialize(const SimulationConfig& config)
 
 	// Seed the random number generator.
 	if (config.world.seed < 0)
+	{
 		m_random.SeedTime();
+		m_originalSeed = m_random.GetSeed();
+	}
 	else
-		m_random.SetSeed((unsigned long) config.world.seed);
+	{
+		m_random.SetSeed((unsigned long)config.world.seed);
+		m_originalSeed = (unsigned long)config.world.seed;
+	}
 	
 	// Spawn some plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
@@ -136,4 +142,30 @@ Agent* Simulation::SelectAgent()
 	}
 
 	return agents.back();
+}
+
+void Simulation::ReadSimulation(std::ifstream& fileIn)
+{
+	unsigned long currentSeed;
+
+	fileIn.read((char*)&currentSeed, sizeof(unsigned long));
+	fileIn.read((char*)&m_originalSeed, sizeof(unsigned long));
+	fileIn.read((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileIn.read((char*)&m_generationAge, sizeof(unsigned int));
+	fileIn.read((char*)&m_generationDuration, sizeof(unsigned int));
+	fileIn.read((char*)&m_config, sizeof(SimulationConfig));
+
+	m_random.SetSeed(currentSeed);
+}
+
+void Simulation::WriteSimulation(std::ofstream& fileOut)
+{
+	unsigned long currentSeed = m_random.GetSeed();
+
+	fileOut.write((char*)&currentSeed, sizeof(unsigned long));
+	fileOut.write((char*)&m_originalSeed, sizeof(unsigned long));
+	fileOut.write((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileOut.write((char*)&m_generationAge, sizeof(unsigned int));
+	fileOut.write((char*)&m_generationDuration, sizeof(unsigned int));
+	fileOut.write((char*)&m_config, sizeof(SimulationConfig));
 }

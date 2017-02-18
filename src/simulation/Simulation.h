@@ -23,6 +23,9 @@ public:
 	void NextGeneration();
 	Agent* SelectAgent();
 
+	void ReadSimulation(std::ifstream& fileIn);
+	void WriteSimulation(std::ofstream& fileOut);
+
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
@@ -38,6 +41,7 @@ private:
 	ObjectManager		m_objectManager;
 	RNG					m_random;
 
+	unsigned long		m_originalSeed;
 	unsigned int		m_generationAge;
 	unsigned int		m_generationDuration;
 };
