@@ -53,11 +53,15 @@ void Agent::OnSpawn()
 		m_energy = 100.0f;
 	}
 
-	// Grow the brain from the genome.
-	m_brain = new Brain();
-	m_genome->GrowBrain(m_brain);
-	m_brain->PreBirth(config.brain.numPrebirthCycles,
-		GetSimulation()->GetRandom());
+	// May already be read() in
+	if (!m_isSerialized)
+	{
+		// Grow the brain from the genome.
+		m_brain = new Brain();
+		m_genome->GrowBrain(m_brain);
+		m_brain->PreBirth(config.brain.numPrebirthCycles,
+			GetSimulation()->GetRandom());
+	}
 
 	// Determine agent properties based on gene values.
 	m_strength = m_genome->GetGeneAsFloat(GenePosition::STRENGTH);
@@ -169,61 +173,55 @@ void Agent::Update()
 	}
 }
 
-void Agent::Read(std::ifstream& fileIn)	// TODO: determine if this will be valid
+void Agent::Read(std::ifstream& fileIn)
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 	m_isSerialized = true;
 	m_genome = new Genome(GetSimulation(), false);
 	unsigned char gene;
 
-	fileIn >> m_objectId
-		>> m_position.x
-		>> m_position.y
-		>> m_position.z
-		>> m_orientation.x
-		>> m_orientation.y
-		>> m_orientation.z
-		>> m_orientation.w
-		>> m_moveSpeed
-		>> m_turnSpeed
-		>> m_energy
-		>> m_age
-		>> m_fitness;
+	fileIn.read((char*)&m_objectId, sizeof(int));
+	fileIn.read((char*)&m_position, sizeof(Vector3f));
+	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
+	fileIn.read((char*)&m_moveSpeed, sizeof(float));
+	fileIn.read((char*)&m_turnSpeed, sizeof(float));
+	fileIn.read((char*)&m_energy, sizeof(float));
+	fileIn.read((char*)&m_age, sizeof(int));
+	fileIn.read((char*)&m_fitness, sizeof(float));
 
 	// Read in genome
 	for (unsigned int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
 	{
-		fileIn >> gene;
+		fileIn.read((char*)&gene, sizeof(unsigned char));
 		m_genome->m_genes.push_back(gene);
 	}
 
-	// TODO:: Brain + synapses?
+	// TODO:: Brain + synapses
 }
 
 void Agent::Write(std::ofstream& fileOut)
 {
 	if (!m_isDestroyed)
 	{
-		fileOut << GetObjectType()
-			<< m_objectId
-			<< m_position.x
-			<< m_position.y
-			<< m_position.z
-			<< m_orientation.x
-			<< m_orientation.y
-			<< m_orientation.z
-			<< m_orientation.w
-			<< m_moveSpeed
-			<< m_turnSpeed
-			<< m_energy
-			<< m_age
-			<< m_fitness;
+		int objType = GetObjectType();
+
+		fileOut.write((char*)&objType, sizeof(int));
+		fileOut.write((char*)&m_objectId, sizeof(int));
+		fileOut.write((char*)&m_position, sizeof(Vector3f));
+		fileOut.write((char*)&m_orientation, sizeof(Quaternion));
+		fileOut.write((char*)&m_moveSpeed, sizeof(float));
+		fileOut.write((char*)&m_turnSpeed, sizeof(float));
+		fileOut.write((char*)&m_energy, sizeof(float));
+		fileOut.write((char*)&m_age, sizeof(int));
+		fileOut.write((char*)&m_fitness, sizeof(float));
 
 		// Write genome
 		for (unsigned int i = 0; i < m_genome->m_genes.size(); ++i)
 		{
-			fileOut << m_genome->m_genes[i];
+			fileOut.write((char*)&m_genome->m_genes[i], sizeof(unsigned char));
 		}
+
+		// TODO: brain
 	}
 }
 

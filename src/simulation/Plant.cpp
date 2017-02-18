@@ -55,29 +55,21 @@ void Plant::Read(std::ifstream& fileIn)
 {
 	m_isSerialized = true;
 
-	fileIn >> m_objectId
-		>> m_position.x
-		>> m_position.y
-		>> m_position.z
-		>> m_orientation.x
-		>> m_orientation.y
-		>> m_orientation.z
-		>> m_orientation.w;
+	fileIn.read((char*)&m_objectId, sizeof(int));
+	fileIn.read((char*)&m_position, sizeof(Vector3f));
+	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
 }
 
 void Plant::Write(std::ofstream& fileOut)
 {
 	if (!m_isDestroyed)
 	{
-		fileOut << GetObjectType()
-			<< m_objectId
-			<< m_position.x
-			<< m_position.y
-			<< m_position.z
-			<< m_orientation.x
-			<< m_orientation.y
-			<< m_orientation.z
-			<< m_orientation.w;
+		int objType = GetObjectType();
+
+		fileOut.write((char*)&objType, sizeof(int));
+		fileOut.write((char*)&m_objectId, sizeof(int));
+		fileOut.write((char*)&m_position, sizeof(Vector3f));
+		fileOut.write((char*)&m_orientation, sizeof(Quaternion));
 	}
 }
 

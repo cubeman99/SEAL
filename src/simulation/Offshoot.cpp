@@ -67,16 +67,11 @@ void Offshoot::Read(std::ifstream& fileIn)
 	int sourceID;
 	m_isSerialized = true;
 
-	fileIn >> m_objectId
-		>> sourceID
-		>> m_energy
-		>> m_position.x
-		>> m_position.y
-		>> m_position.z
-		>> m_orientation.x
-		>> m_orientation.y
-		>> m_orientation.z
-		>> m_orientation.w;
+	fileIn.read((char*)&m_objectId, sizeof(int));
+	fileIn.read((char*)&sourceID, sizeof(int));
+	fileIn.read((char*)&m_energy, sizeof(float));
+	fileIn.read((char*)&m_position, sizeof(Vector3f));
+	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
 
 	// Find my Plant source and let it know it's a daddy
 	m_source = (Plant*)GetSimulation()->GetObjectManager()->GetObj(sourceID);
@@ -87,17 +82,15 @@ void Offshoot::Write(std::ofstream& fileOut)
 {
 	if (!m_isDestroyed)
 	{
-		fileOut << GetObjectType()
-			<< m_objectId
-			<< m_source->GetId()
-			<< m_energy
-			<< m_position.x
-			<< m_position.y
-			<< m_position.z
-			<< m_orientation.x
-			<< m_orientation.y
-			<< m_orientation.z
-			<< m_orientation.w;
+		int objType = GetObjectType();
+		int sourceID = m_source->GetId();
+
+		fileOut.write((char*)&objType, sizeof(int));
+		fileOut.write((char*)&m_objectId, sizeof(int));
+		fileOut.write((char*)&sourceID, sizeof(int));
+		fileOut.write((char*)&m_energy, sizeof(float));
+		fileOut.write((char*)&m_position, sizeof(Vector3f));
+		fileOut.write((char*)&m_orientation, sizeof(Quaternion));
 	}
 }
 
