@@ -15,6 +15,10 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_simulationManager = simulationManager;
 	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: this must change when the executable is moved
 
+	// Load fonts.
+	m_font = m_resourceManager.LoadSpriteFont(
+		"font", "fonts/font_console.png", 16, 8, 12, 0);
+
 	// Load shaders.
 	m_shaderLit = m_resourceManager.LoadShader("lit",
 		"shaders/lit_colored_vs.glsl",
@@ -45,11 +49,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 
-	// TODO: Move this resource creation code somewhere else.
-
 	// Agent model.
-	//m_agentMesh = m_resourceManager.LoadMesh("agent", "models/ae86.obj");
-	//m_agentMesh->SetTransformMatrix(Matrix4f::CreateTranslation(0, 0.4f, 0));
 	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
@@ -66,6 +66,8 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
+	
+	// TODO: Move this resource creation code somewhere else.
 
 	// Create selection circle mesh.
 	{
@@ -237,11 +239,14 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	}
 	
 	// Render the X/Y/Z axis lines.
-	transform.SetIdentity();
-	transform.SetScale(worldRadius * 2.0f);
-	m_renderer.SetShader(m_shaderUnlitVertexColored);
-	m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
-	
+	if (m_simulationManager->GetShowAxisLines())
+	{
+		transform.SetIdentity();
+		transform.SetScale(worldRadius * 2.0f);
+		m_renderer.SetShader(m_shaderUnlitVertexColored);
+		m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
+	}
+
 	// Render the OctTree
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
@@ -267,6 +272,11 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		if (m_simulationManager->GetShowAgentBrain())
 			RenderBrain(selectedAgent);
 	}
+	
+	orthographic = Matrix4f::CreateOrthographic(0.0f,
+		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
+	m_graphics.SetProjection(orthographic);
+	m_graphics.DrawString(m_font, "Hello, World!", Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
 
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);

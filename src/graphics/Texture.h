@@ -14,8 +14,6 @@ class RenderBuffer;
 
 class Texture
 {
-	friend class Font;
-
 public:
 	typedef CubeMapFace::index_type				cubemap_face_index;
 	typedef PixelTransferFormat::value_type		pixel_format;

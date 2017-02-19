@@ -1,5 +1,6 @@
 #include "Color.h"
 #include <math/MathLib.h>
+#include <assert.h>
 
 
 // Convert a color component from an unsigned byte to a float.
@@ -114,14 +115,14 @@ Color::Color(const Vector4f& v) :
 // Access a component of this color.
 unsigned char Color::operator [](int index) const
 {
-	//CMG_ASSERT(index >= 0 && index < 4, "Invalid component index.");
+	assert(index >= 0 && index < 4);
 	return (&r)[index];
 }
 
 // Modify a component of this color.
 unsigned char& Color::operator [](int index)
 {
-	//CMG_ASSERT(index >= 0 && index < 4, "Invalid component index.");
+	assert(index >= 0 && index < 4);
 	return (&r)[index];
 }
 

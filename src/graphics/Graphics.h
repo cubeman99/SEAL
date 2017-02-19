@@ -7,9 +7,9 @@
 #include <math/Matrix4f.h>
 #include <math/Quaternion.h>
 #include "Color.h"
-//#include "Window.h"
 #include "SpriteFont.h"
 #include <assert.h>
+#include <string>
 
 
 struct Viewport
@@ -57,17 +57,56 @@ struct Viewport
 };
 
 
+//-------------------------------------------------------------------------
+// TextAlign - bit flags for text alignment.
+//-------------------------------------------------------------------------
+struct TextAlign
+{
+	enum
+	{
+		CENTER	= 0x0,
+		MIDDLE	= 0x0,
+		TOP		= 0x1,
+		BOTTOM	= 0x2,
+		LEFT	= 0x4,
+		RIGHT	= 0x8,
+
+		TOP_LEFT		= TOP | LEFT,
+		TOP_RIGHT		= TOP | RIGHT,
+		TOP_CENTER		= TOP | CENTER,
+		BOTTOM_LEFT		= BOTTOM | LEFT,
+		BOTTOM_RIGHT	= BOTTOM | RIGHT,
+		BOTTOM_CENTER	= BOTTOM | CENTER,
+		MIDDLE_LEFT		= MIDDLE | LEFT,
+		MIDDLE_RIGHT	= MIDDLE | RIGHT,
+		CENTERED		= MIDDLE | CENTER,
+	};
+};
+
+
+//-------------------------------------------------------------------------
+// Graphics - Used for drawing 2D graphics.
+//-------------------------------------------------------------------------
 class Graphics
 {
 public:
 	Graphics();
 
+	//---------------------------------------------------------------------
+	// General
+
 	void Clear(const Color& color);
 	void SetViewport(const Viewport& viewport, bool scissor);
+
+	//---------------------------------------------------------------------
+	// Lines
 
 	void DrawLine(float x1, float y1, float x2, float y2, const Color& color);
 	void DrawLine(const Vector2f& from, const Vector2f& to, const Color& color);
 	
+	//---------------------------------------------------------------------
+	// Rectangles
+
 	void DrawRect(const Viewport& rect, const Color& color);
 	void DrawRect(const Vector2f& pos, const Vector2f& size, const Color& color);
 	void DrawRect(float x, float y, float width, float height, const Color& color);
@@ -75,20 +114,25 @@ public:
 	void FillRect(const Viewport& rect, const Color& color);
 	void FillRect(float x, float y, float width, float height, const Color& color);
 	
+	//---------------------------------------------------------------------
+	// Circles
+
 	void DrawCircle(const Vector2f& pos, float radius, const Color& color, int numEdges = 20);
 	void FillCircle(const Vector2f& pos, float radius, const Color& color, int numEdges = 20);
-
-	void DrawString(SpriteFont* font, const char* text, const Vector2f& pos, const Color& color, float scale = 1.0f);
-
 	
-	void EnableCull(bool cull);
-	void EnableDepthTest(bool depthTest);
+	//---------------------------------------------------------------------
+	// Text
+
+	void DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align = TextAlign::TOP_LEFT);
+	Vector2f MeasureString(const Font* font, const std::string& text);
+
+	//---------------------------------------------------------------------
+	// Transformations
 
 	void SetProjection(const Matrix4f& projection);
 	
 	void ResetTransform();
 	void SetTransform(const Matrix4f& transform);
-	
 	void Transform(const Matrix4f& transform);
 	void Rotate(const Vector3f& axis, float angle);
 	void Rotate(const Quaternion& rotation);
@@ -96,6 +140,11 @@ public:
 	void Translate(const Vector3f& translation);
 	void Scale(float scale);
 	void Scale(const Vector3f& scale);
+	
+	
+	void EnableCull(bool cull);
+	void EnableDepthTest(bool depthTest);
+
 
 private:
 	

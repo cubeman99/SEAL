@@ -4,6 +4,7 @@
 #include <math/MathLib.h>
 #include <vector>
 #include <fstream>
+#include <assert.h>
 
 
 //-----------------------------------------------------------------------------
@@ -48,8 +49,7 @@ namespace
 	GLenum TranslateMinMagFilter(TextureFilterOptions::value_type minMagFilter,
 									TextureFilterOptions::value_type mipmapFilter)
 	{
-		//CMG_ASSERT(minMagFilter != TextureFilterOptions::NONE,
-			//"You must specify a min and mag filter!");
+		assert(minMagFilter != TextureFilterOptions::NONE);
 
 		if (minMagFilter == TextureFilterOptions::LINEAR)
 		{
@@ -318,9 +318,8 @@ void Texture::WriteFacePixelsAtLevel(cubemap_face_index face, int mipmapLevel,
 								int width, int height, pixel_format format,
 								pixel_type type, const void* pixelData)
 {
-	//CMG_ASSERT(m_params.GetTarget() == TextureTarget::TEXTURE_CUBE_MAP,
-		//"Texture must be a cubemap to modify face pixels.");
-	//CMG_ASSERT(width == height, "Cube map face images must have a square size");
+	assert(m_params.GetTarget() == TextureTarget::TEXTURE_CUBE_MAP);
+	assert(width == height);
 
 	if (mipmapLevel == 0)
 	{
@@ -366,8 +365,7 @@ void Texture::WritePixelsAtLevel1D(int mipmapLevel, int width, const Color* pixe
 void Texture::WritePixelsAtLevel1D(int mipmapLevel, int width, pixel_format format,
 							pixel_type type, const void* pixelData)
 {
-	//CMG_ASSERT(m_params.GetTarget() == TextureTarget::TEXTURE_1D,
-		//"Texture target must be 1D to modify pixels like this.");
+	assert(m_params.GetTarget() == TextureTarget::TEXTURE_1D);
 
 	if (mipmapLevel == 0)
 	{
@@ -413,8 +411,7 @@ void Texture::WritePixelsAtLevel2D(int mipmapLevel, int width, int height,
 							pixel_format format, pixel_type type,
 							const void* pixelData)
 {
-	//CMG_ASSERT(m_params.GetTarget() == TextureTarget::TEXTURE_2D,
-		//"Texture target must be 2D to modify pixels like this.");
+	assert(m_params.GetTarget() == TextureTarget::TEXTURE_2D);
 
 	if (mipmapLevel == 0)
 	{
@@ -465,8 +462,7 @@ void Texture::WritePixelsAtLevel3D(int mipmapLevel, int width, int height,
 							pixel_type type,
 							const void* pixelData)
 {
-	//CMG_ASSERT(m_params.GetTarget() == TextureTarget::TEXTURE_3D,
-		//"Texture target must be 3D to modify pixels like this.");
+	assert(m_params.GetTarget() == TextureTarget::TEXTURE_3D);
 
 	if (mipmapLevel == 0)
 	{

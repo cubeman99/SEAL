@@ -167,19 +167,16 @@ void OctTree::DoGetNumObjects(	const OctTreeNode* node,
 
 void OctTree::DoClear(OctTreeNode* node)
 {
-	// Recursively clear each child sector in this node.
+	// Recursively clear and delete each child sector in this node.
 	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
 	{
 		if (node->m_children[sectorIndex] != nullptr)
 		{
 			DoClear(node->m_children[sectorIndex]);
+			delete node->m_children[sectorIndex];
 			node->m_children[sectorIndex] = nullptr;
 		}
 	}
-
-	// Delete this node itself (but not the root node).
-	if (node != &m_root)
-		delete node;
 }
 
 void OctTree::DoRemoveNode(OctTreeNode* node)

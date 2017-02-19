@@ -39,6 +39,7 @@ private:
 	Vector2f		m_viewPortSize;
 
 	// Resources.
+	Font* m_font;
 	Mesh* m_agentMesh;
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;
