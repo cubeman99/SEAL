@@ -16,6 +16,9 @@ public:
 
 	void Initialize();
 
+	bool SaveSimulation(const std::string& fileName);
+	bool OpenSimulation(const std::string& fileName);
+
 	inline Simulation* GetSimulation() { return m_simulation; }
 	inline bool IsSimulationPuased() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }

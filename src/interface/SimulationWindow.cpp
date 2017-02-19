@@ -29,10 +29,10 @@ enum
 wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     
 	EVT_MENU(wxID_NEW, SimulationWindow::OnNewWindow)
+    EVT_MENU(wxID_OPEN, SimulationWindow::OnOpenSimulation)
+    EVT_MENU(wxID_SAVE, SimulationWindow::OnSaveSimulation)
     EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
-    EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
-    EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
-    EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
+
 	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
 	EVT_MENU(VIEW_LIGHTING, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_OCT_TREE_ON_SURFACE, SimulationWindow::OnMenuItem)
@@ -40,8 +40,13 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_AGENT_VISION, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_AGENT_BRAIN, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
-    EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 
+    EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
+    EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
+    EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
+
+    EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
+	
     EVT_IDLE(SimulationWindow::OnIdle)
     //EVT_TIMER(UPDATE_TIMER, SimulationWindow::OnUpdateTimer)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
@@ -64,7 +69,10 @@ SimulationWindow::SimulationWindow() :
 	// FILE
     wxMenu* menuFile = new wxMenu;
     menuBar->Append(menuFile, wxT("&File"));
-    menuFile->Append(wxID_NEW);
+    menuFile->Append(wxID_NEW, "&New Simulation...\tCTRL+N");
+    menuFile->AppendSeparator();
+    menuFile->Append(wxID_SAVE, "&Save Simulation Timeline...\tCTRL+S");
+    menuFile->Append(wxID_OPEN, "&Open Simulation Timeline...\tCTRL+O");
     menuFile->AppendSeparator();
     menuFile->Append(wxID_CLOSE, "&Close\tCTRL+W");
 	
@@ -261,85 +269,7 @@ void SimulationWindow::OnIdle(wxIdleEvent& e)
 
 void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)
 {
-	/*
-	double startTime = Time::GetTime(); // time the update.
-
-	// Update debug agent move keyboard controls.
-	Agent* agent = m_simulationManager.GetSelectedAgent();
-	if (agent != m_controlledAgent && m_controlledAgent != nullptr)
-		m_controlledAgent->SetManualOverride(false);
-	m_controlledAgent = agent;
-	if (agent != nullptr)
-	{
-		int moveAmount = 0;
-		int turnAmount = 0;
-
-		// Update movement controls (arrow keys).
-		if (wxGetKeyState(WXK_LEFT))
-			turnAmount++;
-		if (wxGetKeyState(WXK_RIGHT))
-			turnAmount--;
-		if (wxGetKeyState(WXK_UP))
-			moveAmount++;
-		if (wxGetKeyState(WXK_DOWN))
-			moveAmount--;
-
-		// Disable wandering if the agent was moved manually.
-		if (agent->GetManualOverride() || moveAmount != 0 || turnAmount != 0)
-		{
-			agent->SetTurnSpeed(turnAmount * agent->GetMaxTurnSpeed() * 0.5f);
-			agent->SetMoveSpeed(moveAmount * agent->GetMaxMoveSpeed());
-			agent->SetManualOverride(true);
-		}
-	}
-
-	// Update the simulation.
-	m_simulationManager.Update();
-	
-	// Update the FPS counter.
-	double timeStamp = Time::GetTime();
-	m_frameCounter++;
-	if (timeStamp > m_lastFrameTimeStamp + 1.0f)
-	{
-		m_lastFrameTimeStamp = timeStamp;
-		m_fps = m_frameCounter;
-		m_frameCounter = 0;
-	}
-
-	// Number of agents.
-	//int numAgents = m_simulationManager.GetSimulation()->GetAgentSystem()->GetNumAgents();
-	int numObjects = m_simulationManager.GetSimulation()->GetObjectManager()->GetNumObjects();
-	std::stringstream ss;
-	//ss << numAgents << " agents";
-	ss << numObjects << " objects";
-	SetStatusText(ss.str(), 1);
-	
-	// FPS.
-	ss.str("");
-	ss << (int) (m_fps + 0.5f) << " fps";
-	SetStatusText(ss.str(), 2);
-	
-	// Update time in milliseconds
-	double endTime = Time::GetTime();
-	double updateTimeMs = (endTime - startTime) * 1000.0;
-	double renderTimeMs = m_simulationManager.GetSimulationRenderer()->GetAverageRenderTime() * 1000.0;
-	ss.str("");
-	ss.setf(std::ios::fixed, std::ios::floatfield);
-	ss.precision(2);
-	ss << "Update time: " << updateTimeMs << " ms";
-	ss << " (total: " << (updateTimeMs + renderTimeMs) << " ms";
-	SetStatusText(ss.str(), 3);
-	
-	// Render time in milliseconds.
-	ss.str("");
-	ss.setf(std::ios::fixed, std::ios::floatfield);
-	ss.precision(2);
-	ss << "Render time: " << renderTimeMs << " ms";
-	SetStatusText(ss.str(), 4);
-	
-	// Tell the simulation panel to render.
-	m_simulationPanel->Refresh(false);
-	*/
+	// Update timer event changed to idle event.
 }
 
 void SimulationWindow::OnWindowClose(wxCloseEvent& e)
@@ -347,3 +277,56 @@ void SimulationWindow::OnWindowClose(wxCloseEvent& e)
 	m_updateTimer.Stop();
     Destroy(); // true is to force the frame to close
 }
+
+
+void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
+{
+	wxFileDialog* openDialog = new wxFileDialog(this,
+		"Choose a file to open", wxEmptyString, wxEmptyString, 
+		"Simulation files (*.bin)|*.bin",
+		wxFD_OPEN, wxDefaultPosition);
+ 
+	if (openDialog->ShowModal() == wxID_OK)
+	{
+		std::string path = (std::string) openDialog->GetPath();
+		
+		if (m_simulationManager.OpenSimulation(path))
+		{
+			// Update the window title to the opened simulation file.
+			SetTitle(openDialog->GetFilename() << wxString(" - SEAL"));
+		}
+		else
+		{
+			wxMessageBox(wxString("Error loading simulation ") <<
+				openDialog->GetPath(), "Open Simulation", wxICON_WARNING);
+		}
+	}
+ 
+	openDialog->Destroy();
+}
+
+void SimulationWindow::OnSaveSimulation(wxCommandEvent& e)
+{
+	wxFileDialog* saveDialog = new wxFileDialog(this,
+		"Choose a file to save", wxEmptyString, wxEmptyString, 
+		"Simulation files (*.bin)|*.bin",
+		wxFD_SAVE, wxDefaultPosition);
+ 
+	if (saveDialog->ShowModal() == wxID_OK)
+	{
+		std::string path = (std::string) saveDialog->GetPath();
+		
+		if (m_simulationManager.SaveSimulation(path))
+		{
+			// success!
+		}
+		else
+		{
+			wxMessageBox(wxString("Error saving simulation to ") <<
+				saveDialog->GetPath(), "Save Simulation", wxICON_WARNING);
+		}
+	}
+ 
+	saveDialog->Destroy();
+}
+

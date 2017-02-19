@@ -43,6 +43,24 @@ void SimulationManager::Initialize()
 	// Seed rand with current time
 	Random::SeedTime();
 }
+
+bool SimulationManager::SaveSimulation(const std::string& fileName)
+{
+	bool result = m_simulation->SaveTimeline(fileName);
+	return result;
+}
+
+bool SimulationManager::OpenSimulation(const std::string& fileName)
+{
+	bool result = m_simulation->LoadTimeline(fileName);
+	
+	if (result)
+	{
+		m_cameraSystem.Initialize(m_simulation);
+	}
+
+	return result;
+}
 		
 void SimulationManager::ToggleCameraTracking()
 {

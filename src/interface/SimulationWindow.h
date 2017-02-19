@@ -30,7 +30,9 @@ private:
 	void OnIdle(wxIdleEvent& e);
     void OnUpdateTimer(wxTimerEvent& e);
     void OnWindowClose(wxCloseEvent& e);
-
+	
+	void OnOpenSimulation(wxCommandEvent& e);
+	void OnSaveSimulation(wxCommandEvent& e);
 	
 	SimulationManager m_simulationManager;
 
