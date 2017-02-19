@@ -154,20 +154,20 @@ bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)
 	}
 
 	// Read in data
-	nextObject->Read(fileIn);
-
-	// On spawn
-	nextObject->OnSpawn();
-	nextObject->m_objectManager = this;
 	nextObject->m_isDestroyed = false;
+	nextObject->m_objectManager = this;
+	nextObject->Read(fileIn);
 
 	// Incorporate
 	m_objects.push_back(nextObject);
 	m_idToObjectMap[nextObject->GetId()] = nextObject;
 	m_octTree.InsertObject(nextObject);
 
+	// On spawn
+	nextObject->OnSpawn();
+
 	// Set Id counter
-	// Once the last object has been read, the Id counter should match that of the loaded sim
+	// Once the last object has been read, the Id counter should match that of the loaded timelime
 	m_objectIdCounter = nextObject->GetId() + 1;
 
 	nextObject = nullptr;

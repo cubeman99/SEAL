@@ -24,7 +24,7 @@ class ObjectManager
 
 public:
 	//-----------------------------------------------------------------------------
-	// Tnitialization & termination
+	// Initialization & termination
 
 	ObjectManager(Simulation* simulation);
 	~ObjectManager();

@@ -40,6 +40,9 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Spawn some plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
 		m_objectManager.SpawnObjectRandom<Plant>();
+
+	// TODO: TEMP:
+	LoadTimeline("DebugTimeline");
 }
 
 void Simulation::Tick()
@@ -206,13 +209,13 @@ bool Simulation::LoadTimeline(std::string fileName)
 	fileIn.read((char*)&numObjects, sizeof(unsigned int));
 
 	// Read and create objects
-	bool objectCreationFailed = false;
-	for (unsigned int i = 0; i < numObjects && !objectCreationFailed; ++i)
+	bool objectCreationGoingWell = true;
+	for (unsigned int i = 0; i < numObjects && objectCreationGoingWell; ++i)
 	{
-		objectCreationFailed = objManager->SpawnObjectSerialized(fileIn);
+		objectCreationGoingWell = objManager->SpawnObjectSerialized(fileIn);
 	}
 
-	if (objectCreationFailed)
+	if (!objectCreationGoingWell)
 	{
 		// TODO: Tell user that the file was corrupt like our government
 		objManager->ClearObjects();
