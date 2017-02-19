@@ -20,6 +20,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 	m_ageInTicks = 0;
 	m_generationAge = 0;
 	m_generationDuration = 60 * 30;
+	m_generationIndex = 0;
 
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
@@ -50,20 +51,54 @@ void Simulation::Tick()
 	m_ageInTicks++;
 	m_objectManager.UpdateObjects();
 	
+	// Advance to the next generation.
 	m_generationAge++;
 	if (m_generationAge >= m_generationDuration)
 	{
+		UpdateStatistics();
+		m_generationStats.push_back(m_statistics);
+
 		NextGeneration();
 	}
-
+	//if (m_ageInTicks % 30 == 0)
+	//{
+	//	UpdateStatistics();
+	//	m_generationStats.push_back(m_statistics);
+	//}
+	
 	// Measure elapsed time.
 	double endTime = Time::GetTime();
 	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
 }
 
+void Simulation::UpdateStatistics()
+{
+	SimulationStats stats;
+	
+	// Cumulatively add statistic values for each agent.
+	unsigned int numAgents = 0;
+	for (auto it = m_objectManager.agents_begin();
+		it != m_objectManager.agents_end(); ++it)
+	{
+		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
+		stats.avgFitness += it->GetFitness();
+		numAgents++;
+	}
+	
+	// Divide averages by agent count.
+	float invNumAgents = 1.0f / numAgents;
+	for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+		stats.avgGeneValues[i] *= invNumAgents;
+	stats.avgFitness *= invNumAgents;
+
+	m_statistics = stats;
+}
+
 void Simulation::NextGeneration()
 {
 	m_generationAge = 0;
+	m_generationIndex++;
 
 	// Count the number of agents.
 	unsigned int numAgents = 0;
@@ -89,12 +124,12 @@ void Simulation::NextGeneration()
 		newPopulation.push_back(child);
 	}
 	
-	// Remove the old agents.
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
-	{
-		it->Destroy();
-	}
+	// Remove the old objects.
+	m_objectManager.ClearObjects();
+	
+	// Spawn some plants.
+	for (int i = 0; i < m_config.plant.numPlants; ++i)
+		m_objectManager.SpawnObjectRandom<Plant>();
 
 	// Insert the new agents.
 	for (unsigned int i = 0; i < newPopulation.size(); ++i)

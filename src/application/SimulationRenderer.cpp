@@ -4,6 +4,7 @@
 #include <simulation/Offshoot.h>
 #include <simulation/Plant.h>
 #include <utilities/Timing.h>
+#include <sstream>
 
 
 SimulationRenderer::SimulationRenderer()
@@ -48,6 +49,14 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
+
+	m_graphFitness.SetFont(m_font);
+	m_graphFitness.SetTitle("Fitness");
+	m_graphFitness.SetXBounds(0, 60);
+	m_graphFitness.SetYBounds(0.0f, 400.0f);
+	m_graphFitness.SetDynamicRange(false);
+	m_graphFitness.SetViewport(Viewport(0, 0, 300, 140));
+	m_graphFitness.AddGraph("graph", Color::YELLOW);
 
 	// Agent model.
 	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
@@ -141,6 +150,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 
 	float aspectRatio = viewPortSize.x / viewPortSize.y;
     glViewport(0, 0, (int) viewPortSize.x, (int) viewPortSize.y);
+	glDisable(GL_SCISSOR_TEST);
 	
 	m_simulationManager->GetCameraSystem()->SetAspectRatio(aspectRatio);
 	
@@ -276,7 +286,19 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	orthographic = Matrix4f::CreateOrthographic(0.0f,
 		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
 	m_graphics.SetProjection(orthographic);
-	m_graphics.DrawString(m_font, "Hello, World!", Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
+	
+	std::stringstream text;
+	text.setf(std::ios::fixed, std::ios::floatfield);
+	text.precision(2);
+
+	text << "Generation " << (simulation->GetGeneration() + 1);
+
+	m_graphics.DrawString(m_font, text.str(), Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
+
+	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
+	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
+	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
+	m_graphFitness.Draw(m_graphics);
 
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);
@@ -527,6 +549,39 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	Vector2f two(2, 2);
 	m_graphics.DrawRect(matrixTopLeft - one, matrixBottomRight -
 		matrixTopLeft + two, outlineColor);
+}
+
+
+void SimulationRenderer::RenderGraphs()
+{
+	Simulation* simulation = m_simulationManager->GetSimulation();
+	
+	// Setup projection.
+	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
+		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
+	
+	// Draw graphs.
+	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
+	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
+	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
+	m_graphFitness.Draw(m_graphics);
+}
+
+void SimulationRenderer::RenderInfoPanel()
+{
+	Simulation* simulation = m_simulationManager->GetSimulation();
+
+	// Setup projection.
+	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
+		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
+	
+	std::stringstream text;
+	text.setf(std::ios::fixed, std::ios::floatfield);
+	text.precision(2);
+
+	text << "Generation " << (simulation->GetGeneration() + 1);
+
+	m_graphics.DrawString(m_font, text.str(), Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
 }
 
 

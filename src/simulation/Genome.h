@@ -29,8 +29,10 @@ enum GenePosition
 	COLOR_GREEN,
 	COLOR_BLUE,
 
+	PHYSIOLOGICAL_GENES_COUNT,
+
 	// First index of nueron genes, also count of non-nueron genes
-	NUERON_GENES_BEGIN
+	NUERON_GENES_BEGIN = PHYSIOLOGICAL_GENES_COUNT,
 };
 
 
