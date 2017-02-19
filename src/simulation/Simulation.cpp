@@ -253,7 +253,7 @@ bool Simulation::LoadTimeline(std::string fileName)
 	if (!objectCreationGoingWell)
 	{
 		// TODO: Tell user that the file was corrupt like our government
-		objManager->ClearObjects();
+		//objManager->ClearObjects();
 		return false;
 	}
 

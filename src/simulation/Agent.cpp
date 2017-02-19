@@ -195,7 +195,7 @@ void Agent::Read(std::ifstream& fileIn)
 	for (int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
 	{
 		fileIn.read((char*)&gene, sizeof(unsigned char));
-		m_genome->m_genes.push_back(gene);
+		m_genome->m_genes[i] = gene;
 	}
 
 	// Read brain
