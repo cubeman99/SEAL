@@ -18,6 +18,7 @@ class Offshoot : public SimulationObject
 public:
 	DECLARE_SIMULATION_OBJECT(SimulationObjectType::OFFSHOOT);
 
+	Offshoot();
 	Offshoot(Plant* plant);
 	~Offshoot();
 	

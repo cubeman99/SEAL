@@ -43,6 +43,16 @@ SimulationObject* ObjectManager::GetObj(int objectId)
 	return nullptr;
 }
 
+SimulationObject* ObjectManager::GetObjByIndex(unsigned int index)
+{
+	if (index < GetNumObjects())
+	{
+		return m_objects[index];
+	}
+	
+	return nullptr;
+}
+
 
 //-----------------------------------------------------------------------------
 // Object management
@@ -105,10 +115,63 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 	m_idToObjectMap[m_objectIdCounter] = object;
 	m_octTree.InsertObject(object);
 	
-	object->m_objectId = m_objectIdCounter++;
-	object->m_objectManager = this;
+	object->m_objectId = m_objectIdCounter++;	// TODO: since this sim is meant to run for a long time, make sure
+	object->m_objectManager = this;				/// this doesn't exceed INT_MAX
 	object->m_isDestroyed = false;
 	object->OnSpawn();
+}
+
+bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)
+{
+	SimulationObjectType objectType;
+	SimulationObject* nextObject;
+
+	fileIn.read((char*)&objectType, sizeof(SimulationObjectType));
+
+	switch (objectType)
+	{
+	case AGENT:
+		nextObject = new Agent();
+		break;
+
+	case PLANT:
+		nextObject = new Plant();
+		break;
+
+	case OFFSHOOT:
+		nextObject = new Offshoot();
+		break;
+
+	case CARCASS:
+		// TODO: when carcass implemented
+		//break;
+
+	default:
+		// Object type not found
+		// Data is missing or corrupt
+		return false;
+		break;
+	}
+
+	// Read in data
+	nextObject->m_isDestroyed = false;
+	nextObject->m_objectManager = this;
+	nextObject->Read(fileIn);
+
+	// Incorporate
+	m_objects.push_back(nextObject);
+	m_idToObjectMap[nextObject->GetId()] = nextObject;
+	m_octTree.InsertObject(nextObject);
+
+	// On spawn
+	nextObject->OnSpawn();
+
+	// Set Id counter
+	// Once the last object has been read, the Id counter should match that of the loaded timelime
+	m_objectIdCounter = nextObject->GetId() + 1;
+
+	nextObject = nullptr;
+	return true;
 }
 
 void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) const

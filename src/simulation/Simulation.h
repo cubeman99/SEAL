@@ -25,6 +25,8 @@ public:
 
 	void UpdateStatistics();
 
+	bool SaveTimeline(std::string fileName);
+	bool LoadTimeline(std::string fileName);
 	void ReadSimulation(std::ifstream& fileIn);
 	void WriteSimulation(std::ofstream& fileOut);
 

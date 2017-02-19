@@ -24,7 +24,7 @@ class ObjectManager
 
 public:
 	//-----------------------------------------------------------------------------
-	// Tnitialization & termination
+	// Initialization & termination
 
 	ObjectManager(Simulation* simulation);
 	~ObjectManager();
@@ -42,6 +42,7 @@ public:
 	inline unsigned int GetNumObjects() const { return m_objects.size(); }
 
 	SimulationObject* GetObj(int objectId);
+	SimulationObject* GetObjByIndex(unsigned int index);
 
 	//-----------------------------------------------------------------------------
 	// Object management
@@ -54,6 +55,7 @@ public:
 	
 	// Spawn an object into the simulation.
 	void SpawnObject(SimulationObject* object);
+	bool SpawnObjectSerialized(std::ifstream& fileIn);
 
 	// Construct and spawn an object into the simulation at a random position.
 	template <class T_Object>

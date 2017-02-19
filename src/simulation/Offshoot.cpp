@@ -3,6 +3,9 @@
 #include <math/MathLib.h>
 #include <simulation/Simulation.h>
 
+Offshoot::Offshoot()
+{
+}
 
 Offshoot::Offshoot(Plant* plant) :
 	m_source(plant)
