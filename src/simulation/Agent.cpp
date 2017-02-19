@@ -289,7 +289,7 @@ void Agent::Write(std::ofstream& fileOut)
 		// -Write synapses
 		for (unsigned int i = 0; i < m_brain->m_numSynapses; ++i)
 		{
-			fileOut.write((char*)&m_brain->m_synapses[i], sizeof(float));
+			fileOut.write((char*)&m_brain->m_synapses[i], sizeof(Synapse));
 		}
 	}
 }
