@@ -43,8 +43,10 @@
     <ClCompile Include="..\..\src\math\MathLib.cpp" />
     <ClCompile Include="..\..\src\math\Matrix3f.cpp" />
     <ClCompile Include="..\..\src\math\Matrix4f.cpp" />
+    <ClCompile Include="..\..\src\math\Point2i.cpp" />
     <ClCompile Include="..\..\src\math\Quaternion.cpp" />
     <ClCompile Include="..\..\src\math\Ray.cpp" />
+    <ClCompile Include="..\..\src\math\Rect2i.cpp" />
     <ClCompile Include="..\..\src\math\Sphere.cpp" />
     <ClCompile Include="..\..\src\math\Transform3f.cpp" />
     <ClCompile Include="..\..\src\math\Vector2f.cpp" />
@@ -101,8 +103,10 @@
     <ClInclude Include="..\..\src\math\MathLib.h" />
     <ClInclude Include="..\..\src\math\Matrix3f.h" />
     <ClInclude Include="..\..\src\math\Matrix4f.h" />
+    <ClInclude Include="..\..\src\math\Point2i.h" />
     <ClInclude Include="..\..\src\math\Quaternion.h" />
     <ClInclude Include="..\..\src\math\Ray.h" />
+    <ClInclude Include="..\..\src\math\Rect2i.h" />
     <ClInclude Include="..\..\src\math\Sphere.h" />
     <ClInclude Include="..\..\src\math\Transform3f.h" />
     <ClInclude Include="..\..\src\math\Vector2f.h" />

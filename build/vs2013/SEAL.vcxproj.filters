@@ -207,6 +207,12 @@
     <ClCompile Include="..\..\src\application\Graph.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\math\Rect2i.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\Point2i.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -379,6 +385,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\SimulationStats.h">
       <Filter>Source Files\simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Rect2i.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Point2i.h">
+      <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

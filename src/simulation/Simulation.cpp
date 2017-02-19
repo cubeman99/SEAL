@@ -43,7 +43,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_objectManager.SpawnObjectRandom<Plant>();
 
 	// TODO: TEMP:
-	LoadTimeline("DebugTimeline");
+	//LoadTimeline("DebugTimeline");
 }
 
 void Simulation::Tick()
@@ -150,7 +150,7 @@ void Simulation::NextGeneration()
 
 	// TODO: TEMP:
 	// Save a copy of the timeline state
-	SaveTimeline("DebugTimeline");
+	//SaveTimeline("DebugTimeline");
 }
 
 Agent* Simulation::SelectAgent()
@@ -190,8 +190,7 @@ Agent* Simulation::SelectAgent()
 bool Simulation::SaveTimeline(std::string fileName)
 {
 	std::ofstream fileOut;
-	std::string filePath = "../../assets/timelines/" + fileName + ".bin";
-	fileOut.open(filePath, std::ios::out | std::ios::binary);
+	fileOut.open(fileName, std::ios::out | std::ios::binary);
 
 	if (!fileOut)
 	{
@@ -223,8 +222,7 @@ bool Simulation::SaveTimeline(std::string fileName)
 bool Simulation::LoadTimeline(std::string fileName)
 {
 	std::ifstream fileIn;
-	std::string filePath = "../../assets/timelines/" + fileName + ".bin";
-	fileIn.open(filePath, std::ios::in | std::ios::binary);
+	fileIn.open(fileName, std::ios::in | std::ios::binary);
 
 	if (!fileIn)
 	{
@@ -253,7 +251,7 @@ bool Simulation::LoadTimeline(std::string fileName)
 	if (!objectCreationGoingWell)
 	{
 		// TODO: Tell user that the file was corrupt like our government
-		//objManager->ClearObjects();
+		objManager->ClearObjects();
 		return false;
 	}
 

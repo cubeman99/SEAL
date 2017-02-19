@@ -4,6 +4,7 @@
 #include <graphics/Color.h>
 #include <graphics/SpriteFont.h>
 #include <graphics/Graphics.h>
+#include <math/Rect2i.h>
 #include <vector>
 #include <string>
 
@@ -65,45 +66,38 @@ class GraphPanel
 public:
 	GraphPanel();
 	~GraphPanel();
+	
+	Graph* GetGraph() { return m_graphs[0]; }
+	void GetGraphRange(const GraphInfo& graph, float& rangeMin,
+		float& rangeMax, float& domainMax, float& domainMin);
 
 	inline void SetTitle(const std::string& title) { m_title = title; }
 	inline void SetFont(SpriteFont* font) { m_font = font; }
-
 	void SetViewport(const Viewport& viewport);
-	
+	void SetViewport(const Rect2i& viewport);
 	void SetXBounds(float minX, float maxX);
 	void SetYBounds(float minY, float maxY);
 	void SetDynamicRange(bool dynamicRange, float dynamicRangePadding = 0.1f);
 
 	Graph* AddGraph(const std::string& name, const Color& color);
 	Graph* GetGraph(const std::string& name);
-	Graph* GetGraph() { return m_graphs[0]; }
-
-
+	
 	void Draw(Graphics& g);
-
-	void GetGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax, float& domainMax, float& domainMin);
 
 private:
 	Vector2f GetPointOnGraph(const Vector2f& point);
 	void DrawGraph(Graphics* g, Graph* graph);
 
+	SpriteFont*	m_font;
+
+	std::string	m_title;
 	std::vector<Graph*> m_graphs;
 	Viewport	m_viewport;
 	Viewport	m_graphViewport;
-	
-	float*		m_data;
-	int			m_dataSize;
-
 	Bounds		m_minBounds;
 	Bounds		m_bounds;
-
-	SpriteFont*	m_font;
-	
 	bool		m_dynamicRange;
 	float		m_dynamicRangePadding;
-
-	std::string	m_title;
 };
 
 
