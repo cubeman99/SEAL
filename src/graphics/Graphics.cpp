@@ -3,7 +3,9 @@
 #include "OpenGLIncludes.h"
 
 
-Graphics::Graphics()
+Graphics::Graphics() :
+	m_canvasWidth(1),
+	m_canvasHeight(1)
 {
 }
 
@@ -19,14 +21,40 @@ void Graphics::Clear(const Color& color)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Graphics::SetCanvasSize(int width, int height)
+{
+	m_canvasWidth = width;
+	m_canvasHeight = height;
+}
+
+void Graphics::SetViewportToCanvas()
+{
+	SetViewport(Rect2i(0, 0, m_canvasWidth, m_canvasHeight), false);
+}
+
+void Graphics::SetViewport(const Rect2i& viewport, bool scissor)
+{
+	SetViewport(Viewport(
+		viewport.position.x,
+		viewport.position.y,
+		viewport.size.x,
+		viewport.size.y), scissor);
+}
+
 void Graphics::SetViewport(const Viewport& viewport, bool scissor)
 {
-	int y = viewport.y;
-	glViewport(viewport.x, y, viewport.width, viewport.height);
+	glViewport(viewport.x, m_canvasHeight - (viewport.y + viewport.height),
+		viewport.width, viewport.height);
+
 	if (scissor)
 	{
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(viewport.x, y, viewport.width, viewport.height);
+		glScissor(viewport.x, m_canvasHeight - (viewport.y + viewport.height),
+			viewport.width, viewport.height);
+	}
+	else
+	{
+		glDisable(GL_SCISSOR_TEST);
 	}
 }
 
@@ -123,6 +151,10 @@ void Graphics::FillCircle(const Vector2f& pos, float radius, const Color& color,
 	glEnd();
 }
 
+void Graphics::DrawString(const Font* font, const std::string& text, float x, float y, const Color& color, int align)
+{
+	DrawString(font, text, Vector2f(x, y), color, align);
+}
 
 void Graphics::DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align)
 {

@@ -29,8 +29,6 @@ Graph::Graph(std::string name, const Color& color) :
 
 
 GraphPanel::GraphPanel() :
-	m_data(nullptr),
-	m_dataSize(0),
 	m_dynamicRange(true),
 	m_dynamicRangePadding(0.1f),
 	m_font(nullptr)
@@ -191,15 +189,18 @@ void GraphPanel::Draw(Graphics& g2)
 
 	// Draw the y-axis labels.
 	g->DrawString(m_font, labelMax,
-		Vector2f((float) padding + labelWidth - (labelMaxLength * 8),
-		(float) m_graphViewport.y - (labelHeight / 2)), colorLabels);
+		(float) padding + labelWidth - (labelMaxLength * 8),
+		(float) m_graphViewport.y - (labelHeight / 2),
+		colorLabels);
 	g->DrawString(m_font, labelMin,
-		Vector2f((float) padding + labelWidth - (labelMinLength * 8),
-		(float) m_graphViewport.y + m_graphViewport.height - (labelHeight / 2)), colorLabels);
+		(float) padding + labelWidth - (labelMinLength * 8),
+		(float) m_graphViewport.y + m_graphViewport.height - (labelHeight / 2),
+		colorLabels);
 
 	g->DrawString(m_font, m_title.c_str(),
-		Vector2f((float) (m_viewport.width / 2) - (titleWidth / 2),
-		(float) padding), colorLabels);
+		(float) (m_viewport.width / 2) - (titleWidth / 2),
+		(float) padding,
+		colorLabels);
 	
 	//-----------------------------------------------------------------------------
 	// GRAPH PLOTS.
@@ -225,20 +226,25 @@ Vector2f GraphPanel::GetPointOnGraph(const Vector2f& point)
 		m_graphViewport.y + m_graphViewport.height - ((point.y - m_bounds.mins.y) / (m_bounds.maxs.y - m_bounds.mins.y) * m_graphViewport.height));
 }
 
-void GraphPanel::GetGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax, float& domainMin, float& domainMax)
+void GraphPanel::GetGraphRange(const GraphInfo& graph, float& rangeMin,
+	float& rangeMax, float& domainMin, float& domainMax)
 {
-	int i, x;
-	for (i = graph.dataOffset, x = 0; i < m_dataSize; i += graph.dataStride, x++)
+	for (unsigned int i = 0; i < m_graphs.size(); ++i)
 	{
-		float y = m_data[i];
-		if (y < rangeMin)
-			rangeMin = y;
-		if (y > rangeMax)
-			rangeMax = y;
-		if ((float) x < domainMin)
-			domainMin = (float) x;
-		if ((float) x > domainMax)
-			domainMax = (float) x;
+		for (int j = 0; j < m_graphs[i]->GetDataCount(); ++j)
+		{
+			float x = (float) i;
+			float y = m_graphs[i]->GetData(j);
+
+			if (y < rangeMin)
+				rangeMin = y;
+			if (y > rangeMax)
+				rangeMax = y;
+			if ((float) x < domainMin)
+				domainMin = (float) x;
+			if ((float) x > domainMax)
+				domainMax = (float) x;
+		}
 	}
 }
 

@@ -1,10 +1,11 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
+#include <math/Matrix4f.h>
+#include <math/Rect2i.h>
 #include <math/Vector2f.h>
 #include <math/Vector3f.h>
 #include <math/Vector4f.h>
-#include <math/Matrix4f.h>
 #include <math/Quaternion.h>
 #include "Color.h"
 #include "SpriteFont.h"
@@ -12,6 +13,9 @@
 #include <string>
 
 
+//-------------------------------------------------------------------------
+// Viewport - integer rectangle class.
+//-------------------------------------------------------------------------
 struct Viewport
 {
 	int x;
@@ -22,8 +26,8 @@ struct Viewport
 	Viewport()
 	{}
 
-	Viewport(int x, int y, int width, int height)
-		: x(x), y(y), width(width), height(height)
+	Viewport(int x, int y, int width, int height) :
+		x(x), y(y), width(width), height(height)
 	{}
 
 	float GetAspectRatio() const
@@ -96,6 +100,9 @@ public:
 	// General
 
 	void Clear(const Color& color);
+	void SetCanvasSize(int width, int height);
+	void SetViewportToCanvas();
+	void SetViewport(const Rect2i& viewport, bool scissor);
 	void SetViewport(const Viewport& viewport, bool scissor);
 
 	//---------------------------------------------------------------------
@@ -123,6 +130,7 @@ public:
 	//---------------------------------------------------------------------
 	// Text
 
+	void DrawString(const Font* font, const std::string& text, float x, float y, const Color& color, int align = TextAlign::TOP_LEFT);
 	void DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align = TextAlign::TOP_LEFT);
 	Vector2f MeasureString(const Font* font, const std::string& text);
 
@@ -151,6 +159,10 @@ private:
 	void gl_Vertex(const Vector2f& v);
 	void gl_Vertex(const Vector3f& v);
 	void gl_Color(const Color& color);
+
+
+	int m_canvasWidth;
+	int m_canvasHeight;
 };
 
 

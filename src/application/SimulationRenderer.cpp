@@ -55,7 +55,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_graphFitness.SetXBounds(0, 60);
 	m_graphFitness.SetYBounds(0.0f, 400.0f);
 	m_graphFitness.SetDynamicRange(false);
-	m_graphFitness.SetViewport(Viewport(0, 0, 300, 140));
+	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
 	m_graphFitness.AddGraph("graph", Color::YELLOW);
 
 	// Agent model.
@@ -137,6 +137,9 @@ SimulationRenderer::~SimulationRenderer()
 void SimulationRenderer::Render(const Vector2f& viewPortSize)
 {
 	m_viewPortSize = viewPortSize;
+
+	m_graphics.SetCanvasSize((int) m_viewPortSize.x, (int) m_viewPortSize.y);
+	m_graphics.SetViewportToCanvas();
 
 	double startTime = Time::GetTime();
 
@@ -283,6 +286,10 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 			RenderBrain(selectedAgent);
 	}
 	
+	RenderGraphs();
+	RenderInfoPanel();
+	
+	/*
 	orthographic = Matrix4f::CreateOrthographic(0.0f,
 		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
 	m_graphics.SetProjection(orthographic);
@@ -298,7 +305,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
 	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
 	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
-	m_graphFitness.Draw(m_graphics);
+	m_graphFitness.Draw(m_graphics);*/
 
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);
@@ -565,6 +572,8 @@ void SimulationRenderer::RenderGraphs()
 	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
 	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
 	m_graphFitness.Draw(m_graphics);
+
+	m_graphics.SetViewportToCanvas();
 }
 
 void SimulationRenderer::RenderInfoPanel()
@@ -581,7 +590,9 @@ void SimulationRenderer::RenderInfoPanel()
 
 	text << "Generation " << (simulation->GetGeneration() + 1);
 
-	m_graphics.DrawString(m_font, text.str(), Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
+	m_graphics.DrawString(m_font, text.str(),
+		m_viewPortSize.x * 0.5f, 6,
+		Color::YELLOW, TextAlign::TOP_CENTER);
 }
 
 
