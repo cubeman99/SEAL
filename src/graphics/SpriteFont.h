@@ -1,30 +1,32 @@
 #ifndef _SPRITE_FONT_H_
 #define _SPRITE_FONT_H_
 
-#include <Windows.h>
-//#include <GL/glew.h>
-#include <graphics/OpenGLIncludes.h>
 #include <math/Vector2f.h>
 #include <math/Vector4f.h>
+#include "Texture.h"
 
 
 class SpriteFont
 {
 public:
-	SpriteFont(const char* imageFileName, int charsPerRow, int charWidth, int charHeight, int charSpacing);
+	friend class Graphics;
+
+public:
+	SpriteFont(Texture* texture, int charsPerRow, int charWidth, int charHeight, int charSpacing);
 	~SpriteFont();
 
-	void DrawString(const char* text, const Vector2f& position, const Vector4f& color, float scale = 1.0f);
+	inline Texture* GetTexture() const { return m_texture; }
 
 private:
-	int		m_charWidth;
-	int		m_charHeight;
-	int		m_charSpacing;
-	int		m_imageWidth;
-	int		m_imageHeight;
-	int		m_charsPerRow;
-	GLuint	m_glTextureId;
+	Texture*	m_texture;
+	int			m_charWidth;
+	int			m_charHeight;
+	int			m_charSpacing;
+	int			m_charsPerRow;
 };
+
+
+typedef SpriteFont Font;
 
 
 #endif // _SPRITE_FONT_H_

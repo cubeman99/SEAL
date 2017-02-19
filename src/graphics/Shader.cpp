@@ -107,7 +107,6 @@ bool Shader::AddStage(const std::string& code, ShaderType::value_type type, cons
 	else
 	{
 		assert(false);
-		//CMG_ASSERT_FALSE("Invalid shader stage type.");
 		return false;
 	}
 
@@ -275,7 +274,6 @@ void Shader::GenerateUniforms()
 			break;
 		default:
 			fprintf(stderr, "Warning: unsupported GLSL uniform type for '%s'\n", uniformName);
-			//CMG_ASSERT_FALSE("Unsupported uniform type");
 			assert(false);
 			break;
 		}

@@ -48,7 +48,8 @@ ResourceManager::~ResourceManager()
 	FreeResources(m_textures);
 	FreeResources(m_meshes);
 	FreeResources(m_materials);
-	FreeResources(m_shaders);
+	FreeResources(m_materials);
+	FreeResources(m_fonts);
 }
 
 
@@ -125,6 +126,22 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	return mesh;
 }
 
+Font* ResourceManager::LoadSpriteFont(const std::string& name,
+	const std::string& path, int charsPerRow, int charWidth,
+	int charHeight, int charSpacing)
+{
+	// Load the font texture.
+	Texture* texture = Texture::LoadTexture(m_assetsPath + path);
+	if (texture == nullptr)
+		return nullptr;
+
+	// Create the sprite font.
+	SpriteFont* font = new SpriteFont(texture,
+		charsPerRow, charWidth, charHeight, charSpacing);
+	AddFont(name, font);
+	return font;
+}
+
 
 //-----------------------------------------------------------------------------
 // Resource management
@@ -150,6 +167,11 @@ void ResourceManager::AddShader(const std::string& name, Shader* shader)
 	AddResource(m_shaders, name, shader);
 }
 
+void ResourceManager::AddFont(const std::string& name, Font* font)
+{
+	AddResource(m_fonts, name, font);
+}
+
 
 //-----------------------------------------------------------------------------
 // Resource loading
@@ -173,5 +195,10 @@ Material* ResourceManager::GetMaterial(const std::string& name)
 Shader* ResourceManager::GetShader(const std::string& name)
 {
 	return GetResource(m_shaders, name);
+}
+
+Font* ResourceManager::GetFont(const std::string& name)
+{
+	return GetResource(m_fonts, name);
 }
 

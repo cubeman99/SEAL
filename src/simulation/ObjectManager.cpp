@@ -60,12 +60,12 @@ SimulationObject* ObjectManager::GetObjByIndex(unsigned int index)
 
 void ObjectManager::ClearObjects()
 {
+	m_idToObjectMap.clear();
+	m_octTree.Clear();
 	// Delete all objects.
 	for (unsigned int i = 0; i < m_objects.size(); ++i)
 		delete m_objects[i];
 	m_objects.clear();
-	m_idToObjectMap.clear();
-	m_octTree.Clear();
 }
 
 void ObjectManager::UpdateObjects()

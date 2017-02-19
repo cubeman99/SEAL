@@ -39,12 +39,13 @@ void Plant::Update()
 		// Respawn with new offshoots
 		m_objectManager->CreateRandomPositionAndOrientation(
 			m_position, m_orientation);
-		SpawnOffshoot();
+		for (int i = 0; i < config.plant.numOffshootsPerPlant; ++i)
+			SpawnOffshoot();
 	}
 	else if (GetNumOffshoots() < config.plant.numOffshootsPerPlant)
 	{
 		// Spawn offshoot if below capacity with random chance
-		if (random.NextInt() % 1000 < 3)
+		if (random.NextInt() % 300 == 0)
 		{
 			SpawnOffshoot();
 		}

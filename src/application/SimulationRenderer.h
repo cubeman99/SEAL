@@ -6,6 +6,7 @@
 #include <math/MathLib.h>
 #include "ResourceManager.h"
 #include "OctTreeRenderer.h"
+#include "Graph.h"
 
 class SimulationManager;
 class Agent;
@@ -24,6 +25,8 @@ public:
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
 	void RenderBrain(Agent* agent);
+	void RenderGraphs();
+	void RenderInfoPanel();
 
 	inline double GetAverageRenderTime() const { return m_renderTime; }
 
@@ -38,7 +41,11 @@ private:
 
 	Vector2f		m_viewPortSize;
 
+
+	GraphPanel		m_graphFitness;
+
 	// Resources.
+	Font* m_font;
 	Mesh* m_agentMesh;
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;

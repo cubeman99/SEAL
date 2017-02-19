@@ -20,7 +20,8 @@ SimulationManager::SimulationManager() :
 	  m_showOctTreeWireFrame(false),
 	  m_showAgentVision(false),
 	  m_showAgentBrain(false),
-	  m_showInvisibleObjects(false)
+	  m_showInvisibleObjects(false),
+	  m_showAxisLines(false)
 {
 }
 

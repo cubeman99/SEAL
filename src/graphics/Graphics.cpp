@@ -123,9 +123,93 @@ void Graphics::FillCircle(const Vector2f& pos, float radius, const Color& color,
 	glEnd();
 }
 
-void Graphics::DrawString(SpriteFont* font, const char* text, const Vector2f& pos, const Color& color, float scale)
+
+void Graphics::DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align)
 {
-	font->DrawString(text, pos, color.ToVector4f(), scale);
+	float scale = 1.0f;
+
+	Texture* texture = font->GetTexture();
+	Vector2f texSize((float) texture->GetWidth(), (float) texture->GetHeight());
+	Vector2f charSize = Vector2f((float) font->m_charWidth , (float) font->m_charHeight) / texSize;
+	Vector2f cursor = position;
+	Vector2f screenCharSize = Vector2f(font->m_charWidth * scale, font->m_charHeight * scale);
+	Vector2f texCoord;
+	int row, col, x, y;
+
+	// Change cursor position based on alignment.
+	Vector2f stringSize = MeasureString(font, text);
+	if (align & TextAlign::RIGHT)
+		cursor.x -= stringSize.x;
+	if (!(align & TextAlign::LEFT))
+		cursor.x -= (int) (stringSize.x * 0.5f);
+	if (align & TextAlign::BOTTOM)
+		cursor.y -= stringSize.y;
+	else if (!(align & TextAlign::TOP))
+		cursor.y -= (int) (stringSize.y * 0.5f);
+
+	glBindTexture(GL_TEXTURE_2D, font->GetTexture()->GetGLTextureId());
+	glBegin(GL_QUADS);
+	glColor4ubv(color.data());
+
+	for (const char* charPtr = text.c_str(); *charPtr != '\0'; charPtr++)
+	{
+		unsigned char c = (unsigned char) *charPtr;
+
+		if (c == '\n')
+		{
+			cursor.x = position.x;
+			cursor.y += font->m_charHeight * scale;
+		}
+		else
+		{
+			col = c % font->m_charsPerRow;
+			row = c / font->m_charsPerRow;
+			x   = col * (font->m_charWidth  + font->m_charSpacing);
+			y   = row * (font->m_charHeight + font->m_charSpacing);
+			texCoord.x = x / (float) font->GetTexture()->GetWidth();
+			texCoord.y = y / (float) font->GetTexture()->GetHeight();
+
+			glTexCoord2f(texCoord.x, texCoord.y);
+			glVertex2f(cursor.x, cursor.y);
+			glTexCoord2f(texCoord.x + charSize.x, texCoord.y);
+			glVertex2f(cursor.x + screenCharSize.x, cursor.y);
+			glTexCoord2f(texCoord.x + charSize.x, texCoord.y + charSize.y);
+			glVertex2f(cursor.x + screenCharSize.x, cursor.y + screenCharSize.y);
+			glTexCoord2f(texCoord.x, texCoord.y + charSize.y);
+			glVertex2f(cursor.x, cursor.y + screenCharSize.y);
+
+			cursor.x += font->m_charWidth * scale;
+		}
+	}
+
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+Vector2f Graphics::MeasureString(const Font* font, const std::string& text)
+{
+	Vector2f cursor(0, 0);
+	Vector2f size(0, 0);
+
+	for (const char* charPtr = text.c_str(); *charPtr != '\0'; charPtr++)
+	{
+		unsigned char c = (unsigned char) *charPtr;
+
+		if (c == '\n')
+		{
+			cursor.x = 0.0f;
+			cursor.y += font->m_charHeight;
+		}
+		else
+		{
+			cursor.x += font->m_charWidth;
+		}
+
+		size.x = Math::Max(size.x, cursor.x);
+		size.y = Math::Max(size.y, cursor.y + font->m_charHeight);
+	}
+
+	return size;
 }
 
 

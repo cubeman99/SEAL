@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\src\application\ArcBallCamera.cpp" />
     <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
+    <ClCompile Include="..\..\src\application\Graph.cpp" />
     <ClCompile Include="..\..\src\application\OctTreeRenderer.cpp" />
     <ClCompile Include="..\..\src\application\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\application\SimulationManager.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="..\..\src\application\ArcBallCamera.h" />
     <ClInclude Include="..\..\src\application\CameraSystem.h" />
     <ClInclude Include="..\..\src\application\GlobeCamera.h" />
+    <ClInclude Include="..\..\src\application\Graph.h" />
     <ClInclude Include="..\..\src\application\OctTreeRenderer.h" />
     <ClInclude Include="..\..\src\application\ResourceManager.h" />
     <ClInclude Include="..\..\src\application\SimulationManager.h" />
@@ -117,6 +119,7 @@
     <ClInclude Include="..\..\src\simulation\Simulation.h" />
     <ClInclude Include="..\..\src\simulation\SimulationConfig.h" />
     <ClInclude Include="..\..\src\simulation\SimulationObject.h" />
+    <ClInclude Include="..\..\src\simulation\SimulationStats.h" />
     <ClInclude Include="..\..\src\simulation\Vision.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
     <ClInclude Include="..\..\src\utilities\FileUtility.h" />

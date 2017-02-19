@@ -33,6 +33,7 @@ public:
 	inline void SetShowAgentVision(bool showAgentVision) { m_showAgentVision = showAgentVision; }
 	inline void SetShowAgentBrain(bool showAgentBrain) { m_showAgentBrain = showAgentBrain; }
 	inline void SetShowInvisibleObjects(bool showInvisibleObjects) { m_showInvisibleObjects = showInvisibleObjects; }
+	inline void SetShowAxisLines(bool showAxisLines) { m_showAxisLines = showAxisLines; }
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
 	inline bool IsLightingEnabled() const { return m_viewLighting; }
@@ -41,6 +42,7 @@ public:
 	inline bool GetShowAgentVision() const { return m_showAgentVision; }
 	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
+	inline bool GetShowAxisLines() const { return m_showAxisLines; }
 
 	inline void SetSelectedAgent(Agent* agent) {
 		m_selectedAgent = agent;
@@ -74,6 +76,7 @@ private:
 	bool m_showAgentVision;
 	bool m_showAgentBrain;
 	bool m_showInvisibleObjects;
+	bool m_showAxisLines;
 };
 
 
