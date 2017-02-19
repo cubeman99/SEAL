@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 // OutputNeurons
 //-----------------------------------------------------------------------------
-enum OutputNeurons // TODO: decide if this is necessary or just use an int of numOutputNuerons
+enum OutputNeurons
 {
 	MOVE_SPEED = 0,
 	TURN_SPEED,
@@ -110,6 +110,8 @@ private:
 	// Positive x-values will yield y-values between 0.5 and 1
 	// Negative x-values will yield y-values between 0 and 0.5
 	static float Sigmoid(float x, float slope);
+
+	friend class Agent;
 
 private:
 	

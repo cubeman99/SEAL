@@ -176,10 +176,12 @@ void Agent::Update()
 void Agent::Read(std::ifstream& fileIn)
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
+	unsigned char gene;
 	m_isSerialized = true;
 	m_genome = new Genome(GetSimulation(), false);
-	unsigned char gene;
+	m_brain = new Brain();
 
+	// Read basic info
 	fileIn.read((char*)&m_objectId, sizeof(int));
 	fileIn.read((char*)&m_position, sizeof(Vector3f));
 	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
@@ -189,14 +191,50 @@ void Agent::Read(std::ifstream& fileIn)
 	fileIn.read((char*)&m_age, sizeof(int));
 	fileIn.read((char*)&m_fitness, sizeof(float));
 
-	// Read in genome
-	for (unsigned int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
+	// Read genome
+	for (int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
 	{
 		fileIn.read((char*)&gene, sizeof(unsigned char));
 		m_genome->m_genes.push_back(gene);
 	}
 
-	// TODO:: Brain + synapses
+	// Read brain
+	fileIn.read((char*)&m_brain->m_numNeurons, sizeof(unsigned int));
+	fileIn.read((char*)&m_brain->m_numInputNeurons, sizeof(unsigned int));
+	fileIn.read((char*)&m_brain->m_numOutputNeurons, sizeof(unsigned int));
+	fileIn.read((char*)&m_brain->m_numSynapses, sizeof(unsigned int));
+	fileIn.read((char*)&m_brain->m_decayRate, sizeof(float));
+	fileIn.read((char*)&m_brain->m_maxWeight, sizeof(float));
+
+	// Allocate neuron and synapse arrays
+	m_brain->m_neurons = new Neuron[m_brain->m_numNeurons];
+	m_brain->m_currNeuronActivations = new float[m_brain->m_numNeurons];
+	m_brain->m_prevNeuronActivations = new float[m_brain->m_numNeurons];
+	m_brain->m_synapses = new Synapse[m_brain->m_numSynapses];
+
+	// -Read nuerons
+	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+	{
+		fileIn.read((char*)&m_brain->m_neurons[i], sizeof(Neuron));
+	}
+
+	// -Read current nueron activations
+	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+	{
+		fileIn.read((char*)&m_brain->m_currNeuronActivations[i], sizeof(float));
+	}
+
+	// -Read previous neuron activations
+	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+	{
+		fileIn.read((char*)&m_brain->m_prevNeuronActivations[i], sizeof(float));
+	}
+
+	// -Read synapses
+	for (unsigned int i = 0; i < m_brain->m_numSynapses; ++i)
+	{
+		fileIn.read((char*)&m_brain->m_synapses[i], sizeof(float));
+	}
 }
 
 void Agent::Write(std::ofstream& fileOut)
@@ -205,6 +243,7 @@ void Agent::Write(std::ofstream& fileOut)
 	{
 		int objType = GetObjectType();
 
+		// Write basic info
 		fileOut.write((char*)&objType, sizeof(int));
 		fileOut.write((char*)&m_objectId, sizeof(int));
 		fileOut.write((char*)&m_position, sizeof(Vector3f));
@@ -221,7 +260,37 @@ void Agent::Write(std::ofstream& fileOut)
 			fileOut.write((char*)&m_genome->m_genes[i], sizeof(unsigned char));
 		}
 
-		// TODO: brain
+		// Write brain
+		fileOut.write((char*)&m_brain->m_numNeurons, sizeof(unsigned int));
+		fileOut.write((char*)&m_brain->m_numInputNeurons, sizeof(unsigned int));
+		fileOut.write((char*)&m_brain->m_numOutputNeurons, sizeof(unsigned int));
+		fileOut.write((char*)&m_brain->m_numSynapses, sizeof(unsigned int));
+		fileOut.write((char*)&m_brain->m_decayRate, sizeof(float));
+		fileOut.write((char*)&m_brain->m_maxWeight, sizeof(float));
+
+		// -Write nuerons
+		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+		{
+			fileOut.write((char*)&m_brain->m_neurons[i], sizeof(Neuron));
+		}
+
+		// -Write current nueron activations
+		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+		{
+			fileOut.write((char*)&m_brain->m_currNeuronActivations[i], sizeof(float));
+		}
+
+		// -Write previous neuron activations
+		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
+		{
+			fileOut.write((char*)&m_brain->m_prevNeuronActivations[i], sizeof(float));
+		}
+
+		// -Write synapses
+		for (unsigned int i = 0; i < m_brain->m_numSynapses; ++i)
+		{
+			fileOut.write((char*)&m_brain->m_synapses[i], sizeof(float));
+		}
 	}
 }
 

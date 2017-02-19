@@ -210,10 +210,7 @@ void Genome::GrowBrain(Brain* brain)
 		config.genes.minSightResolution, config.genes.maxSightResolution);
 
 	// Count the number of neurons.
-	unsigned int numInputNeurons = 2 + ((resRed + resGreen + resBlue) * 2);
 	unsigned int numOutputNeurons = 2;
-	unsigned int numInternalNeurons = 0;
-	
 	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2);
 	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
 	unsigned int maxSynapses = (numOutputNeurons + config.genes.maxInternalNeurons) * maxNeurons;
@@ -296,4 +293,3 @@ void Genome::GrowBrain(Brain* brain)
 	// If an internal neuron has no incoming connections, then remove it.
 	// If an internal neuron has no outgoing connections, then remove it.
 }
-
