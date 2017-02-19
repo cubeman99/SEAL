@@ -22,7 +22,7 @@ enum SimulationObjectType : int
 	AGENT = 'AGNT',
 	PLANT = 'PLNT',
 	OFFSHOOT = 'OFST',
-	//CARCASS = 'CARC',
+	CARCASS = 'CARC',
 	//PREDATOR_AGENT = 'PRED',
 	//PREY_AGENT = 'PREY',
 	//FOOD,

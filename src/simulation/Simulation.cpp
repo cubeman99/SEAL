@@ -109,6 +109,10 @@ void Simulation::NextGeneration()
 		
 		m_objectManager.SpawnObject(agent);
 	}
+
+	// TODO: TEMP:
+	// Save a copy of the timeline state
+	SaveTimeline("DebugTimeline");
 }
 
 Agent* Simulation::SelectAgent()
@@ -142,6 +146,84 @@ Agent* Simulation::SelectAgent()
 	}
 
 	return agents.back();
+}
+
+// Should be called only between ticks in the simulation.
+bool Simulation::SaveTimeline(std::string fileName)
+{
+	std::ofstream fileOut;
+	std::string filePath = "../../assets/timelines/" + fileName + ".bin";
+	fileOut.open(filePath, std::ios::out | std::ios::binary);
+
+	if (!fileOut)
+	{
+		// TODO: Tell user that the file could not be opened for writing
+		return false;
+	}
+
+	// Write the simulation data
+	WriteSimulation(fileOut);
+
+	// Write the number of objects
+	ObjectManager* objManager = GetObjectManager();
+	unsigned int numObjects = objManager->GetNumObjects();
+	fileOut.write((char*)&numObjects, sizeof(unsigned int));
+
+	// Write the object data
+	for (unsigned int i = 0; i < objManager->GetNumObjects(); ++i)
+	{
+		objManager->GetObjByIndex(i)->Write(fileOut);
+	}
+
+	fileOut.close();
+
+	// TODO: Tell user that the file has been saved succesffully
+
+	return true;
+}
+
+bool Simulation::LoadTimeline(std::string fileName)
+{
+	std::ifstream fileIn;
+	std::string filePath = "../../assets/timelines/" + fileName + ".bin";
+	fileIn.open(filePath, std::ios::in | std::ios::binary);
+
+	if (!fileIn)
+	{
+		// TODO: Tell user that the file could not be opened for reading
+		return false;
+	}
+
+	// Clear out the current objects
+	ObjectManager* objManager = GetObjectManager();
+	objManager->ClearObjects();
+
+	// Read the simulation data
+	ReadSimulation(fileIn);
+
+	// Get number of objects
+	unsigned int numObjects;
+	fileIn.read((char*)&numObjects, sizeof(unsigned int));
+
+	// Read and create objects
+	bool objectCreationFailed = false;
+	for (unsigned int i = 0; i < numObjects && !objectCreationFailed; ++i)
+	{
+		objectCreationFailed = objManager->SpawnObjectSerialized(fileIn);
+	}
+
+	if (objectCreationFailed)
+	{
+		// TODO: Tell user that the file was corrupt like our government
+		objManager->ClearObjects();
+		return false;
+	}
+
+	fileIn.close();
+
+	// TODO: Tell user that the file has been loaded succesffully
+
+	return true;
 }
 
 void Simulation::ReadSimulation(std::ifstream& fileIn)
