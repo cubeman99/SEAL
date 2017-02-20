@@ -20,7 +20,7 @@ public:
 	bool OpenSimulation(const std::string& fileName);
 
 	inline Simulation* GetSimulation() { return m_simulation; }
-	inline bool IsSimulationPuased() const { return m_isSimulationPaused; }
+	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }

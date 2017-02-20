@@ -44,22 +44,84 @@ void SimulationManager::Initialize()
 	Random::SeedTime();
 }
 
+//-----------------------------------------------------------------------------
+// Saving & loading
+//-----------------------------------------------------------------------------
+
+// Should be called only between ticks in the simulation.
 bool SimulationManager::SaveSimulation(const std::string& fileName)
 {
-	bool result = m_simulation->SaveTimeline(fileName);
-	return result;
+	std::ofstream fileOut;
+	fileOut.open(fileName, std::ios::out | std::ios::binary);
+
+	if (!fileOut)
+	{
+		// TODO: Tell user that the file could not be opened for writing
+		return false;
+	}
+
+	// Write the simulation data
+	m_simulation->WriteSimulation(fileOut);
+
+	// Write the number of objects
+	ObjectManager* objManager = m_simulation->GetObjectManager();
+	unsigned int numObjects = objManager->GetNumObjects();
+	fileOut.write((char*)&numObjects, sizeof(unsigned int));
+
+	// Write the object data
+	for (unsigned int i = 0; i < objManager->GetNumObjects(); ++i)
+	{
+		objManager->GetObjByIndex(i)->Write(fileOut);
+	}
+
+	fileOut.close();
+
+	// TODO: Tell user that the file has been saved succesffully
+
+	return true;
 }
 
 bool SimulationManager::OpenSimulation(const std::string& fileName)
 {
-	bool result = m_simulation->LoadTimeline(fileName);
-	
-	if (result)
+	std::ifstream fileIn;
+	fileIn.open(fileName, std::ios::in | std::ios::binary);
+
+	if (!fileIn)
 	{
-		m_cameraSystem.Initialize(m_simulation);
+		// TODO: Tell user that the file could not be opened for reading
+		return false;
 	}
 
-	return result;
+	// Clear out the current objects
+	ObjectManager* objManager = m_simulation->GetObjectManager();
+	objManager->ClearObjects();
+
+	// Read the simulation data
+	m_simulation->ReadSimulation(fileIn);
+
+	// Get number of objects
+	unsigned int numObjects;
+	fileIn.read((char*)&numObjects, sizeof(unsigned int));
+
+	// Read and create objects
+	bool objectCreationGoingWell = true;
+	for (unsigned int i = 0; i < numObjects && objectCreationGoingWell; ++i)
+	{
+		objectCreationGoingWell = objManager->SpawnObjectSerialized(fileIn);
+	}
+
+	if (!objectCreationGoingWell)
+	{
+		// TODO: Tell user that the file was corrupt like our government
+		objManager->ClearObjects();
+		return false;
+	}
+
+	fileIn.close();
+
+	// TODO: Tell user that the file has been loaded succesffully
+
+	return true;
 }
 		
 void SimulationManager::ToggleCameraTracking()
