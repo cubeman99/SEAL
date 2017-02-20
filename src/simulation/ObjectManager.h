@@ -82,6 +82,10 @@ public:
 	// Create a random position and orientation on the world's surface.
 	void CreateRandomPositionAndOrientation(
 		Vector3f& position, Quaternion& orientation) const;
+	
+	// Create a random orientation on the world's surface.
+	void CreateRandomOrientation(const Vector3f& position,
+		Quaternion& orientation) const;
 
 	// Create a random position relative to another, also orientation
 	void CreateRelativeRandomPositionAndOrientation( Vector3f relativePosition,

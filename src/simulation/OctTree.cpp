@@ -96,7 +96,7 @@ void OctTree::RemoveObject(object_pointer object)
 	OctTreeNode* node = m_objectToNodeMap[object];
 
 	// Delete the node if this is the only object in it.
-	if (node->GetObjectCount() == 1 && node != &m_root)
+	if (node->GetObjectCount() == 1)
 	{
 		node->m_objects.clear();
 		DoRemoveNode(node);
@@ -181,6 +181,10 @@ void OctTree::DoClear(OctTreeNode* node)
 
 void OctTree::DoRemoveNode(OctTreeNode* node)
 {
+	// Never remove the root node.
+	if (node == &m_root)
+		return;
+
 	// Don't remove nodes that have child nodes.
 	for (unsigned int sectorIndex = 0; sectorIndex < 8; ++sectorIndex)
 	{

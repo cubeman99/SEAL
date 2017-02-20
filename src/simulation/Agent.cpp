@@ -21,7 +21,8 @@ Agent::Agent(Genome* genome, float energy) :
 	m_turnSpeed(0.0f),
 	m_numEyes(2),
 	m_genome(genome),
-	m_energy(energy)
+	m_energy(energy),
+	m_brain(nullptr)
 {
 }
 
@@ -33,7 +34,6 @@ void Agent::OnSpawn()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 
-	m_radius = config.agent.radius;
 	m_manualOverride = false;
 
 	// Don't ovverwrite these values if they've already been read in
@@ -124,8 +124,6 @@ void Agent::OnSpawn()
 		config.agent.radiusAtMinStrength,
 		config.agent.radiusAtMaxStrength,
 		m_strength);
-
-	m_energy = m_maxEnergy * 0.8f;
 
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
@@ -314,7 +312,7 @@ void Agent::UpdateVision()
 	// Clear all sight values.
 	m_eyes[0].ClearSightValues();
 	m_eyes[1].ClearSightValues();
-
+	
 	// Query the octtree for objects within vision range.
 	Sphere visionSphere(m_position, m_maxViewDistance);
 	m_objectManager->GetOctTree()->Query(visionSphere,
@@ -322,12 +320,24 @@ void Agent::UpdateVision()
 	{
 		if (object != this)
 		{
-			// Check for collisions with food.
+			float contactDist = m_radius + object->GetRadius();
+			float matingDist = GetSimulation()->GetConfig().agent.minMatingDistance;
+			float distSqr = m_position.DistToSqr(object->GetPosition());
+
 			// TODO: Move collisions outside of UpdateVision()
-			if (object->GetBoundingSphere().Intersects(GetBoundingSphere()))
+
+			// Check for collisions with food.
+			if (object->GetObjectType() == SimulationObjectType::OFFSHOOT &&
+				distSqr < contactDist * contactDist)
 			{
-				if (object->GetObjectType() == SimulationObjectType::OFFSHOOT)
-					EatPlant((Offshoot*) object);
+				EatPlant((Offshoot*) object);
+			}
+
+			// Check for mating interations with other agents.
+			if (object->GetObjectType() == SimulationObjectType::AGENT &&
+				distSqr < matingDist * matingDist)
+			{
+				Mate((Agent*) object);
 			}
 
 			// Attempt to see the object.
@@ -348,7 +358,79 @@ void Agent::EatPlant(Offshoot* plant)
 		m_energy = Math::Clamp(m_energy, 0.0f, m_maxEnergy);
 		m_fitness += energyAmount;
 	}
+}
 
+void Agent::Mate(Agent* mate)
+{
+	// Make sure only one agent of the pair will call this method.
+	if (GetId() < mate->GetId())
+		return;
+
+	const SimulationConfig& config = GetSimulation()->GetConfig();
+	float energyPercentAtMinChildren = 0.4f;
+	float energyPercentAtMaxChildren = 0.8f;
+
+	// Each agent has:
+	//  - a desired number of children
+	//  - max energy percent for min number of children
+	//  - max energy percent for max number of children
+	//  - a maximum percentage of their energy that they will transfer to their children
+	//  - during mating, each agent cannot give more energy than their desired number of children
+	
+	Agent* agents[2] = { this, mate };
+
+	// Calculate the required energy per child.
+	float avgNumChildrenGene =
+		(agents[0]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT) +
+		agents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
+	int maxNumChildren = (int) (Math::Lerp((float) config.genes.minChildren,
+		(float) config.genes.maxChildren, avgNumChildrenGene) + 0.5f);
+	float maxEnergyPercent = Math::Lerp(energyPercentAtMinChildren,
+		energyPercentAtMaxChildren, avgNumChildrenGene);
+	float maxTransferrableEnergy = (agents[0]->GetMaxEnergy() +
+		agents[1]->GetMaxEnergy()) * maxEnergyPercent;
+	float energyPerChild = maxTransferrableEnergy / (float) maxNumChildren;
+
+	float transferrableEnergy[2];
+	transferrableEnergy[0] = agents[0]->GetEnergy() * maxEnergyPercent;
+	transferrableEnergy[1] = agents[1]->GetEnergy() * maxEnergyPercent;
+	float actualTransferrableEnergy = transferrableEnergy[0] + transferrableEnergy[1];
+
+	// Determine the actual number of children that will be born.
+	//float actualTransferrableEnergy = agents[0]->GetEnergy() + agents[1]->GetEnergy();
+	int actualNumChildren = (int) (actualTransferrableEnergy / energyPerChild);
+	actualNumChildren = Math::Clamp(actualNumChildren, 0, maxNumChildren);
+	if (actualNumChildren == 0)
+		return;
+
+	agents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
+	agents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
+
+	// Spawn the children.
+	for (int i = 0; i < actualNumChildren; ++i)
+	{
+		// Crossover and mutate the genome.
+		Genome* childGenome = Genome::SpawnChild(
+			agents[0]->GetGenome(), agents[1]->GetGenome(), GetSimulation());
+		Agent* child = new Agent(childGenome, energyPerChild);
+
+		// Set the child's position and orientation.
+		Vector3f childPos = (agents[0]->GetPosition() +
+			agents[1]->GetPosition()) * 0.5f;
+		childPos.Normalize();
+		childPos *= GetSimulation()->GetWorld()->GetRadius();
+		child->SetPosition(childPos);
+		Quaternion childOrientation;
+		m_objectManager->CreateRandomOrientation(childPos, childOrientation);
+		child->SetOrientation(childOrientation);
+		
+		child->SetPosition(m_position);
+		child->SetOrientation(m_orientation);
+
+		// Spawn the child into the world.
+		m_objectManager->SpawnObject(child);
+		child->m_energy = energyPerChild;
+	}
 }
 
 void Agent::SeeObject(SimulationObject* object)

@@ -26,7 +26,6 @@ public:
 	
 	struct
 	{
-		float	radius;
 		int		minPreyAgents;
 		int		maxPreyAgents;
 		int		minPredatorAgents;
@@ -34,6 +33,7 @@ public:
 		int		initialPreyCount;
 		int		initialPredatorCount;
 
+		float	minMatingDistance;
 		float	radiusAtMinStrength;
 		float	radiusAtMaxStrength;
 		float	maxEnergyAtMinStrength;

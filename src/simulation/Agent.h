@@ -47,6 +47,7 @@ public:
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
 	void EatPlant(Offshoot* plant);
+	void Mate(Agent* agent);
 
 	//-------------------------------------------------------------------------
 	// Getters
@@ -58,6 +59,7 @@ public:
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
 	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
 	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
+	inline float GetMaxEnergy() const { return m_maxEnergy; }
 	inline float GetFieldOfView() const { return m_fieldOfView; }
 	inline float GetMaxViewDistance() const { return m_maxViewDistance; }
 	inline float GetAngleBetweenEyes() const { return m_angleBetweenEyes; }

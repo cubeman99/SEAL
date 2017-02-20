@@ -12,28 +12,28 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 20;
+	plant.numPlants					= 0;
 	plant.numOffshootsPerPlant		= 5;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 10.0f;
 
-	agent.radius					= 5.0f;
-	agent.radiusAtMinStrength		= 4.0f;
-	agent.radiusAtMaxStrength		= 6.0f;
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 20;
 	agent.minPredatorAgents			= 10;
 	agent.minPredatorAgents			= 80;
 	agent.minPreyAgents				= 20; 
 	agent.maxPreyAgents				= 160;
+	agent.radiusAtMinStrength		= 4.0f;
+	agent.radiusAtMaxStrength		= 6.0f;
 	agent.maxMoveSpeedAtMinStrength	= 0.7f;
 	agent.maxMoveSpeedAtMaxStrength	= 0.3f;
 	agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
 	agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
 	agent.maxEnergyAtMinStrength	= 50.0f;
 	agent.maxEnergyAtMaxStrength	= 100.0f;
+	agent.minMatingDistance			= 23.0f;
 
 	energy.energyCostExist			= 0.005f;
 	energy.energyCostMove			= 0.01f;

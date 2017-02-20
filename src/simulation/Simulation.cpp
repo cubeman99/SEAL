@@ -63,16 +63,16 @@ void Simulation::Tick()
 	m_generationAge++;
 	if (m_generationAge >= m_generationDuration)
 	{
+		//UpdateStatistics();
+		//m_generationStats.push_back(m_statistics);
+
+		//NextGeneration();
+	}
+	if (m_ageInTicks % 30 == 0)
+	{
 		UpdateStatistics();
 		m_generationStats.push_back(m_statistics);
-
-		NextGeneration();
 	}
-	//if (m_ageInTicks % 30 == 0)
-	//{
-	//	UpdateStatistics();
-	//	m_generationStats.push_back(m_statistics);
-	//}
 	
 	// Measure elapsed time.
 	double endTime = Time::GetTime();
