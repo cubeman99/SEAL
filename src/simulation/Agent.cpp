@@ -167,7 +167,7 @@ void Agent::Update()
 		m_energy = 0.0f;
 
 		// TODO: kill agent after energy depletion.
-		//Destroy();
+		Destroy();
 	}
 }
 
@@ -395,6 +395,8 @@ void Agent::Mate(Agent* mate)
 	transferrableEnergy[0] = agents[0]->GetEnergy() * maxEnergyPercent;
 	transferrableEnergy[1] = agents[1]->GetEnergy() * maxEnergyPercent;
 	float actualTransferrableEnergy = transferrableEnergy[0] + transferrableEnergy[1];
+	if (actualTransferrableEnergy < energyPerChild)
+		return;
 
 	// Determine the actual number of children that will be born.
 	//float actualTransferrableEnergy = agents[0]->GetEnergy() + agents[1]->GetEnergy();

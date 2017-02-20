@@ -53,8 +53,8 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_graphFitness.SetFont(m_font);
 	m_graphFitness.SetTitle("Fitness");
 	m_graphFitness.SetXBounds(0, 60);
-	m_graphFitness.SetYBounds(0.0f, 400.0f);
-	m_graphFitness.SetDynamicRange(false);
+	m_graphFitness.SetYBounds(0.0f, 10000.0f);
+	m_graphFitness.SetDynamicRange(true);
 	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
 	m_graphFitness.AddGraph("graph", Color::YELLOW);
 
@@ -569,7 +569,7 @@ void SimulationRenderer::RenderGraphs()
 	
 	// Draw graphs.
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
-	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
+	m_graphFitness.GetGraph()->ConfigData(&stats.data()->totalEnergy, (int) stats.size(), sizeof(SimulationStats), 0);
 	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
 	m_graphFitness.Draw(m_graphics);
 

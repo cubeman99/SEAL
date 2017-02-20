@@ -32,7 +32,7 @@ public:
 
 	float avgFitness;
 	//float bestFitness;
-	//float totalEnergy;
+	float totalEnergy;
 	//float avgEnergy;
 	//float avgEnergyUsage;
 
@@ -44,6 +44,7 @@ public:
 	{
 		memset(avgGeneValues, 0, GenePosition::PHYSIOLOGICAL_GENES_COUNT * sizeof(float));
 		avgFitness = 0.0f;
+		totalEnergy = 0.0f;
 	}
 };
 
