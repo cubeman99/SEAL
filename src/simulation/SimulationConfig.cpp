@@ -12,8 +12,8 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 20;
-	plant.numOffshootsPerPlant		= 5;
+	plant.numPlants					= 10;
+	plant.numOffshootsPerPlant		= 6;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
@@ -34,10 +34,11 @@ SimulationConfig::SimulationConfig()
 	agent.maxEnergyAtMinStrength	= 50.0f;
 	agent.maxEnergyAtMaxStrength	= 100.0f;
 	agent.minMatingDistance			= 23.0f;
+	agent.matingDelay				= 60 * 4;
 
 	energy.energyCostExist			= 0.005f;
-	energy.energyCostMove			= 0.01f;
-	energy.energyCostTurn			= 0.01f;
+	energy.energyCostMove			= 0.02f;
+	energy.energyCostTurn			= 0.02f;
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 

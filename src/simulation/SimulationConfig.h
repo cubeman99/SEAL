@@ -33,6 +33,7 @@ public:
 		int		initialPreyCount;
 		int		initialPredatorCount;
 
+		int		matingDelay;
 		float	minMatingDistance;
 		float	radiusAtMinStrength;
 		float	radiusAtMaxStrength;

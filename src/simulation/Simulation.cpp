@@ -68,7 +68,7 @@ void Simulation::Tick()
 
 		//NextGeneration();
 	}
-	//if (m_ageInTicks % 30 == 0)
+	if (m_ageInTicks % 60 == 0)
 	{
 		UpdateStatistics();
 		m_generationStats.push_back(m_statistics);
@@ -204,6 +204,7 @@ void Simulation::UpdateStatistics()
 			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
 		stats.avgFitness += it->GetFitness();
 		stats.totalEnergy += it->GetEnergy();
+		stats.populationSize++;
 		numAgents++;
 	}
 	

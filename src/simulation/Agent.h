@@ -94,6 +94,8 @@ private:
 	float			m_energy;
 	int				m_age;
 
+	int				m_mateWaitTime;
+
 	float			m_fitness;
 
 	float			m_strength;
@@ -101,7 +103,7 @@ private:
 	float			m_maxTurnSpeed;
 	float			m_maxEnergy;
 	int				m_lifeSpan;
-		
+	
 	unsigned int	m_numEyes;
 	Retina			m_eyes[2]; // 0 = left eye, 1 = right eye.
 	float			m_fieldOfView; // in radians.

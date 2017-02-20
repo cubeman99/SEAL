@@ -36,13 +36,16 @@ void Agent::OnSpawn()
 
 	m_manualOverride = false;
 
+	bool adamAndEve = false;
+
 	// Don't ovverwrite these values if they've already been read in
 	if (!m_isSerialized)
 	{
-		m_moveSpeed = 0.0f;
-		m_turnSpeed = 0.0f;
-		m_age = 0;
-		m_fitness = 0.0f;
+		m_moveSpeed		= 0.0f;
+		m_turnSpeed		= 0.0f;
+		m_age			= 0;
+		m_fitness		= 0.0f;
+		m_mateWaitTime = config.agent.matingDelay; // Don't allow mating initially.
 	}
 
 	// If the genome is null, then create a randomized one.
@@ -50,7 +53,8 @@ void Agent::OnSpawn()
 	if (m_genome == nullptr)
 	{
 		m_genome = new Genome(GetSimulation(), true);
-		m_energy = 100.0f;
+		//m_energy = 100.0f;
+		adamAndEve = true;
 	}
 
 	// May already be read() in
@@ -128,6 +132,11 @@ void Agent::OnSpawn()
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
+
+	if (adamAndEve)
+	{
+		m_energy = m_maxEnergy * 0.70f;
+	}
 }
 
 void Agent::OnDestroy()
@@ -152,6 +161,9 @@ void Agent::Update()
 		// TODO: kill agent after lifetime expiration.
 		//Destroy();
 	}
+
+	if (m_mateWaitTime > 0)
+		m_mateWaitTime--;
 
 	// Turn and move.
 	m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
@@ -314,6 +326,8 @@ void Agent::UpdateVision()
 	
 	std::vector<Agent*> agentMateCollisions;
 
+	bool canMate = (m_mateWaitTime == 0);
+
 	// Query the octtree for objects within vision range.
 	Sphere visionSphere(m_position, m_maxViewDistance);
 	m_objectManager->GetOctTree()->Query(visionSphere,
@@ -336,7 +350,7 @@ void Agent::UpdateVision()
 
 			// Check for mating interations with other agents.
 			if (object->GetObjectType() == SimulationObjectType::AGENT &&
-				distSqr < matingDist * matingDist)
+				distSqr < matingDist * matingDist && canMate)
 			{
 				agentMateCollisions.push_back((Agent*) object); // avoid concurrent modification
 			}
@@ -411,6 +425,8 @@ void Agent::Mate(Agent* mate)
 	// Subtract the transferred energy for each parent.
 	parents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
+	parents[0]->m_mateWaitTime = config.agent.matingDelay;
+	parents[1]->m_mateWaitTime = config.agent.matingDelay;
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)
