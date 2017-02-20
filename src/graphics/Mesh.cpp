@@ -56,27 +56,32 @@ Mesh* Mesh::ImportFromOBJ(const std::string& objFileContents)
 
 		std::stringstream lineStream(line);
 		lineStream >> lineType;
-
+		
 		// Handle each case
 		if (lineType == "v")
 		{
 			// v = vertex position
 			// Ex: v 0.697566 -0.456340 0.845467
-			if (lineStream >> v3.x >> v3.y >> v3.z)
+			if ((lineStream >> v3.x) &&
+				(lineStream >> v3.y) &&
+				(lineStream >> v3.z))
 				positions.push_back(v3);
 		}
 		else if (lineType == "vt")
 		{
 			// vt = vertex texture coordinate
 			// Example: vt 0.123412 0.821312
-			if (lineStream >> v2.x >> v2.y)
+			if ((lineStream >> v2.x) &&
+				(lineStream >> v2.y))
 				texCoords.push_back(v2);
 		}
 		else if (lineType == "vn")
 		{
 			// vn = vertex normal
 			// Example: vn -0.989900 -0.140000 0.024600
-			if (lineStream >> v3.x >> v3.y >> v3.z)
+			if ((lineStream >> v3.x) &&
+				(lineStream >> v3.y) &&
+				(lineStream >> v3.z))
 				normals.push_back(v3);
 		}
 		else if (lineType == "f")

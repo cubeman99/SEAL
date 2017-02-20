@@ -68,7 +68,7 @@ void Simulation::Tick()
 
 		//NextGeneration();
 	}
-	if (m_ageInTicks % 30 == 0)
+	//if (m_ageInTicks % 30 == 0)
 	{
 		UpdateStatistics();
 		m_generationStats.push_back(m_statistics);

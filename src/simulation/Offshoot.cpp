@@ -101,7 +101,7 @@ float Offshoot::Eat()
 {
 	const SimulationConfig& config = GetSimulation()->GetConfig();
 	float amount = config.plant.eatEnergyDepletionRate;
-	float energyEaten = Math::Max(m_energy, amount);
+	float energyEaten = Math::Min(m_energy, amount);
 
 	// Deplete the energy.
 	m_energy -= amount;

@@ -162,11 +162,10 @@ void Agent::Update()
 	m_energy -= config.energy.energyCostMove * m_moveSpeed;
 	m_energy -= config.energy.energyCostTurn * m_turnSpeed;
 
+	// Kill agent if its energy is depleted.
 	if (m_energy <= 0.0f)
 	{
 		m_energy = 0.0f;
-
-		// TODO: kill agent after energy depletion.
 		Destroy();
 	}
 }
@@ -374,60 +373,58 @@ void Agent::Mate(Agent* mate)
 		return;
 
 	const SimulationConfig& config = GetSimulation()->GetConfig();
-	float energyPercentAtMinChildren = 0.4f;
-	float energyPercentAtMaxChildren = 0.8f;
+	float energyPercentAtMinChildren = 0.2f;
+	float energyPercentAtMaxChildren = 0.6f;
 
-	// Each agent has:
-	//  - a desired number of children
-	//  - max energy percent for min number of children
-	//  - max energy percent for max number of children
-	//  - a maximum percentage of their energy that they will transfer to their children
-	//  - during mating, each agent cannot give more energy than their desired number of children
-	
-	Agent* agents[2] = { this, mate };
+	Agent* parents[2] = { this, mate };
 
 	// Calculate the required energy per child.
 	float avgNumChildrenGene =
-		(agents[0]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT) +
-		agents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
+		(parents[0]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT) +
+		parents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
 	int maxNumChildren = (int) (Math::Lerp((float) config.genes.minChildren,
 		(float) config.genes.maxChildren, avgNumChildrenGene) + 0.5f);
 	if (maxNumChildren < 1)
 		maxNumChildren = 1;
 	float maxEnergyPercent = Math::Lerp(energyPercentAtMinChildren,
 		energyPercentAtMaxChildren, avgNumChildrenGene);
-	float maxTransferrableEnergy = (agents[0]->GetMaxEnergy() +
-		agents[1]->GetMaxEnergy()) * maxEnergyPercent;
+	float maxTransferrableEnergy = (parents[0]->GetMaxEnergy() +
+		parents[1]->GetMaxEnergy()) * maxEnergyPercent;
 	float energyPerChild = maxTransferrableEnergy / (float) maxNumChildren;
 
+	// Calculate the amount of energy each parent has availableo to
+	// transfer to their children.
 	float transferrableEnergy[2];
-	transferrableEnergy[0] = agents[0]->GetEnergy() * maxEnergyPercent;
-	transferrableEnergy[1] = agents[1]->GetEnergy() * maxEnergyPercent;
+	transferrableEnergy[0] = parents[0]->GetEnergy() * maxEnergyPercent;
+	transferrableEnergy[1] = parents[1]->GetEnergy() * maxEnergyPercent;
 	float actualTransferrableEnergy = transferrableEnergy[0] + transferrableEnergy[1];
 	if (actualTransferrableEnergy < energyPerChild)
 		return;
 
-	// Determine the actual number of children that will be born.
-	//float actualTransferrableEnergy = agents[0]->GetEnergy() + agents[1]->GetEnergy();
+	// Determine the actual number of children that can be born with
+	// the amount of available transferrable energy.
 	int actualNumChildren = (int) (actualTransferrableEnergy / energyPerChild);
 	actualNumChildren = Math::Clamp(actualNumChildren, 0, maxNumChildren);
 	if (actualNumChildren == 0)
 		return;
 
-	agents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
-	agents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
+	// Subtract the transferred energy for each parent.
+	parents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
+	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)
 	{
 		// Crossover and mutate the genome.
 		Genome* childGenome = Genome::SpawnChild(
-			agents[0]->GetGenome(), agents[1]->GetGenome(), GetSimulation());
+			parents[0]->GetGenome(),
+			parents[1]->GetGenome(),
+			GetSimulation());
 		Agent* child = new Agent(childGenome, energyPerChild);
 
 		// Set the child's position and orientation.
-		Vector3f childPos = (agents[0]->GetPosition() +
-			agents[1]->GetPosition()) * 0.5f;
+		Vector3f childPos = (parents[0]->GetPosition() +
+			parents[1]->GetPosition()) * 0.5f;
 		childPos.Normalize();
 		childPos *= GetSimulation()->GetWorld()->GetRadius();
 		child->SetPosition(childPos);
@@ -440,7 +437,6 @@ void Agent::Mate(Agent* mate)
 
 		// Spawn the child into the world.
 		m_objectManager->SpawnObject(child);
-		child->m_energy = energyPerChild;
 	}
 }
 

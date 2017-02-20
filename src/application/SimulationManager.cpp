@@ -28,6 +28,7 @@ SimulationManager::SimulationManager() :
 SimulationManager::~SimulationManager()
 {
 	delete m_simulation;
+	m_simulation = nullptr;
 }
 
 void SimulationManager::Initialize()

@@ -48,7 +48,7 @@ ResourceManager::~ResourceManager()
 	FreeResources(m_textures);
 	FreeResources(m_meshes);
 	FreeResources(m_materials);
-	FreeResources(m_materials);
+	FreeResources(m_shaders);
 	FreeResources(m_fonts);
 }
 

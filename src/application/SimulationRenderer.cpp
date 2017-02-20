@@ -49,6 +49,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
+	m_resourceManager.AddShader("default_fallback", m_defaultShader);
 
 	m_graphFitness.SetFont(m_font);
 	m_graphFitness.SetTitle("Fitness");
