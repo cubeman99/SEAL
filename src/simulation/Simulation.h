@@ -45,14 +45,6 @@ public:
 	//-------------------------------------------------------------------------
 	// Saving & loading
 
-	// Save the current simulation timeline to file. Returns true on success
-	// false on failure.
-	bool SaveTimeline(std::string fileName);
-	
-	// Load a simulation timeline from file and resume it. Returns true on
-	// success false on failure.
-	bool LoadTimeline(std::string fileName);
-
 	// Read simulation from file.
 	void ReadSimulation(std::ifstream& fileIn);
 

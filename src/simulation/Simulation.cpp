@@ -84,82 +84,6 @@ void Simulation::Tick()
 // Saving & loading
 //-----------------------------------------------------------------------------
 
-// Should be called only between ticks in the simulation.
-bool Simulation::SaveTimeline(std::string fileName)
-{
-	std::ofstream fileOut;
-	fileOut.open(fileName, std::ios::out | std::ios::binary);
-
-	if (!fileOut)
-	{
-		// TODO: Tell user that the file could not be opened for writing
-		return false;
-	}
-
-	// Write the simulation data
-	WriteSimulation(fileOut);
-
-	// Write the number of objects
-	ObjectManager* objManager = GetObjectManager();
-	unsigned int numObjects = objManager->GetNumObjects();
-	fileOut.write((char*)&numObjects, sizeof(unsigned int));
-
-	// Write the object data
-	for (unsigned int i = 0; i < objManager->GetNumObjects(); ++i)
-	{
-		objManager->GetObjByIndex(i)->Write(fileOut);
-	}
-
-	fileOut.close();
-
-	// TODO: Tell user that the file has been saved succesffully
-
-	return true;
-}
-
-bool Simulation::LoadTimeline(std::string fileName)
-{
-	std::ifstream fileIn;
-	fileIn.open(fileName, std::ios::in | std::ios::binary);
-
-	if (!fileIn)
-	{
-		// TODO: Tell user that the file could not be opened for reading
-		return false;
-	}
-
-	// Clear out the current objects
-	ObjectManager* objManager = GetObjectManager();
-	objManager->ClearObjects();
-
-	// Read the simulation data
-	ReadSimulation(fileIn);
-
-	// Get number of objects
-	unsigned int numObjects;
-	fileIn.read((char*)&numObjects, sizeof(unsigned int));
-
-	// Read and create objects
-	bool objectCreationGoingWell = true;
-	for (unsigned int i = 0; i < numObjects && objectCreationGoingWell; ++i)
-	{
-		objectCreationGoingWell = objManager->SpawnObjectSerialized(fileIn);
-	}
-
-	if (!objectCreationGoingWell)
-	{
-		// TODO: Tell user that the file was corrupt like our government
-		objManager->ClearObjects();
-		return false;
-	}
-
-	fileIn.close();
-
-	// TODO: Tell user that the file has been loaded succesffully
-
-	return true;
-}
-
 void Simulation::ReadSimulation(std::ifstream& fileIn)
 {
 	unsigned long currentSeed;
@@ -167,9 +91,22 @@ void Simulation::ReadSimulation(std::ifstream& fileIn)
 	fileIn.read((char*)&currentSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_originalSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileIn.read((char*)&m_generationIndex, sizeof(unsigned int));
 	fileIn.read((char*)&m_generationAge, sizeof(unsigned int));
 	fileIn.read((char*)&m_generationDuration, sizeof(unsigned int));
 	fileIn.read((char*)&m_config, sizeof(SimulationConfig));
+	fileIn.read((char*)&m_statistics, sizeof(SimulationStats));
+
+	// Read all generation statistics
+	m_generationStats.clear();
+	unsigned int statsNum;
+	fileIn.read((char*)&statsNum, sizeof(unsigned int));
+
+	for (unsigned int i = 0; i < statsNum; ++i)
+	{
+		m_generationStats.push_back(SimulationStats());
+		fileIn.read((char*)&m_generationStats[i], sizeof(SimulationStats));
+	}
 
 	m_random.SetSeed(currentSeed);
 }
@@ -181,9 +118,20 @@ void Simulation::WriteSimulation(std::ofstream& fileOut)
 	fileOut.write((char*)&currentSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_originalSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileOut.write((char*)&m_generationIndex, sizeof(unsigned int));
 	fileOut.write((char*)&m_generationAge, sizeof(unsigned int));
 	fileOut.write((char*)&m_generationDuration, sizeof(unsigned int));
 	fileOut.write((char*)&m_config, sizeof(SimulationConfig));
+	fileOut.write((char*)&m_statistics, sizeof(SimulationStats));
+
+	// Write all generation statistics
+	unsigned int statsNum = m_generationStats.size();
+	fileOut.write((char*)&statsNum, sizeof(unsigned int));
+
+	for (unsigned int i = 0; i < statsNum; ++i)
+	{
+		fileOut.write((char*)&m_generationStats[i], sizeof(SimulationStats));
+	}
 }
 
 
