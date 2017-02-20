@@ -94,6 +94,7 @@ Shader* ResourceManager::LoadShader(const std::string& name, const std::string& 
 	ShaderCompileError compileError;
 	if (!shader->CompileAndLink(&compileError))
 	{
+		assert(false);
 		//wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
 		delete shader;
 		return nullptr;
@@ -110,6 +111,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	// Read the file contents.
 	if (!FileUtility::OpenAndGetContents(m_assetsPath + path, fileContents))
 	{
+		assert(false);
 		//wxMessageBox("Error loading mesh file " + path, "File Error", wxICON_WARNING);
 		return nullptr;
 	}
@@ -118,6 +120,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	Mesh* mesh = Mesh::ImportFromOBJ(fileContents);
 	if (mesh == nullptr)
 	{
+		assert(false);
 		//wxMessageBox("Error parsing .obj data from mesh file " + path, "File Error", wxICON_WARNING);
 		return nullptr;
 	}

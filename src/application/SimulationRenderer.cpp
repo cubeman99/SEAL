@@ -58,7 +58,8 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
 	m_graphFitness.AddGraph("graph", Color::YELLOW);
 
-	// Agent model.m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
+	// Agent model.
+	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	

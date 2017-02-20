@@ -313,10 +313,12 @@ void Agent::UpdateVision()
 	m_eyes[0].ClearSightValues();
 	m_eyes[1].ClearSightValues();
 	
+	std::vector<Agent*> agentMateCollisions;
+
 	// Query the octtree for objects within vision range.
 	Sphere visionSphere(m_position, m_maxViewDistance);
 	m_objectManager->GetOctTree()->Query(visionSphere,
-		[=](SimulationObject* object)
+		[&](SimulationObject* object)
 	{
 		if (object != this)
 		{
@@ -337,7 +339,7 @@ void Agent::UpdateVision()
 			if (object->GetObjectType() == SimulationObjectType::AGENT &&
 				distSqr < matingDist * matingDist)
 			{
-				Mate((Agent*) object);
+				agentMateCollisions.push_back((Agent*) object); // avoid concurrent modification
 			}
 
 			// Attempt to see the object.
@@ -347,6 +349,11 @@ void Agent::UpdateVision()
 			}
 		}
 	});
+
+	for (unsigned int i = 0; i < agentMateCollisions.size(); ++i)
+	{
+		Mate(agentMateCollisions[i]);
+	}
 }
 
 void Agent::EatPlant(Offshoot* plant)
@@ -385,6 +392,8 @@ void Agent::Mate(Agent* mate)
 		agents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
 	int maxNumChildren = (int) (Math::Lerp((float) config.genes.minChildren,
 		(float) config.genes.maxChildren, avgNumChildrenGene) + 0.5f);
+	if (maxNumChildren < 1)
+		maxNumChildren = 1;
 	float maxEnergyPercent = Math::Lerp(energyPercentAtMinChildren,
 		energyPercentAtMaxChildren, avgNumChildrenGene);
 	float maxTransferrableEnergy = (agents[0]->GetMaxEnergy() +
