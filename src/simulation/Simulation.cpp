@@ -203,7 +203,7 @@ void Simulation::UpdateStatistics()
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
 			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
 		stats.avgFitness += it->GetFitness();
-		//stats.totalEnergy += it->GetEnergy();
+		stats.totalEnergy += it->GetEnergy();
 		numAgents++;
 	}
 	
