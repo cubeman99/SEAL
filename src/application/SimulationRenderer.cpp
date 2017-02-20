@@ -58,8 +58,7 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
 	m_graphFitness.AddGraph("graph", Color::YELLOW);
 
-	// Agent model.
-	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
+	// Agent model.m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	
@@ -289,24 +288,6 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	RenderGraphs();
 	RenderInfoPanel();
 	
-	/*
-	orthographic = Matrix4f::CreateOrthographic(0.0f,
-		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
-	m_graphics.SetProjection(orthographic);
-	
-	std::stringstream text;
-	text.setf(std::ios::fixed, std::ios::floatfield);
-	text.precision(2);
-
-	text << "Generation " << (simulation->GetGeneration() + 1);
-
-	m_graphics.DrawString(m_font, text.str(), Vector2f(16, 16), Color::YELLOW, TextAlign::TOP_LEFT);
-
-	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
-	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
-	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
-	m_graphFitness.Draw(m_graphics);*/
-
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);
 }
@@ -569,8 +550,13 @@ void SimulationRenderer::RenderGraphs()
 	
 	// Draw graphs.
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
-	m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
-	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
+	if (stats.size() > 0)
+	{
+		//m_graphFitness.GetGraph()->ConfigData(&stats.data()->totalEnergy, (int) stats.size(), sizeof(SimulationStats), 0);
+		m_graphFitness.GetGraph()->ConfigData(&stats.data()->avgFitness, (int) stats.size(), sizeof(SimulationStats), 0);
+	}
+	//m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
+	m_graphFitness.SetXBounds(0, (float) Math::Max(100u, stats.size()));
 	m_graphFitness.Draw(m_graphics);
 
 	m_graphics.SetViewportToCanvas();
