@@ -167,9 +167,22 @@ void Simulation::ReadSimulation(std::ifstream& fileIn)
 	fileIn.read((char*)&currentSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_originalSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileIn.read((char*)&m_generationIndex, sizeof(unsigned int));
 	fileIn.read((char*)&m_generationAge, sizeof(unsigned int));
 	fileIn.read((char*)&m_generationDuration, sizeof(unsigned int));
 	fileIn.read((char*)&m_config, sizeof(SimulationConfig));
+	fileIn.read((char*)&m_statistics, sizeof(SimulationStats));
+
+	// Read all generation statistics
+	m_generationStats.clear();
+	unsigned int statsNum;
+	fileIn.read((char*)&statsNum, sizeof(unsigned int));
+
+	for (unsigned int i = 0; i < statsNum; ++i)
+	{
+		m_generationStats.push_back(SimulationStats());
+		fileIn.read((char*)&m_generationStats[i], sizeof(SimulationStats));
+	}
 
 	m_random.SetSeed(currentSeed);
 }
@@ -181,9 +194,20 @@ void Simulation::WriteSimulation(std::ofstream& fileOut)
 	fileOut.write((char*)&currentSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_originalSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_ageInTicks, sizeof(unsigned int));
+	fileOut.write((char*)&m_generationIndex, sizeof(unsigned int));
 	fileOut.write((char*)&m_generationAge, sizeof(unsigned int));
 	fileOut.write((char*)&m_generationDuration, sizeof(unsigned int));
 	fileOut.write((char*)&m_config, sizeof(SimulationConfig));
+	fileOut.write((char*)&m_statistics, sizeof(SimulationStats));
+
+	// Write all generation statistics
+	unsigned int statsNum = m_generationStats.size();
+	fileOut.write((char*)&statsNum, sizeof(unsigned int));
+
+	for (unsigned int i = 0; i < statsNum; ++i)
+	{
+		fileOut.write((char*)&m_generationStats[i], sizeof(SimulationStats));
+	}
 }
 
 
