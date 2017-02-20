@@ -69,12 +69,12 @@ SimulationWindow::SimulationWindow() :
 	// FILE
     wxMenu* menuFile = new wxMenu;
     menuBar->Append(menuFile, wxT("&File"));
-    menuFile->Append(wxID_NEW, "&New Simulation...\tCTRL+N");
+    menuFile->Append(wxID_NEW, "&New Simulation...\tCtrl+N");
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_SAVE, "&Save Simulation Timeline...\tCTRL+S");
-    menuFile->Append(wxID_OPEN, "&Open Simulation Timeline...\tCTRL+O");
+    menuFile->Append(wxID_SAVE, "&Save Simulation Timeline...\tCtrl+S");
+    menuFile->Append(wxID_OPEN, "&Open Simulation Timeline...\tCtrl+O");
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_CLOSE, "&Close\tCTRL+W");
+    menuFile->Append(wxID_CLOSE, "&Close\tCtrl+W");
 	
 	// SIMULATION
     wxMenu* menuSimulation = new wxMenu;

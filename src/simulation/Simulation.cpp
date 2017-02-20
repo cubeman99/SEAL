@@ -2,6 +2,10 @@
 #include <utilities/Timing.h>
 
 
+//-----------------------------------------------------------------------------
+// Constructor & destructor
+//-----------------------------------------------------------------------------
+
 Simulation::Simulation() :
 	m_objectManager(this)
 {
@@ -12,6 +16,10 @@ Simulation::~Simulation()
 }
 
 
+//-----------------------------------------------------------------------------
+// Initialization & update
+//-----------------------------------------------------------------------------
+
 void Simulation::Initialize(const SimulationConfig& config)
 {
 	m_config = config;
@@ -21,10 +29,6 @@ void Simulation::Initialize(const SimulationConfig& config)
 	m_generationAge = 0;
 	m_generationDuration = 60 * 30;
 	m_generationIndex = 0;
-
-	// Initialize systems.
-	m_world.Initialize(config.world.radius);
-	m_objectManager.Initialize();
 
 	// Seed the random number generator.
 	if (config.world.seed < 0)
@@ -37,13 +41,14 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_random.SetSeed((unsigned long)config.world.seed);
 		m_originalSeed = (unsigned long)config.world.seed;
 	}
+
+	// Initialize systems.
+	m_world.Initialize(config.world.radius);
+	m_objectManager.Initialize();
 	
 	// Spawn some plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
 		m_objectManager.SpawnObjectRandom<Plant>();
-
-	// TODO: TEMP:
-	//LoadTimeline("DebugTimeline");
 }
 
 void Simulation::Tick()
@@ -74,117 +79,10 @@ void Simulation::Tick()
 	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
 }
 
-void Simulation::UpdateStatistics()
-{
-	SimulationStats stats;
-	
-	// Cumulatively add statistic values for each agent.
-	unsigned int numAgents = 0;
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
-	{
-		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
-		stats.avgFitness += it->GetFitness();
-		numAgents++;
-	}
-	
-	// Divide averages by agent count.
-	float invNumAgents = 1.0f / numAgents;
-	for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-		stats.avgGeneValues[i] *= invNumAgents;
-	stats.avgFitness *= invNumAgents;
 
-	m_statistics = stats;
-}
-
-void Simulation::NextGeneration()
-{
-	m_generationAge = 0;
-	m_generationIndex++;
-
-	// Count the number of agents.
-	unsigned int numAgents = 0;
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
-	{
-		numAgents++;
-	}
-
-	// Keep mating agents to create a new population.
-	std::vector<Agent*> newPopulation;
-	for (unsigned int i = 0; i < numAgents; ++i)
-	{
-		// Select two agents to be the parents.
-		Agent* mommy = SelectAgent();
-		Agent* daddy = SelectAgent();
-
-		// Mate the two agents to create a child agent.
-		Genome* childGenome = Genome::SpawnChild(
-			mommy->GetGenome(), daddy->GetGenome(), this);
-		Agent* child = new Agent(childGenome, 100.0f);
-
-		newPopulation.push_back(child);
-	}
-	
-	// Remove the old objects.
-	m_objectManager.ClearObjects();
-	
-	// Spawn some plants.
-	for (int i = 0; i < m_config.plant.numPlants; ++i)
-		m_objectManager.SpawnObjectRandom<Plant>();
-
-	// Insert the new agents.
-	for (unsigned int i = 0; i < newPopulation.size(); ++i)
-	{
-		Agent* agent = newPopulation[i];
-
-		Vector3f position;
-		Quaternion orientation;
-		m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
-		agent->SetPosition(position);
-		agent->SetOrientation(orientation);
-		
-		m_objectManager.SpawnObject(agent);
-	}
-
-	// TODO: TEMP:
-	// Save a copy of the timeline state
-	//SaveTimeline("DebugTimeline");
-}
-
-Agent* Simulation::SelectAgent()
-{
-	// Count the total fitness among all agents.
-	float totalFitness = 0.0f;
-	std::vector<Agent*> agents;
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
-	{
-		totalFitness += it->GetFitness();
-		agents.push_back(*it);
-	}
-
-	if (agents.empty())
-		return nullptr;
-
-	if (totalFitness == 0.0f)
-	{
-		return agents[m_random.NextInt() % agents.size()];
-	}
-
-	// Select the agent randomly, weighted by fitness.
-	float random = m_random.NextFloat();
-	float counter = 0.0f;
-	for (unsigned int i = 0; i < agents.size(); ++i)
-	{
-		counter += agents[i]->GetFitness() / totalFitness;
-		if (random <= counter)
-			return agents[i];
-	}
-
-	return agents.back();
-}
+//-----------------------------------------------------------------------------
+// Saving & loading
+//-----------------------------------------------------------------------------
 
 // Should be called only between ticks in the simulation.
 bool Simulation::SaveTimeline(std::string fileName)
@@ -286,4 +184,125 @@ void Simulation::WriteSimulation(std::ofstream& fileOut)
 	fileOut.write((char*)&m_generationAge, sizeof(unsigned int));
 	fileOut.write((char*)&m_generationDuration, sizeof(unsigned int));
 	fileOut.write((char*)&m_config, sizeof(SimulationConfig));
+}
+
+
+//-----------------------------------------------------------------------------
+// Internal update mechanics
+//-----------------------------------------------------------------------------
+
+void Simulation::UpdateStatistics()
+{
+	SimulationStats stats;
+	
+	// Cumulatively add statistic values for each agent.
+	unsigned int numAgents = 0;
+	for (auto it = m_objectManager.agents_begin();
+		it != m_objectManager.agents_end(); ++it)
+	{
+		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
+		stats.avgFitness += it->GetFitness();
+		numAgents++;
+	}
+	
+	// Divide averages by agent count.
+	float invNumAgents = 1.0f / numAgents;
+	for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+		stats.avgGeneValues[i] *= invNumAgents;
+	stats.avgFitness *= invNumAgents;
+
+	m_statistics = stats;
+}
+
+void Simulation::NextGeneration()
+{
+	m_generationAge = 0;
+	m_generationIndex++;
+
+	// Count the number of agents.
+	unsigned int numAgents = 0;
+	for (auto it = m_objectManager.agents_begin();
+		it != m_objectManager.agents_end(); ++it)
+	{
+		numAgents++;
+	}
+
+	// Keep mating agents to create a new population.
+	Agent** newPopulation = new Agent*[numAgents];
+	for (unsigned int i = 0; i < numAgents; ++i)
+	{
+		// Select and mate two agents.
+		Agent* mommy = SelectAgent();
+		Agent* daddy = SelectAgent();
+		Agent* child = CreateOffspring(mommy, daddy);
+		newPopulation[i] = child;
+	}
+	
+	// Remove the old objects.
+	m_objectManager.ClearObjects();
+	
+	// Spawn some plants.
+	for (int i = 0; i < m_config.plant.numPlants; ++i)
+		m_objectManager.SpawnObjectRandom<Plant>();
+
+	// Spawn the new agents.
+	for (unsigned int i = 0; i < numAgents; ++i)
+	{
+		Agent* agent = newPopulation[i];
+
+		// Randomize the agent's position & orientation.
+		Vector3f position;
+		Quaternion orientation;
+		m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
+		agent->SetPosition(position);
+		agent->SetOrientation(orientation);
+		
+		// Spawn the agent into the world.
+		m_objectManager.SpawnObject(agent);
+	}
+}
+
+Agent* Simulation::SelectAgent()
+{
+	// Count the total fitness among all agents.
+	float totalFitness = 0.0f;
+	std::vector<Agent*> agents;
+	for (auto it = m_objectManager.agents_begin();
+		it != m_objectManager.agents_end(); ++it)
+	{
+		totalFitness += it->GetFitness();
+		agents.push_back(*it);
+	}
+
+	if (agents.empty())
+		return nullptr;
+
+	if (totalFitness == 0.0f)
+	{
+		return agents[m_random.NextInt() % agents.size()];
+	}
+
+	// Select the agent randomly, weighted by fitness.
+	float random = m_random.NextFloat();
+	float counter = 0.0f;
+	for (unsigned int i = 0; i < agents.size(); ++i)
+	{
+		counter += agents[i]->GetFitness() / totalFitness;
+		if (random <= counter)
+			return agents[i];
+	}
+
+	return agents.back();
+}
+
+Agent* Simulation::CreateOffspring(Agent* mommy, Agent* daddy)
+{
+	// Crossover and mutate the genome.
+	Genome* childGenome = Genome::SpawnChild(
+		mommy->GetGenome(), daddy->GetGenome(), this);
+
+	Agent* child = new Agent(childGenome, 100.0f);
+
+	return child;
 }

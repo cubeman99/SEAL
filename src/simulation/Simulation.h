@@ -18,42 +18,79 @@ public:
 	Simulation();
 	~Simulation();
 
-	void Initialize(const SimulationConfig& config);
-	void Tick();
-	void NextGeneration();
-	Agent* SelectAgent();
-
-	void UpdateStatistics();
-
-	bool SaveTimeline(std::string fileName);
-	bool LoadTimeline(std::string fileName);
-	void ReadSimulation(std::ifstream& fileIn);
-	void WriteSimulation(std::ofstream& fileOut);
+	//-------------------------------------------------------------------------
+	// Getters
 
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
 	inline RNG& GetRandom() { return m_random; }
-	inline const SimulationConfig& GetConfig() { return m_config; }
-	inline const SimulationStats& GetStatistics() { return m_statistics; }
 
+	inline const SimulationConfig& GetConfig() const { return m_config; }
+	inline const SimulationStats& GetStatistics() const { return m_statistics; }
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
-
 	inline unsigned int GetGeneration() const { return m_generationIndex; }
+
+
+	//-------------------------------------------------------------------------
+	// Initialization and update
+
+	// Begin a new simulation using the given configuration.
+	void Initialize(const SimulationConfig& config);
+
+	// Update the simulation for one tick.
+	void Tick();
+
+	
+	//-------------------------------------------------------------------------
+	// Saving & loading
+
+	// Save the current simulation timeline to file. Returns true on success
+	// false on failure.
+	bool SaveTimeline(std::string fileName);
+	
+	// Load a simulation timeline from file and resume it. Returns true on
+	// success false on failure.
+	bool LoadTimeline(std::string fileName);
+
+	// Read simulation from file.
+	void ReadSimulation(std::ifstream& fileIn);
+
+	// Write simulation data to file.
+	void WriteSimulation(std::ofstream& fileOut);
+
+
+private:
+	//-------------------------------------------------------------------------
+	// Internal update mechanics
+
+	// Update the statistics
+	void UpdateStatistics();
+
+	// Advance to the next generation
+	void NextGeneration();
+
+	// Randomly select an agent from the population with chances
+	// weighted by fitness.
+	Agent* SelectAgent();
+
+	// Create an offspring agent from two parent agents.
+	Agent* CreateOffspring(Agent* mommy, Agent* daddy);
+
 
 private:
 	SimulationConfig	m_config;
-	unsigned int		m_ageInTicks;
 	World				m_world;
 	ObjectManager		m_objectManager;
 	RNG					m_random;
-
 	SimulationStats		m_statistics;
-
 	unsigned long		m_originalSeed;
-	unsigned int		m_generationAge;
-	unsigned int		m_generationDuration;
+	unsigned int		m_ageInTicks;
 	unsigned int		m_generationIndex;
+	unsigned int		m_generationAge;
+	unsigned int		m_generationDuration; // TODO: move into config.
+
+	// TODO: mating season values here??
 
 public:
 	std::vector<SimulationStats> m_generationStats;

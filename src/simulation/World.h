@@ -10,9 +10,10 @@
 
 //-----------------------------------------------------------------------------
 // World - The spherical planet where on the surface of which the simulation 
-//         components are situated.
+//         components are situated. At the moment, this is pretty much just a
+//         radius.
 //
-// NOTE: The world's center is positioned at the origin (0,0,0)
+// NOTE: The world's center is always positioned at the origin (0,0,0)
 //-----------------------------------------------------------------------------
 class World
 {
@@ -20,17 +21,19 @@ public:
 	World();
 	~World();
 
+	inline float GetRadius() const { return m_radius; }
+
+
+	// Initialize the world with the given radius.
 	void Initialize(float radius);
 
-	inline float GetRadius() { return m_radius; }
-	inline Mesh* GetMesh() { return m_mesh; }
-
+	// Cast a ray onto the sphere, getting the distance between the contact
+	// point. Returns true if the ray cast hit the sphere.
 	bool CastRay(const Ray& ray, float& distance) const;
 
 
 private:
 	float m_radius;
-	Mesh* m_mesh;
 };
 
 
