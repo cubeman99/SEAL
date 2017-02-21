@@ -70,7 +70,7 @@ void Simulation::Tick()
 		//UpdateStatistics();
 		//m_generationStats.push_back(m_statistics);
 
-		//NextGeneration();
+		NextGeneration();
 	}
 	UpdateStatistics();
 	if (m_ageInTicks % 60 == 0)
@@ -183,50 +183,53 @@ void Simulation::UpdateStatistics()
 
 void Simulation::NextGeneration()
 {
+	// This function can still be useful for season purposes
 	m_generationAge = 0;
 	m_generationIndex++;
 
-	// Count the number of agents.
-	unsigned int numAgents = 0;
-	for (auto it = m_objectManager.agents_begin();
-		it != m_objectManager.agents_end(); ++it)
-	{
-		numAgents++;
-	}
+	// Old asexual reproduction code: //////////////////////
 
-	// Keep mating agents to create a new population.
-	Agent** newPopulation = new Agent*[numAgents];
-	for (unsigned int i = 0; i < numAgents; ++i)
-	{
-		// Select and mate two agents.
-		Agent* mommy = SelectAgent();
-		Agent* daddy = SelectAgent();
-		Agent* child = CreateOffspring(mommy, daddy);
-		newPopulation[i] = child;
-	}
-	
-	// Remove the old objects.
-	m_objectManager.ClearObjects();
-	
-	// Spawn some plants.
-	for (int i = 0; i < m_config.plant.numPlants; ++i)
-		m_objectManager.SpawnObjectRandom<Plant>();
+	//// Count the number of agents.
+	//unsigned int numAgents = 0;
+	//for (auto it = m_objectManager.agents_begin();
+	//	it != m_objectManager.agents_end(); ++it)
+	//{
+	//	numAgents++;
+	//}
 
-	// Spawn the new agents.
-	for (unsigned int i = 0; i < numAgents; ++i)
-	{
-		Agent* agent = newPopulation[i];
+	//// Keep mating agents to create a new population.
+	//Agent** newPopulation = new Agent*[numAgents];
+	//for (unsigned int i = 0; i < numAgents; ++i)
+	//{
+	//	// Select and mate two agents.
+	//	Agent* mommy = SelectAgent();
+	//	Agent* daddy = SelectAgent();
+	//	Agent* child = CreateOffspring(mommy, daddy);
+	//	newPopulation[i] = child;
+	//}
+	//
+	//// Remove the old objects.
+	//m_objectManager.ClearObjects();
+	//
+	//// Spawn some plants.
+	//for (int i = 0; i < m_config.plant.numPlants; ++i)
+	//	m_objectManager.SpawnObjectRandom<Plant>();
 
-		// Randomize the agent's position & orientation.
-		Vector3f position;
-		Quaternion orientation;
-		m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
-		agent->SetPosition(position);
-		agent->SetOrientation(orientation);
-		
-		// Spawn the agent into the world.
-		m_objectManager.SpawnObject(agent);
-	}
+	//// Spawn the new agents.
+	//for (unsigned int i = 0; i < numAgents; ++i)
+	//{
+	//	Agent* agent = newPopulation[i];
+
+	//	// Randomize the agent's position & orientation.
+	//	Vector3f position;
+	//	Quaternion orientation;
+	//	m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
+	//	agent->SetPosition(position);
+	//	agent->SetOrientation(orientation);
+	//	
+	//	// Spawn the agent into the world.
+	//	m_objectManager.SpawnObject(agent);
+	//}
 }
 
 Agent* Simulation::SelectAgent()
