@@ -238,10 +238,18 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		m_renderer.SetShader(nullptr);
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(camera->GetViewProjection().data());
-		
-		for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
+
+		// If selecting an agent, only show their vision
+		if (selectedAgent != nullptr)
 		{
-			RenderAgentVisionArcs(*it);
+			RenderAgentVisionArcs(selectedAgent);
+		}
+		else
+		{
+			for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
+			{
+				RenderAgentVisionArcs(*it);
+			}
 		}
 	}
 	
