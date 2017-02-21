@@ -157,7 +157,7 @@ void SimulationManager::Update()
 	// Check if our selected agent has died.
 	// TODO: make an event queue for simultaion (for births and deaths)
 	if (m_selectedAgent != nullptr && m_simulation->
-		GetObjectManager()->GetObj(m_selectedAgentId) == nullptr)
+		GetObjectManager()->GetObjectById(m_selectedAgentId) == nullptr)
 	{
 		m_selectedAgent = nullptr;
 		m_selectedAgentId = 0;

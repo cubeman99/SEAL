@@ -11,6 +11,7 @@ InfoPanelItem::InfoPanelItem() :
 	m_valueType(TYPE_FLOAT),
 	m_valueColor(Color::WHITE),
 	m_valueText("?"),
+	m_valueSuffix(""),
 	m_valueFloat(0.0f),
 	m_valueInt(0),
 	m_valuePrecision(2),
@@ -26,6 +27,13 @@ InfoPanelItem::InfoPanelItem() :
 InfoPanelItem& InfoPanelItem::SetLabel(const std::string& text)
 {
 	m_labelText = text;
+	return *this;
+}
+
+InfoPanelItem& InfoPanelItem::SetLabel(const std::string& text, const std::string& valueSuffix)
+{
+	m_labelText = text;
+	m_valueSuffix = valueSuffix;
 	return *this;
 }
 
@@ -78,7 +86,20 @@ InfoPanelItem& InfoPanelItem::SetValueColor(const Color& color)
 	return *this;
 }
 
-InfoPanelItem& InfoPanelItem::InitBar(const Color& color, float minValue, float maxValue, float centerValue)
+InfoPanelItem& InfoPanelItem::InitBar(const Color& color,
+	int minValue, int maxValue, int centerValue)
+{
+	return InitBar(color, (float) minValue, (float) maxValue, (float) centerValue);
+}
+
+InfoPanelItem& InfoPanelItem::InitBar(const Color& color,
+	unsigned int minValue, unsigned int maxValue, unsigned int centerValue)
+{
+	return InitBar(color, (float) minValue, (float) maxValue, (float) centerValue);
+}
+
+InfoPanelItem& InfoPanelItem::InitBar(const Color& color,
+	float minValue, float maxValue, float centerValue)
 {
 	m_visualType = 1;
 	m_visualColor = color;
@@ -110,19 +131,16 @@ void InfoPanelItem::UpdateValueText()
 		if (m_valuePrecision >= 0)
 		{
 			ss.setf(std::ios::fixed, std::ios::floatfield);
-			ss.precision(2);
+			ss.precision(m_valuePrecision);
 		}
 
-		ss << m_valueFloat;
-
+		ss << m_valueFloat << m_valueSuffix;
 		m_valueText = ss.str();
 	}
 	else if (m_valueType == TYPE_INT)
 	{
 		std::stringstream ss;
-
-		ss << m_valueInt;
-
+		ss << m_valueInt << m_valueSuffix;
 		m_valueText = ss.str();
 	}
 }
@@ -150,11 +168,25 @@ Vector2f InfoPanel::GetSize() const
 	return size;
 }
 
+void InfoPanel::AddSeparator()
+{
+	// TODO: InfoPanel::AddSeparator()
+	AddItem("---------------").SetValue("------");
+}
+
 InfoPanelItem& InfoPanel::AddItem(const std::string& label)
 {
 	m_rows.push_back(InfoPanelItem());
 	InfoPanelItem& item = m_rows[m_rows.size() - 1];
 	item.SetLabel(label);
+	return item;
+}
+
+InfoPanelItem& InfoPanel::AddItem(const std::string& label, const std::string& valueSuffix)
+{
+	m_rows.push_back(InfoPanelItem());
+	InfoPanelItem& item = m_rows[m_rows.size() - 1];
+	item.SetLabel(label, valueSuffix);
 	return item;
 }
 

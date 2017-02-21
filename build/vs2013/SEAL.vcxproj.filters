@@ -207,9 +207,6 @@
     <ClCompile Include="..\..\src\simulation\Nerve.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\application\Graph.cpp">
-      <Filter>Source Files\application</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\Rect2i.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
@@ -221,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\math\Rect2f.cpp">
       <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\Graph.cpp">
+      <Filter>Source Files\application\display</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,9 +389,6 @@
     <ClInclude Include="..\..\src\simulation\Nerve.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\application\Graph.h">
-      <Filter>Source Files\application</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\simulation\SimulationStats.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
@@ -406,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\math\Rect2f.h">
       <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\Graph.h">
+      <Filter>Source Files\application\display</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -35,7 +35,7 @@ void ObjectManager::Initialize()
 // Accessors
 //-----------------------------------------------------------------------------
 
-SimulationObject* ObjectManager::GetObj(int objectId)
+SimulationObject* ObjectManager::GetObjectById(int objectId)
 {
 	auto it = m_idToObjectMap.find(objectId);
 	if (it != m_idToObjectMap.end())

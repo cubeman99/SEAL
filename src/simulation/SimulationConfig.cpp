@@ -37,8 +37,8 @@ SimulationConfig::SimulationConfig()
 	agent.matingDelay				= 60 * 4;
 
 	energy.energyCostExist			= 0.006f;
-	energy.energyCostMove			= 0.02f;
-	energy.energyCostTurn			= 0.02f;
+	energy.energyCostMove			= 0.014f;
+	energy.energyCostTurn			= 0.014f;
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 
@@ -51,8 +51,8 @@ SimulationConfig::SimulationConfig()
 
 	genes.maxInternalNeurons		= 20;		// TODO: tinker
 
-	genes.minLifeSpan				= 60 * 40;
-	genes.maxLifeSpan				= 60 * 100;
+	genes.minLifeSpan				= 60 * 70;
+	genes.maxLifeSpan				= 60 * 160;
 	genes.minStrength				= 0.0f;
 	genes.maxStrength				= 1.0f;
 	genes.minSightDistance			= 20;

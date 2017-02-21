@@ -28,6 +28,7 @@ public:
 	InfoPanelItem();
 
 	InfoPanelItem& SetLabel(const std::string& text);
+	InfoPanelItem& SetLabel(const std::string& text, const std::string& valueSuffix);
 	InfoPanelItem& SetLabelColor(const Color& color);
 
 	InfoPanelItem& SetValue(const std::string& text);
@@ -37,6 +38,8 @@ public:
 	InfoPanelItem& SetPrecision(int precision);
 	InfoPanelItem& SetValueColor(const Color& color);
 
+	InfoPanelItem& InitBar(const Color& color, int minValue, int maxValue, int centerValue = 0);
+	InfoPanelItem& InitBar(const Color& color, unsigned int minValue, unsigned int maxValue, unsigned int centerValue = 0u);
 	InfoPanelItem& InitBar(const Color& color, float minValue, float maxValue, float centerValue = 0.0f);
 	InfoPanelItem& InitSolidColor(const Color& color);
 	InfoPanelItem& SetVisualColor(const Color& color);
@@ -49,6 +52,7 @@ private:
 
 	int			m_valueType;
 	std::string m_valueText;
+	std::string m_valueSuffix;
 	float		m_valueFloat;
 	int			m_valueInt;
 	int			m_valuePrecision;
@@ -72,7 +76,9 @@ public:
 
 	Vector2f GetSize() const;
 
+	void AddSeparator();
 	InfoPanelItem& AddItem(const std::string& label);
+	InfoPanelItem& AddItem(const std::string& label, const std::string& valueSuffix);
 
 	void Draw(Graphics& g, const Vector2f& position);
 

@@ -77,7 +77,8 @@ void Offshoot::Read(std::ifstream& fileIn)
 	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
 
 	// Find my Plant source and let it know it's a daddy
-	m_source = (Plant*)GetSimulation()->GetObjectManager()->GetObj(sourceID);
+	m_source = (Plant*)GetSimulation()->
+		GetObjectManager()->GetObjectById(sourceID);
 	m_source->NotifyOffshootChild(this);
 }
 

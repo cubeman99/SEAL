@@ -41,7 +41,9 @@ public:
 
 	inline unsigned int GetNumObjects() const { return m_objects.size(); }
 
-	SimulationObject* GetObj(int objectId);
+	// Query an object by its object ID.
+	SimulationObject* GetObjectById(int objectId);
+
 	SimulationObject* GetObjByIndex(unsigned int index);
 
 	//-----------------------------------------------------------------------------

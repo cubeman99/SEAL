@@ -78,6 +78,18 @@ void Agent::OnSpawn()
 		GenePosition::LIFE_SPAN,
 		config.genes.minLifeSpan,
 		config.genes.maxLifeSpan);
+	m_desiredNumChildren = m_genome->GetGeneAsInt(
+		GenePosition::CHILD_COUNT,
+		config.genes.minChildren,
+		config.genes.maxChildren);
+	m_mutationRate = m_genome->GetGeneAsFloat(
+		GenePosition::MUTATION_RATE,
+		config.genes.minMutationRate,
+		config.genes.maxMutationRate);
+	m_numCrossoverPoints = m_genome->GetGeneAsInt(
+		GenePosition::CROSSOVER_POINTS,
+		config.genes.minCrossoverPoints,
+		config.genes.maxCrossoverPoints);
 	m_angleBetweenEyes = m_genome->GetGeneAsFloat(
 		GenePosition::ANGLE_BETWEEN_EYES,
 		config.genes.minAngleBetweenEyes,

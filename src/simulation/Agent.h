@@ -65,9 +65,14 @@ public:
 	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
 	inline float GetMaxEnergy() const { return m_maxEnergy; }
 	inline int GetLifeSpan() const { return m_lifeSpan; }
+	inline float GetMutationRate() const { return m_mutationRate; }
+	inline int GetDesiredNumChildren() const { return m_desiredNumChildren; }
+	inline int GetNumCrossoverPoints() const { return m_numCrossoverPoints; }
+	inline float GetStrength() const { return m_strength; }
 	inline float GetFieldOfView() const { return m_fieldOfView; }
 	inline float GetMaxViewDistance() const { return m_maxViewDistance; }
 	inline float GetAngleBetweenEyes() const { return m_angleBetweenEyes; }
+	inline unsigned int GetSightResolution(unsigned int channel) const { return m_eyes[0].GetResolution(channel); }
 	inline unsigned int GetNumEyes() const { return m_numEyes; }
 	inline Retina* GetEye(unsigned int index) { return &m_eyes[index]; }
 	inline const Retina* GetEye(unsigned int index) const { return &m_eyes[index]; }
@@ -88,35 +93,39 @@ private:
 	Genome*			m_genome;
 	Brain*			m_brain;
 
+	// TODO: actually integrate Nerve class and start using these.
 	Nerve*			m_nerveVision[3];
 	Nerve*			m_nerveEnergy;
 	Nerve*			m_nerveRandom;
 	Nerve*			m_nerveMoveSpeed;
 	Nerve*			m_nerveTurnSpeed;
 
+	int				m_age;
+	float			m_energy;
+	float			m_fitness;
 	float			m_moveAmount;
 	float			m_turnAmount;
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
-	float			m_energy;
-	int				m_age;
-
 	int				m_mateWaitTime;
 	float			m_energyUsage;
 
-	float			m_fitness;
-
+	// Genome determined
 	float			m_strength;
 	float			m_maxMoveSpeed;
 	float			m_maxTurnSpeed;
 	float			m_maxEnergy;
 	int				m_lifeSpan;
-	
-	unsigned int	m_numEyes;
-	Retina			m_eyes[2]; // 0 = left eye, 1 = right eye.
+	int				m_desiredNumChildren;
+	float			m_mutationRate;
+	int				m_numCrossoverPoints;
 	float			m_fieldOfView; // in radians.
 	float			m_maxViewDistance;
 	float			m_angleBetweenEyes; // in radians.
+	
+	// Vision
+	unsigned int	m_numEyes;
+	Retina			m_eyes[2]; // 0 = left eye, 1 = right eye.
 
 	
 	// DEBUG: enable/disable manual override. This is for debug

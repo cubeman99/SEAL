@@ -257,7 +257,8 @@ void SimulationWindow::UpdateDebugAgentControls()
 		(agent == nullptr || agent->GetId() != m_controlledAgentId))
 	{
 		Agent* controlledAgent = (Agent*) m_simulationManager
-			.GetSimulation()->GetObjectManager()->GetObj(m_controlledAgentId);
+			.GetSimulation()->GetObjectManager()
+			->GetObjectById(m_controlledAgentId);
 		if (controlledAgent != nullptr)
 			controlledAgent->SetManualOverride(false);
 	}
