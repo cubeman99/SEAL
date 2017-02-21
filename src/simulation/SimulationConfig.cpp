@@ -62,7 +62,6 @@ SimulationConfig::SimulationConfig()
 	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
 	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
 	genes.minSightResolution		= 1;
-	//genes.minSightResolution		= 6; // For debugging sight
 	genes.maxSightResolution		= 6;
 	genes.minBodyColor[0]			= 0.0f;
 	genes.maxBodyColor[0]			= 1.0f;

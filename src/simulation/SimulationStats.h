@@ -10,7 +10,7 @@ public:
 	//-------------------------------------------------------------------------
 	// Genes
 
-	float avgGeneValues[GenePosition::PHYSIOLOGICAL_GENES_COUNT];
+	float avgGeneValue[GenePosition::PHYSIOLOGICAL_GENES_COUNT];
 
 	//float avgViewDistance;
 	//float avgFieldOfView;
@@ -28,6 +28,12 @@ public:
 	//float avgColorBlue;
 
 	//-------------------------------------------------------------------------
+	// Output neurons
+
+	float avgMoveAmount; // 0 to 1
+	float avgTurnAmount; // -1 to 1
+
+	//-------------------------------------------------------------------------
 	// Performance
 
 	int simulationAge;
@@ -37,7 +43,7 @@ public:
 	float totalEnergy;
 	float populationSize;
 	float avgEnergy;
-	//float avgEnergyUsage;
+	float avgEnergyUsage;
 
 
 public:
@@ -45,12 +51,16 @@ public:
 
 	SimulationStats()
 	{
-		memset(avgGeneValues, 0, GenePosition::PHYSIOLOGICAL_GENES_COUNT * sizeof(float));
+		memset(avgGeneValue, 0, GenePosition::PHYSIOLOGICAL_GENES_COUNT * sizeof(float));
+
 		avgFitness = 0.0f;
 		totalEnergy = 0.0f;
 		avgEnergy = 0.0f;
+		avgEnergyUsage = 0.0f;
 		populationSize = 0;
 		simulationAge = 0;
+		avgMoveAmount = 0.0f;
+		avgTurnAmount = 0.0f;
 	}
 };
 

@@ -151,9 +151,12 @@ void Simulation::UpdateStatistics()
 		it != m_objectManager.agents_end(); ++it)
 	{
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-			stats.avgGeneValues[i] += it->GetGenome()->GetGeneAsFloat(i);
+			stats.avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
 		stats.avgFitness += it->GetFitness();
 		stats.totalEnergy += it->GetEnergy();
+		stats.avgEnergyUsage += it->GetEnergyUsage();
+		stats.avgMoveAmount += it->GetMoveAmount();
+		stats.avgTurnAmount += it->GetTurnAmount();
 		stats.populationSize++;
 		numAgents++;
 	}
@@ -163,9 +166,12 @@ void Simulation::UpdateStatistics()
 	{
 		float invNumAgents = 1.0f / numAgents;
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-			stats.avgGeneValues[i] *= invNumAgents;
-		stats.avgFitness *= invNumAgents;
+			stats.avgGeneValue[i] *= invNumAgents;
 		stats.avgEnergy = stats.totalEnergy * invNumAgents;
+		stats.avgEnergyUsage *= invNumAgents;
+		stats.avgFitness *= invNumAgents;
+		stats.avgMoveAmount *= invNumAgents;
+		stats.avgTurnAmount *= invNumAgents;
 	}
 
 	m_statistics = stats;

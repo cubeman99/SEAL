@@ -574,14 +574,52 @@ void SimulationRenderer::RenderInfoPanel()
 	stringstream text;
 	text.setf(ios::fixed, ios::floatfield);
 	text.precision(2);
-
-	text << "Generation " << (simulation->GetGeneration() + 1) << endl;
-	text << "Age: " << simulation->GetAgeInTicks() << endl;
-	text << "Population Size: " << stats.populationSize << endl;
-	text << "Total Energy: " << stats.totalEnergy << endl;
-	text << "Avg Energy: " << stats.avgEnergy << endl;
-	text << "Avg Fitness: " << stats.avgFitness << endl;
+	
+	text << "SIMULATION" << endl;
+	text << "---------------------------------" << endl;
+	text << "generation       = " << (simulation->GetGeneration() + 1) << endl;
+	text << "age              = " << simulation->GetAgeInTicks() << endl;
+	text << "population size  = " << stats.populationSize << endl;
+	text << "total energy     = " << stats.totalEnergy << endl;
+	text << "avg energy       = " << stats.avgEnergy << endl;
+	text.precision(4);
+	text << "avg energy Usage = " << stats.avgEnergyUsage << endl;
+	text.precision(2);
+	text << "avg fitness      = " << stats.avgFitness << endl;
+	text << "avg turn amount  = " << stats.avgTurnAmount << endl;
+	text << "avg move amount  = " << stats.avgMoveAmount << endl;
 	//text << "# Plants: " << stats.populationSize << endl;
+
+	Agent* agent = m_simulationManager->GetSelectedAgent();
+	if (agent != nullptr)
+	{
+		text << endl;
+		text << "AGENT ID " << agent->GetId() << endl;
+		text << "---------------------------------" << endl;
+		text << "age = " << agent->GetAge() << endl;
+		text << "energy = " << agent->GetEnergy() << " (" << (agent->GetEnergyPercent() * 100.0f) << "%)" << endl;
+		text << "energy usage = " << agent->GetEnergyUsage() << endl;
+		text << "fitness = " << agent->GetFitness() << endl;
+
+		text << "move speed = " << agent->GetMoveSpeed() << " (" << (agent->GetMoveAmount() * 100.0f) << "%)" << endl;
+		text << "turn speed = " << agent->GetTurnSpeed() << " (" << (agent->GetTurnAmount() * 100.0f) << "%)" << endl;
+
+		text << "fov = " << agent->GetFieldOfView() << endl;
+		text << "angle b/w eyes = " << agent->GetAngleBetweenEyes() << endl;
+		text << "sight distance = " << agent->GetMaxViewDistance() << endl;
+	}
+
+	/*
+	age
+	energy 
+	fitness
+
+	move speed
+	turn speed
+
+	GENOME:
+	...
+	*/
 
 	string textStr = text.str();
 	Vector2f textPos(m_viewPortSize.x - 220, 8);

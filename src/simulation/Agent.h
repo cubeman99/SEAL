@@ -52,11 +52,15 @@ public:
 	//-------------------------------------------------------------------------
 	// Getters
 
+	inline int GetAge() const { return m_age; }
 	inline float GetEnergy() const { return m_energy; }
 	inline float GetEnergyPercent() const { return (m_energy / m_maxEnergy); }
+	inline float GetEnergyUsage() const { return m_energyUsage; }
 	inline float GetFitness() const { return m_fitness; }
 	inline float GetMoveSpeed() const { return m_moveSpeed; }
 	inline float GetTurnSpeed() const { return m_turnSpeed; }
+	inline float GetMoveAmount() const { return m_moveAmount; }
+	inline float GetTurnAmount() const { return m_turnAmount; }
 	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
 	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
 	inline float GetMaxEnergy() const { return m_maxEnergy; }
@@ -89,12 +93,15 @@ private:
 	Nerve*			m_nerveMoveSpeed;
 	Nerve*			m_nerveTurnSpeed;
 
+	float			m_moveAmount;
+	float			m_turnAmount;
 	float			m_moveSpeed; // Distance units per second.
 	float			m_turnSpeed; // Radians per second.
 	float			m_energy;
 	int				m_age;
 
 	int				m_mateWaitTime;
+	float			m_energyUsage;
 
 	float			m_fitness;
 

@@ -11,7 +11,8 @@ Agent::Agent() :
 	m_turnSpeed(0.0f),
 	m_numEyes(2),
 	m_genome(nullptr),
-	m_brain(nullptr)
+	m_brain(nullptr),
+	m_energyUsage(0.0f)
 {
 }
 
@@ -170,10 +171,11 @@ void Agent::Update()
 	m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
 	m_objectManager->MoveObjectForward(this, m_moveSpeed);
 
-	// Update energy costs.
-	m_energy -= config.energy.energyCostExist;
-	m_energy -= config.energy.energyCostMove * m_moveSpeed;
-	m_energy -= config.energy.energyCostTurn * m_turnSpeed;
+	// Update energy usage.
+	m_energyUsage = config.energy.energyCostExist +
+		(config.energy.energyCostMove * m_moveSpeed) +
+		(config.energy.energyCostTurn * m_turnSpeed);
+	m_energy -= m_energyUsage;
 
 	// Kill agent if its energy is depleted.
 	if (m_energy <= 0.0f)
@@ -560,7 +562,11 @@ void Agent::UpdateBrain()
 			m_brain->GetNumInputNeurons() + 0);
 		float turnAmount = m_brain->GetNeuronActivation(
 			m_brain->GetNumInputNeurons() + 1);
-		m_moveSpeed = moveAmount * m_maxMoveSpeed;
-		m_turnSpeed = ((turnAmount * 2) - 1) * m_maxTurnSpeed;
+
+		m_moveAmount = moveAmount;
+		m_turnAmount = (turnAmount * 2.0f) - 1.0f;
+
+		m_moveSpeed = m_moveAmount * m_maxMoveSpeed;
+		m_turnSpeed = m_turnAmount * m_maxTurnSpeed;
 	}
 }
