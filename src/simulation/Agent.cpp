@@ -427,7 +427,13 @@ void Agent::Mate(Agent* mate)
 	int actualNumChildren = (int) (actualTransferrableEnergy / energyPerChild);
 	actualNumChildren = Math::Clamp(actualNumChildren, 0, maxNumChildren);
 	if (actualNumChildren == 0)
+	{
+		// Small delay to decrease the unnecessary use of this function
+		parents[0]->m_mateWaitTime = 20;
+		parents[1]->m_mateWaitTime = 20;
 		return;
+	}
+
 
 	// Subtract the transferred energy for each parent.
 	parents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
