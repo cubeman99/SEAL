@@ -21,7 +21,8 @@ enum
 	SHOW_INVISIBLE_OBJECTS,
 
 	DEBUG_SPAWN_AGENTS,
-	
+	DEBUG_DELETE_AGENT,
+
 	UPDATE_TIMER,
 };
 
@@ -33,6 +34,9 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_MENU(wxID_SAVE, SimulationWindow::OnSaveSimulation)
     EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
 
+    EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
+
+    EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
 	EVT_MENU(VIEW_WIREFRAME_MODE, SimulationWindow::OnMenuItem)
 	EVT_MENU(VIEW_LIGHTING, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_OCT_TREE_ON_SURFACE, SimulationWindow::OnMenuItem)
@@ -40,10 +44,9 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_AGENT_VISION, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_AGENT_BRAIN, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
-
-    EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnPlayPauseSimulation)
-    EVT_MENU(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnToggleCameraTracking)
+	
     EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnSpawnAgents)
+    EVT_MENU(DEBUG_DELETE_AGENT, SimulationWindow::OnMenuItem)
 
     EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
 	
@@ -97,6 +100,7 @@ SimulationWindow::SimulationWindow() :
     wxMenu* menuDebug = new wxMenu;
     menuBar->Append(menuDebug, wxT("&Debug"));
     menuDebug->Append(DEBUG_SPAWN_AGENTS, "&Spawn Agents\tG");
+    menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Selected Agent\tDelete");
 
 	// HELP
     wxMenu* menuHelp = new wxMenu;
@@ -119,7 +123,7 @@ SimulationWindow::SimulationWindow() :
 	// Initialize a new simulation.
 	m_simulationManager.Initialize();
 
-	m_controlledAgent = nullptr;
+	m_controlledAgentId = -1;
 }
 
 void SimulationWindow::OnClose(wxCommandEvent& e)
@@ -176,6 +180,10 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	case SHOW_INVISIBLE_OBJECTS:
 		m_simulationManager.SetShowInvisibleObjects(e.IsChecked());
 		break;
+	case DEBUG_DELETE_AGENT:
+		if (m_simulationManager.GetSelectedAgent() != nullptr)
+			m_simulationManager.GetSelectedAgent()->Destroy();
+		break;
 	case wxID_ABOUT:
 	{
 		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russel (2017)",
@@ -189,12 +197,21 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 void SimulationWindow::OnIdle(wxIdleEvent& e)
 {
 	double startTime = Time::GetTime(); // time the update.
-
+	
 	// Update debug agent move keyboard controls.
 	Agent* agent = m_simulationManager.GetSelectedAgent();
-	if (agent != m_controlledAgent && m_controlledAgent != nullptr)
-		m_controlledAgent->SetManualOverride(false);
-	m_controlledAgent = agent;
+	if (m_controlledAgentId >= 0 && 
+		(agent == nullptr || agent->GetId() != m_controlledAgentId))
+	{
+		Agent* controlledAgent = (Agent*) m_simulationManager
+			.GetSimulation()->GetObjectManager()->GetObj(m_controlledAgentId);
+		if (controlledAgent != nullptr)
+			controlledAgent->SetManualOverride(false);
+		if (agent != nullptr)
+			m_controlledAgentId = agent->GetId();
+		else
+			m_controlledAgentId = -1;
+	}
 	if (agent != nullptr)
 	{
 		int moveAmount = 0;

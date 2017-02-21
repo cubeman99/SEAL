@@ -38,7 +38,7 @@ private:
 
 	SimulationRenderPanel* m_simulationPanel;
 
-	Agent*	m_controlledAgent;
+	int		m_controlledAgentId;
 
     wxTimer	m_updateTimer;
 	int		m_frameCounter;
