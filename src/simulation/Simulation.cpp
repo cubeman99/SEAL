@@ -68,9 +68,9 @@ void Simulation::Tick()
 
 		//NextGeneration();
 	}
+	UpdateStatistics();
 	if (m_ageInTicks % 60 == 0)
 	{
-		UpdateStatistics();
 		m_generationStats.push_back(m_statistics);
 	}
 	
@@ -143,6 +143,8 @@ void Simulation::UpdateStatistics()
 {
 	SimulationStats stats;
 	
+	stats.simulationAge = m_ageInTicks;
+
 	// Cumulatively add statistic values for each agent.
 	unsigned int numAgents = 0;
 	for (auto it = m_objectManager.agents_begin();
@@ -157,10 +159,14 @@ void Simulation::UpdateStatistics()
 	}
 	
 	// Divide averages by agent count.
-	float invNumAgents = 1.0f / numAgents;
-	for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-		stats.avgGeneValues[i] *= invNumAgents;
-	stats.avgFitness *= invNumAgents;
+	if (numAgents > 0)
+	{
+		float invNumAgents = 1.0f / numAgents;
+		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+			stats.avgGeneValues[i] *= invNumAgents;
+		stats.avgFitness *= invNumAgents;
+		stats.avgEnergy = stats.totalEnergy * invNumAgents;
+	}
 
 	m_statistics = stats;
 }

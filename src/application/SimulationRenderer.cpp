@@ -563,20 +563,40 @@ void SimulationRenderer::RenderGraphs()
 void SimulationRenderer::RenderInfoPanel()
 {
 	Simulation* simulation = m_simulationManager->GetSimulation();
+	const SimulationStats& stats = simulation->GetStatistics();
 
 	// Setup projection.
 	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
 		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
 	
-	std::stringstream text;
-	text.setf(std::ios::fixed, std::ios::floatfield);
+	using namespace std;
+
+	stringstream text;
+	text.setf(ios::fixed, ios::floatfield);
 	text.precision(2);
 
-	text << "Generation " << (simulation->GetGeneration() + 1);
+	text << "Generation " << (simulation->GetGeneration() + 1) << endl;
+	text << "Age: " << simulation->GetAgeInTicks() << endl;
+	text << "Population Size: " << stats.populationSize << endl;
+	text << "Total Energy: " << stats.totalEnergy << endl;
+	text << "Avg Energy: " << stats.avgEnergy << endl;
+	text << "Avg Fitness: " << stats.avgFitness << endl;
+	//text << "# Plants: " << stats.populationSize << endl;
 
+	string textStr = text.str();
+	Vector2f textPos(m_viewPortSize.x - 220, 8);
+
+	// Draw the text background.
+	float border = 6;
+	Vector2f textBoxSize = m_graphics.MeasureString(m_font, textStr);
+	textBoxSize += 2.0f * Vector2f(border);
+	Vector2f textBoxPos = textPos - Vector2f(border);
+	m_graphics.FillRect(textBoxPos, textBoxSize,
+		Vector4f(0, 0, 0, 0.8f));
+
+	// Draw the text.
 	m_graphics.DrawString(m_font, text.str(),
-		m_viewPortSize.x * 0.5f, 6,
-		Color::YELLOW, TextAlign::TOP_CENTER);
+		textPos, Color::WHITE, TextAlign::TOP_LEFT);
 }
 
 
