@@ -51,8 +51,8 @@ SimulationConfig::SimulationConfig()
 
 	genes.maxInternalNeurons		= 20;		// TODO: tinker
 
-	genes.minLifeSpan				= 60 * 60;
-	genes.maxLifeSpan				= 60 * 200;
+	genes.minLifeSpan				= 60 * 40;
+	genes.maxLifeSpan				= 60 * 100;
 	genes.minStrength				= 0.0f;
 	genes.maxStrength				= 1.0f;
 	genes.minSightDistance			= 20;

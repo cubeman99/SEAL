@@ -156,10 +156,11 @@ void Agent::Update()
 	UpdateBrain();
 
 	m_age++;
+
+	// Kill agent after lifetime expiration.
 	if (m_age > m_lifeSpan)
 	{
-		// TODO: kill agent after lifetime expiration.
-		//Destroy();
+		Destroy();
 	}
 
 	if (m_mateWaitTime > 0)
