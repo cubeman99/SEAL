@@ -20,7 +20,7 @@ SimulationConfig::SimulationConfig()
 	plant.eatEnergyDepletionRate	= 10.0f;
 
 	agent.initialPredatorCount		= 10;
-	agent.initialPreyCount			= 20;
+	agent.initialPreyCount			= 60;
 	agent.minPredatorAgents			= 10;
 	agent.minPredatorAgents			= 80;
 	agent.minPreyAgents				= 20; 
@@ -36,14 +36,14 @@ SimulationConfig::SimulationConfig()
 	agent.minMatingDistance			= 23.0f;
 	agent.matingDelay				= 60 * 4;
 
-	energy.energyCostExist			= 0.005f;
+	energy.energyCostExist			= 0.006f;
 	energy.energyCostMove			= 0.02f;
 	energy.energyCostTurn			= 0.02f;
 	energy.energyCostNeuron			= 0.0f;
 	energy.energyCostSynapse		= 0.0f;
 
 	genes.minChildren				= 1;
-	genes.maxChildren				= 4;
+	genes.maxChildren				= 3;
 	genes.minMutationRate			= 0.001f;	// 1 in 1000 genes mutate. TODO: tinker
 	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
 	genes.minCrossoverPoints		= 1;
