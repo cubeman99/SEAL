@@ -5,7 +5,8 @@
 #include <simulation/Plant.h>
 #include <utilities/Timing.h>
 #include <sstream>
-
+#include <iostream>
+#include <iomanip>
 
 SimulationRenderer::SimulationRenderer()
 {
@@ -568,13 +569,16 @@ void SimulationRenderer::RenderInfoPanel()
 	InfoPanel simInfoPanel;
 	simInfoPanel.SetTitle("Simulation");
 	simInfoPanel.SetFont(m_font);
+	simInfoPanel.AddItem("world age").SetValue(simulation->GetAgeInTicks());
 	simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
-	simInfoPanel.AddItem("age").SetValue(simulation->GetAgeInTicks());
+	simInfoPanel.AddItem("season age").SetValue(simulation->GetGenerationAge()).InitBar(Color::MAGENTA, 0, (float) simulation->GetGenerationDuration());
+	//simInfoPanel.AddSeparator();
 	simInfoPanel.AddItem("total energy").SetValue(stats.totalEnergy);
 	simInfoPanel.AddItem("population size").SetValue((int) stats.populationSize);
 	simInfoPanel.AddItem("avg energy").SetValue(stats.avgEnergy);
 	simInfoPanel.AddItem("avg energy usage").SetValue(stats.avgEnergyUsage);
 	simInfoPanel.AddItem("avg fitness").SetValue(stats.avgFitness);
+	//simInfoPanel.AddSeparator();
 	simInfoPanel.AddItem("avg move amount").SetValue(stats.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
 	simInfoPanel.AddItem("avg turn amount").SetValue(stats.avgTurnAmount).InitBar(Color::CYAN, -1, 1);
 	Vector2f panelPos = Vector2f(6, 6);
@@ -584,21 +588,29 @@ void SimulationRenderer::RenderInfoPanel()
 	Agent* agent = m_simulationManager->GetSelectedAgent();
 	if (agent != nullptr)
 	{
-		std::stringstream title;
-		title << "Agent " << agent->GetId();
+		std::stringstream text;
+		text << "Agent " << agent->GetId();
 
 		InfoPanel agentInfoPanel;
-		agentInfoPanel.SetTitle(title.str());
+		agentInfoPanel.SetTitle(text.str());
 		agentInfoPanel.SetFont(m_font);
 		agentInfoPanel.AddItem("age").SetValue(agent->GetAge()).InitBar(Color::CYAN, 0, (float) agent->GetLifeSpan());
 		agentInfoPanel.AddItem("energy").SetValue(agent->GetEnergy()).InitBar(Color::YELLOW, 0, agent->GetMaxEnergy());
 		agentInfoPanel.AddItem("energy usage").SetValue(agent->GetEnergyUsage()).SetPrecision(4);
 		agentInfoPanel.AddItem("fitness").SetValue(agent->GetFitness());
+		//simInfoPanel.AddSeparator();
 		agentInfoPanel.AddItem("move speed").SetValue(agent->GetMoveSpeed()).InitBar(Color::GREEN, 0, agent->GetMaxMoveSpeed());
 		agentInfoPanel.AddItem("turn speed").SetValue(agent->GetTurnSpeed()).InitBar(Color::CYAN, -agent->GetMaxTurnSpeed(), agent->GetMaxTurnSpeed(), 0.0f);
+		//simInfoPanel.AddSeparator();
 		agentInfoPanel.AddItem("fov").SetValue((int) Math::ToDegrees(agent->GetFieldOfView()));
 		agentInfoPanel.AddItem("angle b/w eyes").SetValue((int) Math::ToDegrees(agent->GetAngleBetweenEyes()));
 		agentInfoPanel.AddItem("sight distance").SetValue(agent->GetMaxViewDistance());
+		Color col = Color(agent->GetColor());
+		text.str("");
+		text << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.r
+			<< std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.g
+			<< std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.b;
+		agentInfoPanel.AddItem("color").SetValue(text.str()).InitSolidColor(agent->GetColor());
 		panelPos.y += simInfoPanel.GetSize().y + 10;
 		agentInfoPanel.Draw(m_graphics, panelPos);
 	}

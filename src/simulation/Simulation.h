@@ -30,6 +30,8 @@ public:
 	inline const SimulationStats& GetStatistics() const { return m_statistics; }
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 	inline unsigned int GetGeneration() const { return m_generationIndex; }
+	inline unsigned int GetGenerationAge() const { return m_generationAge; }
+	inline unsigned int GetGenerationDuration() const { return m_generationDuration; }
 
 
 	//-------------------------------------------------------------------------
