@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\application\Graph.cpp" />
+    <ClCompile Include="..\..\src\application\InfoPanel.cpp" />
     <ClCompile Include="..\..\src\application\OctTreeRenderer.cpp" />
     <ClCompile Include="..\..\src\application\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\application\SimulationManager.cpp" />
@@ -46,6 +47,7 @@
     <ClCompile Include="..\..\src\math\Point2i.cpp" />
     <ClCompile Include="..\..\src\math\Quaternion.cpp" />
     <ClCompile Include="..\..\src\math\Ray.cpp" />
+    <ClCompile Include="..\..\src\math\Rect2f.cpp" />
     <ClCompile Include="..\..\src\math\Rect2i.cpp" />
     <ClCompile Include="..\..\src\math\Sphere.cpp" />
     <ClCompile Include="..\..\src\math\Transform3f.cpp" />
@@ -74,6 +76,7 @@
     <ClInclude Include="..\..\src\application\CameraSystem.h" />
     <ClInclude Include="..\..\src\application\GlobeCamera.h" />
     <ClInclude Include="..\..\src\application\Graph.h" />
+    <ClInclude Include="..\..\src\application\InfoPanel.h" />
     <ClInclude Include="..\..\src\application\OctTreeRenderer.h" />
     <ClInclude Include="..\..\src\application\ResourceManager.h" />
     <ClInclude Include="..\..\src\application\SimulationManager.h" />
@@ -106,6 +109,7 @@
     <ClInclude Include="..\..\src\math\Point2i.h" />
     <ClInclude Include="..\..\src\math\Quaternion.h" />
     <ClInclude Include="..\..\src\math\Ray.h" />
+    <ClInclude Include="..\..\src\math\Rect2f.h" />
     <ClInclude Include="..\..\src\math\Rect2i.h" />
     <ClInclude Include="..\..\src\math\Sphere.h" />
     <ClInclude Include="..\..\src\math\Transform3f.h" />
@@ -182,7 +186,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;WINVER=0x0400;__WXMSW__;_WINDOWS;wxUSE_GUI=1;_UNICODE;UNICODE;wxUSE_UNICODE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WINVER=0x0400;__WXMSW__;_WINDOWS;wxUSE_GUI=1;_UNICODE;UNICODE;wxUSE_UNICODE;_CRT_SECURE_NO_WARNINGS;_INC_MALLOC;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\wxWidgets\include;..\..\wxWidgets\include\msvc;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

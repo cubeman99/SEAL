@@ -64,6 +64,7 @@ public:
 	inline float GetMaxTurnSpeed() const { return m_maxTurnSpeed; }
 	inline float GetMaxMoveSpeed() const { return m_maxMoveSpeed; }
 	inline float GetMaxEnergy() const { return m_maxEnergy; }
+	inline int GetLifeSpan() const { return m_lifeSpan; }
 	inline float GetFieldOfView() const { return m_fieldOfView; }
 	inline float GetMaxViewDistance() const { return m_maxViewDistance; }
 	inline float GetAngleBetweenEyes() const { return m_angleBetweenEyes; }

@@ -1,5 +1,6 @@
 #include "Vector2f.h"
 #include "MathLib.h"
+#include "Point2i.h"
 
 
 //-----------------------------------------------------------------------------
@@ -22,11 +23,11 @@ Vector2f::Vector2f()
 {
 }
 
-//Vector2f::Vector2f(const Point2i& v) :
-//	x((float) v.x),
-//	y((float) v.y)
-//{
-//}
+Vector2f::Vector2f(const Point2i& v) :
+	x((float) v.x),
+	y((float) v.y)
+{
+}
 
 // Construct a vector with the given components.
 Vector2f::Vector2f(float x, float y) :

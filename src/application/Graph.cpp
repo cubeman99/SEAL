@@ -39,6 +39,7 @@ GraphPanel::~GraphPanel()
 {
 	for (unsigned int i = 0; i < m_graphs.size(); i++)
 		delete m_graphs[i];
+	m_graphs.clear();
 }
 
 
@@ -67,6 +68,14 @@ void GraphPanel::SetDynamicRange(bool dynamicRange, float dynamicRangePadding)
 void GraphPanel::SetViewport(const Viewport& viewport)
 {
 	m_viewport = viewport;
+}
+
+void GraphPanel::SetViewport(const Rect2i& viewport)
+{
+	m_viewport.x = viewport.position.x;
+	m_viewport.y = viewport.position.y;
+	m_viewport.width = viewport.size.x;
+	m_viewport.height = viewport.size.y;
 }
 
 
@@ -217,6 +226,8 @@ void GraphPanel::Draw(Graphics& g2)
 	{
 		DrawGraph(g, m_graphs[i]);
 	}
+	
+	g->ResetTransform();
 }
 
 Vector2f GraphPanel::GetPointOnGraph(const Vector2f& point)

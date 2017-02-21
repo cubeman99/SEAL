@@ -199,42 +199,7 @@ void SimulationWindow::OnIdle(wxIdleEvent& e)
 	double startTime = Time::GetTime(); // time the update.
 	
 	// Update debug agent move keyboard controls.
-	Agent* agent = m_simulationManager.GetSelectedAgent();
-	if (m_controlledAgentId >= 0 && 
-		(agent == nullptr || agent->GetId() != m_controlledAgentId))
-	{
-		Agent* controlledAgent = (Agent*) m_simulationManager
-			.GetSimulation()->GetObjectManager()->GetObj(m_controlledAgentId);
-		if (controlledAgent != nullptr)
-			controlledAgent->SetManualOverride(false);
-		if (agent != nullptr)
-			m_controlledAgentId = agent->GetId();
-		else
-			m_controlledAgentId = -1;
-	}
-	if (agent != nullptr)
-	{
-		int moveAmount = 0;
-		int turnAmount = 0;
-
-		// Update movement controls (arrow keys).
-		if (wxGetKeyState(WXK_LEFT))
-			turnAmount++;
-		if (wxGetKeyState(WXK_RIGHT))
-			turnAmount--;
-		if (wxGetKeyState(WXK_UP))
-			moveAmount++;
-		if (wxGetKeyState(WXK_DOWN))
-			moveAmount--;
-
-		// Disable wandering if the agent was moved manually.
-		if (agent->GetManualOverride() || moveAmount != 0 || turnAmount != 0)
-		{
-			agent->SetTurnSpeed(turnAmount * agent->GetMaxTurnSpeed() * 0.5f);
-			agent->SetMoveSpeed(moveAmount * agent->GetMaxMoveSpeed());
-			agent->SetManualOverride(true);
-		}
-	}
+	UpdateDebugAgentControls();
 
 	// Update the simulation.
 	m_simulationManager.Update();
@@ -282,6 +247,52 @@ void SimulationWindow::OnIdle(wxIdleEvent& e)
 	
 	// Tell the simulation panel to render.
 	m_simulationPanel->Refresh(false);
+}
+
+void SimulationWindow::UpdateDebugAgentControls()
+{
+	// Check if the use has selected a new agent.
+	Agent* agent = m_simulationManager.GetSelectedAgent();
+	if (m_controlledAgentId >= 0 && 
+		(agent == nullptr || agent->GetId() != m_controlledAgentId))
+	{
+		Agent* controlledAgent = (Agent*) m_simulationManager
+			.GetSimulation()->GetObjectManager()->GetObj(m_controlledAgentId);
+		if (controlledAgent != nullptr)
+			controlledAgent->SetManualOverride(false);
+	}
+	
+	// Sync the controlled agent with the selected agent.
+	if (agent != nullptr)
+		m_controlledAgentId = agent->GetId();
+	else
+		m_controlledAgentId = -1;
+
+	// Update movement controls for the currently selected agent.
+	if (agent != nullptr)
+	{
+		int moveAmount = 0;
+		int turnAmount = 0;
+
+		// Update movement controls (arrow keys).
+		if (wxGetKeyState(WXK_LEFT))
+			turnAmount++;
+		if (wxGetKeyState(WXK_RIGHT))
+			turnAmount--;
+		if (wxGetKeyState(WXK_UP))
+			moveAmount++;
+		if (wxGetKeyState(WXK_DOWN))
+			moveAmount--;
+
+		// Disable wandering if the agent was moved manually.
+		if (agent->GetManualOverride() || moveAmount != 0 || turnAmount != 0)
+		{
+			agent->SetTurnSpeed(turnAmount * agent->GetMaxTurnSpeed() * 0.5f);
+			agent->SetMoveSpeed(moveAmount * agent->GetMaxMoveSpeed());
+			agent->SetManualOverride(true);
+		}
+	}
+
 }
 
 void SimulationWindow::OnUpdateTimer(wxTimerEvent& e)

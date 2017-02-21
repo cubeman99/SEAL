@@ -81,6 +81,12 @@ void Graphics::DrawLine(const Vector2f& from, const Vector2f& to, const Color& c
 	glEnd();
 }
 
+void Graphics::DrawRect(const Rect2f& rect, const Color& color)
+{
+	DrawRect(rect.position.x, rect.position.y,
+		rect.size.x, rect.size.y, color);
+}
+
 void Graphics::DrawRect(const Viewport& rect, const Color& color)
 {
 	DrawRect((float) rect.x, (float) rect.y,
@@ -100,15 +106,21 @@ void Graphics::DrawRect(float x, float y, float width, float height, const Color
 	FillRect(x, y + height - 1, width, 1, color);
 }
 
-void Graphics::FillRect(const Vector2f& pos, const Vector2f& size, const Color& color)
+void Graphics::FillRect(const Rect2f& rect, const Color& color)
 {
-	FillRect(pos.x, pos.y, size.x, size.y, color);
+	FillRect(rect.position.x, rect.position.y,
+		rect.size.x, rect.size.y, color);
 }
 
 void Graphics::FillRect(const Viewport& rect, const Color& color)
 {
 	FillRect((float) rect.x, (float) rect.y,
 		(float) rect.width, (float) rect.height, color);
+}
+
+void Graphics::FillRect(const Vector2f& pos, const Vector2f& size, const Color& color)
+{
+	FillRect(pos.x, pos.y, size.x, size.y, color);
 }
 
 void Graphics::FillRect(float x, float y, float width, float height, const Color& color)
@@ -158,6 +170,8 @@ void Graphics::DrawString(const Font* font, const std::string& text, float x, fl
 
 void Graphics::DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align)
 {
+	assert(font != nullptr);
+
 	float scale = 1.0f;
 
 	Texture* texture = font->GetTexture();

@@ -7,6 +7,7 @@
 #include <math/Vector3f.h>
 #include <math/Vector4f.h>
 #include <math/Quaternion.h>
+#include <math/Rect2f.h>
 #include "Color.h"
 #include "SpriteFont.h"
 #include <assert.h>
@@ -114,11 +115,13 @@ public:
 	//---------------------------------------------------------------------
 	// Rectangles
 
+	void DrawRect(const Rect2f& rect, const Color& color);
 	void DrawRect(const Viewport& rect, const Color& color);
 	void DrawRect(const Vector2f& pos, const Vector2f& size, const Color& color);
 	void DrawRect(float x, float y, float width, float height, const Color& color);
-	void FillRect(const Vector2f& pos, const Vector2f& size, const Color& color);
+	void FillRect(const Rect2f& rect, const Color& color);
 	void FillRect(const Viewport& rect, const Color& color);
+	void FillRect(const Vector2f& pos, const Vector2f& size, const Color& color);
 	void FillRect(float x, float y, float width, float height, const Color& color);
 	
 	//---------------------------------------------------------------------

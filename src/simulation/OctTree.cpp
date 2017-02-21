@@ -93,7 +93,11 @@ void OctTree::InsertObject(object_pointer object)
 
 void OctTree::RemoveObject(object_pointer object)
 {
-	OctTreeNode* node = m_objectToNodeMap[object];
+	auto it = m_objectToNodeMap.find(object);
+	if (it == m_objectToNodeMap.end())
+		return;
+
+	OctTreeNode* node = it->second;
 
 	// Delete the node if this is the only object in it.
 	if (node->GetObjectCount() == 1)

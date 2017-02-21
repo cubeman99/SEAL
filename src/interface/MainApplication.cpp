@@ -24,6 +24,7 @@ bool MainApplication::OnInit()
 int MainApplication::OnExit()
 {
     delete m_glContext;
+	m_glContext = nullptr;
 
     return wxApp::OnExit();
 }

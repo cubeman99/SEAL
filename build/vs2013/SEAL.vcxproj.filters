@@ -40,6 +40,9 @@
     <Filter Include="Source Files\application\camera">
       <UniqueIdentifier>{42b02647-5f3d-4443-914a-1040e6b93391}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\application\display">
+      <UniqueIdentifier>{40a0885f-1c7c-4b21-85e0-3f40665b0f79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -211,6 +214,12 @@
       <Filter>Source Files\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\math\Point2i.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\application\InfoPanel.cpp">
+      <Filter>Source Files\application\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\Rect2f.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
   </ItemGroup>
@@ -390,6 +399,12 @@
       <Filter>Source Files\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\math\Point2i.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\InfoPanel.h">
+      <Filter>Source Files\application\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Rect2f.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
   </ItemGroup>

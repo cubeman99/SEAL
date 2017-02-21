@@ -29,6 +29,10 @@ Agent::Agent(Genome* genome, float energy) :
 
 Agent::~Agent()
 {
+	delete m_brain;
+	m_brain = nullptr;
+	delete m_genome;
+	m_genome = nullptr;
 }
 
 void Agent::OnSpawn()

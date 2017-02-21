@@ -21,7 +21,7 @@ struct Vector2f
 
 	// Constructors.
 	Vector2f();
-	//Vector2f(const Point2i& v);
+	Vector2f(const Point2i& v);
 	explicit Vector2f(float x, float y);
 	explicit Vector2f(float value);
 

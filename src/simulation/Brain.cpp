@@ -50,9 +50,13 @@ void Brain::Initialize(unsigned int numNeurons,
 	unsigned int numSynapses, float initialActivation)
 {
 	delete m_currNeuronActivations;
+	m_currNeuronActivations = nullptr;
 	delete m_prevNeuronActivations;
+	m_prevNeuronActivations = nullptr;
 	delete m_neurons;
+	m_neurons = nullptr;
 	delete m_synapses;
+	m_synapses = nullptr;
 
 	m_numNeurons = numNeurons;
 	m_numSynapses = numSynapses;

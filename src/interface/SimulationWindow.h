@@ -34,6 +34,8 @@ private:
 	void OnOpenSimulation(wxCommandEvent& e);
 	void OnSaveSimulation(wxCommandEvent& e);
 	
+	void UpdateDebugAgentControls();
+
 	SimulationManager m_simulationManager;
 
 	SimulationRenderPanel* m_simulationPanel;

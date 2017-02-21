@@ -7,6 +7,8 @@
 #include "ResourceManager.h"
 #include "OctTreeRenderer.h"
 #include "Graph.h"
+#include "InfoPanel.h"
+
 
 class SimulationManager;
 class Agent;

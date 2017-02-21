@@ -349,7 +349,6 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 }
 
 
-
 void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 {
 	float stripWidth = 240.0f;
@@ -364,16 +363,6 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 
 	Vector3f channelColor;
 	Color outlineColor(100, 100, 100);
-
-	Vector2f barSize(stripHeight * 0.3f, stripHeight);
-	Vector2f barPos = stripPos[0] - Vector2f(separation + barSize.x, 0.0f);
-	m_graphics.DrawRect(barPos, barSize, Color::YELLOW);
-	if (agent->GetEnergyPercent() > 0.0f)
-	{
-		barPos.y += (1.0f - agent->GetEnergyPercent()) * barSize.y;
-		barSize.y -= (1.0f - agent->GetEnergyPercent()) * barSize.y;
-		m_graphics.FillRect(barPos, barSize, Color::YELLOW);
-	}
 
 	// Draw each vision strip.
 	for (unsigned int eyeIndex = 0; eyeIndex < 2; eyeIndex++)
@@ -552,9 +541,15 @@ void SimulationRenderer::RenderGraphs()
 		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
 	
 	// Draw graphs.
+	Vector2i viewSize(m_viewPortSize);
+	Vector2i graphSize(280, 84);
+	Rect2i graphBox(viewSize.x - graphSize.x - 6, 6,
+		graphSize.x, graphSize.y);
+	
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
 	m_graphFitness.GetGraph()->ConfigData(&stats.data()->populationSize, (int) stats.size(), sizeof(SimulationStats), 0);
 	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
+	m_graphFitness.SetViewport(graphBox);
 	m_graphFitness.Draw(m_graphics);
 
 	m_graphics.SetViewportToCanvas();
@@ -563,78 +558,50 @@ void SimulationRenderer::RenderGraphs()
 void SimulationRenderer::RenderInfoPanel()
 {
 	Simulation* simulation = m_simulationManager->GetSimulation();
-	const SimulationStats& stats = simulation->GetStatistics();
+	SimulationStats stats = simulation->GetStatistics();
 
 	// Setup projection.
 	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
 		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
-	
-	using namespace std;
 
-	stringstream text;
-	text.setf(ios::fixed, ios::floatfield);
-	text.precision(2);
+	// Draw info panel for simulation.
+	InfoPanel simInfoPanel;
+	simInfoPanel.SetTitle("Simulation");
+	simInfoPanel.SetFont(m_font);
+	simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
+	simInfoPanel.AddItem("age").SetValue(simulation->GetAgeInTicks());
+	simInfoPanel.AddItem("total energy").SetValue(stats.totalEnergy);
+	simInfoPanel.AddItem("population size").SetValue((int) stats.populationSize);
+	simInfoPanel.AddItem("avg energy").SetValue(stats.avgEnergy);
+	simInfoPanel.AddItem("avg energy usage").SetValue(stats.avgEnergyUsage);
+	simInfoPanel.AddItem("avg fitness").SetValue(stats.avgFitness);
+	simInfoPanel.AddItem("avg move amount").SetValue(stats.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
+	simInfoPanel.AddItem("avg turn amount").SetValue(stats.avgTurnAmount).InitBar(Color::CYAN, -1, 1);
+	Vector2f panelPos = Vector2f(6, 6);
+	simInfoPanel.Draw(m_graphics, panelPos);
 	
-	text << "SIMULATION" << endl;
-	text << "---------------------------------" << endl;
-	text << "generation       = " << (simulation->GetGeneration() + 1) << endl;
-	text << "age              = " << simulation->GetAgeInTicks() << endl;
-	text << "population size  = " << stats.populationSize << endl;
-	text << "total energy     = " << stats.totalEnergy << endl;
-	text << "avg energy       = " << stats.avgEnergy << endl;
-	text.precision(4);
-	text << "avg energy Usage = " << stats.avgEnergyUsage << endl;
-	text.precision(2);
-	text << "avg fitness      = " << stats.avgFitness << endl;
-	text << "avg turn amount  = " << stats.avgTurnAmount << endl;
-	text << "avg move amount  = " << stats.avgMoveAmount << endl;
-	//text << "# Plants: " << stats.populationSize << endl;
-
+	// Draw info panel for seleced agent.
 	Agent* agent = m_simulationManager->GetSelectedAgent();
 	if (agent != nullptr)
 	{
-		text << endl;
-		text << "AGENT ID " << agent->GetId() << endl;
-		text << "---------------------------------" << endl;
-		text << "age = " << agent->GetAge() << endl;
-		text << "energy = " << agent->GetEnergy() << " (" << (agent->GetEnergyPercent() * 100.0f) << "%)" << endl;
-		text << "energy usage = " << agent->GetEnergyUsage() << endl;
-		text << "fitness = " << agent->GetFitness() << endl;
+		std::stringstream title;
+		title << "Agent " << agent->GetId();
 
-		text << "move speed = " << agent->GetMoveSpeed() << " (" << (agent->GetMoveAmount() * 100.0f) << "%)" << endl;
-		text << "turn speed = " << agent->GetTurnSpeed() << " (" << (agent->GetTurnAmount() * 100.0f) << "%)" << endl;
-
-		text << "fov = " << agent->GetFieldOfView() << endl;
-		text << "angle b/w eyes = " << agent->GetAngleBetweenEyes() << endl;
-		text << "sight distance = " << agent->GetMaxViewDistance() << endl;
+		InfoPanel agentInfoPanel;
+		agentInfoPanel.SetTitle(title.str());
+		agentInfoPanel.SetFont(m_font);
+		agentInfoPanel.AddItem("age").SetValue(agent->GetAge()).InitBar(Color::CYAN, 0, (float) agent->GetLifeSpan());
+		agentInfoPanel.AddItem("energy").SetValue(agent->GetEnergy()).InitBar(Color::YELLOW, 0, agent->GetMaxEnergy());
+		agentInfoPanel.AddItem("energy usage").SetValue(agent->GetEnergyUsage()).SetPrecision(4);
+		agentInfoPanel.AddItem("fitness").SetValue(agent->GetFitness());
+		agentInfoPanel.AddItem("move speed").SetValue(agent->GetMoveSpeed()).InitBar(Color::GREEN, 0, agent->GetMaxMoveSpeed());
+		agentInfoPanel.AddItem("turn speed").SetValue(agent->GetTurnSpeed()).InitBar(Color::CYAN, -agent->GetMaxTurnSpeed(), agent->GetMaxTurnSpeed(), 0.0f);
+		agentInfoPanel.AddItem("fov").SetValue((int) Math::ToDegrees(agent->GetFieldOfView()));
+		agentInfoPanel.AddItem("angle b/w eyes").SetValue((int) Math::ToDegrees(agent->GetAngleBetweenEyes()));
+		agentInfoPanel.AddItem("sight distance").SetValue(agent->GetMaxViewDistance());
+		panelPos.y += simInfoPanel.GetSize().y + 10;
+		agentInfoPanel.Draw(m_graphics, panelPos);
 	}
-
-	/*
-	age
-	energy 
-	fitness
-
-	move speed
-	turn speed
-
-	GENOME:
-	...
-	*/
-
-	string textStr = text.str();
-	Vector2f textPos(m_viewPortSize.x - 220, 8);
-
-	// Draw the text background.
-	float border = 6;
-	Vector2f textBoxSize = m_graphics.MeasureString(m_font, textStr);
-	textBoxSize += 2.0f * Vector2f(border);
-	Vector2f textBoxPos = textPos - Vector2f(border);
-	m_graphics.FillRect(textBoxPos, textBoxSize,
-		Vector4f(0, 0, 0, 0.8f));
-
-	// Draw the text.
-	m_graphics.DrawString(m_font, text.str(),
-		textPos, Color::WHITE, TextAlign::TOP_LEFT);
 }
 
 

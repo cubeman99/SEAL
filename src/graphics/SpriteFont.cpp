@@ -15,4 +15,5 @@ SpriteFont::SpriteFont(Texture* texture, int charsPerRow,
 SpriteFont::~SpriteFont()
 {
 	delete m_texture;
+	m_texture = nullptr;
 }
