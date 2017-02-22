@@ -2,6 +2,7 @@
 #include <math/Matrix4f.h>
 #include <math/MathLib.h>
 #include <utilities/Random.h>
+#include <utilities/Timing.h>
 #include <simulation/Simulation.h>
 
 
@@ -21,7 +22,9 @@ SimulationManager::SimulationManager() :
 	  m_showAgentVision(false),
 	  m_showAgentBrain(false),
 	  m_showInvisibleObjects(false),
-	  m_showAxisLines(false)
+	  m_showAxisLines(false),
+	  m_maxTicksPerFrame(false),
+	  m_ticksPerFrame(1)
 {
 }
 
@@ -148,11 +151,34 @@ void SimulationManager::PauseSimulation()
 	m_isSimulationPaused = !m_isSimulationPaused;
 }
 
+void SimulationManager::TickSimulation()
+{
+	m_simulation->Tick();
+}
+
 void SimulationManager::Update()
 {
 	// Update simulation.
 	if (!m_isSimulationPaused)
-		m_simulation->Tick();
+	{
+		if (m_maxTicksPerFrame)
+		{
+			double startTime = Time::GetTime();
+			double elapsedTime = 0.0;
+			while (elapsedTime < 0.016667)
+			{
+				TickSimulation();
+				elapsedTime = Time::GetTime() - startTime;
+			}
+		}
+		else
+		{
+			for (unsigned int i = 0; i < m_ticksPerFrame; ++i)
+			{
+				TickSimulation();
+			}
+		}
+	}
 	
 	// Check if our selected agent has died.
 	// TODO: make an event queue for simultaion (for births and deaths)

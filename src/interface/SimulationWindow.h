@@ -16,36 +16,46 @@ class SimulationWindow : public wxFrame
 public:
     SimulationWindow();
 
+	// Getters
 	inline SimulationManager* GetSimulationManager() { return &m_simulationManager; }
+	inline SimulationRenderPanel* GetRenderPanel() { return m_simulationPanel; }
+
 
 private:
     wxDECLARE_EVENT_TABLE();
-
-    void OnClose(wxCommandEvent& e);
-    void OnNewWindow(wxCommandEvent& e);
-    void OnPlayPauseSimulation(wxCommandEvent& e);
-    void OnToggleCameraTracking(wxCommandEvent& e);
-    void OnSpawnAgents(wxCommandEvent& e);
-    void OnMenuItem(wxCommandEvent& e);
-	void OnIdle(wxIdleEvent& e);
-    void OnUpdateTimer(wxTimerEvent& e);
-    void OnWindowClose(wxCloseEvent& e);
 	
+	// UI
+	void CreateUI();
+	
+	// Window events
+    void OnNewWindow(wxCommandEvent& e);
+    void OnClose(wxCommandEvent& e);
+    void OnWindowClose(wxCloseEvent& e);
+
+	// Menu item events
+	void OnUpdateMenuItem(wxUpdateUIEvent& e);
+    void OnMenuItem(wxCommandEvent& e);
 	void OnOpenSimulation(wxCommandEvent& e);
 	void OnSaveSimulation(wxCommandEvent& e);
-	
+
+	// Updates
+	void OnIdle(wxIdleEvent& e);
+	void UpdateStatusBar();
 	void UpdateDebugAgentControls();
 
-	SimulationManager m_simulationManager;
 
+private:
+	SimulationManager m_simulationManager;
 	SimulationRenderPanel* m_simulationPanel;
 
 	int		m_controlledAgentId;
-
-    wxTimer	m_updateTimer;
 	int		m_frameCounter;
 	float	m_fps;
 	double	m_lastFrameTimeStamp;
+	double	m_updateTimeMs;
+
+	// Menu items
+	wxMenuItem* m_menuItemTickOnce;
 };
 
 

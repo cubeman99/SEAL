@@ -93,7 +93,7 @@ Graph* GraphPanel::GetGraph(const std::string& name)
 		if (m_graphs[i]->GetName() == name)
 			return m_graphs[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 void GraphPanel::Draw(Graphics& g2)

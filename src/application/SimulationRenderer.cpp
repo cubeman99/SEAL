@@ -53,16 +53,16 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_resourceManager.AddShader("default_fallback", m_defaultShader);
 
 	m_graphFitness.SetFont(m_font);
-	m_graphFitness.SetTitle("Population");
+	m_graphFitness.SetTitle("Population Size");
 	m_graphFitness.SetXBounds(0, 60);
 	m_graphFitness.SetYBounds(0.0f, 10000.0f);
 	m_graphFitness.SetYBounds(0.0f, 300);
 	m_graphFitness.SetDynamicRange(false);
 	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
-	//m_graphFitness.AddGraph("graph", Color::YELLOW);
-	m_graphFitness.AddGraph("red", Color::RED);
-	m_graphFitness.AddGraph("green", Color::GREEN);
-	m_graphFitness.AddGraph("blue", Color::BLUE);
+	m_graphFitness.AddGraph("graph", Color::CYAN);
+	//m_graphFitness.AddGraph("red", Color::RED);
+	//m_graphFitness.AddGraph("green", Color::GREEN);
+	//m_graphFitness.AddGraph("blue", Color::BLUE);
 
 	// Agent model.
 	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
@@ -560,13 +560,14 @@ void SimulationRenderer::RenderGraphs()
 	
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
 	//m_graphFitness.GetGraph()->ConfigData(&stats.data()->populationSize
-	m_graphFitness.SetYBounds(0, 1);
-	m_graphFitness.GetGraph("red")->ConfigData(&stats.data()->avgGeneValue[GenePosition::LIFE_SPAN],
+	m_graphFitness.SetYBounds(0, 500);
+	//m_graphFitness.SetYBounds(0, 1);
+	m_graphFitness.GetGraph()->ConfigData(&stats.data()->populationSize,
 		(int) stats.size(), sizeof(SimulationStats), 0);
-	m_graphFitness.GetGraph("green")->ConfigData(&stats.data()->avgGeneValue[GenePosition::MUTATION_RATE],
-		(int) stats.size(), sizeof(SimulationStats), 0);
-	m_graphFitness.GetGraph("blue")->ConfigData(&stats.data()->avgGeneValue[GenePosition::CHILD_COUNT],
-		(int) stats.size(), sizeof(SimulationStats), 0);
+	//m_graphFitness.GetGraph("green")->ConfigData(&stats.data()->avgGeneValue[GenePosition::MUTATION_RATE],
+	//	(int) stats.size(), sizeof(SimulationStats), 0);
+	//m_graphFitness.GetGraph("blue")->ConfigData(&stats.data()->avgGeneValue[GenePosition::CHILD_COUNT],
+	//	(int) stats.size(), sizeof(SimulationStats), 0);
 	m_graphFitness.SetXBounds(0, (float) Math::Max(6u, stats.size()));
 	m_graphFitness.SetViewport(graphBox);
 	m_graphFitness.Draw(m_graphics);

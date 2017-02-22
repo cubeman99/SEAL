@@ -26,6 +26,10 @@ public:
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
 
+	inline void SetSimulationPaused(bool isSimulationPaused) { m_isSimulationPaused = isSimulationPaused; }
+	inline void SetTicksFerFrame(unsigned int ticksPerFrame) { m_ticksPerFrame = ticksPerFrame; }
+	inline void SetMaxTicksPerFrame(bool maxTicksPerFrame) { m_maxTicksPerFrame = maxTicksPerFrame; }
+
 	// Render options
 	// TODO: have some sort of enum for view options like these.
 
@@ -60,17 +64,20 @@ public:
 	void StopCameraTracking();
 	void PauseSimulation();
 	
+	void TickSimulation();
 	void Update();
 	
 private:
 	SimulationRenderer m_simulationRenderer;
-	Simulation* m_simulation;
-	CameraSystem m_cameraSystem;
-	bool m_isSimulationPaused;
-	int m_selectedAgentId;
-	Agent* m_selectedAgent;
+	Simulation*		m_simulation;
+	CameraSystem	m_cameraSystem;
+	int				m_selectedAgentId;
+	Agent*			m_selectedAgent;
 
-
+	bool			m_isSimulationPaused;
+	unsigned int	m_ticksPerFrame;
+	bool			m_maxTicksPerFrame;
+	
 	// Render options.
 	bool m_viewWireFrameMode;
 	bool m_viewLighting;

@@ -44,7 +44,7 @@ SimulationConfig::SimulationConfig()
 
 	genes.minChildren				= 1;
 	genes.maxChildren				= 3;
-	genes.minMutationRate			= 0.001f;	// 1 in 1000 genes mutate. TODO: tinker
+	genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
 	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
 	genes.minCrossoverPoints		= 1;
 	genes.maxCrossoverPoints		= 4;

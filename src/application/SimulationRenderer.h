@@ -20,6 +20,8 @@ public:
 	SimulationRenderer();
 	~SimulationRenderer();
 
+	void LoadResources();
+
 	void Initialize(SimulationManager* simulationManager);
 
 	void Render(const Vector2f& viewPortSize);
