@@ -25,6 +25,7 @@ void main()
 	vec3 lightDir = normalize(u_lightDir);
 	float lightAmount = dot(-lightDir, v_normal);
 	//lightAmount = (lightAmount + 1) / 2;
+	//lightAmount *= lightAmount;
 	lightAmount = max(0, lightAmount);
 	v_lightColor = u_lightColor * lightAmount;
 	//v_lightColor = (max(0, lightAmount) + vec3(1)) / 2; 
