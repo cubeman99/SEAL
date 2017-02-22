@@ -17,6 +17,8 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::Initialize()
 {
+	ClearObjects();
+
 	m_objectIdCounter = 1;
 
 	// Setup the OctTree.
@@ -62,6 +64,7 @@ void ObjectManager::ClearObjects()
 {
 	m_idToObjectMap.clear();
 	m_octTree.Clear();
+
 	// Delete all objects.
 	for (unsigned int i = 0; i < m_objects.size(); ++i)
 		delete m_objects[i];

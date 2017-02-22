@@ -65,10 +65,11 @@ public:
 class OctTreeRenderer
 {
 public:
-	OctTreeRenderer();
+	OctTreeRenderer(SimulationManager* simulationManager,
+					ResourceManager* resourceManager);
 
-	void Initialize(ResourceManager* resourceManager,
-					SimulationManager* simulationManager);
+	void Initialize();
+	void OnNewSimulation(Simulation* simulation);
 
 	// Rendering
 	void RenderOctTree(Renderer* renderer, OctTree* octTree);
@@ -102,7 +103,7 @@ private:
 	Vector2f ComputeIntersectionPoint(	const Bounds2D& circle, int edgeIndex,
 										int pointIndex, Vector2f* corners);
 
-
+	ResourceManager* m_resourceManager;
 	SimulationManager* m_simulationManager;
 	Renderer*	m_renderer;
 	OctTree*	m_octTree;

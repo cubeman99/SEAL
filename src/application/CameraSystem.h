@@ -16,7 +16,8 @@ class CameraSystem
 public:
 	CameraSystem();
 
-	void Initialize(Simulation* simulation);
+	void Initialize();
+	void OnNewSimulation(Simulation* simulation);
 
 	inline ICamera* GetActiveCamera() const { return m_camera; }
 	inline Matrix4f GetViewProjectionMatrix() const { return m_camera->GetViewProjection(); }

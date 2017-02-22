@@ -40,6 +40,7 @@ private:
     void OnPaint(wxPaintEvent& e);
 
 
+private:
 	SimulationWindow* m_simulationWindow;
 };
 

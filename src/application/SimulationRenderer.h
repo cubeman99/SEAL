@@ -17,38 +17,45 @@ class Agent;
 class SimulationRenderer
 {
 public:
-	SimulationRenderer();
+	SimulationRenderer(SimulationManager* simulationManager);
 	~SimulationRenderer();
 
+	// Getters
+	inline double GetAverageRenderTime() const { return m_renderTime; }
+
+	void Initialize();
+	void OnNewSimulation(Simulation* simulation);
+
+	// Render the simulation display given the canvas size.
+	void Render(const Vector2f& canvasSize);
+
+
+private:
 	void LoadResources();
 
-	void Initialize(SimulationManager* simulationManager);
-
-	void Render(const Vector2f& viewPortSize);
-
+	// Rendering
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
 	void RenderBrain(Agent* agent);
 	void RenderGraphs();
 	void RenderInfoPanel();
 
-	inline double GetAverageRenderTime() const { return m_renderTime; }
 
 private:
 	SimulationManager* m_simulationManager;
+
 	ResourceManager	m_resourceManager;
 	Renderer		m_renderer; // Used to render 3d meshes
 	Graphics		m_graphics; // used to draw 2d shapes
 	OctTreeRenderer	m_octTreeRenderer;
 
 	double			m_renderTime; // measured time of render (in seconds)
+	Vector2f		m_canvasSize;
 
-	Vector2f		m_viewPortSize;
-
-
+	// Visuals
 	GraphPanel		m_graphFitness;
 
-	// Resources.
+	// Resources
 	Font* m_font;
 	Mesh* m_agentMesh;
 	Mesh* m_plantMesh;

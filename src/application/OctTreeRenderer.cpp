@@ -78,24 +78,26 @@ ContourCurve::ContourCurve(bool fullCircle) :
 // OctTreeRenderer
 //-----------------------------------------------------------------------------
 
-OctTreeRenderer::OctTreeRenderer() :
+OctTreeRenderer::OctTreeRenderer(SimulationManager* simulationManager,
+								ResourceManager* resourceManager) :
 	m_octTree(nullptr),
 	m_renderer(nullptr),
 	m_shaderUnlit(nullptr),
-	m_simulationManager(nullptr)
+	m_resourceManager(resourceManager),
+	m_simulationManager(simulationManager)
 {
 }
 
-void OctTreeRenderer::Initialize(ResourceManager* resourceManager,
-								SimulationManager* simulationManager)
+void OctTreeRenderer::Initialize()
 {
-	m_simulationManager = simulationManager;
+	// Get resources.
+	m_shaderUnlit = m_resourceManager->GetShader("unlit");
+}
 
-	m_shaderUnlit = resourceManager->GetShader("unlit");
-
+void OctTreeRenderer::OnNewSimulation(Simulation* simulation)
+{
 	m_worldSphere.position = Vector3f::ZERO;
-	m_worldSphere.radius = m_simulationManager->
-		GetSimulation()->GetWorld()->GetRadius();
+	m_worldSphere.radius = simulation->GetWorld()->GetRadius();
 }
 
 

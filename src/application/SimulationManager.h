@@ -11,21 +11,36 @@
 class SimulationManager
 {
 public:
+	// Constructor & destructor
     SimulationManager();
 	~SimulationManager();
 
+	// Initialization
 	void Initialize();
+	void OnNewSimulation();
 
+	// Simulation
+	void BeginNewSimulation(const SimulationConfig& config);
 	bool SaveSimulation(const std::string& fileName);
 	bool OpenSimulation(const std::string& fileName);
+	
+	// Updates
+	void TickSimulation();
+	void Update();
 
+	// Interface controls
+	void SetSelectedAgent(Agent* agent);
+	void SetCameraTracking(bool cameraTracking);
+
+	// Getters
 	inline Simulation* GetSimulation() { return m_simulation; }
-	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
-	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
+	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
+	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 
+	// Setters
 	inline void SetSimulationPaused(bool isSimulationPaused) { m_isSimulationPaused = isSimulationPaused; }
 	inline void SetTicksFerFrame(unsigned int ticksPerFrame) { m_ticksPerFrame = ticksPerFrame; }
 	inline void SetMaxTicksPerFrame(bool maxTicksPerFrame) { m_maxTicksPerFrame = maxTicksPerFrame; }
@@ -50,23 +65,8 @@ public:
 	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 	inline bool GetShowAxisLines() const { return m_showAxisLines; }
-
-	inline void SetSelectedAgent(Agent* agent) {
-		m_selectedAgent = agent;
-		if (agent == nullptr)
-			m_selectedAgentId = -1;
-		else
-			m_selectedAgentId = agent->GetId();
-	}
-
-	void ToggleCameraTracking();
-	void StartCameraTracking();
-	void StopCameraTracking();
-	void PauseSimulation();
 	
-	void TickSimulation();
-	void Update();
-	
+
 private:
 	SimulationRenderer m_simulationRenderer;
 	Simulation*		m_simulation;

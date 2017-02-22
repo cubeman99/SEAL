@@ -7,10 +7,11 @@
 
 
 // ----------------------------------------------------------------------------
-// SimulationManager
+// Constructor & destructor
 // ----------------------------------------------------------------------------
 
 SimulationManager::SimulationManager() :
+	  m_simulationRenderer(this),
 	  m_simulation(nullptr),
 	  m_selectedAgentId(-1),
 	  m_selectedAgent(nullptr),
@@ -34,23 +35,63 @@ SimulationManager::~SimulationManager()
 	m_simulation = nullptr;
 }
 
+
+//-----------------------------------------------------------------------------
+// Initialization
+//-----------------------------------------------------------------------------
+
 void SimulationManager::Initialize()
 {
-	SimulationConfig config; // TEMP: use default config values.
-	m_simulation = new Simulation();
-	m_simulation->Initialize(config);
-
-	// Initialize systems.
-	m_cameraSystem.Initialize(m_simulation);
-	m_simulationRenderer.Initialize(this);
+	// Initialize sub-systems.
+	m_cameraSystem.Initialize();
+	m_simulationRenderer.Initialize();
 	
-	// Seed rand with current time
+	// Seed Random with current time.
+	// The static random should NOT be used for simulation logic.
+	// It should be used for graphics or UI stuff.
 	Random::SeedTime();
+
+	// Begin a new simulation with default config values.
+	// TODO: load default config values from a default config file.
+	SimulationConfig config;
+	BeginNewSimulation(config);
+}
+		
+void SimulationManager::OnNewSimulation()
+{
+	// Notify sub-systems of the new simulation.
+	m_cameraSystem.OnNewSimulation(m_simulation);
+	m_simulationRenderer.OnNewSimulation(m_simulation);
+
+	// Reset viewing state.
+	m_selectedAgent			= nullptr;
+	m_selectedAgentId		= -1;
+	m_isSimulationPaused	= false;
+	m_viewWireFrameMode		= false;
+	m_viewLighting			= true;
+	m_showOctTree			= false;
+	m_showOctTreeWireFrame	= false;
+	m_showAgentVision		= false;
+	m_showAgentBrain		= false;
+	m_showInvisibleObjects	= false;
+	m_showAxisLines			= false;
+	m_maxTicksPerFrame		= false;
+	m_ticksPerFrame			= 1;
 }
 
 //-----------------------------------------------------------------------------
-// Saving & loading
+// Simulation
 //-----------------------------------------------------------------------------
+
+void SimulationManager::BeginNewSimulation(const SimulationConfig& config)
+{
+	if (m_simulation == nullptr)
+		m_simulation = new Simulation();
+	
+	m_simulation->Initialize(config);
+
+	OnNewSimulation();
+}
 
 // Should be called only between ticks in the simulation.
 bool SimulationManager::SaveSimulation(const std::string& fileName)
@@ -63,6 +104,17 @@ bool SimulationManager::SaveSimulation(const std::string& fileName)
 		// TODO: Tell user that the file could not be opened for writing
 		return false;
 	}
+
+	// TODO: Write a file header, including:
+	// 1. A "magic number" (fixed sequence of characters)
+	//  - the magic number will always be the same for these timeline files
+	//  - try to use something particularly unique, like 'SEALTML'
+	//  - this will be an easy detection for files that are not the right format.
+	// 2. A file version number:
+	//  - this version number gets changed if the timeline file format changes.
+	//  - this will help detect loading of old timeline files, whether we
+	//    support loading legacy files or not.
+	// note: the file header could be made into a struct
 
 	// Write the simulation data
 	m_simulation->WriteSimulation(fileOut);
@@ -123,33 +175,17 @@ bool SimulationManager::OpenSimulation(const std::string& fileName)
 
 	fileIn.close();
 
+	OnNewSimulation();
+
 	// TODO: Tell user that the file has been loaded succesffully
 
 	return true;
 }
-		
-void SimulationManager::ToggleCameraTracking()
-{
-	if (m_cameraSystem.IsTrackingObject())
-		m_cameraSystem.StopTrackingObject();
-	else if (m_selectedAgentId >= 0)
-		m_cameraSystem.StartTrackingObject(m_selectedAgent);
-}
-		
-void SimulationManager::StartCameraTracking()
-{
-	m_cameraSystem.StartTrackingObject(m_selectedAgent);
-}
 
-void SimulationManager::StopCameraTracking()
-{
-	m_cameraSystem.StopTrackingObject();
-}
 
-void SimulationManager::PauseSimulation()
-{
-	m_isSimulationPaused = !m_isSimulationPaused;
-}
+//-----------------------------------------------------------------------------
+// Updates
+//-----------------------------------------------------------------------------
 
 void SimulationManager::TickSimulation()
 {
@@ -193,3 +229,27 @@ void SimulationManager::Update()
 	// Update camera system.
 	m_cameraSystem.Update();
 }
+
+
+//-----------------------------------------------------------------------------
+// Interface controls
+//-----------------------------------------------------------------------------
+
+void SimulationManager::SetSelectedAgent(Agent* agent)
+{
+	m_selectedAgent = agent;
+	if (agent == nullptr)
+		m_selectedAgentId = -1;
+	else
+		m_selectedAgentId = agent->GetId();
+}
+
+
+void SimulationManager::SetCameraTracking(bool cameraTracking)
+{
+	if (cameraTracking && m_selectedAgent != nullptr)
+		m_cameraSystem.StartTrackingObject(m_selectedAgent);
+	else
+		m_cameraSystem.StopTrackingObject();
+}
+

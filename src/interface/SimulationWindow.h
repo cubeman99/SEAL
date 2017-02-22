@@ -28,13 +28,13 @@ private:
 	void CreateUI();
 	
 	// Window events
-    void OnNewWindow(wxCommandEvent& e);
-    void OnClose(wxCommandEvent& e);
     void OnWindowClose(wxCloseEvent& e);
 
 	// Menu item events
 	void OnUpdateMenuItem(wxUpdateUIEvent& e);
     void OnMenuItem(wxCommandEvent& e);
+    void OnClose(wxCommandEvent& e);
+    void OnNewSimulation(wxCommandEvent& e);
 	void OnOpenSimulation(wxCommandEvent& e);
 	void OnSaveSimulation(wxCommandEvent& e);
 
@@ -56,6 +56,8 @@ private:
 
 	// Menu items
 	wxMenuItem* m_menuItemTickOnce;
+	wxMenuItem* m_menuItemCameraTracking;
+	wxMenuItem* m_menuItemDeleteAgent;
 };
 
 

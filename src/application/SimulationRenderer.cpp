@@ -8,20 +8,26 @@
 #include <iostream>
 #include <iomanip>
 
-SimulationRenderer::SimulationRenderer()
+
+SimulationRenderer::SimulationRenderer(SimulationManager* simulationManager) :
+	m_simulationManager(simulationManager),
+	m_octTreeRenderer(simulationManager, &m_resourceManager)
 {
 }
 
-void SimulationRenderer::Initialize(SimulationManager* simulationManager)
+void SimulationRenderer::LoadResources()
 {
-	m_simulationManager = simulationManager;
 	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: this must change when the executable is moved
 
+	//-------------------------------------------------------------------------
 	// Load fonts.
+
 	m_font = m_resourceManager.LoadSpriteFont(
 		"font", "fonts/font_console.png", 16, 8, 12, 0);
 
+	//-------------------------------------------------------------------------
 	// Load shaders.
+
 	m_shaderLit = m_resourceManager.LoadShader("lit",
 		"shaders/lit_colored_vs.glsl",
 		"shaders/lit_colored_fs.glsl");
@@ -46,23 +52,16 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 		"#version 330 core\n"
 		"out vec4 o_color;\n"
 		"void main() { o_color = vec4(1,0,1,1); }";
-	m_defaultShader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, "default_shader_vs");
-	m_defaultShader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, "default_shader_fs");
+	m_defaultShader->AddStage(vertexSource,
+		ShaderType::VERTEX_SHADER, "default_shader_vs");
+	m_defaultShader->AddStage(fragmentSource,
+		ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
 	m_resourceManager.AddShader("default_fallback", m_defaultShader);
 
-	m_graphFitness.SetFont(m_font);
-	m_graphFitness.SetTitle("Population Size");
-	m_graphFitness.SetXBounds(0, 60);
-	m_graphFitness.SetYBounds(0.0f, 10000.0f);
-	m_graphFitness.SetYBounds(0.0f, 300);
-	m_graphFitness.SetDynamicRange(false);
-	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
-	m_graphFitness.AddGraph("graph", Color::CYAN);
-	//m_graphFitness.AddGraph("red", Color::RED);
-	//m_graphFitness.AddGraph("green", Color::GREEN);
-	//m_graphFitness.AddGraph("blue", Color::BLUE);
+	//-------------------------------------------------------------------------
+	// Models
 
 	// Agent model.
 	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
@@ -73,10 +72,6 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
 	m_plantMaterial = new Material();
 	m_plantMaterial->SetColor(Color::GREEN);
-
-	// Initialize the oct-tree renderer.
-	m_octTreeRenderer.Initialize(&m_resourceManager, simulationManager);
-	
 	// World model (ico-sphere).
 	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
 	m_worldMaterial = new Material();
@@ -135,16 +130,42 @@ void SimulationRenderer::Initialize(SimulationManager* simulationManager)
 	m_resourceManager.AddMaterial("world", m_worldMaterial);
 }
 
+void SimulationRenderer::Initialize()
+{
+	LoadResources();
+
+	// Initialize the oct-tree renderer.
+	m_octTreeRenderer.Initialize();
+
+	m_graphFitness.SetFont(m_font);
+	m_graphFitness.SetTitle("Population Size");
+	m_graphFitness.SetXBounds(0, 60);
+	m_graphFitness.SetYBounds(0.0f, 10000.0f);
+	m_graphFitness.SetYBounds(0.0f, 300);
+	m_graphFitness.SetDynamicRange(false);
+	m_graphFitness.SetViewport(Viewport(6, 6, 280, 84));
+	m_graphFitness.AddGraph("graph", Color::CYAN);
+	//m_graphFitness.AddGraph("red", Color::RED);
+	//m_graphFitness.AddGraph("green", Color::GREEN);
+	//m_graphFitness.AddGraph("blue", Color::BLUE);
+}
+
+void SimulationRenderer::OnNewSimulation(Simulation* simulation)
+{
+	// Notify sub-systems of the new simulation.
+	m_octTreeRenderer.OnNewSimulation(simulation);
+}
+
 SimulationRenderer::~SimulationRenderer()
 {
 	// The resource manager will automatically delete our resources.
 }
 
-void SimulationRenderer::Render(const Vector2f& viewPortSize)
+void SimulationRenderer::Render(const Vector2f& canvasSize)
 {
-	m_viewPortSize = viewPortSize;
+	m_canvasSize = canvasSize;
 
-	m_graphics.SetCanvasSize((int) m_viewPortSize.x, (int) m_viewPortSize.y);
+	m_graphics.SetCanvasSize((int) m_canvasSize.x, (int) m_canvasSize.y);
 	m_graphics.SetViewportToCanvas();
 
 	double startTime = Time::GetTime();
@@ -157,8 +178,8 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	
 	Vector3f cameraForward = camera->GetOrientation().GetForward();
 
-	float aspectRatio = viewPortSize.x / viewPortSize.y;
-    glViewport(0, 0, (int) viewPortSize.x, (int) viewPortSize.y);
+	float aspectRatio = canvasSize.x / canvasSize.y;
+    glViewport(0, 0, (int) canvasSize.x, (int) canvasSize.y);
 	glDisable(GL_SCISSOR_TEST);
 	
 	m_simulationManager->GetCameraSystem()->SetAspectRatio(aspectRatio);
@@ -223,7 +244,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 			Matrix4f::CreateScale(object->GetRadius());
 		material.SetColor(object->GetColor());
 		
-		// Render with the appropriate mesh.
+		// Render object with the appropriate mesh.
 		if (object->IsObjectType<Agent>())
 			m_renderer.RenderMesh(m_agentMesh, &material, modelMatrix);
 		else if (object->IsObjectType<Plant>())
@@ -246,7 +267,9 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 		}
 		else
 		{
-			for (auto it = objectManager->agents_begin(); it != objectManager->agents_end(); ++it)
+			// Render vision arcs for all agents.
+			for (auto it = objectManager->agents_begin();
+				it != objectManager->agents_end(); ++it)
 			{
 				RenderAgentVisionArcs(*it);
 			}
@@ -278,7 +301,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
 	// Switch to orthographic mode to render the HUD.
-	Matrix4f orthographic = Matrix4f::CreateOrthographic(0.0f, m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f);
+	Matrix4f orthographic = Matrix4f::CreateOrthographic(0.0f, m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(orthographic.data());
 	glMatrixMode(GL_MODELVIEW);
@@ -287,7 +310,7 @@ void SimulationRenderer::Render(const Vector2f& viewPortSize)
 	glDisable(GL_CULL_FACE);
 	m_renderer.SetShader(0);
 	orthographic = Matrix4f::CreateOrthographic(0.5f,
-		m_viewPortSize.x + 0.5f, m_viewPortSize.y + 0.5f, 0.5f, -1.0f, 1.0f);
+		m_canvasSize.x + 0.5f, m_canvasSize.y + 0.5f, 0.5f, -1.0f, 1.0f);
 	m_graphics.SetProjection(orthographic);
 
 	if (selectedAgent != nullptr)
@@ -367,7 +390,7 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 	float stripHeight = 60.0f;
 	float separation = 40.0f;
 	
-	Vector2f center(m_viewPortSize.x * 0.5f, m_viewPortSize.y - 30 - stripHeight);
+	Vector2f center(m_canvasSize.x * 0.5f, m_canvasSize.y - 30 - stripHeight);
 
 	Vector2f stripPos[2];
 	stripPos[0].Set(center.x - (separation * 0.5f) - stripWidth, center.y - (stripHeight * 0.5f));
@@ -432,10 +455,10 @@ void SimulationRenderer::RenderBrain(Agent* agent)
 	unsigned int numOutIntNeurons = numNeurons - numInputNeurons;
 	
 	// Fit the brain to the width of the window.
-	Vector2f cellSize = Vector2f((m_viewPortSize.x * 0.7f) / numNeurons);
+	Vector2f cellSize = Vector2f((m_canvasSize.x * 0.7f) / numNeurons);
 	cellSize.y = cellSize.x;
 
-	Vector2f center(m_viewPortSize.x * 0.5f, 100);
+	Vector2f center(m_canvasSize.x * 0.5f, 100);
 	Vector2f matrixSize(cellSize.x * numNeurons, cellSize.y * numOutIntNeurons);
 	Vector2f matrixTopLeft(center.x - (matrixSize.x * 0.5f), 100);
 	Vector2f matrixBottomRight = matrixTopLeft + cellSize *
@@ -550,10 +573,10 @@ void SimulationRenderer::RenderGraphs()
 	
 	// Setup projection.
 	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
-		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
+		m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f));
 	
 	// Draw graphs.
-	Vector2i viewSize(m_viewPortSize);
+	Vector2i viewSize(m_canvasSize);
 	Vector2i graphSize(280, 84);
 	Rect2i graphBox(viewSize.x - graphSize.x - 6, 6,
 		graphSize.x, graphSize.y);
@@ -583,7 +606,7 @@ void SimulationRenderer::RenderInfoPanel()
 
 	// Setup projection.
 	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
-		m_viewPortSize.x, m_viewPortSize.y, 0.0f, -1.0f, 1.0f));
+		m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f));
 
 	std::string degSymbol = "x";
 	degSymbol[0] = (char) 248;

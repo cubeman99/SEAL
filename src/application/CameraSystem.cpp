@@ -14,7 +14,11 @@ CameraSystem::CameraSystem() :
 	m_camera = &m_globeCamera;
 }
 
-void CameraSystem::Initialize(Simulation* simulation)
+void CameraSystem::Initialize()
+{
+}
+
+void CameraSystem::OnNewSimulation(Simulation* simulation)
 {
 	m_simulation = simulation;
 	

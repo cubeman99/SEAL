@@ -23,12 +23,13 @@ Simulation::~Simulation()
 void Simulation::Initialize(const SimulationConfig& config)
 {
 	m_config = config;
-	
+
 	// Initialize simulation state.
 	m_ageInTicks = 0;
 	m_generationAge = 0;
 	m_generationDuration = 60 * 30;
 	m_generationIndex = 0;
+	m_generationStats.clear();
 
 	// Seed the random number generator.
 	if (config.world.seed < 0)

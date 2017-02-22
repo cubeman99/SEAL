@@ -51,12 +51,15 @@ enum
 
 wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 
-	EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
     EVT_IDLE(SimulationWindow::OnIdle)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
 
+	EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
+	EVT_UPDATE_UI(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnUpdateMenuItem)
+	EVT_UPDATE_UI(DEBUG_DELETE_AGENT, SimulationWindow::OnUpdateMenuItem)
+
 	// File
-	EVT_MENU(wxID_NEW, SimulationWindow::OnNewWindow)
+	EVT_MENU(wxID_NEW, SimulationWindow::OnNewSimulation)
     EVT_MENU(wxID_OPEN, SimulationWindow::OnOpenSimulation)
     EVT_MENU(wxID_SAVE, SimulationWindow::OnSaveSimulation)
     EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
@@ -121,7 +124,7 @@ void SimulationWindow::CreateUI()
 	SetTitle(wxT("New Simulation - SEAL"));
 	
 	// Create the render panel.
-    m_simulationPanel = new SimulationRenderPanel(this, NULL);
+    m_simulationPanel = new SimulationRenderPanel(this, nullptr);
 
     // Make a menubar
     wxMenuBar* menuBar = new wxMenuBar;
@@ -147,21 +150,21 @@ void SimulationWindow::CreateUI()
     menuSimulation->AppendCheckItem(PLAY_PAUSE_SIMULATION, "&Pause Simulation\tP")->Check(false);
     m_menuItemTickOnce = menuSimulation->Append(SIMULATION_TICK_ONCE, "&Tick once\t]");
     menuSimulation->AppendSeparator();
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_100, "&100% Speed")->Check(true);
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_200, "&200% Speed");
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_400, "&400% Speed");
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_MAX, "&Maximum Speed");
-	
-	m_menuItemTickOnce->Enable(false);
+    menuSimulation->AppendRadioItem(SIMULATION_SPEED_100, "&100% Speed\t1")->Check(true);
+    menuSimulation->AppendRadioItem(SIMULATION_SPEED_200, "&200% Speed\t2");
+    menuSimulation->AppendRadioItem(SIMULATION_SPEED_400, "&400% Speed\t3");
+    menuSimulation->AppendRadioItem(SIMULATION_SPEED_MAX, "&Maximum Speed\t0");
 	
 	//-------------------------------------------------------------------------
 	// VIEW
 
     wxMenu* menuView = new wxMenu;
     menuBar->Append(menuView, wxT("&View"));
-    menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Toggle Camera &Tracking\tT");
+    m_menuItemCameraTracking = menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Camera &Tracking\tT");
+	menuView->AppendSeparator();
     menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
     menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL")->Check(true);
+	menuView->AppendSeparator();
     menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO")->Check(false);
     menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O")->Check(false);
     menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA")->Check(false);
@@ -174,7 +177,7 @@ void SimulationWindow::CreateUI()
     wxMenu* menuDebug = new wxMenu;
     menuBar->Append(menuDebug, wxT("&Debug"));
     menuDebug->Append(DEBUG_SPAWN_AGENTS, "&Spawn Agents\tG");
-    menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Selected Agent\tDelete");
+    m_menuItemDeleteAgent = menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Agent\tDelete");
 
 	//-------------------------------------------------------------------------
 	// HELP
@@ -196,16 +199,6 @@ void SimulationWindow::CreateUI()
 // Window events
 //-----------------------------------------------------------------------------
 
-void SimulationWindow::OnNewWindow(wxCommandEvent& e)
-{
-    new SimulationWindow();
-}
-
-void SimulationWindow::OnClose(wxCommandEvent& e)
-{
-    Close(true); // true is to force the frame to close
-}
-
 void SimulationWindow::OnWindowClose(wxCloseEvent& e)
 {
     Destroy(); // true is to force the frame to close
@@ -223,6 +216,13 @@ void SimulationWindow::OnUpdateMenuItem(wxUpdateUIEvent& e)
 	case SIMULATION_TICK_ONCE:
 		m_menuItemTickOnce->Enable(m_simulationManager.IsSimulationPaused());
 		break;
+	case TOGGLE_CAMERA_TRACKING:
+		m_menuItemCameraTracking->Check(
+			m_simulationManager.GetCameraSystem()->IsTrackingObject());
+	case DEBUG_DELETE_AGENT:
+		m_menuItemDeleteAgent->Enable(
+			m_simulationManager.GetSelectedAgent() != nullptr);
+		break;
 	}
 }
 
@@ -235,7 +235,6 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 
 	case PLAY_PAUSE_SIMULATION:
 		m_simulationManager.SetSimulationPaused(e.IsChecked());
-		//m_menuItemTickOnce->Enable(e.IsChecked());
 		break;
 	case SIMULATION_TICK_ONCE:
 		m_simulationManager.TickSimulation();
@@ -260,7 +259,7 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	// View
 
 	case TOGGLE_CAMERA_TRACKING:
-		m_simulationManager.ToggleCameraTracking();
+		m_simulationManager.SetCameraTracking(e.IsChecked());
 		break;
 	case VIEW_WIREFRAME_MODE:
 		m_simulationManager.SetViewWireFrameMode(e.IsChecked());
@@ -304,11 +303,31 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 
 	case wxID_ABOUT:
 	{
-		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russel (2017)",
+		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russell (2017)",
 			"About SEAL", wxICON_INFORMATION);
 		break;
 	}
 	}
+}
+
+void SimulationWindow::OnClose(wxCommandEvent& e)
+{
+    Close(true); // true is to force the frame to close
+}
+
+void SimulationWindow::OnNewSimulation(wxCommandEvent& e)
+{
+	// TODO: New simulation dialog
+	// First: ask "Do you want to save your current simulation?"
+	// Open dialog:
+	//   - specify path to config file.
+	//      -OR-
+	//   - dialog box for editing config params within app
+	//wxMessageBox("TODO: New Simulation");
+	
+	// TEMP: begin a new simulation with default config values.
+	SimulationConfig config;
+	m_simulationManager.BeginNewSimulation(config);
 }
 
 void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
