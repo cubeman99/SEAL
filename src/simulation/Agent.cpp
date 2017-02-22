@@ -345,7 +345,7 @@ void Agent::UpdateVision()
 	
 	std::vector<Agent*> agentMateCollisions;
 
-	bool canMate = (m_mateWaitTime == 0);
+	bool canMate = (m_mateWaitTime == 0 && GetSimulation()->IsMatingSeason());
 
 	// Query the octtree for objects within vision range.
 	Sphere visionSphere(m_position, m_maxViewDistance);

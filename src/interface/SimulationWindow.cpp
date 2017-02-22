@@ -137,8 +137,8 @@ void SimulationWindow::CreateUI()
     menuBar->Append(menuFile, wxT("&File"));
     menuFile->Append(wxID_NEW, "&New Simulation...\tCtrl+N");
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_SAVE, "&Save Simulation Timeline...\tCtrl+S");
-    menuFile->Append(wxID_OPEN, "&Open Simulation Timeline...\tCtrl+O");
+    menuFile->Append(wxID_SAVE, "&Save Simulation...\tCtrl+S");
+    menuFile->Append(wxID_OPEN, "&Open Simulation...\tCtrl+O");
     menuFile->AppendSeparator();
     menuFile->Append(wxID_CLOSE, "&Close\tCtrl+W");
 	
@@ -337,7 +337,7 @@ void SimulationWindow::OnNewSimulation(wxCommandEvent& e)
 void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
 {
 	wxFileDialog* openDialog = new wxFileDialog(this,
-		"Choose a file to open", wxEmptyString, wxEmptyString, 
+		"Open Simulation", wxEmptyString, wxEmptyString, 
 		"Simulation files (*.bin)|*.bin",
 		wxFD_OPEN, wxDefaultPosition);
  
@@ -363,7 +363,7 @@ void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
 void SimulationWindow::OnSaveSimulation(wxCommandEvent& e)
 {
 	wxFileDialog* saveDialog = new wxFileDialog(this,
-		"Choose a file to save", wxEmptyString, wxEmptyString, 
+		"Save Simulation", wxEmptyString, wxEmptyString, 
 		"Simulation files (*.bin)|*.bin",
 		wxFD_SAVE, wxDefaultPosition);
  

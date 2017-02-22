@@ -33,6 +33,8 @@ public:
 	inline unsigned int GetGenerationAge() const { return m_generationAge; }
 	inline unsigned int GetGenerationDuration() const { return m_generationDuration; }
 
+	bool IsMatingSeason() const;
+
 
 	//-------------------------------------------------------------------------
 	// Initialization and update
