@@ -318,16 +318,20 @@ void SimulationWindow::OnClose(wxCommandEvent& e)
 void SimulationWindow::OnNewSimulation(wxCommandEvent& e)
 {
 	// TODO: New simulation dialog
-	// First: ask "Do you want to save your current simulation?"
-	// Open dialog:
 	//   - specify path to config file.
 	//      -OR-
 	//   - dialog box for editing config params within app
-	//wxMessageBox("TODO: New Simulation");
 	
-	// TEMP: begin a new simulation with default config values.
-	SimulationConfig config;
-	m_simulationManager.BeginNewSimulation(config);
+	// Ask the user if they're sure what they're doing.
+	wxMessageDialog dialog(this,
+		"Are you sure you want to begin a new simulation?",
+		"New Simulation", wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
+	if (dialog.ShowModal() == wxID_YES)
+	{
+		// TEMP: begin a new simulation with default config values.
+		SimulationConfig config;
+		m_simulationManager.BeginNewSimulation(config);
+	}
 }
 
 void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
