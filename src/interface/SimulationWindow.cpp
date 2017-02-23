@@ -111,7 +111,9 @@ SimulationWindow::SimulationWindow() :
 	m_infoPanelCanvas(nullptr),
 	m_pageGraphs(nullptr),
 	m_graphComboBox(nullptr),
-	m_graphCanvas(nullptr)
+	m_graphCanvas(nullptr),
+	m_pageLog(nullptr),
+	m_logBox(nullptr)
 {
 	// Setup the window UI.
 	CreateUI();
@@ -136,6 +138,8 @@ void SimulationWindow::CreateUI()
     SetIcon(wxICON(sample));
 	SetTitle(wxT("New Simulation - SEAL"));
 
+	//-------------------------------------------------------------------------
+
 	m_splitter = new wxSplitterWindow(this, -1, wxPoint(0, 0),
                                 wxSize(400, 400), wxSP_3D | wxSP_LIVE_UPDATE);
 	
@@ -143,7 +147,9 @@ void SimulationWindow::CreateUI()
     m_simulationPanel = new SimulationRenderPanel(m_splitter, this, nullptr);
 	
 	m_tabControl = new wxNotebook(m_splitter, -1, wxDefaultPosition, wxDefaultSize);
-
+	
+	//-------------------------------------------------------------------------
+	// Info tab.
 	m_pageInfo = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
 	{
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -154,7 +160,9 @@ void SimulationWindow::CreateUI()
 		m_pageInfo->SetSizerAndFit(sizer);
 	}
 	m_tabControl->AddPage(m_pageInfo, "Info", true);
-
+	
+	//-------------------------------------------------------------------------
+	// Graphs tab.
 	m_pageGraphs = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
 	{
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -172,6 +180,24 @@ void SimulationWindow::CreateUI()
 	}
 	m_tabControl->AddPage(m_pageGraphs, "Graphs");
 
+	//-------------------------------------------------------------------------
+	// Log tab.
+	m_pageLog = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
+	{
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		
+		m_logBox = new wxTextCtrl(m_pageLog, -1, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE  |wxTE_READONLY);
+		sizer->Add(m_logBox, 1, wxEXPAND | wxALL, 0);
+
+		wxLog::SetActiveTarget(new wxLogTextCtrl(m_logBox));
+
+		m_pageLog->SetSizerAndFit(sizer);
+	}
+	m_tabControl->AddPage(m_pageLog, "Log");
+
+	//-------------------------------------------------------------------------
+
 	m_splitter->SplitVertically(m_simulationPanel, m_tabControl, -100);
 	m_splitter->SetMinimumPaneSize(100);
 	m_splitter->SetSashPosition(-300);
@@ -183,6 +209,8 @@ void SimulationWindow::CreateUI()
 	// Set initial window size.
     SetClientSize(1000, 600);
     Show();
+
+	wxLogMessage("Test message using wxLogMessage()");
 }
 
 void SimulationWindow::CreateMenuBar()

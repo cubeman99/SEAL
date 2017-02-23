@@ -70,6 +70,8 @@ private:
 			wxWindow*				m_pageGraphs;
 				GraphCanvas*		m_graphCanvas;
 				wxComboBox*			m_graphComboBox;
+			wxWindow*				m_pageLog;
+				wxTextCtrl*			m_logBox;
 
 	// Menu items
 	wxMenuItem* m_menuItemTickOnce;
