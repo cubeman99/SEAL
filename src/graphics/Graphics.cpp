@@ -14,6 +14,19 @@ Graphics::Graphics() :
 // General graphics operations
 //-----------------------------------------------------------------------------
 
+void Graphics::SetupCanvas2D(int width, int height)
+{
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glUseProgram(0);
+
+	SetCanvasSize(width, height);
+	SetViewportToCanvas();
+	SetCanvasProjection();
+}
+
 void Graphics::Clear(const Color& color)
 {
 	Vector4f c = color.ToVector4f();

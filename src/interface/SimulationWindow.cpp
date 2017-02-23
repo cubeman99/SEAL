@@ -3,7 +3,6 @@
 #include "SimulationRenderPanel.h"
 #include <sstream>
 #include <utilities/Timing.h>
-#include <wx/splitter.h>
 #include "GraphCanvas.h"
 
 
@@ -106,6 +105,12 @@ wxEND_EVENT_TABLE()
 SimulationWindow::SimulationWindow() :
 	wxFrame(NULL, wxID_ANY, wxT("New Simulation - SEAL")),
 	m_simulationPanel(nullptr),
+	m_splitter(nullptr),
+	m_tabControl(nullptr),
+	m_pageInfo(nullptr),
+	m_infoPanelCanvas(nullptr),
+	m_pageGraphs(nullptr),
+	m_graphComboBox(nullptr),
 	m_graphCanvas(nullptr)
 {
 	// Setup the window UI.
@@ -131,60 +136,46 @@ void SimulationWindow::CreateUI()
     SetIcon(wxICON(sample));
 	SetTitle(wxT("New Simulation - SEAL"));
 
-	wxSplitterWindow* splitter = new wxSplitterWindow(this, -1, wxPoint(0, 0),
+	m_splitter = new wxSplitterWindow(this, -1, wxPoint(0, 0),
                                 wxSize(400, 400), wxSP_3D | wxSP_LIVE_UPDATE);
 	
 	// Create the render panel.
-    m_simulationPanel = new SimulationRenderPanel(splitter, this, nullptr);
+    m_simulationPanel = new SimulationRenderPanel(m_splitter, this, nullptr);
 	
-	wxWindow* rightWindow = new wxWindow(splitter, -1, wxDefaultPosition, wxDefaultSize, 0L);
+	m_tabControl = new wxNotebook(m_splitter, -1, wxDefaultPosition, wxDefaultSize);
 
-	//wxButton* button = new wxButton(rightWindow, -1, "Hello, World!");
-	
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	m_pageInfo = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
+	{
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 		
-	wxString choices[2] = { "Population Size", "Total Energy" };
-	m_graphComboBox = new wxComboBox(rightWindow, CHOOSE_GRAPH, wxEmptyString, wxDefaultPosition, wxDefaultSize, 2, choices, wxCB_READONLY);
-	m_graphComboBox->SetSelection(0);
-    sizer->Add(m_graphComboBox, 0, wxEXPAND | wxALL, 0);
+		m_infoPanelCanvas = new InfoPanelCanvas(m_pageInfo, this);
+		sizer->Add(m_infoPanelCanvas, 1, wxEXPAND | wxALL, 0);
+
+		m_pageInfo->SetSizerAndFit(sizer);
+	}
+	m_tabControl->AddPage(m_pageInfo, "Info", true);
+
+	m_pageGraphs = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
+	{
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		
+		m_graphComboBox = new wxComboBox(m_pageGraphs, CHOOSE_GRAPH,
+			wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+		m_graphComboBox->SetSelection(0);
+		sizer->Add(m_graphComboBox, 0, wxEXPAND | wxALL, 0);
 	
-	m_graphCanvas = new GraphCanvas(rightWindow, this);
-	m_graphCanvas->SetSize(wxSize(100, 200));
-    sizer->Add(m_graphCanvas, 1, wxEXPAND | wxALL, 0);
+		m_graphCanvas = new GraphCanvas(m_pageGraphs, this);
+		m_graphCanvas->SetSize(wxSize(100, 200));
+		sizer->Add(m_graphCanvas, 1, wxEXPAND | wxALL, 0);
 
-	rightWindow->SetSizerAndFit(sizer);
+		m_pageGraphs->SetSizerAndFit(sizer);
+	}
+	m_tabControl->AddPage(m_pageGraphs, "Graphs");
 
-	//comboBox->SetLabel("Graph");
-	//wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-
-	// // create text ctrl with minimal size 100x60
- //   sizer->Add(
- //       new wxTextCtrl( rightWindow, -1, "My text.", wxDefaultPosition, wxSize(100,60), wxTE_MULTILINE),
- //       1,            // make vertically stretchable
- //       wxEXPAND |    // make horizontally stretchable
- //       wxALL,        //   and make border all around
- //       10 );         // set border width to 10
- //   wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
- //   button_sizer->Add(
- //       new wxButton( rightWindow, wxID_OK, "OK" ),
- //       0,           // make horizontally unstretchable
- //       wxALL,       // make border all around (implicit top alignment)
- //       10 );        // set border width to 10
- //   button_sizer->Add(
- //       new wxButton( rightWindow, wxID_CANCEL, "Cancel" ),
- //       0,           // make horizontally unstretchable
- //       wxALL,       // make border all around (implicit top alignment)
- //       10 );        // set border width to 10
- //   sizer->Add(
- //       button_sizer,
- //       0,                // make vertically unstretchable
- //       wxALIGN_CENTER ); // no border and centre horizontally
-	//rightWindow->SetSizerAndFit(sizer);
-
-	splitter->SplitVertically(m_simulationPanel, rightWindow, -100);
-	splitter->SetMinimumPaneSize(100);
-	splitter->SetSashPosition(-300);
-	splitter->SetSashGravity(1.0);
+	m_splitter->SplitVertically(m_simulationPanel, m_tabControl, -100);
+	m_splitter->SetMinimumPaneSize(100);
+	m_splitter->SetSashPosition(-300);
+	m_splitter->SetSashGravity(1.0);
 
     CreateMenuBar();
     CreateStatusBar(4);
@@ -499,6 +490,7 @@ void SimulationWindow::OnIdle(wxIdleEvent& e)
 	// Tell the simulation panel to render.
 	m_simulationPanel->Refresh(false);
 	m_graphCanvas->Refresh(false);
+	m_infoPanelCanvas->Refresh(false);
 }
 
 void SimulationWindow::UpdateDebugAgentControls()

@@ -101,6 +101,9 @@ public:
 	// General
 
 	void Clear(const Color& color);
+
+	void SetupCanvas2D(int width, int height);
+
 	void SetCanvasSize(int width, int height);
 	void SetViewportToCanvas();
 	void SetViewport(const Rect2i& viewport, bool scissor);

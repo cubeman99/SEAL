@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
     <ClCompile Include="..\..\src\graphics\VertexData.cpp" />
     <ClCompile Include="..\..\src\interface\GraphCanvas.cpp" />
+    <ClCompile Include="..\..\src\interface\InfoPanelCanvas.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
     <ClInclude Include="..\..\src\graphics\VertexData.h" />
     <ClInclude Include="..\..\src\interface\GraphCanvas.h" />
+    <ClInclude Include="..\..\src\interface\InfoPanelCanvas.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />

@@ -76,22 +76,8 @@ void GraphCanvas::OnPaint(wxPaintEvent& e)
 	canvasSize.y = (float) clientSize.y;
 	
 	// Switch to orthographic mode to render the HUD.
-	Matrix4f orthographic = Matrix4f::CreateOrthographic(
-		0.0f, canvasSize.x, canvasSize.y, 0.0f, -1.0f, 1.0f);
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(orthographic.data());
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glUseProgram(0);
-	orthographic = Matrix4f::CreateOrthographic(0.5f,
-		canvasSize.x + 0.5f, canvasSize.y + 0.5f, 0.5f, -1.0f, 1.0f);
 	Graphics m_graphics;
-	m_graphics.SetProjection(orthographic);
-	m_graphics.SetCanvasSize(canvasSize.x, canvasSize.y);
-	m_graphics.SetViewportToCanvas();
-
+	m_graphics.SetupCanvas2D(canvasSize.x, canvasSize.y);
 	m_graphics.Clear(Color::BLACK);
 
 	

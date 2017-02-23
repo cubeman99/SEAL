@@ -43,6 +43,9 @@
     <Filter Include="Source Files\application\diagrams">
       <UniqueIdentifier>{40a0885f-1c7c-4b21-85e0-3f40665b0f79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\interface\canvas">
+      <UniqueIdentifier>{1af5b050-8ad3-4db9-9f8a-77d022fc7dc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -219,14 +222,17 @@
     <ClCompile Include="..\..\src\math\Rect2f.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\GraphCanvas.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\application\GraphManager.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\application\DiagramDrawer.cpp">
       <Filter>Source Files\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interface\GraphCanvas.cpp">
+      <Filter>Source Files\interface\canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interface\InfoPanelCanvas.cpp">
+      <Filter>Source Files\interface\canvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,14 +416,17 @@
     <ClInclude Include="..\..\src\math\Rect2f.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\interface\GraphCanvas.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\application\GraphManager.h">
       <Filter>Source Files\application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\application\DiagramDrawer.h">
       <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\InfoPanelCanvas.h">
+      <Filter>Source Files\interface\canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\GraphCanvas.h">
+      <Filter>Source Files\interface\canvas</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -37,8 +37,6 @@ private:
 	// Rendering
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
-	void RenderGraphs();
-	void RenderInfoPanel();
 
 
 private:

@@ -73,14 +73,16 @@ public:
 
 	inline void SetTitle(const std::string& title) { m_title = title; }
 	inline void SetFont(Font* font) { m_font = font; }
-
+	
+	Vector2f GetMinimumSize() const;
 	Vector2f GetSize() const;
 
+	void Clear();
 	void AddSeparator();
 	InfoPanelItem& AddItem(const std::string& label);
 	InfoPanelItem& AddItem(const std::string& label, const std::string& valueSuffix);
 
-	void Draw(Graphics& g, const Vector2f& position);
+	void Draw(Graphics& g, const Rect2f& bounds);
 
 private:
 	std::string	m_title;

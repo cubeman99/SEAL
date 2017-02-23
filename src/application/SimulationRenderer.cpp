@@ -151,28 +151,24 @@ SimulationRenderer::~SimulationRenderer()
 
 void SimulationRenderer::Render(const Vector2f& canvasSize)
 {
-	m_canvasSize = canvasSize;
-
-	m_graphics.SetCanvasSize((int) m_canvasSize.x, (int) m_canvasSize.y);
-	m_graphics.SetViewportToCanvas();
-
 	double startTime = Time::GetTime();
 
+	m_canvasSize = canvasSize;
+
 	Simulation* simulation = m_simulationManager->GetSimulation();
-	ICamera* camera = m_simulationManager->GetCameraSystem()->GetActiveCamera();
+	ICamera* camera = m_simulationManager->
+		GetCameraSystem()->GetActiveCamera();
 	Agent* selectedAgent = m_simulationManager->GetSelectedAgent();
 	float worldRadius = simulation->GetWorld()->GetRadius();
 	Transform3f transform;
 	
-	Vector3f cameraForward = camera->GetOrientation().GetForward();
-
 	float aspectRatio = canvasSize.x / canvasSize.y;
-    glViewport(0, 0, (int) canvasSize.x, (int) canvasSize.y);
-	glDisable(GL_SCISSOR_TEST);
-	
 	m_simulationManager->GetCameraSystem()->SetAspectRatio(aspectRatio);
 	
-	// Apply render parameters.
+
+	//-------------------------------------------------------------------------
+	// Setup render parameters.
+
 	RenderParams renderParams;
 	renderParams.EnableDepthTest(true);
 	renderParams.EnableDepthBufferWrite(true);
@@ -183,11 +179,13 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	renderParams.EnableCullFace(false);
 	renderParams.SetCullFace(CullFace::BACK);
 	renderParams.SetFrontFace(FrontFace::CLOCKWISE); // TODO: meshes loaded from file have CCW front-face winding order ??
-	renderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT | ClearBits::DEPTH_BUFFER_BIT);
+	renderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT |
+		ClearBits::DEPTH_BUFFER_BIT);
 	renderParams.SetClearColor(Color::BLACK);
 	renderParams.SetPolygonMode(PolygonMode::FILL);
 	renderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
-	renderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA, BlendFunc::ONE_MINUS_SOURCE_ALPHA);
+	renderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA,
+		BlendFunc::ONE_MINUS_SOURCE_ALPHA);
 	if (m_simulationManager->IsViewWireFrameMode())
 		renderParams.SetPolygonMode(PolygonMode::LINE);
 	else
@@ -209,6 +207,13 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		m_renderer.SetAmbientLight(Color(33, 36, 63));
 	}
 
+    glViewport(0, 0, (int) canvasSize.x, (int) canvasSize.y);
+	glDisable(GL_SCISSOR_TEST);
+
+
+	//-------------------------------------------------------------------------
+	// Render the simulation.
+
 	// Render the world.
 	transform.SetIdentity();
 	transform.SetScale(worldRadius);
@@ -220,12 +225,14 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	material.SetIsLit(true);
 	m_renderer.SetShader(m_shaderLit);
 	ObjectManager* objectManager = simulation->GetObjectManager();
-	for (auto it = objectManager->objects_begin(); it != objectManager->objects_end(); ++it)
+	for (auto it = objectManager->objects_begin();
+		it != objectManager->objects_end(); ++it)
 	{
 		SimulationObject* object = *it;
 
 		// Don't render invisible objects.
-		if (!object->IsVisible() && !m_simulationManager->GetShowInvisibleObjects())
+		if (!object->IsVisible() &&
+			!m_simulationManager->GetShowInvisibleObjects())
 			continue;
 
 		Matrix4f modelMatrix = object->GetObjectToWorld() * 
@@ -273,7 +280,8 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		transform.rot = selectedAgent->GetOrientation();
 		transform.SetScale(selectedAgent->GetRadius() * 1.2f);
 		m_renderer.SetShader(m_shaderUnlit);
-		m_renderer.RenderMesh(m_meshSelectionCircle, m_materialSelectionCircle, transform);
+		m_renderer.RenderMesh(m_meshSelectionCircle,
+			m_materialSelectionCircle, transform);
 	}
 	
 	// Render the X/Y/Z axis lines.
@@ -288,20 +296,11 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	// Render the OctTree
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
-	// Switch to orthographic mode to render the HUD.
-	Matrix4f orthographic = Matrix4f::CreateOrthographic(0.0f, m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f);
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(orthographic.data());
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	m_renderer.SetShader(0);
-	orthographic = Matrix4f::CreateOrthographic(0.5f,
-		m_canvasSize.x + 0.5f, m_canvasSize.y + 0.5f, 0.5f, -1.0f, 1.0f);
-	m_graphics.SetProjection(orthographic);
-	
-	RenderInfoPanel(); // TODO: move this panel into GUI side panel
+
+	//-------------------------------------------------------------------------
+	// Render UI overlay.
+
+	m_graphics.SetupCanvas2D((int) m_canvasSize.x, (int) m_canvasSize.y);
 
 	if (selectedAgent != nullptr)
 	{
@@ -316,6 +315,8 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 				DrawBrainMatrix(m_graphics, selectedAgent, brainBounds);
 		}
 	}
+
+	//-------------------------------------------------------------------------
 	
 	double endTime = Time::GetTime();
 	m_renderTime = (endTime - startTime);
@@ -431,88 +432,3 @@ void SimulationRenderer::RenderAgentVisionStrips(Agent* agent)
 		}
 	}
 }
-
-void SimulationRenderer::RenderInfoPanel()
-{
-	Simulation* simulation = m_simulationManager->GetSimulation();
-	const SimulationStats& stats = simulation->GetStatistics();
-	const SimulationConfig& config = simulation->GetConfig();
-
-	// Setup projection.
-	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
-		m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f));
-
-	std::string degSymbol = "x";
-	degSymbol[0] = (char) 248;
-
-	// Draw info panel for simulation.
-	InfoPanel simInfoPanel;
-	simInfoPanel.SetTitle("Simulation");
-	simInfoPanel.SetFont(m_font);
-	simInfoPanel.AddItem("world age").SetValue(simulation->GetAgeInTicks());
-	simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
-	simInfoPanel.AddItem("season age").SetValue(simulation->GetGenerationAge()).InitBar(Color::MAGENTA, 0u, simulation->GetGenerationDuration());
-	simInfoPanel.AddItem("population size").SetValue((int) stats.populationSize).InitBar(Color::CYAN, config.agent.minPreyAgents, config.agent.maxPreyAgents);
-	simInfoPanel.AddSeparator();
-	simInfoPanel.AddItem("total energy").SetValue(stats.totalEnergy);
-	simInfoPanel.AddItem("avg energy").SetValue(stats.avgEnergy);
-	simInfoPanel.AddItem("avg energy usage").SetValue(stats.avgEnergyUsage);
-	simInfoPanel.AddItem("avg fitness").SetValue(stats.avgFitness);
-	simInfoPanel.AddSeparator();
-	simInfoPanel.AddItem("avg move amount").SetValue(stats.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
-	simInfoPanel.AddItem("avg turn amount").SetValue(stats.avgTurnAmount).InitBar(Color::CYAN, 0, 1);
-	Vector2f panelPos = Vector2f(6, 6);
-	simInfoPanel.Draw(m_graphics, panelPos);
-	
-	// Draw info panel for seleced agent.
-	Agent* agent = m_simulationManager->GetSelectedAgent();
-	if (agent != nullptr)
-	{
-		Genome* genome = agent->GetGenome();
-
-		std::stringstream text;
-
-		// Set title text.
-		text << "Agent " << agent->GetId();
-		std::string titleText = text.str();
-
-		// Set color value text as a hexcode
-		Color col = Color(agent->GetColor());
-		text.str("");
-		text << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.r
-			<< std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.g
-			<< std::setfill('0') << std::setw(2) << std::hex << std::uppercase << (int) col.b;
-		std::string colorText = text.str();
-		
-		Color colBlue(0, 106, 255);
-
-		InfoPanel agentInfoPanel;
-		agentInfoPanel.SetTitle(titleText);
-		agentInfoPanel.SetFont(m_font);
-		agentInfoPanel.AddItem("age").SetValue(agent->GetAge()).InitBar(Color::MAGENTA, 0, agent->GetLifeSpan());
-		agentInfoPanel.AddItem("energy").SetValue(agent->GetEnergy()).InitBar(Color::YELLOW, 0.0f, agent->GetMaxEnergy());
-		agentInfoPanel.AddItem("energy usage").SetValue(agent->GetEnergyUsage()).SetPrecision(4);
-		agentInfoPanel.AddItem("fitness").SetValue(agent->GetFitness());
-		agentInfoPanel.AddSeparator();
-		agentInfoPanel.AddItem("move speed").SetValue(agent->GetMoveSpeed()).InitBar(Color::GREEN, 0.0f, agent->GetMaxMoveSpeed());
-		agentInfoPanel.AddItem("turn speed").SetValue(-agent->GetTurnSpeed()).InitBar(Color::CYAN, -agent->GetMaxTurnSpeed(), agent->GetMaxTurnSpeed(), 0.0f);
-		agentInfoPanel.AddSeparator();
-		agentInfoPanel.AddItem("color").SetValue(text.str()).InitSolidColor(agent->GetColor());
-		agentInfoPanel.AddItem("life span").SetValue(agent->GetLifeSpan()).InitBar(Color::MAGENTA, config.genes.minLifeSpan, config.genes.maxLifeSpan);
-		agentInfoPanel.AddItem("strength").SetValue(agent->GetStrength()).InitBar(Color::RED, config.genes.minStrength, config.genes.maxStrength);
-		agentInfoPanel.AddItem("num children").SetValue(agent->GetDesiredNumChildren()).InitBar(Color::GREEN, config.genes.minChildren, config.genes.maxChildren);
-		agentInfoPanel.AddItem("muation rate", "%").SetValue(agent->GetMutationRate() * 100).InitBar(Color::MAGENTA, config.genes.minMutationRate * 100, config.genes.maxMutationRate * 100);
-		agentInfoPanel.AddItem("crossover points").SetValue(agent->GetNumCrossoverPoints()).InitBar(Color::YELLOW, config.genes.minCrossoverPoints, config.genes.maxCrossoverPoints);
-		agentInfoPanel.AddItem("field of view", degSymbol).SetValue(Math::ToDegrees(agent->GetFieldOfView())).SetPrecision(0).InitBar(Color::GREEN, Math::ToDegrees(config.genes.minFieldOfView), Math::ToDegrees(config.genes.maxFieldOfView));
-		agentInfoPanel.AddItem("angle b/w eyes", degSymbol).SetValue(Math::ToDegrees(agent->GetAngleBetweenEyes())).SetPrecision(0).InitBar(Color(255, 128, 0), Math::ToDegrees(config.genes.minAngleBetweenEyes), Math::ToDegrees(config.genes.maxAngleBetweenEyes));
-		agentInfoPanel.AddItem("sight distance").SetValue(agent->GetMaxViewDistance()).InitBar(Color::CYAN, config.genes.minSightDistance, config.genes.maxSightDistance);
-		agentInfoPanel.AddItem("resolution red").SetValue(agent->GetSightResolution(0)).InitBar(Color::RED, config.genes.minSightResolution, config.genes.maxSightResolution);
-		agentInfoPanel.AddItem("resolution green").SetValue(agent->GetSightResolution(1)).InitBar(Color::GREEN, config.genes.minSightResolution, config.genes.maxSightResolution);
-		agentInfoPanel.AddItem("resolution blue").SetValue(agent->GetSightResolution(2)).InitBar(colBlue, config.genes.minSightResolution, config.genes.maxSightResolution);
-
-		
-		panelPos.y += simInfoPanel.GetSize().y + 10;
-		agentInfoPanel.Draw(m_graphics, panelPos);
-	}
-}
-

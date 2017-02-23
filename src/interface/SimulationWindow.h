@@ -7,6 +7,9 @@
 #include <simulation/Simulation.h>
 #include "SimulationRenderPanel.h"
 #include "GraphCanvas.h"
+#include "InfoPanelCanvas.h"
+#include <wx/notebook.h>
+#include <wx/splitter.h>
 
 
 //-----------------------------------------------------------------------------
@@ -58,9 +61,15 @@ private:
 	double	m_lastFrameTimeStamp;
 	double	m_updateTimeMs;
 
-	SimulationRenderPanel*	m_simulationPanel;
-	GraphCanvas*			m_graphCanvas;
-	wxComboBox*				m_graphComboBox;
+	// Window hierarchy
+	wxSplitterWindow*				m_splitter;
+		SimulationRenderPanel*		m_simulationPanel;
+		wxNotebook*					m_tabControl;
+			wxWindow*				m_pageInfo;
+				InfoPanelCanvas*	m_infoPanelCanvas;
+			wxWindow*				m_pageGraphs;
+				GraphCanvas*		m_graphCanvas;
+				wxComboBox*			m_graphComboBox;
 
 	// Menu items
 	wxMenuItem* m_menuItemTickOnce;

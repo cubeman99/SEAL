@@ -151,6 +151,23 @@ InfoPanel::InfoPanel()
 
 }
 
+Vector2f InfoPanel::GetMinimumSize() const
+{
+	float labelColWidth = 150;
+	float valueColWidth = 80;
+	float visualColWidth = 60;
+	float colWidth = labelColWidth + valueColWidth + visualColWidth;
+	float rowHeight = 12;
+	float rowSeparation = 2;
+	float titleHeight = 20;
+	int numRows = (int) m_rows.size();
+
+	Vector2f size;
+	size.x = colWidth + (m_margin * 2);
+	size.y = titleHeight + (m_margin * 4) + (rowHeight * numRows) + (rowSeparation * (numRows - 1));
+	return size;
+}
+
 Vector2f InfoPanel::GetSize() const
 {
 	float labelColWidth = 150;
@@ -166,6 +183,11 @@ Vector2f InfoPanel::GetSize() const
 	size.x = colWidth + (m_margin * 2);
 	size.y = titleHeight + (m_margin * 4) + (rowHeight * numRows) + (rowSeparation * (numRows - 1));
 	return size;
+}
+
+void InfoPanel::Clear()
+{
+	m_rows.clear();
 }
 
 void InfoPanel::AddSeparator()
@@ -190,19 +212,26 @@ InfoPanelItem& InfoPanel::AddItem(const std::string& label, const std::string& v
 	return item;
 }
 
-void InfoPanel::Draw(Graphics& g, const Vector2f& position)
+void InfoPanel::Draw(Graphics& g, const Rect2f& bounds)
 {
+	Vector2f position = bounds.position;
+
 	int numRows = (int) m_rows.size();
 
-	float labelColWidth = 150;
-	float valueColWidth = 80;
-	float visualColWidth = 60;
+	m_margin = 6;
+
+	float totalColWidth = bounds.size.x - (m_margin * 2);
+	float labelColWidth = 0.5f * totalColWidth;
+	float valueColWidth = 0.3f * totalColWidth;
+	float visualColWidth = 0.2f * totalColWidth;
+
+	//float labelColWidth = 150;
+	//float valueColWidth = 80;
+	//float visualColWidth = 60;
 	float colWidth = labelColWidth + valueColWidth + visualColWidth;
 	float rowHeight = 12;
 	float rowSeparation = 2;
 	float titleMargin = 20;
-
-	m_margin = 6;
 
 	Vector2f rowHalfHeight(0.0f, rowHeight * 0.5f);
 
