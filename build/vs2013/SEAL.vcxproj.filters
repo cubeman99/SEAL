@@ -228,6 +228,9 @@
     <ClCompile Include="..\..\src\application\GraphManager.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\application\DiagramDrawer.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -417,6 +420,9 @@
       <Filter>Source Files\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\application\GraphManager.h">
+      <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\DiagramDrawer.h">
       <Filter>Source Files\application</Filter>
     </ClInclude>
   </ItemGroup>

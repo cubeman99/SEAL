@@ -6,6 +6,9 @@
 #include <string>
 
 
+//-----------------------------------------------------------------------------
+// GraphRange
+//-----------------------------------------------------------------------------
 struct GraphRange
 {
 	enum
@@ -21,7 +24,9 @@ struct GraphRange
 	int		maxType;
 	float	dynamicPaddingPercent;
 
-	
+
+	GraphRange();
+
 	GraphRange& SetFixedMin(float rangeMin);
 	GraphRange& SetFixedMax(float rangeMax);
 	GraphRange& SetFixedRange(float rangeMin, float rangeMax);
@@ -32,19 +37,12 @@ struct GraphRange
 	GraphRange& SetDynamicMax(float smallestRangeMax);
 	GraphRange& SetDynamicRange(float largestRangeMin, float smallestRangeMax);
 	GraphRange& SetDynamicRangePadding(float dynamicPaddingPercent);
-
-
-	GraphRange() :
-		minType(FIXED),
-		minValue(0.0f),
-		maxType(DYNAMIC),
-		maxValue(1.0f),
-		dynamicPaddingPercent(0.1f)
-	{
-	}
 };
 
 
+//-----------------------------------------------------------------------------
+// GraphInfo
+//-----------------------------------------------------------------------------
 class GraphInfo
 {
 public:
@@ -52,10 +50,10 @@ public:
 	{
 		TYPE_FLOAT,
 		TYPE_DOUBLE,
-		//TYPE_BYTE,
-		//TYPE_UNSIGNED_BYTE,
-		//TYPE_SHORT,
-		//TYPE_UNSIGNED_SHORT,
+		TYPE_BYTE,
+		TYPE_UNSIGNED_BYTE,
+		TYPE_SHORT,
+		TYPE_UNSIGNED_SHORT,
 		TYPE_UNSIGNED_INT,
 		TYPE_INT,
 		TYPE_LONG,
@@ -90,6 +88,9 @@ private:
 };
 
 
+//-----------------------------------------------------------------------------
+// GraphManager
+//-----------------------------------------------------------------------------
 class GraphManager
 {
 public:

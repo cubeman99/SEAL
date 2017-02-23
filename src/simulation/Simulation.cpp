@@ -1,5 +1,6 @@
 #include "Simulation.h"
 #include <utilities/Timing.h>
+#include <math/MathLib.h>
 
 
 //-----------------------------------------------------------------------------
@@ -174,7 +175,7 @@ void Simulation::UpdateStatistics()
 		stats.totalEnergy += it->GetEnergy();
 		stats.avgEnergyUsage += it->GetEnergyUsage();
 		stats.avgMoveAmount += it->GetMoveAmount();
-		stats.avgTurnAmount += it->GetTurnAmount();
+		stats.avgTurnAmount += Math::Abs(it->GetTurnAmount());
 		stats.populationSize++;
 		numAgents++;
 	}

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\application\ArcBallCamera.cpp" />
     <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
+    <ClCompile Include="..\..\src\application\DiagramDrawer.cpp" />
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\application\Graph.cpp" />
     <ClCompile Include="..\..\src\application\GraphManager.cpp" />
@@ -76,6 +77,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\application\ArcBallCamera.h" />
     <ClInclude Include="..\..\src\application\CameraSystem.h" />
+    <ClInclude Include="..\..\src\application\DiagramDrawer.h" />
     <ClInclude Include="..\..\src\application\GlobeCamera.h" />
     <ClInclude Include="..\..\src\application\Graph.h" />
     <ClInclude Include="..\..\src\application\GraphManager.h" />

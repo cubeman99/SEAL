@@ -574,13 +574,14 @@ void SimulationRenderer::RenderGraphs()
 	// Setup projection.
 	m_graphics.SetProjection(Matrix4f::CreateOrthographic(0.0f,
 		m_canvasSize.x, m_canvasSize.y, 0.0f, -1.0f, 1.0f));
-	
+
+	/*
 	// Draw graphs.
 	Vector2i viewSize(m_canvasSize);
 	Vector2i graphSize(280, 84);
 	Rect2i graphBox(viewSize.x - graphSize.x - 6, 6,
 		graphSize.x, graphSize.y);
-	
+		
 	std::vector<SimulationStats>& stats = m_simulationManager->GetSimulation()->m_generationStats;
 	//m_graphFitness.GetGraph()->ConfigData(&stats.data()->populationSize
 	m_graphFitness.SetYBounds(0, 500);
@@ -596,10 +597,15 @@ void SimulationRenderer::RenderGraphs()
 	m_graphFitness.Draw(m_graphics);
 
 	m_graphics.SetViewportToCanvas();
+	*/
 
+	Vector2f graphSize(280, 84);
+	Rect2f graphBox(m_canvasSize.x - graphSize.x - 6, 6, graphSize.x, graphSize.y);
 
-	GraphInfo* graph = m_simulationManager->GetGraphManager()->GetGraph(0);
-	DrawGraph(m_graphics, *graph, Rect2f(0, 0, 400, 200));
+	unsigned int graphIndex = (simulation->GetAgeInTicks() / 60) % m_simulationManager->GetGraphManager()->GetNumGraphs();
+
+	GraphInfo* graph = m_simulationManager->GetGraphManager()->GetGraph(graphIndex);
+	DrawGraph(m_graphics, *graph, graphBox);
 }
 
 void SimulationRenderer::RenderInfoPanel()
@@ -630,7 +636,7 @@ void SimulationRenderer::RenderInfoPanel()
 	simInfoPanel.AddItem("avg fitness").SetValue(stats.avgFitness);
 	simInfoPanel.AddSeparator();
 	simInfoPanel.AddItem("avg move amount").SetValue(stats.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
-	simInfoPanel.AddItem("avg turn amount").SetValue(stats.avgTurnAmount).InitBar(Color::CYAN, -1, 1);
+	simInfoPanel.AddItem("avg turn amount").SetValue(stats.avgTurnAmount).InitBar(Color::CYAN, 0, 1);
 	Vector2f panelPos = Vector2f(6, 6);
 	simInfoPanel.Draw(m_graphics, panelPos);
 	
@@ -685,7 +691,6 @@ void SimulationRenderer::RenderInfoPanel()
 		agentInfoPanel.Draw(m_graphics, panelPos);
 	}
 }
-
 
 void SimulationRenderer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect)
 {

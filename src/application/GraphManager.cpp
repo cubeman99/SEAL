@@ -5,6 +5,15 @@
 // GraphRange
 //-----------------------------------------------------------------------------
 
+GraphRange::GraphRange() :
+	minType(FIXED),
+	minValue(0.0f),
+	maxType(DYNAMIC),
+	maxValue(1.0f),
+	dynamicPaddingPercent(0.1f)
+{
+}
+
 GraphRange& GraphRange::SetFixedMin(float rangeMin)
 {
 	minValue = rangeMin;
@@ -101,19 +110,32 @@ GraphInfo::GraphInfo(const std::string& title, int dataOffset) :
 float GraphInfo::GetData(SimulationStats* stats) const
 {
 	char* rawData = ((char*) stats) + m_dataOffset;
-	if (m_dataType == TYPE_FLOAT)
+
+	switch (m_dataType)
+	{
+	case TYPE_FLOAT:
 		return *((float*) rawData);
-	if (m_dataType == TYPE_DOUBLE)
+	case TYPE_DOUBLE:
 		return (float) *((double*) rawData);
-	if (m_dataType == TYPE_INT)
+	case TYPE_BYTE:
+		return (float) *rawData;
+	case TYPE_UNSIGNED_BYTE:
+		return (float) *((unsigned char*) rawData);
+	case TYPE_SHORT:
+		return (float) *((short*) rawData);
+	case TYPE_UNSIGNED_SHORT:
+		return (float) *((unsigned short*) rawData);
+	case TYPE_INT:
 		return (float) *((int*) rawData);
-	if (m_dataType == TYPE_UNSIGNED_INT)
+	case TYPE_UNSIGNED_INT:
 		return (float) *((unsigned int*) rawData);
-	if (m_dataType == TYPE_LONG)
+	case TYPE_LONG:
 		return (float) *((long*) rawData);
-	if (m_dataType == TYPE_UNSIGNED_LONG)
+	case TYPE_UNSIGNED_LONG:
 		return (float) *((unsigned long*) rawData);
-	return 0.0f;
+	default:
+		return 0.0f;
+	}
 }
 
 GraphInfo& GraphInfo::SetTitle(const std::string& title)
@@ -178,16 +200,42 @@ void GraphManager::OnNewSimulation(Simulation* simulation)
 	zeroAndUp.SetFixedMin(0.0f);
 	zeroAndUp.SetDynamicMax();
 	zeroAndUp.SetDynamicRangePadding(0.1f);
+
+	GraphRange zeroToOne;
+	zeroToOne.SetFixedRange(0, 1);
 	
 	GraphRange rangePop;
 	rangePop.SetFixedMin(0.0f);
-	//rangePop.SetFixedMax(config.agent.maxPreyAgents);
-	rangePop.SetDynamicMax(config.agent.maxPreyAgents);
+	rangePop.SetDynamicMax((float) config.agent.maxPreyAgents);
+	zeroAndUp.SetDynamicRangePadding(0.1f);
 
+	Color blue(0, 106, 255);
+	Color orange(255, 128, 0);
+
+	// General
 	CREATE_GRAPH_FLOAT("Population Size", populationSize, Color::CYAN).SetRange(rangePop);
-	CREATE_GRAPH_FLOAT("Average Energy", avgEnergy, Color::YELLOW).SetRange(zeroAndUp);
 	CREATE_GRAPH_FLOAT("Total Energy", totalEnergy, Color::YELLOW).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Simulation Age", simulationAge, Color::MAGENTA).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Energy", avgEnergy, Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Energy Usage", avgEnergyUsage, Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Fitness", avgFitness, Color::GREEN).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Move Amount", avgMoveAmount, Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Turn Amount", avgTurnAmount, Color::YELLOW).SetRange(zeroToOne);
+
+	// Average gene values
+	CREATE_GRAPH_FLOAT("Avg Color Red", avgGeneValue[GenePosition::COLOR_RED], Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Color Green", avgGeneValue[GenePosition::COLOR_GREEN], Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Color Blue", avgGeneValue[GenePosition::COLOR_BLUE], blue).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Lifespan", avgGeneValue[GenePosition::LIFE_SPAN], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Strength", avgGeneValue[GenePosition::STRENGTH], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Child Count", avgGeneValue[GenePosition::CHILD_COUNT], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Mutation Rate", avgGeneValue[GenePosition::MUTATION_RATE], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Crossover Points", avgGeneValue[GenePosition::CROSSOVER_POINTS], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Field of View", avgGeneValue[GenePosition::FIELD_OF_VIEW], Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Angle Between Eyes", avgGeneValue[GenePosition::ANGLE_BETWEEN_EYES], orange).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Sight Distance", avgGeneValue[GenePosition::VIEW_DISTANCE], Color::CYAN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Red", avgGeneValue[GenePosition::RESOLUTION_RED], Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Green", avgGeneValue[GenePosition::RESOLUTION_GREEN], Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Blue", avgGeneValue[GenePosition::RESOLUTION_BLUE], blue).SetRange(zeroToOne);
 }
 
 GraphInfo& GraphManager::AddGraph(const GraphInfo& graphInfo)
