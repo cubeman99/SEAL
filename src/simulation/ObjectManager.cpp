@@ -185,26 +185,24 @@ void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) 
 	// Rotate the object's position and orientation around the 
 	// center point of the world sphere.
 
+	float worldRadius = m_simulation->GetWorld()->GetRadius();
+
 	// Determine the axis and angle to rotate around the surface.
 	Vector3f axis = object->m_orientation.GetLeft();
-	float angle = distance / m_simulation->GetWorld()->GetRadius();
+	float angle = distance / worldRadius;
 	Quaternion rotation(axis, angle);
 
 	// Rotate the position and orientation.
 	rotation.RotateVector(object->m_position);
 	object->m_orientation.Rotate(rotation);
 
-	//// Move the object forward linearly first.
-	//Vector3f posPrev = object->m_position;
-	//object->m_position += object->m_orientation.GetForward() * distance;
+	// Snap position to world surface.
+	object->m_position.Normalize();
+	object->m_position *= worldRadius;
 
-	//// Snap the position to the world's surface.
-	//object->m_position.Normalize();
-	//object->m_position *= m_simulation->GetWorld()->GetRadius();
-
-	//// Keep the orientation tangent to the world's surface.
-	//float angle = Math::ACos(Vector3f::Normalize(object->m_position).Dot(Vector3f::Normalize(posPrev)));
-	//object->m_orientation.Rotate(object->m_orientation.GetRight(), angle);
+	// TODO: Keep orientation tangent to world surface.
+	//Vector3f forward = object->m_orientation.GetForward();
+	//Vector3f up = object->m_position;
 }
 
 
