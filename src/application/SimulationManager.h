@@ -5,6 +5,7 @@
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
 #include "CameraSystem.h"
+#include "GraphManager.h"
 #include "SimulationRenderer.h"
 
 
@@ -37,6 +38,8 @@ public:
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
+	inline GraphManager* GetGraphManager() { return &m_graphManager; }
+
 	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 
@@ -68,12 +71,15 @@ public:
 	
 
 private:
-	SimulationRenderer m_simulationRenderer;
-	Simulation*		m_simulation;
-	CameraSystem	m_cameraSystem;
+	Simulation* m_simulation;
+
+	// Systems
+	SimulationRenderer	m_simulationRenderer;
+	CameraSystem		m_cameraSystem;
+	GraphManager		m_graphManager;
+
 	int				m_selectedAgentId;
 	Agent*			m_selectedAgent;
-
 	bool			m_isSimulationPaused;
 	unsigned int	m_ticksPerFrame;
 	bool			m_maxTicksPerFrame;

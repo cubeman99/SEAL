@@ -1,5 +1,5 @@
-#ifndef _SIMULATION_RENDER_PANEL_H_
-#define _SIMULATION_RENDER_PANEL_H_
+#ifndef _GRAPH_CANVAS_H_
+#define _GRAPH_CANVAS_H_
 
 #include <graphics/OpenGLIncludes.h>
 #include <wx/wx.h>
@@ -14,14 +14,13 @@ class SimulationManager;
 
 
 //-----------------------------------------------------------------------------
-// SimulationRenderPanel - The UI panel where the simulation is drawn to
-//                         screen and can be interacted with.
+// GraphCanvas
 //-----------------------------------------------------------------------------
-class SimulationRenderPanel : public wxGLCanvas
+class GraphCanvas : public wxGLCanvas
 {
 public:
-    SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow, int* attribList = nullptr);
-	~SimulationRenderPanel();
+    GraphCanvas(wxWindow* parent, SimulationWindow* simulationWindow);
+	~GraphCanvas();
 
 	// Getters
 	SimulationManager* GetSimulationManager();
@@ -32,11 +31,6 @@ private:
 	wxDECLARE_EVENT_TABLE();
 
 	// UI Events
-    void OnKeyDown(wxKeyEvent& e);
-	void OnMouseDown(wxMouseEvent& e);
-	void OnMouseMotion(wxMouseEvent& e);
-	void OnMouseWheel(wxMouseEvent& e);
-	void OnSize(wxSizeEvent& e);
     void OnPaint(wxPaintEvent& e);
 
 
@@ -45,4 +39,4 @@ private:
 };
 
 
-#endif // _SIMULATION_RENDER_PANEL_H_
+#endif // _GRAPH_CANVAS_H_

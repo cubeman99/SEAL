@@ -28,7 +28,7 @@ wxEND_EVENT_TABLE()
 // Constructor & destructor
 //-----------------------------------------------------------------------------
 
-SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
+SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow, int* attribList)
     // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
     // flag should always be set, because even making the canvas smaller should
     // be followed by a paint event that updates the entire canvas with new
@@ -37,7 +37,7 @@ SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, int* attribList)
                  wxDefaultPosition, wxDefaultSize,
                  wxFULL_REPAINT_ON_RESIZE)
 {
-	m_simulationWindow = (SimulationWindow*) parent;
+	m_simulationWindow = simulationWindow;
 
 	// Force the OpenGL context to be created now.
 	wxGetApp().GetGLContext(this);
@@ -185,6 +185,8 @@ void SimulationRenderPanel::OnPaint(wxPaintEvent& e)
     // This is required even though dc is not used otherwise.
     wxPaintDC dc(this);
 	
+	wxGetApp().GetGLContext(this);
+
 	// Get the view port size.
     const wxSize clientSize = GetClientSize();
 	Vector2f viewPortSize;

@@ -3,6 +3,8 @@
 #include "SimulationRenderPanel.h"
 #include <sstream>
 #include <utilities/Timing.h>
+#include <wx/splitter.h>
+#include "GraphCanvas.h"
 
 
 //-----------------------------------------------------------------------------
@@ -122,14 +124,76 @@ void SimulationWindow::CreateUI()
 {
     SetIcon(wxICON(sample));
 	SetTitle(wxT("New Simulation - SEAL"));
+
+	wxSplitterWindow* splitter = new wxSplitterWindow(this, -1, wxPoint(0, 0),
+                                wxSize(400, 400), wxSP_3D | wxSP_LIVE_UPDATE);
 	
 	// Create the render panel.
-    m_simulationPanel = new SimulationRenderPanel(this, nullptr);
+    m_simulationPanel = new SimulationRenderPanel(splitter, this, nullptr);
+	
+	wxWindow* rightWindow = new wxWindow(splitter, -1, wxDefaultPosition, wxDefaultSize, 0L);
 
-    // Make a menubar
-    wxMenuBar* menuBar = new wxMenuBar;
+	//wxButton* button = new wxButton(rightWindow, -1, "Hello, World!");
+
+	wxString choices[2] = { "Population Size", "Total Energy" };
+
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+	
+
+	GraphCanvas* graphCanvas = new GraphCanvas(rightWindow, this);
+	graphCanvas->SetMinSize(wxSize(100, 100));
+	
+    sizer->Add(graphCanvas, 1, wxEXPAND | wxALL, 10);
+	rightWindow->SetSizerAndFit(sizer);
+
+	//wxComboBox* comboBox = new wxComboBox(rightWindow, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 2, choices, wxCB_READONLY);
+	//comboBox->SetLabel("Graph");
+	//comboBox->SetSelection(0);
+	//wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+	// // create text ctrl with minimal size 100x60
+ //   sizer->Add(
+ //       new wxTextCtrl( rightWindow, -1, "My text.", wxDefaultPosition, wxSize(100,60), wxTE_MULTILINE),
+ //       1,            // make vertically stretchable
+ //       wxEXPAND |    // make horizontally stretchable
+ //       wxALL,        //   and make border all around
+ //       10 );         // set border width to 10
+ //   wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+ //   button_sizer->Add(
+ //       new wxButton( rightWindow, wxID_OK, "OK" ),
+ //       0,           // make horizontally unstretchable
+ //       wxALL,       // make border all around (implicit top alignment)
+ //       10 );        // set border width to 10
+ //   button_sizer->Add(
+ //       new wxButton( rightWindow, wxID_CANCEL, "Cancel" ),
+ //       0,           // make horizontally unstretchable
+ //       wxALL,       // make border all around (implicit top alignment)
+ //       10 );        // set border width to 10
+ //   sizer->Add(
+ //       button_sizer,
+ //       0,                // make vertically unstretchable
+ //       wxALIGN_CENTER ); // no border and centre horizontally
+	//rightWindow->SetSizerAndFit(sizer);
+
+	splitter->SplitVertically(m_simulationPanel, rightWindow, -100);
+	splitter->SetMinimumPaneSize(100);
+	splitter->SetSashPosition(-50);
+	splitter->SetSashGravity(1.0);
+
+    CreateMenuBar();
+    CreateStatusBar(4);
+	
+	// Set initial window size.
+    SetClientSize(800, 600);
+    Show();
+}
+
+void SimulationWindow::CreateMenuBar()
+{
+    wxMenuBar* menuBar = new wxMenuBar();
     SetMenuBar(menuBar);
-
+	
 	//-------------------------------------------------------------------------
 	// FILE
 
@@ -185,13 +249,6 @@ void SimulationWindow::CreateUI()
     wxMenu* menuHelp = new wxMenu;
     menuBar->Append(menuHelp, wxT("&Help"));
     menuHelp->Append(wxID_ABOUT);
-
-	// Make a status bar
-    CreateStatusBar(4);
-	
-	// Set initial window size.
-    SetClientSize(800, 600);
-    Show();
 }
 
 

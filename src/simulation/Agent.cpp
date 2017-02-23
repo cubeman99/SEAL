@@ -371,7 +371,8 @@ void Agent::UpdateVision()
 			if (object->GetObjectType() == SimulationObjectType::AGENT &&
 				distSqr < matingDist * matingDist && canMate)
 			{
-				agentMateCollisions.push_back((Agent*) object); // avoid concurrent modification
+				// put into an array to avoid concurrent modification of octtree
+				agentMateCollisions.push_back((Agent*) object);
 			}
 
 			// Attempt to see the object.
@@ -382,6 +383,7 @@ void Agent::UpdateVision()
 		}
 	});
 
+	// Attempt to mate with detected nearby agents.
 	for (unsigned int i = 0; i < agentMateCollisions.size(); ++i)
 	{
 		Mate(agentMateCollisions[i]);

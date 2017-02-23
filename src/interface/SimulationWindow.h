@@ -26,6 +26,7 @@ private:
 	
 	// UI
 	void CreateUI();
+	void CreateMenuBar();
 	
 	// Window events
     void OnWindowClose(wxCloseEvent& e);

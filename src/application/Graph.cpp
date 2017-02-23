@@ -228,6 +228,7 @@ void GraphPanel::Draw(Graphics& g2)
 	}
 	
 	g->ResetTransform();
+	g->SetViewportToCanvas();
 }
 
 Vector2f GraphPanel::GetPointOnGraph(const Vector2f& point)
@@ -237,6 +238,7 @@ Vector2f GraphPanel::GetPointOnGraph(const Vector2f& point)
 		m_graphViewport.y + m_graphViewport.height - ((point.y - m_bounds.mins.y) / (m_bounds.maxs.y - m_bounds.mins.y) * m_graphViewport.height));
 }
 
+/*
 void GraphPanel::GetGraphRange(const GraphInfo& graph, float& rangeMin,
 	float& rangeMax, float& domainMin, float& domainMax)
 {
@@ -257,7 +259,7 @@ void GraphPanel::GetGraphRange(const GraphInfo& graph, float& rangeMin,
 				domainMax = (float) x;
 		}
 	}
-}
+}*/
 
 void GraphPanel::DrawGraph(Graphics* g, Graph* graph)
 {

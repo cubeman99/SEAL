@@ -182,16 +182,20 @@ void Graphics::DrawString(const Font* font, const std::string& text, const Vecto
 	Vector2f texCoord;
 	int row, col, x, y;
 
+	Vector2f startPosition = position;
+
 	// Change cursor position based on alignment.
 	Vector2f stringSize = MeasureString(font, text);
 	if (align & TextAlign::RIGHT)
-		cursor.x -= stringSize.x;
-	if (!(align & TextAlign::LEFT))
-		cursor.x -= (int) (stringSize.x * 0.5f);
+		startPosition.x -= stringSize.x;
+	else if (!(align & TextAlign::LEFT))
+		startPosition.x -= (int) (stringSize.x * 0.5f);
 	if (align & TextAlign::BOTTOM)
-		cursor.y -= stringSize.y;
+		startPosition.y -= stringSize.y;
 	else if (!(align & TextAlign::TOP))
-		cursor.y -= (int) (stringSize.y * 0.5f);
+		startPosition.y -= (int) (stringSize.y * 0.5f);
+
+	cursor = startPosition;
 
 	glBindTexture(GL_TEXTURE_2D, font->GetTexture()->GetGLTextureId());
 	glBegin(GL_QUADS);
@@ -203,7 +207,7 @@ void Graphics::DrawString(const Font* font, const std::string& text, const Vecto
 
 		if (c == '\n')
 		{
-			cursor.x = position.x;
+			cursor.x = startPosition.x;
 			cursor.y += font->m_charHeight * scale;
 		}
 		else
@@ -289,6 +293,13 @@ void Graphics::SetProjection(const Matrix4f& projection)
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(projection.data());
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void Graphics::SetCanvasProjection()
+{
+	SetProjection(Matrix4f::CreateOrthographic(
+		0.0f, (float) m_canvasWidth,
+		(float) m_canvasHeight, 0.0f, -1.0f, 1.0f));
 }
 
 

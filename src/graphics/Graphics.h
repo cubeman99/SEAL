@@ -141,6 +141,7 @@ public:
 	// Transformations
 
 	void SetProjection(const Matrix4f& projection);
+	void SetCanvasProjection();
 	
 	void ResetTransform();
 	void SetTransform(const Matrix4f& transform);

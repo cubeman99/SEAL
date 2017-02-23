@@ -8,7 +8,7 @@
 #include "OctTreeRenderer.h"
 #include "Graph.h"
 #include "InfoPanel.h"
-
+#include "GraphManager.h"
 
 class SimulationManager;
 class Agent;
@@ -40,6 +40,7 @@ private:
 	void RenderGraphs();
 	void RenderInfoPanel();
 
+	void DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect);
 
 private:
 	SimulationManager* m_simulationManager;

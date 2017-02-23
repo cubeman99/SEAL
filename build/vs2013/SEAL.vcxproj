@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\application\Graph.cpp" />
+    <ClCompile Include="..\..\src\application\GraphManager.cpp" />
     <ClCompile Include="..\..\src\application\InfoPanel.cpp" />
     <ClCompile Include="..\..\src\application\OctTreeRenderer.cpp" />
     <ClCompile Include="..\..\src\application\ResourceManager.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="..\..\src\graphics\Texture.cpp" />
     <ClCompile Include="..\..\src\graphics\TextureParams.cpp" />
     <ClCompile Include="..\..\src\graphics\VertexData.cpp" />
+    <ClCompile Include="..\..\src\interface\GraphCanvas.cpp" />
     <ClCompile Include="..\..\src\interface\MainApplication.cpp" />
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp" />
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp" />
@@ -76,6 +78,7 @@
     <ClInclude Include="..\..\src\application\CameraSystem.h" />
     <ClInclude Include="..\..\src\application\GlobeCamera.h" />
     <ClInclude Include="..\..\src\application\Graph.h" />
+    <ClInclude Include="..\..\src\application\GraphManager.h" />
     <ClInclude Include="..\..\src\application\InfoPanel.h" />
     <ClInclude Include="..\..\src\application\OctTreeRenderer.h" />
     <ClInclude Include="..\..\src\application\ResourceManager.h" />
@@ -98,6 +101,7 @@
     <ClInclude Include="..\..\src\graphics\Texture.h" />
     <ClInclude Include="..\..\src\graphics\TextureParams.h" />
     <ClInclude Include="..\..\src\graphics\VertexData.h" />
+    <ClInclude Include="..\..\src\interface\GraphCanvas.h" />
     <ClInclude Include="..\..\src\interface\MainApplication.h" />
     <ClInclude Include="..\..\src\interface\OpenGLContext.h" />
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h" />

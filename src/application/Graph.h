@@ -9,14 +9,6 @@
 #include <string>
 
 
-struct GraphInfo
-{
-
-	int		dataOffset;
-	int		dataStride;
-	Color	color;
-};
-
 struct Bounds
 {
 	Vector2f mins;
@@ -68,8 +60,8 @@ public:
 	~GraphPanel();
 	
 	Graph* GetGraph() { return m_graphs[0]; }
-	void GetGraphRange(const GraphInfo& graph, float& rangeMin,
-		float& rangeMax, float& domainMax, float& domainMin);
+	//void GetGraphRange(const GraphInfo& graph, float& rangeMin,
+		//float& rangeMax, float& domainMax, float& domainMin);
 
 	inline void SetTitle(const std::string& title) { m_title = title; }
 	inline void SetFont(SpriteFont* font) { m_font = font; }

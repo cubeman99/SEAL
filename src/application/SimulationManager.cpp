@@ -45,7 +45,8 @@ void SimulationManager::Initialize()
 	// Initialize sub-systems.
 	m_cameraSystem.Initialize();
 	m_simulationRenderer.Initialize();
-	
+	m_graphManager.Initialize();
+
 	// Seed Random with current time.
 	// The static random should NOT be used for simulation logic.
 	// It should be used for graphics or UI stuff.
@@ -62,6 +63,7 @@ void SimulationManager::OnNewSimulation()
 	// Notify sub-systems of the new simulation.
 	m_cameraSystem.OnNewSimulation(m_simulation);
 	m_simulationRenderer.OnNewSimulation(m_simulation);
+	m_graphManager.OnNewSimulation(m_simulation);
 
 	// Reset viewing state.
 	m_selectedAgent			= nullptr;
