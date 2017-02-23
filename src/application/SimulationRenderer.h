@@ -6,7 +6,6 @@
 #include <math/MathLib.h>
 #include "ResourceManager.h"
 #include "OctTreeRenderer.h"
-#include "Graph.h"
 #include "InfoPanel.h"
 #include "GraphManager.h"
 
@@ -22,6 +21,8 @@ public:
 
 	// Getters
 	inline double GetAverageRenderTime() const { return m_renderTime; }
+	inline ResourceManager* GetResourceManager() { return &m_resourceManager; }
+	inline OctTreeRenderer* GetOctTreeRenderer() { return &m_octTreeRenderer; }
 
 	void Initialize();
 	void OnNewSimulation(Simulation* simulation);
@@ -36,11 +37,9 @@ private:
 	// Rendering
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
-	void RenderBrain(Agent* agent);
 	void RenderGraphs();
 	void RenderInfoPanel();
 
-	void DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect);
 
 private:
 	SimulationManager* m_simulationManager;
@@ -52,9 +51,6 @@ private:
 
 	double			m_renderTime; // measured time of render (in seconds)
 	Vector2f		m_canvasSize;
-
-	// Visuals
-	GraphPanel		m_graphFitness;
 
 	// Resources
 	Font* m_font;

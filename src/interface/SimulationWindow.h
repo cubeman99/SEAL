@@ -6,6 +6,7 @@
 #include <application/SimulationManager.h>
 #include <simulation/Simulation.h>
 #include "SimulationRenderPanel.h"
+#include "GraphCanvas.h"
 
 
 //-----------------------------------------------------------------------------
@@ -19,6 +20,8 @@ public:
 	// Getters
 	inline SimulationManager* GetSimulationManager() { return &m_simulationManager; }
 	inline SimulationRenderPanel* GetRenderPanel() { return m_simulationPanel; }
+
+	void OnNewSimulation();
 
 
 private:
@@ -34,6 +37,7 @@ private:
 	// Menu item events
 	void OnUpdateMenuItem(wxUpdateUIEvent& e);
     void OnMenuItem(wxCommandEvent& e);
+	void OnChooseGraph(wxCommandEvent& e);
     void OnClose(wxCommandEvent& e);
     void OnNewSimulation(wxCommandEvent& e);
 	void OnOpenSimulation(wxCommandEvent& e);
@@ -47,13 +51,16 @@ private:
 
 private:
 	SimulationManager m_simulationManager;
-	SimulationRenderPanel* m_simulationPanel;
 
 	int		m_controlledAgentId;
 	int		m_frameCounter;
 	float	m_fps;
 	double	m_lastFrameTimeStamp;
 	double	m_updateTimeMs;
+
+	SimulationRenderPanel*	m_simulationPanel;
+	GraphCanvas*			m_graphCanvas;
+	wxComboBox*				m_graphComboBox;
 
 	// Menu items
 	wxMenuItem* m_menuItemTickOnce;

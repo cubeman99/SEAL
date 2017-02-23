@@ -70,22 +70,7 @@ Simulation* SimulationRenderPanel::GetSimulation()
 
 void SimulationRenderPanel::OnKeyDown(wxKeyEvent& e)
 {
-    switch (e.GetKeyCode())
-    {
-        case WXK_RIGHT:
-            break;
-        case WXK_LEFT:
-            break;
-        case WXK_DOWN:
-            break;
-        case WXK_UP:
-            break;
-        default:
-		{
-            e.Skip();
-            return;
-		}
-    }
+	//GetParent()->GetEventHandler()->ProcessEvent(e);
 }
 
 void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
@@ -132,6 +117,9 @@ void SimulationRenderPanel::OnMouseDown(wxMouseEvent& e)
 	{
 		// (right mouse button is for camera controls)
 	}
+	
+	SetFocus();
+	//GetParent()->GetEventHandler()->ProcessEvent(e);
 }
 
 void SimulationRenderPanel::OnMouseMotion(wxMouseEvent& e)

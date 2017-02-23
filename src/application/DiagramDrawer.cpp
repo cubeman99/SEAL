@@ -5,11 +5,17 @@
 
 
 DiagramDrawer::DiagramDrawer(SimulationManager* simulationManager) :
-	m_simulationManager(simulationManager)
+	m_simulationManager(simulationManager),
+	m_font(nullptr)
 {
 
 }
 
+void DiagramDrawer::Initialize()
+{
+	m_font = m_simulationManager->GetResourceManager()->GetFont("font");
+
+}
 
 
 void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bounds)
@@ -138,10 +144,12 @@ void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bou
 
 void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect)
 {
-	Font* m_font = nullptr;
 	Simulation* simulation = m_simulationManager->GetSimulation();
 	SimulationStats* stats = simulation->m_generationStats.data();
 	unsigned int numStats = simulation->m_generationStats.size();
+
+	//-------------------------------------------------------------------------
+	// Visual options.
 
 	Color colorBackground	= Color::BLACK;
 	Color colorGraphArea	= Color::BLACK;
@@ -150,6 +158,7 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 	Color colorZeroX		= Color::WHITE;
 	Color colorGraphMargin	= Color::LIGHT_GRAY;
 	Color colorLabels		= Color::WHITE;
+	int padding = 6;
 
 	//-------------------------------------------------------------------------
 	// Calculate view bounds.
@@ -193,43 +202,62 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 		if (range.maxType == GraphRange::DYNAMIC_CLAMPED && maxs.y < range.maxValue)
 			maxs.y = range.maxValue;
 	}
+	if (maxs.y - mins.y == 0.0f)
+		maxs.y = mins.y + 1.0f;
 
 	//-------------------------------------------------------------------------
 	// Determine range label strings and graph area rectangle.
 
-	std::stringstream str;
-	str << mins.y;
-	std::string labelMin = str.str();
+	// Find a good precision to display range labels at.
+	int precision = 0;
+	int dataType = graph.GetDataType();
+	if (dataType == GraphInfo::TYPE_FLOAT ||
+		dataType == GraphInfo::TYPE_DOUBLE)
+	{
+		float largestRangeNumber = Math::Max(
+			Math::Abs(mins.y), Math::Abs(maxs.y));
+		if (largestRangeNumber < 0.1f)
+			precision = 4;
+		else if (largestRangeNumber < 1.0f)
+			precision = 3;
+		else if (largestRangeNumber < 10.0f)
+			precision = 2;
+		else if (largestRangeNumber <= 50.0f)
+			precision = 1;
+	}
 
-	str.str("");
-	str << maxs.y;
-	std::string labelMax = str.str();
+	// Create the text for the range labels.
+	std::stringstream ss;
+	ss.setf(std::ios::fixed, std::ios::floatfield);
+	ss.precision(precision);
+	ss << mins.y;
+	std::string labelMin = ss.str();
+	ss.str("");
+	ss << maxs.y;
+	std::string labelMax = ss.str();
 
-	int labelMinLength = labelMin.length();
-	int labelMaxLength = labelMax.length();
-	int labelTextLength = Math::Max(labelMinLength, labelMaxLength);
+	// Measure the text sizes.
+	Vector2f titleSize = g.MeasureString(m_font, graph.GetTitle());
+	Vector2f labelMinSize = g.MeasureString(m_font, labelMin);
+	Vector2f labelMaxSize = g.MeasureString(m_font, labelMax);
+	float labelWidth = Math::Max(labelMinSize.x, labelMaxSize.x);
 	
-	int padding		= 6;
-	int labelWidth	= 8 * labelTextLength;
-	int labelHeight	= 12;
-	int titleWidth	= graph.GetTitle().length() * 8;
-	int titleHeight	= 12;
-	
+	// Determine the rectangle for the graph area.
 	Rect2f graphRect = rect;
 	graphRect.position.x	+= labelWidth + (padding * 2);
-	graphRect.position.y	+= padding + titleHeight;
+	graphRect.position.y	+= padding + titleSize.y;
 	graphRect.size.x		= rect.size.x - (padding * 3) - labelWidth;
-	graphRect.size.y		= rect.size.y - (padding * 2) - titleHeight;
+	graphRect.size.y		= rect.size.y - (padding * 2) - titleSize.y;
 
 	//-------------------------------------------------------------------------
 	
 	g.SetViewportToCanvas();
 	g.SetCanvasProjection();
 
-	// Fill background
+	// Fill background.
 	g.FillRect(rect, colorBackground);
 
-	// Fill graph area background
+	// Fill graph area background.
 	g.FillRect(graphRect, colorGraphArea);
 	
 	// Draw the graph area's left margin.
@@ -257,18 +285,18 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 
 	// Draw the y-axis labels.
 	g.DrawString(m_font, labelMax,
-		graphRect.position.x - padding,
-		graphRect.position.y,
+		Math::Floor(graphRect.position.x - padding),
+		Math::Floor(graphRect.position.y),
 		colorLabels, TextAlign::MIDDLE_RIGHT);
 	g.DrawString(m_font, labelMin,
-		graphRect.position.x - padding,
-		graphRect.position.y + graphRect.size.y,
+		Math::Floor(graphRect.position.x - padding),
+		Math::Floor(graphRect.position.y + graphRect.size.y),
 		colorLabels, TextAlign::MIDDLE_RIGHT);
 
 	// Draw title
 	g.DrawString(m_font, graph.GetTitle(),
-		rect.position.x + (float) (rect.size.x / 2),
-		rect.position.y + (float) padding,
+		Math::Floor(rect.position.x + (float) (rect.size.x / 2)),
+		Math::Floor(rect.position.y + (float) padding),
 		colorLabels, TextAlign::TOP_CENTER);
 
 	//-------------------------------------------------------------------------

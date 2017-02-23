@@ -1,7 +1,6 @@
 #ifndef _GRAPH_MANAGER_H_
 #define _GRAPH_MANAGER_H_
 
-#include "Graph.h"
 #include <simulation/Simulation.h>
 #include <string>
 

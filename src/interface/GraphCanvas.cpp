@@ -28,7 +28,8 @@ GraphCanvas::GraphCanvas(wxWindow* parent, SimulationWindow* simulationWindow)
     // viewport settings.
     : wxGLCanvas(parent, wxID_ANY, nullptr,
                  wxDefaultPosition, wxDefaultSize,
-                 wxFULL_REPAINT_ON_RESIZE)
+                 wxFULL_REPAINT_ON_RESIZE),
+	m_graphIndex(0)
 {
 	m_simulationWindow = simulationWindow;
 
@@ -93,13 +94,14 @@ void GraphCanvas::OnPaint(wxPaintEvent& e)
 
 	m_graphics.Clear(Color::BLACK);
 
-	//m_graphics.FillRect(32, 48, 128, 64, Color::GREEN);
-
-
-	Rect2f box(Vector2f::ZERO, canvasSize);
-	box.Inset(32, 32);
-	m_graphics.DrawRect(box, Color::MAGENTA);
 	
+	Vector2f graphSize(280, 84);
+	Rect2f graphBox(0.0f, 0.0f, canvasSize.x, 120);
+	SimulationManager* simulationManager = m_simulationWindow->GetSimulationManager();
+
+	GraphInfo* graph = simulationManager->GetGraphManager()->GetGraph(m_graphIndex);
+	simulationManager->GetDiagramDrawer()->DrawGraph(m_graphics, *graph, graphBox);
+
     SwapBuffers();
 }
 

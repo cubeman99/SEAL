@@ -40,7 +40,7 @@
     <Filter Include="Source Files\application\camera">
       <UniqueIdentifier>{42b02647-5f3d-4443-914a-1040e6b93391}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\application\display">
+    <Filter Include="Source Files\application\diagrams">
       <UniqueIdentifier>{40a0885f-1c7c-4b21-85e0-3f40665b0f79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -214,13 +214,10 @@
       <Filter>Source Files\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\application\InfoPanel.cpp">
-      <Filter>Source Files\application\display</Filter>
+      <Filter>Source Files\application\diagrams</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\math\Rect2f.cpp">
       <Filter>Source Files\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\application\Graph.cpp">
-      <Filter>Source Files\application\display</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\interface\GraphCanvas.cpp">
       <Filter>Source Files\interface</Filter>
@@ -408,13 +405,10 @@
       <Filter>Source Files\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\application\InfoPanel.h">
-      <Filter>Source Files\application\display</Filter>
+      <Filter>Source Files\application\diagrams</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\math\Rect2f.h">
       <Filter>Source Files\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\application\Graph.h">
-      <Filter>Source Files\application\display</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\interface\GraphCanvas.h">
       <Filter>Source Files\interface</Filter>

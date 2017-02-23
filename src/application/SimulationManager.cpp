@@ -12,6 +12,7 @@
 
 SimulationManager::SimulationManager() :
 	  m_simulationRenderer(this),
+	  m_diagramDrawer(this),
 	  m_simulation(nullptr),
 	  m_selectedAgentId(-1),
 	  m_selectedAgent(nullptr),
@@ -46,6 +47,7 @@ void SimulationManager::Initialize()
 	m_cameraSystem.Initialize();
 	m_simulationRenderer.Initialize();
 	m_graphManager.Initialize();
+	m_diagramDrawer.Initialize();
 
 	// Seed Random with current time.
 	// The static random should NOT be used for simulation logic.

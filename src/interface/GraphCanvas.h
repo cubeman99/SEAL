@@ -26,6 +26,9 @@ public:
 	SimulationManager* GetSimulationManager();
 	Simulation* GetSimulation();
 
+	inline unsigned int GetGraphIndex() const { return m_graphIndex; }
+	inline void SetGraphIndex(unsigned int graphIndex) { m_graphIndex = graphIndex; }
+
 
 private:
 	wxDECLARE_EVENT_TABLE();
@@ -36,6 +39,7 @@ private:
 
 private:
 	SimulationWindow* m_simulationWindow;
+	unsigned int m_graphIndex;
 };
 
 

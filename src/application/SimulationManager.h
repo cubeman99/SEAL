@@ -7,6 +7,7 @@
 #include "CameraSystem.h"
 #include "GraphManager.h"
 #include "SimulationRenderer.h"
+#include "DiagramDrawer.h"
 
 
 class SimulationManager
@@ -38,7 +39,9 @@ public:
 	inline ICamera* GetActiveCamera() const { return m_cameraSystem.GetActiveCamera(); }
 	inline CameraSystem* GetCameraSystem() { return &m_cameraSystem; }
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
+	inline ResourceManager* GetResourceManager() { return m_simulationRenderer.GetResourceManager(); }
 	inline GraphManager* GetGraphManager() { return &m_graphManager; }
+	inline DiagramDrawer* GetDiagramDrawer() { return &m_diagramDrawer; }
 
 	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
@@ -77,6 +80,7 @@ private:
 	SimulationRenderer	m_simulationRenderer;
 	CameraSystem		m_cameraSystem;
 	GraphManager		m_graphManager;
+	DiagramDrawer		m_diagramDrawer;
 
 	int				m_selectedAgentId;
 	Agent*			m_selectedAgent;

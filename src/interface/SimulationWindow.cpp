@@ -15,6 +15,8 @@ enum
 {
     NEW_STEREO_WINDOW = wxID_HIGHEST + 1,
 
+	CHOOSE_GRAPH,
+
 	// File
 	// (using default wxIDs)
 
@@ -55,6 +57,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 
     EVT_IDLE(SimulationWindow::OnIdle)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
+
+	EVT_COMBOBOX(CHOOSE_GRAPH, SimulationWindow::OnChooseGraph)
 
 	EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
 	EVT_UPDATE_UI(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnUpdateMenuItem)
@@ -101,13 +105,15 @@ wxEND_EVENT_TABLE()
 
 SimulationWindow::SimulationWindow() :
 	wxFrame(NULL, wxID_ANY, wxT("New Simulation - SEAL")),
-	m_simulationPanel(nullptr)
+	m_simulationPanel(nullptr),
+	m_graphCanvas(nullptr)
 {
 	// Setup the window UI.
 	CreateUI();
 
 	// Initialize a new simulation.
 	m_simulationManager.Initialize();
+	OnNewSimulation();
 
 	// Setup stuff.
 	m_frameCounter = 0;
@@ -134,22 +140,21 @@ void SimulationWindow::CreateUI()
 	wxWindow* rightWindow = new wxWindow(splitter, -1, wxDefaultPosition, wxDefaultSize, 0L);
 
 	//wxButton* button = new wxButton(rightWindow, -1, "Hello, World!");
-
-	wxString choices[2] = { "Population Size", "Total Energy" };
-
+	
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-
+		
+	wxString choices[2] = { "Population Size", "Total Energy" };
+	m_graphComboBox = new wxComboBox(rightWindow, CHOOSE_GRAPH, wxEmptyString, wxDefaultPosition, wxDefaultSize, 2, choices, wxCB_READONLY);
+	m_graphComboBox->SetSelection(0);
+    sizer->Add(m_graphComboBox, 0, wxEXPAND | wxALL, 0);
 	
+	m_graphCanvas = new GraphCanvas(rightWindow, this);
+	m_graphCanvas->SetSize(wxSize(100, 200));
+    sizer->Add(m_graphCanvas, 1, wxEXPAND | wxALL, 0);
 
-	GraphCanvas* graphCanvas = new GraphCanvas(rightWindow, this);
-	graphCanvas->SetMinSize(wxSize(100, 100));
-	
-    sizer->Add(graphCanvas, 1, wxEXPAND | wxALL, 10);
 	rightWindow->SetSizerAndFit(sizer);
 
-	//wxComboBox* comboBox = new wxComboBox(rightWindow, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 2, choices, wxCB_READONLY);
 	//comboBox->SetLabel("Graph");
-	//comboBox->SetSelection(0);
 	//wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	// // create text ctrl with minimal size 100x60
@@ -178,14 +183,14 @@ void SimulationWindow::CreateUI()
 
 	splitter->SplitVertically(m_simulationPanel, rightWindow, -100);
 	splitter->SetMinimumPaneSize(100);
-	splitter->SetSashPosition(-50);
+	splitter->SetSashPosition(-300);
 	splitter->SetSashGravity(1.0);
 
     CreateMenuBar();
     CreateStatusBar(4);
 	
 	// Set initial window size.
-    SetClientSize(800, 600);
+    SetClientSize(1000, 600);
     Show();
 }
 
@@ -249,6 +254,17 @@ void SimulationWindow::CreateMenuBar()
     wxMenu* menuHelp = new wxMenu;
     menuBar->Append(menuHelp, wxT("&Help"));
     menuHelp->Append(wxID_ABOUT);
+}
+
+void SimulationWindow::OnNewSimulation()
+{
+	GraphManager* graphManager = m_simulationManager.GetGraphManager();
+
+	m_graphComboBox->Clear();
+	for (unsigned int i = 0; i < graphManager->GetNumGraphs(); ++i)
+		m_graphComboBox->Append(graphManager->GetGraph(i)->GetTitle());
+	m_graphComboBox->SetSelection(0);
+	m_graphCanvas->SetGraphIndex(0);
 }
 
 
@@ -367,6 +383,11 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	}
 }
 
+void SimulationWindow::OnChooseGraph(wxCommandEvent& e)
+{
+	m_graphCanvas->SetGraphIndex(e.GetSelection());
+}
+
 void SimulationWindow::OnClose(wxCommandEvent& e)
 {
     Close(true); // true is to force the frame to close
@@ -388,6 +409,7 @@ void SimulationWindow::OnNewSimulation(wxCommandEvent& e)
 		// TEMP: begin a new simulation with default config values.
 		SimulationConfig config;
 		m_simulationManager.BeginNewSimulation(config);
+		OnNewSimulation();
 	}
 }
 
@@ -406,6 +428,7 @@ void SimulationWindow::OnOpenSimulation(wxCommandEvent& e)
 		{
 			// Update the window title to the opened simulation file.
 			SetTitle(openDialog->GetFilename() << wxString(" - SEAL"));
+			OnNewSimulation();
 		}
 		else
 		{
@@ -431,6 +454,7 @@ void SimulationWindow::OnSaveSimulation(wxCommandEvent& e)
 		if (m_simulationManager.SaveSimulation(path))
 		{
 			// success!
+			OnNewSimulation();
 		}
 		else
 		{
@@ -474,6 +498,7 @@ void SimulationWindow::OnIdle(wxIdleEvent& e)
 	
 	// Tell the simulation panel to render.
 	m_simulationPanel->Refresh(false);
+	m_graphCanvas->Refresh(false);
 }
 
 void SimulationWindow::UpdateDebugAgentControls()
