@@ -64,7 +64,7 @@ void SimulationRenderer::LoadResources()
 	// Models
 
 	// Agent model.
-	m_agentMesh = m_resourceManager.LoadMesh("agent", "models/agent.obj");
+	m_agentMeshCarnivore = m_resourceManager.LoadMesh("agent", "models/agent.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	
@@ -76,6 +76,8 @@ void SimulationRenderer::LoadResources()
 	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
+
+	m_agentMeshHerbivore = m_worldMesh;
 	
 	// TODO: Move this resource creation code somewhere else.
 
@@ -241,7 +243,13 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		
 		// Render object with the appropriate mesh.
 		if (object->IsObjectType<Agent>())
-			m_renderer.RenderMesh(m_agentMesh, &material, modelMatrix);
+		{
+			Agent* agent = (Agent*) object;
+			if (agent->GetSpecies() == SPECIES_HERBIVORE)
+				m_renderer.RenderMesh(m_agentMeshHerbivore, &material, modelMatrix);
+			else
+				m_renderer.RenderMesh(m_agentMeshCarnivore, &material, modelMatrix);
+		}
 		else if (object->IsObjectType<Plant>())
 			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
 		else if (object->IsObjectType<Offshoot>())

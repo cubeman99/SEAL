@@ -21,12 +21,8 @@ wxEND_EVENT_TABLE()
 // Constructor & destructor
 //-----------------------------------------------------------------------------
 
-GraphCanvas::GraphCanvas(wxWindow* parent, SimulationWindow* simulationWindow)
-    // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
-    // flag should always be set, because even making the canvas smaller should
-    // be followed by a paint event that updates the entire canvas with new
-    // viewport settings.
-    : wxGLCanvas(parent, wxID_ANY, nullptr,
+GraphCanvas::GraphCanvas(wxWindow* parent, SimulationWindow* simulationWindow) :
+    wxGLCanvas(parent, wxID_ANY, nullptr,
                  wxDefaultPosition, wxDefaultSize,
                  wxFULL_REPAINT_ON_RESIZE),
 	m_graphIndex(0)

@@ -67,7 +67,9 @@ void Simulation::Initialize(const SimulationConfig& config)
 
 	// Spawn some agents.
 	for (int i = 0; i < m_config.agent.initialPreyCount; ++i)
-		m_objectManager.SpawnObjectRandom<Agent>();
+		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
+	for (int i = 0; i < m_config.agent.initialPredatorCount; ++i)
+		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
 }
 
 void Simulation::Tick()
@@ -286,7 +288,7 @@ Agent* Simulation::CreateOffspring(Agent* mommy, Agent* daddy)
 	Genome* childGenome = Genome::SpawnChild(
 		mommy->GetGenome(), daddy->GetGenome(), this);
 
-	Agent* child = new Agent(childGenome, 100.0f);
+	Agent* child = new Agent(childGenome, 100.0f, mommy->GetSpecies());
 
 	return child;
 }

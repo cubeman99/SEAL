@@ -88,9 +88,22 @@ private:
 	std::string	m_title;
 
 	int			m_margin;
+	int			m_rowHeight;
+	int			m_rowSeparation;
+	int			m_titleHeight;
+
 	int			m_width;
 	int			m_height;
 	Font*		m_font;
+	float		m_labelColProportion;
+	float		m_valueColProportion;
+	float		m_visualColProportion;
+
+	Color		m_colorText;
+	Color		m_colorBorder;
+	Color		m_colorBackground;
+	Color		m_colorStripe1;
+	Color		m_colorStripe2;
 
 	std::vector<InfoPanelItem> m_rows;
 };

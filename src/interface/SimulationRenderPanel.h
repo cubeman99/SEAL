@@ -20,7 +20,7 @@ class SimulationManager;
 class SimulationRenderPanel : public wxGLCanvas
 {
 public:
-    SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow, int* attribList = nullptr);
+    SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow);
 	~SimulationRenderPanel();
 
 	// Getters

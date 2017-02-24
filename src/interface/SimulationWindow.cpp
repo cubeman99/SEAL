@@ -38,7 +38,8 @@ enum
 	SHOW_INVISIBLE_OBJECTS,
 
 	// Debug
-	DEBUG_SPAWN_AGENTS,
+	DEBUG_SPAWN_CARNIVORES,
+	DEBUG_SPAWN_HERBIVORES,
 	DEBUG_DELETE_AGENT,
 
 	// Help
@@ -88,7 +89,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
 	
 	// Debug
-    EVT_MENU(DEBUG_SPAWN_AGENTS, SimulationWindow::OnMenuItem)
+    EVT_MENU(DEBUG_SPAWN_CARNIVORES, SimulationWindow::OnMenuItem)
+    EVT_MENU(DEBUG_SPAWN_HERBIVORES, SimulationWindow::OnMenuItem)
     EVT_MENU(DEBUG_DELETE_AGENT, SimulationWindow::OnMenuItem)
 
 	// About
@@ -135,21 +137,24 @@ SimulationWindow::SimulationWindow() :
 
 void SimulationWindow::CreateUI()
 {
-    SetIcon(wxICON(sample));
-	SetTitle(wxT("New Simulation - SEAL"));
-
 	//-------------------------------------------------------------------------
+	// Create vertically-split layout.
 
-	m_splitter = new wxSplitterWindow(this, -1, wxPoint(0, 0),
-                                wxSize(400, 400), wxSP_3D | wxSP_LIVE_UPDATE);
+	m_splitter = new wxSplitterWindow(this, -1, wxDefaultPosition,
+		wxDefaultSize, wxSP_3D | wxSP_LIVE_UPDATE);
 	
-	// Create the render panel.
-    m_simulationPanel = new SimulationRenderPanel(m_splitter, this, nullptr);
-	
+    m_simulationPanel = new SimulationRenderPanel(m_splitter, this);
+
 	m_tabControl = new wxNotebook(m_splitter, -1, wxDefaultPosition, wxDefaultSize);
+
+	m_splitter->SplitVertically(m_simulationPanel, m_tabControl, -100);
+	m_splitter->SetMinimumPaneSize(100);
+	m_splitter->SetSashPosition(-300);
+	m_splitter->SetSashGravity(1.0);
 	
 	//-------------------------------------------------------------------------
 	// Info tab.
+
 	m_pageInfo = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
 	{
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -163,6 +168,7 @@ void SimulationWindow::CreateUI()
 	
 	//-------------------------------------------------------------------------
 	// Graphs tab.
+
 	m_pageGraphs = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
 	{
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -182,6 +188,7 @@ void SimulationWindow::CreateUI()
 
 	//-------------------------------------------------------------------------
 	// Log tab.
+
 	m_pageLog = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
 	{
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -198,18 +205,17 @@ void SimulationWindow::CreateUI()
 
 	//-------------------------------------------------------------------------
 
-	m_splitter->SplitVertically(m_simulationPanel, m_tabControl, -100);
-	m_splitter->SetMinimumPaneSize(100);
-	m_splitter->SetSashPosition(-300);
-	m_splitter->SetSashGravity(1.0);
-
     CreateMenuBar();
     CreateStatusBar(4);
+
+    SetIcon(wxICON(sample));
+	SetTitle(wxT("New Simulation - SEAL"));
 	
 	// Set initial window size.
     SetClientSize(1000, 600);
     Show();
 
+	// TODO: remove this test message.
 	wxLogMessage("Test message using wxLogMessage()");
 }
 
@@ -264,7 +270,8 @@ void SimulationWindow::CreateMenuBar()
 
     wxMenu* menuDebug = new wxMenu;
     menuBar->Append(menuDebug, wxT("&Debug"));
-    menuDebug->Append(DEBUG_SPAWN_AGENTS, "&Spawn Agents\tG");
+    menuDebug->Append(DEBUG_SPAWN_CARNIVORES, "&Spawn Carnivore Agents\tG");
+    menuDebug->Append(DEBUG_SPAWN_HERBIVORES, "&Spawn Herbivore Agents\tH");
     m_menuItemDeleteAgent = menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Agent\tDelete");
 
 	//-------------------------------------------------------------------------
@@ -377,12 +384,19 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 
 	//-------------------------------------------------------------------------
 	// Debug
-
-	case DEBUG_SPAWN_AGENTS:
+		
+	case DEBUG_SPAWN_CARNIVORES:
 		for (int i = 0; i < 10; i++)
 		{
 			m_simulationManager.GetSimulation()->
-				GetObjectManager()->SpawnObjectRandom<Agent>();
+				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
+		}
+		break;
+	case DEBUG_SPAWN_HERBIVORES:
+		for (int i = 0; i < 10; i++)
+		{
+			m_simulationManager.GetSimulation()->
+				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
 		}
 		break;
 	case DEBUG_DELETE_AGENT:

@@ -4,6 +4,10 @@
 #include <math/MathLib.h>
 
 
+//-----------------------------------------------------------------------------
+// InfoPanelItem
+//-----------------------------------------------------------------------------
+
 InfoPanelItem::InfoPanelItem() :
 	m_labelText("?"),
 	m_labelColor(Color::WHITE),
@@ -146,43 +150,57 @@ void InfoPanelItem::UpdateValueText()
 }
 
 
-InfoPanel::InfoPanel()
-{
 
+//-----------------------------------------------------------------------------
+// InfoPanel
+//-----------------------------------------------------------------------------
+
+InfoPanel::InfoPanel() :
+	m_font(nullptr),
+	m_title("Untitled")
+{
+	m_margin				= 6;
+	m_rowHeight				= 12;
+	m_rowSeparation			= 2;
+	m_titleHeight			= 20;
+	m_labelColProportion	= 0.5f;
+	m_valueColProportion	= 0.3f;
+	m_visualColProportion	= 0.2f;
+
+	// Dark theme
+	m_colorText			= Color::WHITE;
+	m_colorBorder		= Color::WHITE;
+	m_colorBackground	= Color::BLACK;
+	m_colorStripe1		= Color::BLACK;
+	m_colorStripe2		= Color(24, 24, 24);
+
+	// Light theme
+	//m_colorText			= Color::BLACK;
+	//m_colorBorder		= Color::BLACK;
+	//m_colorBackground	= Color::WHITE;
+	//m_colorStripe1		= Color::WHITE;
+	//m_colorStripe2		= Color(200, 200, 200);
 }
 
 Vector2f InfoPanel::GetMinimumSize() const
 {
-	float labelColWidth = 150;
-	float valueColWidth = 80;
-	float visualColWidth = 60;
-	float colWidth = labelColWidth + valueColWidth + visualColWidth;
-	float rowHeight = 12;
-	float rowSeparation = 2;
-	float titleHeight = 20;
+	int totalColWidth = 290; // miminum width
+
+	int valueColWidth = (int) (m_valueColProportion * totalColWidth);
+	int visualColWidth = (int) (m_visualColProportion * totalColWidth);
+	int labelColWidth = totalColWidth - valueColWidth - visualColWidth;
+	int colWidth = labelColWidth + valueColWidth + visualColWidth;
 	int numRows = (int) m_rows.size();
 
 	Vector2f size;
-	size.x = colWidth + (m_margin * 2);
-	size.y = titleHeight + (m_margin * 4) + (rowHeight * numRows) + (rowSeparation * (numRows - 1));
+	size.x = (float) colWidth + (m_margin * 2);
+	size.y = (float) m_titleHeight + (m_margin * 4) + (m_rowHeight * numRows) + (m_rowSeparation * (numRows - 1));
 	return size;
 }
 
 Vector2f InfoPanel::GetSize() const
 {
-	float labelColWidth = 150;
-	float valueColWidth = 80;
-	float visualColWidth = 60;
-	float colWidth = labelColWidth + valueColWidth + visualColWidth;
-	float rowHeight = 12;
-	float rowSeparation = 2;
-	float titleHeight = 20;
-	int numRows = (int) m_rows.size();
-
-	Vector2f size;
-	size.x = colWidth + (m_margin * 2);
-	size.y = titleHeight + (m_margin * 4) + (rowHeight * numRows) + (rowSeparation * (numRows - 1));
-	return size;
+	return GetMinimumSize();
 }
 
 void InfoPanel::Clear()
@@ -214,38 +232,37 @@ InfoPanelItem& InfoPanel::AddItem(const std::string& label, const std::string& v
 
 void InfoPanel::Draw(Graphics& g, const Rect2f& bounds)
 {
+	//-------------------------------------------------------------------------
+	// Calculate positions and sizes.
+
+	int rowSeparationUpper = m_rowSeparation / 2;
+	int rowSeparationLower = (m_rowSeparation - rowSeparationUpper);
+
 	Vector2f position = bounds.position;
 
 	int numRows = (int) m_rows.size();
 
-	m_margin = 6;
+	int totalColWidth = (int) bounds.size.x - (m_margin * 2);
+	int valueColWidth = (int) (m_valueColProportion * totalColWidth);
+	int visualColWidth = (int) (m_visualColProportion * totalColWidth);
+	int labelColWidth = totalColWidth - valueColWidth - visualColWidth;
+	int colWidth = labelColWidth + valueColWidth + visualColWidth;
+	
+	Vector2f rowHalfHeight(0.0f, m_rowHeight * 0.5f);
 
-	float totalColWidth = bounds.size.x - (m_margin * 2);
-	float labelColWidth = 0.5f * totalColWidth;
-	float valueColWidth = 0.3f * totalColWidth;
-	float visualColWidth = 0.2f * totalColWidth;
-
-	//float labelColWidth = 150;
-	//float valueColWidth = 80;
-	//float visualColWidth = 60;
-	float colWidth = labelColWidth + valueColWidth + visualColWidth;
-	float rowHeight = 12;
-	float rowSeparation = 2;
-	float titleMargin = 20;
-
-	Vector2f rowHalfHeight(0.0f, rowHeight * 0.5f);
-
-	Rect2f titleBox(position.x, position.y, colWidth, titleMargin);
+	Rect2f titleBox(position.x, position.y, (float) colWidth, (float) m_titleHeight);
 	titleBox.size += Vector2f(m_margin * 2.0f);
-	Rect2f contentBox(position.x, titleBox.GetBottom(), colWidth,
-		(rowHeight * numRows) + (rowSeparation * (numRows - 1)));
+	Rect2f contentBox(position.x, titleBox.GetBottom(), (float) colWidth,
+		(float) (m_rowHeight * numRows) + (m_rowSeparation * (numRows - 1)));
 	contentBox.size += Vector2f(m_margin * 2.0f);
 	Rect2f panelBox = titleBox;
 	panelBox.size.y += contentBox.size.y;
 	Vector2f rowPos = contentBox.position + Vector2f((float) m_margin);
 	
+	//-------------------------------------------------------------------------
+
 	// Fill panel background.
-	g.FillRect(panelBox, Color::BLACK);
+	g.FillRect(panelBox, m_colorBackground);
 
 	// Draw rows.
 	for (unsigned int i = 0; i < m_rows.size(); ++i)
@@ -253,28 +270,28 @@ void InfoPanel::Draw(Graphics& g, const Rect2f& bounds)
 		InfoPanelItem& item = m_rows[i];
 		
 		Vector2f labelPos = rowPos;
-		Vector2f valuePos = rowPos + Vector2f(labelColWidth, 0);
-		Vector2f visualPos = valuePos + Vector2f(valueColWidth, 0);
+		Vector2f valuePos = rowPos + Vector2f((float) labelColWidth, 0);
+		Vector2f visualPos = valuePos + Vector2f((float) valueColWidth, 0);
 
-		Rect2f rowBox(rowPos.x, rowPos.y, colWidth, rowHeight);
+		Rect2f rowBox(rowPos.x, rowPos.y, (float) colWidth, (float) m_rowHeight);
 		if (i > 0)
-			rowBox.Inflate(0, rowSeparation * 0.5f, 0, 0);
+			rowBox.Inflate(0, (float) rowSeparationUpper, 0, 0);
 		if (i < m_rows.size() - 1)
-			rowBox.Inflate(0, 0, 0, rowSeparation * 0.5f);
-
-		Color rowColor = Color::BLACK;
-		if (i % 2 == 1)
-			rowColor = Color(24, 24, 24);
+			rowBox.Inflate(0, 0, 0, (float) rowSeparationLower);
 
 		// Draw row background.
+		Color rowColor = (i % 2 == 0 ? m_colorStripe1 : m_colorStripe2);
 		g.FillRect(rowBox, rowColor);
 
 		// Draw label and value text.
 		item.UpdateValueText();
-		g.DrawString(m_font, item.m_labelText, labelPos + rowHalfHeight, item.m_labelColor, TextAlign::MIDDLE_LEFT);
-		g.DrawString(m_font, item.m_valueText, valuePos + rowHalfHeight, item.m_valueColor, TextAlign::MIDDLE_LEFT);
+		g.DrawString(m_font, item.m_labelText, labelPos + rowHalfHeight,
+			m_colorText, TextAlign::MIDDLE_LEFT);
+		g.DrawString(m_font, item.m_valueText, valuePos + rowHalfHeight,
+			m_colorText, TextAlign::MIDDLE_LEFT);
 
-		Rect2f visualBox(visualPos.x, visualPos.y, visualColWidth, rowHeight);
+		Rect2f visualBox(visualPos.x, visualPos.y,
+			(float) visualColWidth, (float) m_rowHeight);
 
 		// Draw visual.
 		if (item.m_visualType == InfoPanelItem::VISUAL_BAR)
@@ -320,16 +337,17 @@ void InfoPanel::Draw(Graphics& g, const Rect2f& bounds)
 			g.FillRect(visualBox, item.m_visualColor);
 		}
 
-		rowPos.y += rowHeight + rowSeparation;
+		rowPos.y += m_rowHeight + m_rowSeparation;
 	}
 	
 	// Draw title.
 	Vector2f titlePos = titleBox.GetCenter();
-	g.DrawString(m_font, m_title, titlePos, Color::WHITE, TextAlign::CENTERED);
+	g.DrawString(m_font, m_title, titlePos,
+		m_colorText, TextAlign::CENTERED);
 
 	// Draw panel borders.
-	g.DrawRect(titleBox, Color::WHITE);
-	g.DrawRect(contentBox, Color::WHITE);
+	g.DrawRect(titleBox, m_colorBorder);
+	g.DrawRect(contentBox, m_colorBorder);
 }
 
 

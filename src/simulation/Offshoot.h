@@ -29,7 +29,7 @@ public:
 	void Write(std::ofstream& fileOut) override;
 
 	// Eat this plant offshoot. Returns the amount of energy eaten.
-	float Eat();
+	float Eat(float amount);
 
 private:
 	Plant* m_source;

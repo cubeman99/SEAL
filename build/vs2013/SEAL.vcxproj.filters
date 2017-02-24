@@ -102,9 +102,6 @@
     <ClCompile Include="..\..\src\interface\OpenGLContext.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp">
-      <Filter>Source Files\interface</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\interface\SimulationWindow.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
@@ -234,6 +231,9 @@
     <ClCompile Include="..\..\src\interface\InfoPanelCanvas.cpp">
       <Filter>Source Files\interface\canvas</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp">
+      <Filter>Source Files\interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -291,9 +291,6 @@
       <Filter>Source Files\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\interface\OpenGLContext.h">
-      <Filter>Source Files\interface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h">
       <Filter>Source Files\interface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\interface\SimulationWindow.h">
@@ -427,6 +424,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\GraphCanvas.h">
       <Filter>Source Files\interface\canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h">
+      <Filter>Source Files\interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

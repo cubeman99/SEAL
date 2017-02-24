@@ -28,12 +28,8 @@ wxEND_EVENT_TABLE()
 // Constructor & destructor
 //-----------------------------------------------------------------------------
 
-SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow, int* attribList)
-    // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
-    // flag should always be set, because even making the canvas smaller should
-    // be followed by a paint event that updates the entire canvas with new
-    // viewport settings.
-    : wxGLCanvas(parent, wxID_ANY, attribList,
+SimulationRenderPanel::SimulationRenderPanel(wxWindow* parent, SimulationWindow* simulationWindow) :
+    wxGLCanvas(parent, wxID_ANY, nullptr,
                  wxDefaultPosition, wxDefaultSize,
                  wxFULL_REPAINT_ON_RESIZE)
 {

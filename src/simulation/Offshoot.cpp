@@ -98,10 +98,8 @@ void Offshoot::Write(std::ofstream& fileOut)
 	}
 }
 
-float Offshoot::Eat()
+float Offshoot::Eat(float amount)
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
-	float amount = config.plant.eatEnergyDepletionRate;
 	float energyEaten = Math::Min(m_energy, amount);
 
 	// Deplete the energy.

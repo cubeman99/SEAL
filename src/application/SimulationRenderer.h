@@ -52,7 +52,8 @@ private:
 
 	// Resources
 	Font* m_font;
-	Mesh* m_agentMesh;
+	Mesh* m_agentMeshHerbivore;
+	Mesh* m_agentMeshCarnivore;
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;
 	Mesh* m_meshSelectionCircle;

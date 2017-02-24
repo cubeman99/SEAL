@@ -12,6 +12,13 @@
 class Offshoot;
 
 
+enum Species
+{
+	SPECIES_HERBIVORE,
+	SPECIES_CARNIVORE,
+};
+
+
 //-----------------------------------------------------------------------------
 // Agent - A single being of the simulation with its own body and brain.
 //-----------------------------------------------------------------------------
@@ -24,10 +31,10 @@ public:
 	// Constructors & destructor
 
 	// Adam and Eve constructor
-	Agent();
+	Agent(Species species = SPECIES_HERBIVORE);
 	
 	// Natural born constructor
-	Agent(Genome* genome, float energy);
+	Agent(Genome* genome, float energy, Species species);
 
 	~Agent();
 
@@ -47,11 +54,14 @@ public:
 	void UpdateBrain();
 	void SeeObject(SimulationObject* object);
 	void EatPlant(Offshoot* plant);
-	void Mate(Agent* agent);
+	void Mate(Agent* other);
+	void Attack(Agent* other);
+	void OnTouchAgent(Agent* other);
 
 	//-------------------------------------------------------------------------
 	// Getters
-
+	
+	inline Species GetSpecies() const { return m_species; }
 	inline int GetAge() const { return m_age; }
 	inline float GetEnergy() const { return m_energy; }
 	inline float GetEnergyPercent() const { return (m_energy / m_maxEnergy); }
@@ -100,8 +110,11 @@ private:
 	Nerve*			m_nerveMoveSpeed;
 	Nerve*			m_nerveTurnSpeed;
 
+	Species			m_species;
+
 	int				m_age;
 	float			m_energy;
+	float			m_healthEnergy;
 	float			m_fitness;
 	float			m_moveAmount;
 	float			m_turnAmount;
@@ -109,7 +122,7 @@ private:
 	float			m_turnSpeed; // Radians per second.
 	int				m_mateWaitTime;
 	float			m_energyUsage;
-
+	
 	// Genome determined
 	float			m_strength;
 	float			m_maxMoveSpeed;

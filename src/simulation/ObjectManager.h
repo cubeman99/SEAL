@@ -57,6 +57,7 @@ public:
 	
 	// Spawn an object into the simulation.
 	void SpawnObject(SimulationObject* object);
+	void SpawnObjectRandom(SimulationObject* object);
 	bool SpawnObjectSerialized(std::ifstream& fileIn);
 
 	// Construct and spawn an object into the simulation at a random position.

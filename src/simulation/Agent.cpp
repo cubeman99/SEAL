@@ -5,25 +5,33 @@
 #include <math/MathLib.h>
 #include <math/Vector2f.h>
 
+
+//-----------------------------------------------------------------------------
+// Constructors & destructor
+//-----------------------------------------------------------------------------
+
 // Adam and Eve constructor
-Agent::Agent() :
+Agent::Agent(Species species) :
 	m_moveSpeed(0.0f),
 	m_turnSpeed(0.0f),
 	m_numEyes(2),
 	m_genome(nullptr),
 	m_brain(nullptr),
-	m_energyUsage(0.0f)
+	m_energyUsage(0.0f),
+	m_species(species)
 {
 }
 
 // Natural born constructor
-Agent::Agent(Genome* genome, float energy) :
+Agent::Agent(Genome* genome, float energy, Species species) :
 	m_moveSpeed(0.0f),
 	m_turnSpeed(0.0f),
 	m_numEyes(2),
 	m_genome(genome),
 	m_energy(energy),
-	m_brain(nullptr)
+	m_healthEnergy(energy),
+	m_brain(nullptr),
+	m_species(species)
 {
 }
 
@@ -34,6 +42,11 @@ Agent::~Agent()
 	delete m_genome;
 	m_genome = nullptr;
 }
+
+
+//-----------------------------------------------------------------------------
+// Simulation object methods
+//-----------------------------------------------------------------------------
 
 void Agent::OnSpawn()
 {
@@ -58,7 +71,6 @@ void Agent::OnSpawn()
 	if (m_genome == nullptr)
 	{
 		m_genome = new Genome(GetSimulation(), true);
-		//m_energy = 100.0f;
 		adamAndEve = true;
 	}
 
@@ -146,6 +158,11 @@ void Agent::OnSpawn()
 		config.agent.radiusAtMaxStrength,
 		m_strength);
 
+	if (m_species == SPECIES_HERBIVORE)
+		m_color.Set(0, 0, 1);
+	else if (m_species == SPECIES_CARNIVORE)
+		m_color.Set(1, 0, 0);
+
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
@@ -153,6 +170,7 @@ void Agent::OnSpawn()
 	if (adamAndEve)
 	{
 		m_energy = m_maxEnergy * 0.70f;
+		m_healthEnergy = m_energy;
 	}
 }
 
@@ -322,6 +340,11 @@ void Agent::Write(std::ofstream& fileOut)
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+// Agent methods
+//-----------------------------------------------------------------------------
+
 void Agent::UpdateVision()
 {
 	// Update eye matrices.
@@ -344,7 +367,10 @@ void Agent::UpdateVision()
 	m_eyes[1].ClearSightValues();
 	
 	std::vector<Agent*> agentMateCollisions;
+	std::vector<Agent*> agentCollisions;
 
+	//bool canEatPlants = (m_species == SPECIES_HERBIVORE);
+	bool canEatPlants = true;
 	bool canMate = (m_mateWaitTime == 0 && GetSimulation()->IsMatingSeason());
 
 	// Query the octtree for objects within vision range.
@@ -362,7 +388,7 @@ void Agent::UpdateVision()
 
 			// Check for collisions with food.
 			if (object->GetObjectType() == SimulationObjectType::OFFSHOOT &&
-				distSqr < contactDist * contactDist)
+				distSqr < contactDist * contactDist && canEatPlants)
 			{
 				EatPlant((Offshoot*) object);
 			}
@@ -375,6 +401,13 @@ void Agent::UpdateVision()
 				agentMateCollisions.push_back((Agent*) object);
 			}
 
+			// Check for collision with another agent.
+			if (object->GetObjectType() == SimulationObjectType::AGENT &&
+				distSqr < contactDist * contactDist)
+			{
+				agentCollisions.push_back((Agent*) object);
+			}
+
 			// Attempt to see the object.
 			if (object->IsVisible())
 			{
@@ -382,6 +415,11 @@ void Agent::UpdateVision()
 			}
 		}
 	});
+
+	for (unsigned int i = 0; i < agentCollisions.size(); ++i)
+	{
+		OnTouchAgent(agentCollisions[i]);
+	}
 
 	// Attempt to mate with detected nearby agents.
 	for (unsigned int i = 0; i < agentMateCollisions.size(); ++i)
@@ -394,17 +432,52 @@ void Agent::EatPlant(Offshoot* plant)
 {
 	if (m_energy < m_maxEnergy)
 	{
-		float energyAmount = plant->Eat();
-		m_energy += energyAmount;
-		m_energy = Math::Clamp(m_energy, 0.0f, m_maxEnergy);
-		m_fitness += energyAmount;
+		const SimulationConfig& config = GetSimulation()->GetConfig();
+
+		if (m_species == SPECIES_HERBIVORE)
+		{
+			float eatAmount = Math::Min(config.plant.eatEnergyDepletionRate, m_maxEnergy - m_energy);
+			float energyAmount = plant->Eat(eatAmount);
+			m_energy = Math::Min(m_energy + energyAmount, m_maxEnergy);
+			m_healthEnergy = Math::Min(m_healthEnergy + energyAmount, m_maxEnergy);
+			m_fitness += energyAmount;
+		}
+		else
+		{
+			plant->Eat(config.plant.eatEnergyDepletionRate);
+		}
+	}
+}
+
+void Agent::OnTouchAgent(Agent* other)
+{
+	if (m_species == SPECIES_CARNIVORE &&
+		other->m_species == SPECIES_HERBIVORE)
+	{
+		Attack(other);
+	}
+}
+
+void Agent::Attack(Agent* other)
+{
+	// TODO: use strength attack algorithm thingy.
+
+	float attackAmount = (m_maxEnergy - m_energy) / m_maxEnergy;
+
+	other->m_healthEnergy -= attackAmount;
+
+	if (other->m_healthEnergy <= 0.0f)
+	{
+		m_energy = Math::Min(m_energy + other->m_energy, m_maxEnergy);
+		other->m_healthEnergy = 0.0f;
+		other->Destroy();
 	}
 }
 
 void Agent::Mate(Agent* mate)
 {
 	// Make sure only one agent of the pair will call this method.
-	if (GetId() < mate->GetId())
+	if (GetId() < mate->GetId() || m_species != mate->m_species)
 		return;
 
 	const SimulationConfig& config = GetSimulation()->GetConfig();
@@ -417,6 +490,10 @@ void Agent::Mate(Agent* mate)
 	float avgNumChildrenGene =
 		(parents[0]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT) +
 		parents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
+
+	if (m_species == SPECIES_CARNIVORE)
+		avgNumChildrenGene *= 0.5f;
+
 	int maxNumChildren = (int) (Math::Lerp((float) config.genes.minChildren,
 		(float) config.genes.maxChildren, avgNumChildrenGene) + 0.5f);
 	if (maxNumChildren < 1)
@@ -443,6 +520,7 @@ void Agent::Mate(Agent* mate)
 	if (actualNumChildren == 0)
 	{
 		// Small delay to decrease the unnecessary use of this function
+		// TODO: magic numbers
 		parents[0]->m_mateWaitTime = 20;
 		parents[1]->m_mateWaitTime = 20;
 		return;
@@ -454,6 +532,11 @@ void Agent::Mate(Agent* mate)
 	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 	parents[0]->m_mateWaitTime = config.agent.matingDelay;
 	parents[1]->m_mateWaitTime = config.agent.matingDelay;
+	if (m_species == SPECIES_CARNIVORE)
+	{
+		parents[0]->m_mateWaitTime = config.agent.matingDelay * 5;
+		parents[1]->m_mateWaitTime = config.agent.matingDelay * 5;
+	}
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)
@@ -463,7 +546,7 @@ void Agent::Mate(Agent* mate)
 			parents[0]->GetGenome(),
 			parents[1]->GetGenome(),
 			GetSimulation());
-		Agent* child = new Agent(childGenome, energyPerChild);
+		Agent* child = new Agent(childGenome, energyPerChild, m_species);
 
 		// Set the child's position and orientation.
 		Vector3f childPos = (parents[0]->GetPosition() +

@@ -7,21 +7,23 @@ SimulationConfig::SimulationConfig()
 	// Setup some default values for debug purposes.
 
 	world.radius					= 160.0f; // gives a circumference of about 1000
+	world.radius					= 150; // gives a circumference of about 1000
 	world.seed						= -1;
 	plant.radius					= 2.5f;
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 10;
-	plant.numOffshootsPerPlant		= 6;
+	plant.numPlants					= 15;
+	plant.numOffshootsPerPlant		= 10;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
-	plant.eatEnergyDepletionRate	= 10.0f;
+	plant.eatEnergyDepletionRate	= 5.0f;
 
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 60;
-	agent.minPredatorAgents			= 10;
+
+	agent.minPredatorAgents			= 0;
 	agent.minPredatorAgents			= 80;
 	agent.minPreyAgents				= 20; 
 	agent.maxPreyAgents				= 160;

@@ -124,7 +124,12 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 	object->m_objectManager = this;				// this doesn't exceed INT_MAX
 	object->m_isDestroyed = false;
 	object->OnSpawn();
+}
 
+void ObjectManager::SpawnObjectRandom(SimulationObject* object)
+{
+	CreateRandomPositionAndOrientation(object->m_position, object->m_orientation);
+	SpawnObject(object);
 }
 
 bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)

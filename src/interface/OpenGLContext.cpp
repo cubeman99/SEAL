@@ -52,27 +52,16 @@ static wxString glGetwxString(GLenum name)
 // OpenGLContext
 //-----------------------------------------------------------------------------
 
-OpenGLContext::OpenGLContext(wxGLCanvas *canvas)
-             : wxGLContext(canvas)
+OpenGLContext::OpenGLContext(wxGLCanvas* canvas) :
+	wxGLContext(canvas)
 {
     SetCurrent(*canvas);
 	
     // set up the parameters we want to use
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT0);
     glEnable(GL_TEXTURE_2D);
 
-    // add slightly more light, the default lighting is rather dark
-    //GLfloat ambient[] = { 0.5, 0.5, 0.5, 0.5 };
-    //glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-
-    // set viewing projection
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
-	
 	// Initialize GLEW.
 	glewInit();
 

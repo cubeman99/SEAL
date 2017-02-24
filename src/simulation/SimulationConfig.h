@@ -26,6 +26,9 @@ public:
 	
 	struct
 	{
+		//herbivore
+		//carnivore 
+
 		int		minPreyAgents;
 		int		maxPreyAgents;
 		int		minPredatorAgents;
