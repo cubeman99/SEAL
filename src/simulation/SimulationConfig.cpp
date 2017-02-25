@@ -23,9 +23,8 @@ SimulationConfig::SimulationConfig()
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 60;
 
-	agent.minPredatorAgents			= 0;
-	agent.minPredatorAgents			= 80;
-	agent.minPreyAgents				= 20; 
+	agent.minPredatorAgents			= 10;
+	agent.minPreyAgents				= 30;
 	agent.maxPreyAgents				= 160;
 	agent.radiusAtMinStrength		= 4.0f;
 	agent.radiusAtMaxStrength		= 6.0f;

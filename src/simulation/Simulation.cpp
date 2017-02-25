@@ -80,13 +80,33 @@ void Simulation::Tick()
 	m_ageInTicks++;
 	m_objectManager.UpdateObjects();
 	
+	
+	// Cumulatively add statistic values for each agent.
+	unsigned int numAgents[2] = { 0, 0 };
+	for (auto it = m_objectManager.agents_begin();
+		it != m_objectManager.agents_end(); ++it)
+	{
+		numAgents[(int) it->GetSpecies()]++;
+	}
+	int herbsToAdd = m_config.agent.minPreyAgents - numAgents[SPECIES_HERBIVORE];
+	if (herbsToAdd > 0)
+	{
+		for (int i = 0; i < herbsToAdd; ++i)
+			m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
+	}
+	int carnsToAdd = m_config.agent.minPredatorAgents - numAgents[SPECIES_CARNIVORE];
+	if (carnsToAdd > 0)
+	{
+		for (int i = 0; i < carnsToAdd; ++i)
+			m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
+	}
+
+
+
 	// Advance to the next generation.
 	m_generationAge++;
 	if (m_generationAge >= m_generationDuration)
 	{
-		//UpdateStatistics();
-		//m_generationStats.push_back(m_statistics);
-
 		NextGeneration();
 	}
 	UpdateStatistics();
