@@ -227,10 +227,10 @@ void GraphManager::OnNewSimulation(Simulation* simulation)
 	CREATE_GRAPH_FLOAT("Avg Color Green", avgGeneValue[GenePosition::COLOR_GREEN], Color::GREEN).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Color Blue", avgGeneValue[GenePosition::COLOR_BLUE], blue).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Lifespan", avgGeneValue[GenePosition::LIFE_SPAN], Color::MAGENTA).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Strength", avgGeneValue[GenePosition::STRENGTH], Color::MAGENTA).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Child Count", avgGeneValue[GenePosition::CHILD_COUNT], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Strength", avgGeneValue[GenePosition::STRENGTH], Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Child Count", avgGeneValue[GenePosition::CHILD_COUNT], Color::GREEN).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Mutation Rate", avgGeneValue[GenePosition::MUTATION_RATE], Color::MAGENTA).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Crossover Points", avgGeneValue[GenePosition::CROSSOVER_POINTS], Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Crossover Points", avgGeneValue[GenePosition::CROSSOVER_POINTS], Color::YELLOW).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Field of View", avgGeneValue[GenePosition::FIELD_OF_VIEW], Color::GREEN).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Angle Between Eyes", avgGeneValue[GenePosition::ANGLE_BETWEEN_EYES], orange).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Sight Distance", avgGeneValue[GenePosition::VIEW_DISTANCE], Color::CYAN).SetRange(zeroToOne);

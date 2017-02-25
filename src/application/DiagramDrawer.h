@@ -19,6 +19,13 @@ public:
 	void DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bounds);
 	void DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& bounds);
 
+	void DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned int numGraphs, const Rect2f& bounds);
+
+	inline Font* GetFont() const { return m_font; }
+
+private:
+
+	void CalcGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax);
 
 private:
 	SimulationManager* m_simulationManager;

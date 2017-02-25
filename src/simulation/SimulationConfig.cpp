@@ -49,8 +49,9 @@ SimulationConfig::SimulationConfig()
 	
 	herbivore.genes.minChildren				= 1;
 	herbivore.genes.maxChildren				= 3;
-	herbivore.genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
-	herbivore.genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
+	//herbivore.genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
+	herbivore.genes.minMutationRate			= 0.02f;	// 1 in 50 genes
+	herbivore.genes.maxMutationRate			= 0.1f;		// 1 in 10 genes
 	herbivore.genes.minCrossoverPoints		= 1;
 	herbivore.genes.maxCrossoverPoints		= 4;
 	herbivore.genes.maxInternalNeurons		= 20;		// TODO: tinker
@@ -105,7 +106,7 @@ SimulationConfig::SimulationConfig()
 	
 	carnivore.energy.energyCostExist		= 0.006f;
 	carnivore.energy.energyCostMove			= 0.014f;
-	carnivore.energy.energyCostTurn			= 0.035f;
+	carnivore.energy.energyCostTurn			= 0.035f; // increased this to try prevent meat grinders
 }
 
 

@@ -142,11 +142,67 @@ void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bou
 }
 
 
-void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect)
+
+void DiagramDrawer::CalcGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax)
 {
 	Simulation* simulation = m_simulationManager->GetSimulation();
 	SimulationStats* stats = simulation->m_generationStats.data();
 	unsigned int numStats = simulation->m_generationStats.size();
+
+	//-------------------------------------------------------------------------
+	// Calculate view bounds.
+
+	const GraphRange& range = graph.GetRange();
+
+	for (unsigned int i = 0; i < numStats; ++i)
+	{
+		float x = (float) i;
+		float y = graph.GetData(stats + i);
+		if (i == 0 || y < rangeMin) rangeMin = y;
+		if (i == 0 || y > rangeMax) rangeMax = y;
+	}
+
+	float rangeSpan = rangeMax - rangeMin;
+
+	//-------------------------------------------------------------------------
+	// Adjust view bounds range for fixed or dynamic clamped ranges.
+
+	if (range.minType == GraphRange::FIXED)
+	{
+		rangeMin = range.minValue;
+	}
+	else
+	{
+		rangeMin -= range.dynamicPaddingPercent * rangeSpan;
+		if (range.minType == GraphRange::DYNAMIC_CLAMPED && rangeMin > range.minValue)
+			rangeMin = range.minValue;
+	}
+	if (range.maxType == GraphRange::FIXED)
+	{
+		rangeMax = range.maxValue;
+	}
+	else
+	{
+		rangeMax += range.dynamicPaddingPercent * rangeSpan;
+		if (range.maxType == GraphRange::DYNAMIC_CLAMPED && rangeMax < range.maxValue)
+			rangeMax = range.maxValue;
+	}
+	if (rangeMax - rangeMin == 0.0f)
+		rangeMax = rangeMin + 1.0f;
+}
+
+void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect)
+{
+	DrawGraphs(g, &graph, 1, rect);
+}
+
+void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned int numGraphs, const Rect2f& rect)
+{
+	Simulation* simulation = m_simulationManager->GetSimulation();
+	SimulationStats* stats = simulation->m_generationStats.data();
+	unsigned int numStats = simulation->m_generationStats.size();
+	std::string title = graphs[0].GetTitle();
+	int dataType = graphs[0].GetDataType();
 
 	//-------------------------------------------------------------------------
 	// Visual options.
@@ -161,61 +217,29 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 	int padding = 6;
 
 	//-------------------------------------------------------------------------
-	// Calculate view bounds.
+	// Calculate view range.
 
-	const GraphRange& range = graph.GetRange();
-
-	Vector2f mins;
-	Vector2f maxs;
-	for (unsigned int i = 0; i < numStats; ++i)
+	float rangeMin;
+	float rangeMax;
+	float r0, r1;
+	CalcGraphRange(graphs[0], rangeMin, rangeMax);
+	for (unsigned int i = 1; i < numGraphs; ++i)
 	{
-		float x = (float) i;
-		float y = graph.GetData(stats + i);
-		if (i == 0 || x < mins.x) mins.x = x;
-		if (i == 0 || y < mins.y) mins.y = y;
-		if (i == 0 || x > maxs.x) maxs.x = x;
-		if (i == 0 || y > maxs.y) maxs.y = y;
+		CalcGraphRange(graphs[0], r0, r1);
+		rangeMin = Math::Min(rangeMin, r0);
+		rangeMax = Math::Min(rangeMax, r1);
 	}
-
-	float rangeSpan = maxs.y - mins.y;
-
-	//-------------------------------------------------------------------------
-	// Adjust view bounds range for fixed or dynamic clamped ranges.
-
-	if (range.minType == GraphRange::FIXED)
-	{
-		mins.y = range.minValue;
-	}
-	else
-	{
-		mins.y -= range.dynamicPaddingPercent * rangeSpan;
-		if (range.minType == GraphRange::DYNAMIC_CLAMPED && mins.y > range.minValue)
-			mins.y = range.minValue;
-	}
-	if (range.maxType == GraphRange::FIXED)
-	{
-		maxs.y = range.maxValue;
-	}
-	else
-	{
-		maxs.y += range.dynamicPaddingPercent * rangeSpan;
-		if (range.maxType == GraphRange::DYNAMIC_CLAMPED && maxs.y < range.maxValue)
-			maxs.y = range.maxValue;
-	}
-	if (maxs.y - mins.y == 0.0f)
-		maxs.y = mins.y + 1.0f;
 
 	//-------------------------------------------------------------------------
 	// Determine range label strings and graph area rectangle.
 
 	// Find a good precision to display range labels at.
 	int precision = 0;
-	int dataType = graph.GetDataType();
 	if (dataType == GraphInfo::TYPE_FLOAT ||
 		dataType == GraphInfo::TYPE_DOUBLE)
 	{
 		float largestRangeNumber = Math::Max(
-			Math::Abs(mins.y), Math::Abs(maxs.y));
+			Math::Abs(rangeMin), Math::Abs(rangeMax));
 		if (largestRangeNumber < 0.1f)
 			precision = 4;
 		else if (largestRangeNumber < 1.0f)
@@ -230,14 +254,14 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 	std::stringstream ss;
 	ss.setf(std::ios::fixed, std::ios::floatfield);
 	ss.precision(precision);
-	ss << mins.y;
+	ss << rangeMin;
 	std::string labelMin = ss.str();
 	ss.str("");
-	ss << maxs.y;
+	ss << rangeMax;
 	std::string labelMax = ss.str();
 
 	// Measure the text sizes.
-	Vector2f titleSize = g.MeasureString(m_font, graph.GetTitle());
+	Vector2f titleSize = g.MeasureString(m_font, title);
 	Vector2f labelMinSize = g.MeasureString(m_font, labelMin);
 	Vector2f labelMaxSize = g.MeasureString(m_font, labelMax);
 	float labelWidth = Math::Max(labelMinSize.x, labelMaxSize.x);
@@ -294,7 +318,7 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 		colorLabels, TextAlign::MIDDLE_RIGHT);
 
 	// Draw title
-	g.DrawString(m_font, graph.GetTitle(),
+	g.DrawString(m_font, title,
 		Math::Floor(rect.position.x + (float) (rect.size.x / 2)),
 		Math::Floor(rect.position.y + (float) padding),
 		colorLabels, TextAlign::TOP_CENTER);
@@ -303,25 +327,24 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 	
 	// Setup projection for graph view bounds.
 	Matrix4f viewBoundsProjection;
-	viewBoundsProjection.InitOrthographic(mins.x, maxs.x, mins.y, maxs.y, -1, 1);
+	viewBoundsProjection.InitOrthographic(0.0f, (float) numStats - 1, rangeMin, rangeMax, -1, 1);
 	g.SetViewport(Rect2i((int) graphRect.position.x,
 		(int) graphRect.position.y, (int) graphRect.size.x, (int) graphRect.size.y), true);
 	g.SetProjection(viewBoundsProjection);
 	
 	// Draw the graph line.
-	glBegin(GL_LINE_STRIP);
-	glColor4ubv(graph.GetColor().data());
-	for (unsigned int i = 0; i < numStats; ++i)
+	for (unsigned int graphIndex = 0; graphIndex < numGraphs; ++graphIndex)
 	{
-		float x = (float) i;
-		float y = graph.GetData(stats + i);
-		if (i == 0 && x < mins.x) mins.x = x;
-		if (i == 0 && y < mins.y) mins.y = y;
-		if (i == 0 && x > maxs.x) maxs.x = x;
-		if (i == 0 && y > maxs.y) maxs.y = y;
-		glVertex2f(x, y);
+		glBegin(GL_LINE_STRIP);
+		glColor4ubv(graphs[graphIndex].GetColor().data());
+		for (unsigned int i = 0; i < numStats; ++i)
+		{
+			float x = (float) i;
+			float y = graphs[graphIndex].GetData(stats + i);
+			glVertex2f(x, y);
+		}
+		glEnd();
 	}
-	glEnd();
 
 	g.SetViewportToCanvas();
 	g.SetCanvasProjection();

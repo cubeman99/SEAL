@@ -79,14 +79,57 @@ void GraphCanvas::OnPaint(wxPaintEvent& e)
 	
 	Vector2f graphSize(280, 84);
 	Rect2f graphBox(0.0f, 0.0f, canvasSize.x, 120);
+	graphBox.Inset(4, 0);
 	SimulationManager* simulationManager = m_simulationWindow->GetSimulationManager();
 
 	GraphInfo* graph = simulationManager->GetGraphManager()->GetGraph(m_graphIndex);
+
+	float labelHeight = 32;
+
+	Font* font = simulationManager->GetDiagramDrawer()->GetFont();
+	
+	//-----------------------------------------------------------------------------
+	// Draw herbivore graph.
+
+	graphBox.position.y += labelHeight * 0.5f;
+	m_graphics.DrawString(font, " Herbivores:", graphBox.position, Color::GREEN, TextAlign::MIDDLE_LEFT);
+	graphBox.position.y += labelHeight * 0.5f;
+
 	graph->SetSpecies(Species::SPECIES_HERBIVORE);
 	simulationManager->GetDiagramDrawer()->DrawGraph(m_graphics, *graph, graphBox);
-	graph->SetSpecies(Species::SPECIES_CARNIVORE);
 	graphBox.position.y += graphBox.size.y;
+	
+	//-----------------------------------------------------------------------------
+	// Draw the carnivore graph.
+
+	graphBox.position.y += labelHeight * 0.5f;
+	m_graphics.DrawString(font, " Carnivores:", graphBox.position, Color::RED, TextAlign::MIDDLE_LEFT);
+	graphBox.position.y += labelHeight * 0.5f;
+
+	graph->SetSpecies(Species::SPECIES_CARNIVORE);
 	simulationManager->GetDiagramDrawer()->DrawGraph(m_graphics, *graph, graphBox);
+	graphBox.position.y += graphBox.size.y;
+	
+	//-----------------------------------------------------------------------------
+	// Draw the two species graphs combined.
+
+	GraphInfo combinedGraphs[2];
+	combinedGraphs[0] = *graph;
+	combinedGraphs[0].SetSpecies(SPECIES_HERBIVORE);
+	combinedGraphs[0].SetColor(Color::GREEN);
+	combinedGraphs[1] = *graph;
+	combinedGraphs[1].SetSpecies(SPECIES_CARNIVORE);
+	combinedGraphs[1].SetColor(Color::RED);
+
+	graphBox.position.y += labelHeight * 0.5f;
+	m_graphics.DrawString(font, " Combined:", graphBox.position, Color::YELLOW, TextAlign::MIDDLE_LEFT);
+	graphBox.position.y += labelHeight * 0.5f;
+
+	graphBox.size.y *= 2.0f;
+	graph->SetSpecies(Species::SPECIES_CARNIVORE);
+	simulationManager->GetDiagramDrawer()->DrawGraphs(m_graphics, combinedGraphs, 2, graphBox);
+	graphBox.position.y += graphBox.size.y;
+
 
     SwapBuffers();
 }
