@@ -109,7 +109,8 @@ GraphInfo::GraphInfo(const std::string& title, int dataOffset) :
 	
 float GraphInfo::GetData(SimulationStats* stats) const
 {
-	char* rawData = ((char*) stats) + m_dataOffset;
+	char* rawData = ((char*) &stats->species[m_species]) + m_dataOffset;
+	//char* rawData = ((char*) stats) + m_dataOffset;
 
 	switch (m_dataType)
 	{
@@ -171,7 +172,7 @@ GraphInfo& GraphInfo::SetData(int dataOffset, DataType dataType)
 //-----------------------------------------------------------------------------
 
 #define CREATE_GRAPH_FLOAT(title, statName, color) \
-	AddGraph(GraphInfo()).SetTitle(title).SetData(offsetof(SimulationStats, statName), GraphInfo::TYPE_FLOAT).SetColor(color)
+	AddGraph(GraphInfo()).SetTitle(title).SetData(offsetof(SpeciesStats, statName), GraphInfo::TYPE_FLOAT).SetColor(color)
 
 
 GraphManager::GraphManager()

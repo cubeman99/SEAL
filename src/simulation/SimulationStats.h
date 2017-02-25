@@ -3,53 +3,34 @@
 
 #include "Genome.h"
 
-
-struct SimulationStats
+//-----------------------------------------------------------------------------
+// SpeciesStats - various statistics for a single agent species.
+//-----------------------------------------------------------------------------
+struct SpeciesStats
 {
 public:
 	//-------------------------------------------------------------------------
-	// Genes
+	// General
 
-	float avgGeneValue[GenePosition::PHYSIOLOGICAL_GENES_COUNT];
-
-	//float avgViewDistance;
-	//float avgFieldOfView;
-	//float avgAngleBetweenEyes;
-	//float avgResolutionRed;
-	//float avgResolutionGreen;
-	//float avgResolutionBlue;
-	//float avgMutationRate;
-	//float avgNumCrossoverPoints;
-	//float avgChildCount;
-	//float avgLifeSpan;
-	//float avgStrength;
-	//float avgColorRed;
-	//float avgColorGreen;
-	//float avgColorBlue;
+	float populationSize;
+	float totalEnergy;
+	float avgEnergy;
+	float avgEnergyUsage;
+	float avgFitness;
+	//float bestFitness;
 
 	//-------------------------------------------------------------------------
 	// Output neurons
 
 	float avgMoveAmount; // 0 to 1
 	float avgTurnAmount; // -1 to 1
-
+	
 	//-------------------------------------------------------------------------
-	// Performance
+	// Genes
 
-	int simulationAge;
+	float avgGeneValue[GenePosition::PHYSIOLOGICAL_GENES_COUNT];
 
-	float avgFitness;
-	//float bestFitness;
-	float totalEnergy;
-	float populationSize;
-	float avgEnergy;
-	float avgEnergyUsage;
-
-
-public:
-	//-------------------------------------------------------------------------
-
-	SimulationStats()
+	void Reset()
 	{
 		memset(avgGeneValue, 0, GenePosition::PHYSIOLOGICAL_GENES_COUNT * sizeof(float));
 
@@ -58,9 +39,47 @@ public:
 		avgEnergy = 0.0f;
 		avgEnergyUsage = 0.0f;
 		populationSize = 0;
-		simulationAge = 0;
 		avgMoveAmount = 0.0f;
 		avgTurnAmount = 0.0f;
+	}
+};
+
+
+//-----------------------------------------------------------------------------
+// SimulationStats - various simulation statistics.
+//-----------------------------------------------------------------------------
+struct SimulationStats
+{
+public:
+
+	int simulationAge;
+	
+
+	//-------------------------------------------------------------------------
+	// Species statistics
+
+	union
+	{
+		SpeciesStats species[2];
+
+		struct
+		{
+			SpeciesStats herbivore; // species[0]
+			SpeciesStats carnivore; // species[1]
+		};
+	};
+
+
+
+public:
+	//-------------------------------------------------------------------------
+
+	SimulationStats()
+	{
+		simulationAge = 0;
+
+		species[0].Reset();
+		species[1].Reset();
 	}
 };
 

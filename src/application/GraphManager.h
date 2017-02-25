@@ -77,6 +77,7 @@ public:
 	GraphInfo& SetRange(const GraphRange& range);
 	GraphInfo& SetData(int dataOffset, DataType dataType);
 
+	inline void SetSpecies(Species species) { m_species = species; }
 
 private:
 	std::string		m_title;
@@ -84,6 +85,7 @@ private:
 	GraphRange		m_range;
 	int				m_dataOffset;
 	DataType		m_dataType;
+	Species			m_species;
 };
 
 

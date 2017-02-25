@@ -82,6 +82,10 @@ void GraphCanvas::OnPaint(wxPaintEvent& e)
 	SimulationManager* simulationManager = m_simulationWindow->GetSimulationManager();
 
 	GraphInfo* graph = simulationManager->GetGraphManager()->GetGraph(m_graphIndex);
+	graph->SetSpecies(Species::SPECIES_HERBIVORE);
+	simulationManager->GetDiagramDrawer()->DrawGraph(m_graphics, *graph, graphBox);
+	graph->SetSpecies(Species::SPECIES_CARNIVORE);
+	graphBox.position.y += graphBox.size.y;
 	simulationManager->GetDiagramDrawer()->DrawGraph(m_graphics, *graph, graphBox);
 
     SwapBuffers();

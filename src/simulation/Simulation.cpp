@@ -177,32 +177,36 @@ void Simulation::UpdateStatistics()
 	stats.simulationAge = m_ageInTicks;
 
 	// Cumulatively add statistic values for each agent.
-	unsigned int numAgents = 0;
+	unsigned int numAgents[2] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
+		Species spec = it->GetSpecies();
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-			stats.avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
-		stats.avgFitness += it->GetFitness();
-		stats.totalEnergy += it->GetEnergy();
-		stats.avgEnergyUsage += it->GetEnergyUsage();
-		stats.avgMoveAmount += it->GetMoveAmount();
-		stats.avgTurnAmount += Math::Abs(it->GetTurnAmount());
-		stats.populationSize++;
-		numAgents++;
+			stats.species[spec].avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
+		stats.species[spec].avgFitness += it->GetFitness();
+		stats.species[spec].totalEnergy += it->GetEnergy();
+		stats.species[spec].avgEnergyUsage += it->GetEnergyUsage();
+		stats.species[spec].avgMoveAmount += it->GetMoveAmount();
+		stats.species[spec].avgTurnAmount += Math::Abs(it->GetTurnAmount());
+		stats.species[spec].populationSize++;
+		numAgents[spec]++;
 	}
 	
 	// Divide averages by agent count.
-	if (numAgents > 0)
+	for (unsigned int species = 0; species < 2; ++species)
 	{
-		float invNumAgents = 1.0f / numAgents;
-		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
-			stats.avgGeneValue[i] *= invNumAgents;
-		stats.avgEnergy = stats.totalEnergy * invNumAgents;
-		stats.avgEnergyUsage *= invNumAgents;
-		stats.avgFitness *= invNumAgents;
-		stats.avgMoveAmount *= invNumAgents;
-		stats.avgTurnAmount *= invNumAgents;
+		if (numAgents[species] > 0)
+		{
+			float invNumAgents = 1.0f / numAgents[species];
+			for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+				stats.species[species].avgGeneValue[i] *= invNumAgents;
+			stats.species[species].avgEnergy = stats.species[species].totalEnergy * invNumAgents;
+			stats.species[species].avgEnergyUsage *= invNumAgents;
+			stats.species[species].avgFitness *= invNumAgents;
+			stats.species[species].avgMoveAmount *= invNumAgents;
+			stats.species[species].avgTurnAmount *= invNumAgents;
+		}
 	}
 
 	m_statistics = stats;

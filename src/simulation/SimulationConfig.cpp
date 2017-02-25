@@ -102,6 +102,10 @@ SimulationConfig::SimulationConfig()
 	carnivore.genes.maxBodyColor[1]		= 0.0f;
 	carnivore.genes.minBodyColor[2]		= 0.0f;
 	carnivore.genes.maxBodyColor[2]		= 0.0f;
+	
+	carnivore.energy.energyCostExist		= 0.006f;
+	carnivore.energy.energyCostMove			= 0.014f;
+	carnivore.energy.energyCostTurn			= 0.035f;
 }
 
 
