@@ -206,7 +206,7 @@ void GraphManager::OnNewSimulation(Simulation* simulation)
 	
 	GraphRange rangePop;
 	rangePop.SetFixedMin(0.0f);
-	rangePop.SetDynamicMax((float) config.agent.maxPreyAgents);
+	rangePop.SetDynamicMax((float) config.herbivore.population.maxAgents);
 	zeroAndUp.SetDynamicRangePadding(0.1f);
 
 	Color blue(0, 106, 255);

@@ -9,29 +9,39 @@
 // Constructor & destructor
 //-----------------------------------------------------------------------------
 
-Genome::Genome(Simulation* theSimulation, bool randomized)	:
-	m_simulation(theSimulation)
+Genome::Genome(const SpeciesConfig& config)
 {	
-	m_genes.resize(DetermineGenomeSize(theSimulation));
-	
-	// Randomize all genes.
-	if (randomized)
-	{
-		Randomize();
-	}
+	m_genes.resize(DetermineGenomeSize(config));
 }
 
 Genome::~Genome()
 {
 }
 
-Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
-{
-	const SimulationConfig& config = theSimulation->GetConfig();
-	RNG& random = theSimulation->GetRandom();
 
+//-----------------------------------------------------------------------------
+// Genome operations
+//-----------------------------------------------------------------------------
+
+void Genome::Randomize(RNG& random)
+{
+	for (unsigned int i = 0; i < m_genes.size(); ++i)
+		m_genes[i] = (unsigned char) (random.NextInt() % 256);
+}
+
+int Genome::DetermineGenomeSize(const SpeciesConfig& config)
+{
+	unsigned int numOutputNeurons = 2;
+	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
+	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
+	return GenePosition::NUERON_GENES_BEGIN +
+		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
+}
+
+Genome* Genome::SpawnChild(Genome* p1, Genome* p2, const SpeciesConfig& config, RNG& random)
+{
 	// Given to the Agent class of the new agent to destroy when needed.
-	Genome* child = new Genome(theSimulation, false);
+	Genome* child = new Genome(config);
 	Genome* currentParent = p1;
 	const int GENOME_SIZE = (int)p1->m_genes.size();
 
@@ -143,27 +153,6 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation)
 	return child;
 }
 
-int Genome::DetermineGenomeSize(Simulation* theSimulation)
-{
-	const SimulationConfig& config = theSimulation->GetConfig();
-
-	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
-	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
-	return GenePosition::NUERON_GENES_BEGIN +
-		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));
-}
-
-//-----------------------------------------------------------------------------
-// Genome operations
-//-----------------------------------------------------------------------------
-
-void Genome::Randomize()
-{
-	RNG& random = m_simulation->GetRandom();
-	for (unsigned int i = 0; i < m_genes.size(); ++i)
-		m_genes[i] = (unsigned char) (random.NextInt() % 256);
-}
 
 //-----------------------------------------------------------------------------
 // Gene access
@@ -194,11 +183,8 @@ unsigned int Genome::GetGeneAsInt(unsigned int index, unsigned int minValue, uns
 // Neurogenetics
 //-----------------------------------------------------------------------------
 
-void Genome::GrowBrain(Brain* brain)
+void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 {
-	const SimulationConfig& config = m_simulation->GetConfig();
-	RNG& random = m_simulation->GetRandom();
-
 	//-------------------------------------------------------------------------
 	// Count up the input and output neurons.
 

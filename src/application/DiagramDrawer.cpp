@@ -20,8 +20,8 @@ void DiagramDrawer::Initialize()
 
 void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bounds)
 {
-	const SimulationConfig& config =
-		m_simulationManager->GetSimulation()->GetConfig();
+	const SpeciesConfig& config = m_simulationManager->
+		GetSimulation()->GetAgentConfig(agent->GetSpecies());
 	Brain* brain = agent->GetBrain();
 
 	unsigned int numNeurons = brain->GetNumNeurons();

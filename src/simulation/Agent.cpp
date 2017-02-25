@@ -50,7 +50,7 @@ Agent::~Agent()
 
 void Agent::OnSpawn()
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
 
 	m_manualOverride = false;
 
@@ -70,7 +70,8 @@ void Agent::OnSpawn()
 	// This is a sign that this agent is a first gen with no parents.
 	if (m_genome == nullptr)
 	{
-		m_genome = new Genome(GetSimulation(), true);
+		m_genome = new Genome(config);
+		m_genome->Randomize(GetSimulation()->GetRandom());
 		adamAndEve = true;
 	}
 
@@ -79,7 +80,7 @@ void Agent::OnSpawn()
 	{
 		// Grow the brain from the genome.
 		m_brain = new Brain();
-		m_genome->GrowBrain(m_brain);
+		m_genome->GrowBrain(m_brain, config, GetSimulation()->GetRandom());
 		m_brain->PreBirth(config.brain.numPrebirthCycles,
 			GetSimulation()->GetRandom());
 	}
@@ -158,11 +159,6 @@ void Agent::OnSpawn()
 		config.agent.radiusAtMaxStrength,
 		m_strength);
 
-	if (m_species == SPECIES_HERBIVORE)
-		m_color.Set(0, 0, 1);
-	else if (m_species == SPECIES_CARNIVORE)
-		m_color.Set(1, 0, 0);
-
 	// Configure eyes.
 	m_eyes[0].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
 	m_eyes[1].Configure(m_fieldOfView, m_maxViewDistance, 3, resolutions);
@@ -185,7 +181,7 @@ void Agent::OnDestroy()
 
 void Agent::Update()
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
 
 	UpdateVision();
 	UpdateBrain();
@@ -221,10 +217,10 @@ void Agent::Update()
 
 void Agent::Read(std::ifstream& fileIn)
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
-	unsigned char gene;
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
+
 	m_isSerialized = true;
-	m_genome = new Genome(GetSimulation(), false);
+	m_genome = new Genome(config);
 	m_brain = new Brain();
 
 	// Read basic info
@@ -238,11 +234,8 @@ void Agent::Read(std::ifstream& fileIn)
 	fileIn.read((char*)&m_fitness, sizeof(float));
 
 	// Read genome
-	for (int i = 0; i < Genome::DetermineGenomeSize(GetSimulation()); ++i)
-	{
-		fileIn.read((char*)&gene, sizeof(unsigned char));
-		m_genome->m_genes[i] = gene;
-	}
+	fileIn.read((char*)m_genome->GetData(),
+		m_genome->GetSize() * sizeof(unsigned char));
 
 	// Read brain
 	fileIn.read((char*)&m_brain->m_numNeurons, sizeof(unsigned int));
@@ -301,10 +294,7 @@ void Agent::Write(std::ofstream& fileOut)
 		fileOut.write((char*)&m_fitness, sizeof(float));
 
 		// Write genome
-		for (unsigned int i = 0; i < m_genome->m_genes.size(); ++i)
-		{
-			fileOut.write((char*)&m_genome->m_genes[i], sizeof(unsigned char));
-		}
+		fileOut.write((char*)m_genome->GetData(), m_genome->GetSize() * sizeof(unsigned char));
 
 		// Write brain
 		fileOut.write((char*)&m_brain->m_numNeurons, sizeof(unsigned int));
@@ -347,6 +337,8 @@ void Agent::Write(std::ofstream& fileOut)
 
 void Agent::UpdateVision()
 {
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
+
 	// Update eye matrices.
 	float zNear = 0.01f;
 	float zFar = m_maxViewDistance;
@@ -381,7 +373,7 @@ void Agent::UpdateVision()
 		if (object != this)
 		{
 			float contactDist = m_radius + object->GetRadius();
-			float matingDist = GetSimulation()->GetConfig().agent.minMatingDistance;
+			float matingDist = config.agent.minMatingDistance;
 			float distSqr = m_position.DistToSqr(object->GetPosition());
 
 			// TODO: Move collisions outside of UpdateVision()
@@ -476,11 +468,12 @@ void Agent::Attack(Agent* other)
 
 void Agent::Mate(Agent* mate)
 {
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
+
 	// Make sure only one agent of the pair will call this method.
 	if (GetId() < mate->GetId() || m_species != mate->m_species)
 		return;
 
-	const SimulationConfig& config = GetSimulation()->GetConfig();
 	float energyPercentAtMinChildren = 0.2f;
 	float energyPercentAtMaxChildren = 0.6f;
 
@@ -490,9 +483,6 @@ void Agent::Mate(Agent* mate)
 	float avgNumChildrenGene =
 		(parents[0]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT) +
 		parents[1]->GetGenome()->GetGeneAsFloat(GenePosition::CHILD_COUNT)) * 0.5f;
-
-	if (m_species == SPECIES_CARNIVORE)
-		avgNumChildrenGene *= 0.5f;
 
 	int maxNumChildren = (int) (Math::Lerp((float) config.genes.minChildren,
 		(float) config.genes.maxChildren, avgNumChildrenGene) + 0.5f);
@@ -532,20 +522,14 @@ void Agent::Mate(Agent* mate)
 	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 	parents[0]->m_mateWaitTime = config.agent.matingDelay;
 	parents[1]->m_mateWaitTime = config.agent.matingDelay;
-	if (m_species == SPECIES_CARNIVORE)
-	{
-		parents[0]->m_mateWaitTime = config.agent.matingDelay * 5;
-		parents[1]->m_mateWaitTime = config.agent.matingDelay * 5;
-	}
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)
 	{
 		// Crossover and mutate the genome.
 		Genome* childGenome = Genome::SpawnChild(
-			parents[0]->GetGenome(),
-			parents[1]->GetGenome(),
-			GetSimulation());
+			parents[0]->GetGenome(), parents[1]->GetGenome(),
+			config, GetSimulation()->GetRandom());
 		Agent* child = new Agent(childGenome, energyPerChild, m_species);
 
 		// Set the child's position and orientation.
@@ -628,7 +612,7 @@ void Agent::SeeObject(SimulationObject* object)
 
 void Agent::UpdateBrain()
 {
-	const SimulationConfig& config = GetSimulation()->GetConfig();
+	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
 	RNG& random = GetSimulation()->GetRandom();
 
 	//-------------------------------------------------------------------------

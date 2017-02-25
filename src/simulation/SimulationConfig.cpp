@@ -6,9 +6,12 @@ SimulationConfig::SimulationConfig()
 {
 	// Setup some default values for debug purposes.
 
-	world.radius					= 160.0f; // gives a circumference of about 1000
-	world.radius					= 150; // gives a circumference of about 1000
-	world.seed						= -1;
+	world.radius	= 150; // gives a circumference of about 1000
+	world.seed		= -1;
+
+	//-------------------------------------------------------------------------
+	// Plant
+
 	plant.radius					= 2.5f;
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
@@ -20,67 +23,85 @@ SimulationConfig::SimulationConfig()
 	plant.growthRate				= 0.05f;
 	plant.eatEnergyDepletionRate	= 5.0f;
 
-	agent.initialPredatorCount		= 10;
-	agent.initialPreyCount			= 60;
+	//-------------------------------------------------------------------------
+	// Carnivore
 
-	agent.minPredatorAgents			= 0;
-	agent.minPreyAgents				= 0;
-	agent.maxPreyAgents				= 160;
-	agent.radiusAtMinStrength		= 4.0f;
-	agent.radiusAtMaxStrength		= 6.0f;
-	agent.maxMoveSpeedAtMinStrength	= 0.7f;
-	agent.maxMoveSpeedAtMaxStrength	= 0.3f;
-	agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
-	agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
-	agent.maxEnergyAtMinStrength	= 50.0f;
-	agent.maxEnergyAtMaxStrength	= 100.0f;
-	agent.minMatingDistance			= 23.0f;
-	agent.matingDelay				= 60 * 4;
+	herbivore.population.initialAgents	= 60;
+	herbivore.population.minAgents		= 0;
+	herbivore.population.maxAgents		= 160;
 
-	energy.energyCostExist			= 0.006f;
-	energy.energyCostMove			= 0.014f;
-	energy.energyCostTurn			= 0.014f;
-	energy.energyCostNeuron			= 0.0f;
-	energy.energyCostSynapse		= 0.0f;
+	herbivore.agent.radiusAtMinStrength			= 4.0f;
+	herbivore.agent.radiusAtMaxStrength			= 6.0f;
+	herbivore.agent.maxMoveSpeedAtMinStrength	= 0.7f;
+	herbivore.agent.maxMoveSpeedAtMaxStrength	= 0.3f;
+	herbivore.agent.maxTurnSpeedAtMinStrength	= Math::ToRadians<float>(8);
+	herbivore.agent.maxTurnSpeedAtMaxStrength	= Math::ToRadians<float>(5);
+	herbivore.agent.maxEnergyAtMinStrength		= 50.0f;
+	herbivore.agent.maxEnergyAtMaxStrength		= 100.0f;
+	herbivore.agent.minMatingDistance			= 23.0f;
+	herbivore.agent.matingDelay					= 60 * 4;
+	
+	herbivore.energy.energyCostExist		= 0.006f;
+	herbivore.energy.energyCostMove			= 0.014f;
+	herbivore.energy.energyCostTurn			= 0.014f;
+	herbivore.energy.energyCostNeuron		= 0.0f;
+	herbivore.energy.energyCostSynapse		= 0.0f;
+	
+	herbivore.genes.minChildren				= 1;
+	herbivore.genes.maxChildren				= 3;
+	herbivore.genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
+	herbivore.genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
+	herbivore.genes.minCrossoverPoints		= 1;
+	herbivore.genes.maxCrossoverPoints		= 4;
+	herbivore.genes.maxInternalNeurons		= 20;		// TODO: tinker
+	herbivore.genes.minLifeSpan				= 60 * 70;
+	herbivore.genes.maxLifeSpan				= 60 * 160;
+	herbivore.genes.minStrength				= 0.0f;
+	herbivore.genes.maxStrength				= 1.0f;
+	herbivore.genes.minSightDistance		= 20;
+	herbivore.genes.maxSightDistance		= 60;
+	herbivore.genes.minFieldOfView			= Math::ToRadians<float>(10);
+	herbivore.genes.maxFieldOfView			= Math::ToRadians<float>(120);
+	herbivore.genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
+	herbivore.genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
+	herbivore.genes.minSightResolution		= 1;
+	herbivore.genes.maxSightResolution		= 6;
+	herbivore.genes.minBodyColor[0]			= 0.0f;
+	herbivore.genes.maxBodyColor[0]			= 0.0f;
+	herbivore.genes.minBodyColor[1]			= 0.0f;
+	herbivore.genes.maxBodyColor[1]			= 0.0f;
+	herbivore.genes.minBodyColor[2]			= 1.0f; // herbivore = blue for now
+	herbivore.genes.maxBodyColor[2]			= 1.0f;
+	
+	herbivore.brain.numPrebirthCycles		= 10;
+	herbivore.brain.sigmoidSlope			= 1.0f;
+	herbivore.brain.maxBias					= 1.0f;
+	herbivore.brain.initMaxWeight			= 0.5f;
+	herbivore.brain.maxWeight				= 1.0f;
+	herbivore.brain.weightLearningRate		= 0.08f;
+	herbivore.brain.weightDecayRate			= 0.998f;
 
-	genes.minChildren				= 1;
-	genes.maxChildren				= 3;
-	genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
-	genes.maxMutationRate			= 0.1f;		// 1 in 10 genes mutate. TODO: tinker
-	genes.minCrossoverPoints		= 1;
-	genes.maxCrossoverPoints		= 4;
+	//-------------------------------------------------------------------------
+	// Carnivore
 
-	genes.maxInternalNeurons		= 20;		// TODO: tinker
+	// Set carnivore config to herbivore config
+	carnivore = herbivore;
+	
+	carnivore.population.initialAgents	= 10;
+	carnivore.population.minAgents		= 10;
+	carnivore.population.maxAgents		= 50;
+	
+	carnivore.agent.matingDelay			= 60 * 16;
 
-	genes.minLifeSpan				= 60 * 70;
-	genes.maxLifeSpan				= 60 * 160;
-	genes.minStrength				= 0.0f;
-	genes.maxStrength				= 1.0f;
-	genes.minSightDistance			= 20;
-	genes.maxSightDistance			= 60;
-	genes.minFieldOfView			= Math::ToRadians<float>(10);
-	genes.maxFieldOfView			= Math::ToRadians<float>(120);
-	genes.minAngleBetweenEyes		= Math::ToRadians<float>(0);
-	genes.maxAngleBetweenEyes		= Math::ToRadians<float>(100);
-	genes.minSightResolution		= 1;
-	genes.maxSightResolution		= 6;
-	genes.minBodyColor[0]			= 0.0f;
-	genes.maxBodyColor[0]			= 1.0f;
-	genes.minBodyColor[1]			= 0.0f;
-	genes.maxBodyColor[1]			= 1.0f;
-	genes.minBodyColor[2]			= 0.0f;
-	genes.maxBodyColor[2]			= 1.0f;
+	carnivore.genes.minChildren			= 1;
+	carnivore.genes.maxChildren			= 2;
 
-	brain.numPrebirthCycles			= 10;
-	brain.sigmoidSlope				= 1.0f;
-	brain.maxBias					= 1.0f;
-	brain.initMaxWeight				= 0.5f;
-	brain.maxWeight					= 1.0f;
-	brain.weightLearningRate		= 0.08f;
-	brain.weightDecayRate			= 0.99f;
-
-	brain.weightLearningRate		= 0.08f;
-	brain.weightDecayRate			= 0.998f;
+	carnivore.genes.minBodyColor[0]		= 1.0f; // carnivore = red for now
+	carnivore.genes.maxBodyColor[0]		= 1.0f;
+	carnivore.genes.minBodyColor[1]		= 0.0f;
+	carnivore.genes.maxBodyColor[1]		= 0.0f;
+	carnivore.genes.minBodyColor[2]		= 0.0f;
+	carnivore.genes.maxBodyColor[2]		= 0.0f;
 }
 
 

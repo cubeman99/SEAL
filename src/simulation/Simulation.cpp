@@ -66,9 +66,9 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_objectManager.SpawnObjectRandom<Plant>();
 
 	// Spawn some agents.
-	for (int i = 0; i < m_config.agent.initialPreyCount; ++i)
+	for (int i = 0; i < m_config.herbivore.population.initialAgents; ++i)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
-	for (int i = 0; i < m_config.agent.initialPredatorCount; ++i)
+	for (int i = 0; i < m_config.carnivore.population.initialAgents; ++i)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
 }
 
@@ -79,29 +79,19 @@ void Simulation::Tick()
 	// Update systems.
 	m_ageInTicks++;
 	m_objectManager.UpdateObjects();
-	
-	
-	// Cumulatively add statistic values for each agent.
-	unsigned int numAgents[2] = { 0, 0 };
+		
+	// Count the number of agents and add new ones if population size is below the minimum.
+	int numAgents[2] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
 		numAgents[(int) it->GetSpecies()]++;
 	}
-	int herbsToAdd = m_config.agent.minPreyAgents - numAgents[SPECIES_HERBIVORE];
-	if (herbsToAdd > 0)
+	for (unsigned int i = 0; i < 2; ++i)
 	{
-		for (int i = 0; i < herbsToAdd; ++i)
-			m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
+		if (numAgents[i] < m_config.species[i].population.minAgents)
+			m_objectManager.SpawnObjectRandom(new Agent((Species) i));
 	}
-	int carnsToAdd = m_config.agent.minPredatorAgents - numAgents[SPECIES_CARNIVORE];
-	if (carnsToAdd > 0)
-	{
-		for (int i = 0; i < carnsToAdd; ++i)
-			m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
-	}
-
-
 
 	// Advance to the next generation.
 	m_generationAge++;
@@ -306,7 +296,8 @@ Agent* Simulation::CreateOffspring(Agent* mommy, Agent* daddy)
 {
 	// Crossover and mutate the genome.
 	Genome* childGenome = Genome::SpawnChild(
-		mommy->GetGenome(), daddy->GetGenome(), this);
+		mommy->GetGenome(), daddy->GetGenome(),
+		GetAgentConfig(mommy->GetSpecies()), m_random);
 
 	Agent* child = new Agent(childGenome, 100.0f, mommy->GetSpecies());
 

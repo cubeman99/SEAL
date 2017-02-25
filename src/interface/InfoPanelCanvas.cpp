@@ -80,7 +80,8 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 	Simulation* simulation = m_simulationWindow->
 		GetSimulationManager()->GetSimulation();
 	const SimulationStats& stats = simulation->GetStatistics();
-	const SimulationConfig& config = simulation->GetConfig();
+	//const SimulationConfig& config = simulation->GetConfig();
+	const SpeciesConfig& config = simulation->GetAgentConfig(SPECIES_HERBIVORE);
 	Font* m_font = m_simulationWindow->GetSimulationManager()->
 		GetResourceManager()->GetFont("font");
 	
@@ -100,7 +101,7 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 	m_simInfoPanel.AddItem("world age").SetValue(simulation->GetAgeInTicks());
 	m_simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
 	m_simInfoPanel.AddItem("season age").SetValue(simulation->GetGenerationAge()).InitBar(Color::MAGENTA, 0u, simulation->GetGenerationDuration());
-	m_simInfoPanel.AddItem("population size").SetValue((int) stats.populationSize).InitBar(Color::CYAN, config.agent.minPreyAgents, config.agent.maxPreyAgents);
+	m_simInfoPanel.AddItem("population size").SetValue((int) stats.populationSize).InitBar(Color::CYAN, config.population.minAgents, config.population.maxAgents);
 	m_simInfoPanel.AddSeparator();
 	m_simInfoPanel.AddItem("total energy").SetValue(stats.totalEnergy);
 	m_simInfoPanel.AddItem("avg energy").SetValue(stats.avgEnergy);

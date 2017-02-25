@@ -64,8 +64,8 @@ void SimulationRenderer::LoadResources()
 	// Models
 
 	// Agent model.
-	m_agentMeshCarnivore = m_resourceManager.LoadMesh("agent", "models/agent.obj");
-	m_agentMeshHerbivore = m_resourceManager.LoadMesh("agent", "models/herbivore.obj");
+	m_agentMeshCarnivore = m_resourceManager.LoadMesh("carnivore", "models/agent.obj");
+	m_agentMeshHerbivore = m_resourceManager.LoadMesh("herbivore", "models/herbivore.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	

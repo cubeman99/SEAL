@@ -2,6 +2,8 @@
 #define _GENOME_H_
 
 #include <vector>
+#include <simulation/SimulationConfig.h>
+#include <utilities/Random.h>
 
 class Simulation;
 class Brain;
@@ -42,20 +44,29 @@ public:
 	//-------------------------------------------------------------------------
 	// Constructor & destructor
 
-	Genome(Simulation* theSimulation, bool randomized);
+	Genome(const SpeciesConfig& config);
 	~Genome();
 	
 	//-------------------------------------------------------------------------
 	// Genome operations
 
 	// Randomize all gene values.
-	void Randomize();
+	void Randomize(RNG& random);
 
-	static int DetermineGenomeSize(Simulation* theSimulation);
-	static Genome* SpawnChild(Genome* p1, Genome* p2, Simulation* theSimulation);
+	// Calculate genome size based on agent species configuration.
+	static int DetermineGenomeSize(const SpeciesConfig& config);
+
+	// Create a child genome from two parent genomes,
+	// through crossover and mutation.
+	static Genome* SpawnChild(Genome* p1, Genome* p2,
+		const SpeciesConfig& config, RNG& random);
 	
 	//-------------------------------------------------------------------------
 	// Gene access
+
+	const unsigned char* GetData() const { return m_genes.data(); }
+	unsigned char* GetData() { return m_genes.data(); }
+	unsigned int GetSize() const { return m_genes.size(); }
 
 	float GetGeneAsFloat(unsigned int index) const;
 	float GetGeneAsFloat(unsigned int index, float minValue, float maxValue) const;
@@ -66,13 +77,11 @@ public:
 	// Neurogenetics
 
 	// Create a brain from the encoding in the neurological genes.
-	void GrowBrain(Brain* brain);
+	void GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random);
 
-	friend class Agent;
 
 private:
 	std::vector<unsigned char> m_genes; // A gene is 1 byte. 0 = minimum value, 255 = maximum
-	Simulation* m_simulation;
 };
 
 

@@ -3,39 +3,26 @@
 
 
 //-----------------------------------------------------------------------------
-// SimulationConfig - contains the values for various simulation parameters
+// SpeciesConfig - configuration for a single agent species.
 //-----------------------------------------------------------------------------
-struct SimulationConfig
+struct SpeciesConfig
 {
-public:
-	SimulationConfig();
-
-	
 	//-------------------------------------------------------------------------
-	// General
-	
+	// Population sizes
+
 	struct
 	{
-		float	radius;
-		int		seed;	// -1 means random seed.
+		int		initialAgents;
+		int		minAgents;
+		int		maxAgents;
 
-	} world;
+	} population;
 
 	//-------------------------------------------------------------------------
-	// Agents
-	
+	// Agent configuration
+
 	struct
 	{
-		//herbivore
-		//carnivore 
-
-		int		minPreyAgents;
-		int		maxPreyAgents;
-		int		minPredatorAgents;
-		int		maxPredatorAgents;
-		int		initialPreyCount;
-		int		initialPredatorCount;
-
 		int		matingDelay;
 		float	minMatingDistance;
 		float	radiusAtMinStrength;
@@ -50,20 +37,17 @@ public:
 	} agent;
 
 	//-------------------------------------------------------------------------
-	// Plants
+	// Energy costs
 	
 	struct
 	{
-		float	radius;
-		float	color[3];
-		int		numPlants;
-		int		numOffshootsPerPlant;
-		float	maxEnergy;
-		float	offshootSpawnRadius;
-		float	growthRate; // energy per tick
-		float	eatEnergyDepletionRate;
+		float	energyCostExist; // energy per tick
+		float	energyCostMove; // energy per distance per tick.
+		float	energyCostTurn; // energy per radian per tick.
+		float	energyCostNeuron;
+		float	energyCostSynapse;
 
-	} plant;
+	} energy;
 
 	//-------------------------------------------------------------------------
 	// Agent gene ranges
@@ -100,19 +84,6 @@ public:
 	} genes;
 
 	//-------------------------------------------------------------------------
-	// Energy costs
-	
-	struct
-	{
-		float	energyCostExist; // energy per tick
-		float	energyCostMove; // energy per distance per tick.
-		float	energyCostTurn; // energy per radian per tick.
-		float	energyCostNeuron;
-		float	energyCostSynapse;
-
-	} energy;
-
-	//-------------------------------------------------------------------------
 	// Brain
 	
 	struct
@@ -126,6 +97,60 @@ public:
 		float	weightDecayRate;
 
 	} brain;
+};
+
+
+
+//-----------------------------------------------------------------------------
+// SimulationConfig - configuration for an entire simulation. Contains the
+//                    values for various simulation parameters
+//-----------------------------------------------------------------------------
+struct SimulationConfig
+{
+public:
+	SimulationConfig();
+
+	
+	//-------------------------------------------------------------------------
+	// General
+	
+	struct
+	{
+		float	radius;
+		int		seed;	// -1 means random seed.
+
+	} world;
+
+	//-------------------------------------------------------------------------
+	// Plants
+	
+	struct
+	{
+		float	radius;
+		float	color[3];
+		int		numPlants;
+		int		numOffshootsPerPlant;
+		float	maxEnergy;
+		float	offshootSpawnRadius;
+		float	growthRate; // energy per tick
+		float	eatEnergyDepletionRate;
+
+	} plant;
+
+	//-------------------------------------------------------------------------
+	// Agent species
+
+	union
+	{
+		SpeciesConfig species[2];
+
+		struct
+		{
+			SpeciesConfig herbivore; // species[0]
+			SpeciesConfig carnivore; // species[1]
+		};
+	};
+
 };
 
 

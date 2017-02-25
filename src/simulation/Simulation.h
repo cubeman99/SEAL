@@ -27,6 +27,8 @@ public:
 	inline RNG& GetRandom() { return m_random; }
 
 	inline const SimulationConfig& GetConfig() const { return m_config; }
+	inline const SpeciesConfig& GetAgentConfig(Species species) const { return m_config.species[(int) species]; }
+
 	inline const SimulationStats& GetStatistics() const { return m_statistics; }
 	inline unsigned int GetAgeInTicks() const { return m_ageInTicks; }
 	inline unsigned int GetGeneration() const { return m_generationIndex; }
