@@ -65,6 +65,7 @@ void SimulationRenderer::LoadResources()
 
 	// Agent model.
 	m_agentMeshCarnivore = m_resourceManager.LoadMesh("agent", "models/agent.obj");
+	m_agentMeshHerbivore = m_resourceManager.LoadMesh("agent", "models/herbivore.obj");
 	m_agentMaterial = new Material();
 	m_agentMaterial->SetColor(Color::BLUE);
 	
@@ -72,12 +73,11 @@ void SimulationRenderer::LoadResources()
 	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
 	m_plantMaterial = new Material();
 	m_plantMaterial->SetColor(Color::GREEN);
+
 	// World model (ico-sphere).
 	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
-
-	m_agentMeshHerbivore = m_worldMesh;
 	
 	// TODO: Move this resource creation code somewhere else.
 

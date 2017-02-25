@@ -13,8 +13,8 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 15;
-	plant.numOffshootsPerPlant		= 10;
+	plant.numPlants					= 10;
+	plant.numOffshootsPerPlant		= 8;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
@@ -23,8 +23,8 @@ SimulationConfig::SimulationConfig()
 	agent.initialPredatorCount		= 10;
 	agent.initialPreyCount			= 60;
 
-	agent.minPredatorAgents			= 10;
-	agent.minPreyAgents				= 30;
+	agent.minPredatorAgents			= 0;
+	agent.minPreyAgents				= 0;
 	agent.maxPreyAgents				= 160;
 	agent.radiusAtMinStrength		= 4.0f;
 	agent.radiusAtMaxStrength		= 6.0f;
