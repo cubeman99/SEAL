@@ -138,6 +138,7 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 		m_agentInfoPanel.SetFont(m_font);
 		m_agentInfoPanel.Clear();
 		m_agentInfoPanel.AddItem("age").SetValue(agent->GetAge()).InitBar(Color::MAGENTA, 0, agent->GetLifeSpan());
+		m_agentInfoPanel.AddItem("health").SetValue(agent->GetHealthEnergy()).InitBar(Color::GREEN, 0.0f, agent->GetMaxEnergy());
 		m_agentInfoPanel.AddItem("energy").SetValue(agent->GetEnergy()).InitBar(Color::YELLOW, 0.0f, agent->GetMaxEnergy());
 		m_agentInfoPanel.AddItem("energy usage").SetValue(agent->GetEnergyUsage()).SetPrecision(4);
 		m_agentInfoPanel.AddItem("fitness").SetValue(agent->GetFitness());

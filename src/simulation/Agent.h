@@ -64,6 +64,7 @@ public:
 	inline Species GetSpecies() const { return m_species; }
 	inline int GetAge() const { return m_age; }
 	inline float GetEnergy() const { return m_energy; }
+	inline float GetHealthEnergy() const { return m_healthEnergy; }
 	inline float GetEnergyPercent() const { return (m_energy / m_maxEnergy); }
 	inline float GetEnergyUsage() const { return m_energyUsage; }
 	inline float GetFitness() const { return m_fitness; }

@@ -6,7 +6,7 @@ SimulationConfig::SimulationConfig()
 {
 	// Setup some default values for debug purposes.
 
-	world.radius	= 150; // gives a circumference of about 1000
+	world.radius	= 160; // gives a circumference of about 1000
 	world.seed		= -1;
 
 	//-------------------------------------------------------------------------
@@ -16,8 +16,8 @@ SimulationConfig::SimulationConfig()
 	plant.color[0]					= 0.0f;
 	plant.color[1]					= 1.0f;
 	plant.color[2]					= 0.0f;
-	plant.numPlants					= 10;
-	plant.numOffshootsPerPlant		= 8;
+	plant.numPlants					= 12;
+	plant.numOffshootsPerPlant		= 4;
 	plant.maxEnergy					= 16.0f;
 	plant.offshootSpawnRadius		= 80;
 	plant.growthRate				= 0.05f;
@@ -26,7 +26,7 @@ SimulationConfig::SimulationConfig()
 	//-------------------------------------------------------------------------
 	// Carnivore
 
-	herbivore.population.initialAgents	= 60;
+	herbivore.population.initialAgents	= 80;
 	herbivore.population.minAgents		= 0;
 	herbivore.population.maxAgents		= 160;
 
@@ -55,8 +55,8 @@ SimulationConfig::SimulationConfig()
 	herbivore.genes.minCrossoverPoints		= 1;
 	herbivore.genes.maxCrossoverPoints		= 4;
 	herbivore.genes.maxInternalNeurons		= 20;		// TODO: tinker
-	herbivore.genes.minLifeSpan				= 60 * 70;
-	herbivore.genes.maxLifeSpan				= 60 * 160;
+	herbivore.genes.minLifeSpan				= 60 * 120;
+	herbivore.genes.maxLifeSpan				= 60 * 200;
 	herbivore.genes.minStrength				= 0.0f;
 	herbivore.genes.maxStrength				= 1.0f;
 	herbivore.genes.minSightDistance		= 20;
@@ -93,10 +93,11 @@ SimulationConfig::SimulationConfig()
 	carnivore.population.maxAgents		= 50;
 	
 	carnivore.agent.matingDelay			= 60 * 16;
-
+	
+	herbivore.genes.minLifeSpan			= 60 * 70;
+	herbivore.genes.maxLifeSpan			= 60 * 160;
 	carnivore.genes.minChildren			= 1;
 	carnivore.genes.maxChildren			= 2;
-
 	carnivore.genes.minBodyColor[0]		= 1.0f; // carnivore = red for now
 	carnivore.genes.maxBodyColor[0]		= 1.0f;
 	carnivore.genes.minBodyColor[1]		= 0.0f;
@@ -104,9 +105,9 @@ SimulationConfig::SimulationConfig()
 	carnivore.genes.minBodyColor[2]		= 0.0f;
 	carnivore.genes.maxBodyColor[2]		= 0.0f;
 	
-	carnivore.energy.energyCostExist		= 0.006f;
-	carnivore.energy.energyCostMove			= 0.014f;
-	carnivore.energy.energyCostTurn			= 0.035f; // increased this to try prevent meat grinders
+	carnivore.energy.energyCostExist	= 0.006f;
+	carnivore.energy.energyCostMove		= 0.014f;
+	carnivore.energy.energyCostTurn		= 0.035f; // increased this to try prevent meat grinders
 }
 
 

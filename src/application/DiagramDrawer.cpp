@@ -143,54 +143,6 @@ void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bou
 
 
 
-void DiagramDrawer::CalcGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax)
-{
-	Simulation* simulation = m_simulationManager->GetSimulation();
-	SimulationStats* stats = simulation->m_generationStats.data();
-	unsigned int numStats = simulation->m_generationStats.size();
-
-	//-------------------------------------------------------------------------
-	// Calculate view bounds.
-
-	const GraphRange& range = graph.GetRange();
-
-	for (unsigned int i = 0; i < numStats; ++i)
-	{
-		float x = (float) i;
-		float y = graph.GetData(stats + i);
-		if (i == 0 || y < rangeMin) rangeMin = y;
-		if (i == 0 || y > rangeMax) rangeMax = y;
-	}
-
-	float rangeSpan = rangeMax - rangeMin;
-
-	//-------------------------------------------------------------------------
-	// Adjust view bounds range for fixed or dynamic clamped ranges.
-
-	if (range.minType == GraphRange::FIXED)
-	{
-		rangeMin = range.minValue;
-	}
-	else
-	{
-		rangeMin -= range.dynamicPaddingPercent * rangeSpan;
-		if (range.minType == GraphRange::DYNAMIC_CLAMPED && rangeMin > range.minValue)
-			rangeMin = range.minValue;
-	}
-	if (range.maxType == GraphRange::FIXED)
-	{
-		rangeMax = range.maxValue;
-	}
-	else
-	{
-		rangeMax += range.dynamicPaddingPercent * rangeSpan;
-		if (range.maxType == GraphRange::DYNAMIC_CLAMPED && rangeMax < range.maxValue)
-			rangeMax = range.maxValue;
-	}
-	if (rangeMax - rangeMin == 0.0f)
-		rangeMax = rangeMin + 1.0f;
-}
-
 void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f& rect)
 {
 	DrawGraphs(g, &graph, 1, rect);
@@ -201,6 +153,8 @@ void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned in
 	Simulation* simulation = m_simulationManager->GetSimulation();
 	SimulationStats* stats = simulation->m_generationStats.data();
 	unsigned int numStats = simulation->m_generationStats.size();
+
+	// Assume the title and data type of the first graph.
 	std::string title = graphs[0].GetTitle();
 	int dataType = graphs[0].GetDataType();
 
@@ -219,15 +173,14 @@ void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned in
 	//-------------------------------------------------------------------------
 	// Calculate view range.
 
-	float rangeMin;
-	float rangeMax;
+	float rangeMin, rangeMax;
 	float r0, r1;
 	CalcGraphRange(graphs[0], rangeMin, rangeMax);
 	for (unsigned int i = 1; i < numGraphs; ++i)
 	{
 		CalcGraphRange(graphs[0], r0, r1);
 		rangeMin = Math::Min(rangeMin, r0);
-		rangeMax = Math::Min(rangeMax, r1);
+		rangeMax = Math::Max(rangeMax, r1);
 	}
 
 	//-------------------------------------------------------------------------
@@ -356,5 +309,55 @@ void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned in
 
 	// Draw graph outline
 	g.DrawRect(rect, colorOutline);
+}
+
+
+
+void DiagramDrawer::CalcGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax)
+{
+	Simulation* simulation = m_simulationManager->GetSimulation();
+	SimulationStats* stats = simulation->m_generationStats.data();
+	unsigned int numStats = simulation->m_generationStats.size();
+
+	//-------------------------------------------------------------------------
+	// Calculate view bounds.
+
+	const GraphRange& range = graph.GetRange();
+
+	for (unsigned int i = 0; i < numStats; ++i)
+	{
+		float x = (float) i;
+		float y = graph.GetData(stats + i);
+		if (i == 0 || y < rangeMin) rangeMin = y;
+		if (i == 0 || y > rangeMax) rangeMax = y;
+	}
+
+	float rangeSpan = rangeMax - rangeMin;
+
+	//-------------------------------------------------------------------------
+	// Adjust view bounds range for fixed or dynamic clamped ranges.
+
+	if (range.minType == GraphRange::FIXED)
+	{
+		rangeMin = range.minValue;
+	}
+	else
+	{
+		rangeMin -= range.dynamicPaddingPercent * rangeSpan;
+		if (range.minType == GraphRange::DYNAMIC_CLAMPED && rangeMin > range.minValue)
+			rangeMin = range.minValue;
+	}
+	if (range.maxType == GraphRange::FIXED)
+	{
+		rangeMax = range.maxValue;
+	}
+	else
+	{
+		rangeMax += range.dynamicPaddingPercent * rangeSpan;
+		if (range.maxType == GraphRange::DYNAMIC_CLAMPED && rangeMax < range.maxValue)
+			rangeMax = range.maxValue;
+	}
+	if (rangeMax - rangeMin == 0.0f)
+		rangeMax = rangeMin + 1.0f;
 }
 
