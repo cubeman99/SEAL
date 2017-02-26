@@ -191,7 +191,7 @@ void Agent::Update()
 	// Kill agent after lifetime expiration.
 	if (m_age > m_lifeSpan)
 	{
-		Destroy();
+		Die();
 	}
 
 	if (m_mateWaitTime > 0)
@@ -211,7 +211,7 @@ void Agent::Update()
 	if (m_energy <= 0.0f)
 	{
 		m_energy = 0.0f;
-		Destroy();
+		Die();
 	}
 }
 
@@ -460,10 +460,24 @@ void Agent::Attack(Agent* other)
 
 	if (other->m_healthEnergy <= 0.0f)
 	{
+		m_fitness += other->m_energy;
 		m_energy = Math::Min(m_energy + other->m_energy, m_maxEnergy);
 		other->m_healthEnergy = 0.0f;
-		other->Destroy();
+		other->Die();
 	}
+}
+
+void Agent::Die()
+{
+	float ageFitnessParam = 1.0f / 60.0f; // 1 fitness per second
+	float energyFitnessParam = 2.0f;
+
+	m_fitness += m_age * ageFitnessParam;
+	m_fitness += m_energy * energyFitnessParam;
+	
+	GetSimulation()->OnAgentDie(this);
+
+	Destroy();
 }
 
 void Agent::Mate(Agent* mate)

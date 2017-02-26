@@ -60,8 +60,8 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
-	m_fittestLists[0].Reset(10);
-	m_fittestLists[1].Reset(10);
+	m_fittestLists[0].Reset(20); // TODO: make these configurable
+	m_fittestLists[1].Reset(40);
 	
 	// Spawn some plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
@@ -98,6 +98,16 @@ void Simulation::Tick()
 	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
 }
 
+
+void Simulation::OnAgentDie(Agent* agent)
+{
+	m_fittestLists[agent->GetSpecies()].Update(
+		agent, agent->GetFitness());
+
+	// TODO: death statistics
+}
+
+
 void Simulation::UpdateSteadyStateGA()
 {
 	// Count the number of agents and add new ones if population size is below the minimum.
@@ -116,7 +126,7 @@ void Simulation::UpdateSteadyStateGA()
 		{
 			// Choose method of agent generation.
 			if (m_fittestLists->IsFull() && 
-				m_random.NextFloat() < 0.5f) // TODO: magic number
+				m_random.NextFloat() < 0.7f) // TODO: magic number
 			{
 				// Mate two fittest agents.
 				Genome* mommy;
@@ -216,11 +226,15 @@ void Simulation::UpdateStatistics()
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
 			stats.species[spec].avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
 		stats.species[spec].avgFitness += it->GetFitness();
-		stats.species[spec].totalEnergy += it->GetEnergy();
 		stats.species[spec].avgEnergyUsage += it->GetEnergyUsage();
 		stats.species[spec].avgMoveAmount += it->GetMoveAmount();
 		stats.species[spec].avgTurnAmount += Math::Abs(it->GetTurnAmount());
+
+		stats.species[spec].totalEnergy += it->GetEnergy();
 		stats.species[spec].populationSize++;
+		stats.species[spec].bestFitness = Math::Max(it->GetFitness(),
+			stats.species[spec].bestFitness);
+
 		numAgents[spec]++;
 	}
 	
@@ -237,6 +251,10 @@ void Simulation::UpdateStatistics()
 			stats.species[species].avgFitness *= invNumAgents;
 			stats.species[species].avgMoveAmount *= invNumAgents;
 			stats.species[species].avgTurnAmount *= invNumAgents;
+			
+			stats.species[species].bestFitness = Math::Max(
+				m_statistics.species[species].bestFitness,
+				stats.species[species].bestFitness);
 		}
 	}
 

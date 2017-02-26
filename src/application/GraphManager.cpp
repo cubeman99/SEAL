@@ -218,6 +218,7 @@ void GraphManager::OnNewSimulation(Simulation* simulation)
 	CREATE_GRAPH_FLOAT("Total Energy", totalEnergy, Color::YELLOW).SetRange(zeroAndUp);
 	CREATE_GRAPH_FLOAT("Avg Energy", avgEnergy, Color::YELLOW).SetRange(zeroAndUp);
 	CREATE_GRAPH_FLOAT("Avg Energy Usage", avgEnergyUsage, Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Best Fitness", bestFitness, Color::GREEN).SetRange(zeroAndUp);
 	CREATE_GRAPH_FLOAT("Avg Fitness", avgFitness, Color::GREEN).SetRange(zeroAndUp);
 	CREATE_GRAPH_FLOAT("Avg Move Amount", avgMoveAmount, Color::GREEN).SetRange(zeroToOne);
 	CREATE_GRAPH_FLOAT("Avg Turn Amount", avgTurnAmount, Color::YELLOW).SetRange(zeroToOne);

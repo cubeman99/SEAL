@@ -58,6 +58,7 @@ public:
 	void Mate(Agent* other);
 	void Attack(Agent* other);
 	void OnTouchAgent(Agent* other);
+	void Die();
 
 	//-------------------------------------------------------------------------
 	// Getters

@@ -17,7 +17,7 @@ public:
 	float avgEnergy;
 	float avgEnergyUsage;
 	float avgFitness;
-	//float bestFitness;
+	float bestFitness;
 
 	//-------------------------------------------------------------------------
 	// Output neurons
@@ -41,6 +41,7 @@ public:
 		populationSize = 0;
 		avgMoveAmount = 0.0f;
 		avgTurnAmount = 0.0f;
+		bestFitness = 0.0f;
 	}
 };
 

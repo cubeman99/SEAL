@@ -59,6 +59,10 @@ public:
 	// Write simulation data to file.
 	void WriteSimulation(std::ofstream& fileOut);
 
+	//-------------------------------------------------------------------------
+	// Events
+
+	void OnAgentDie(Agent* agent);
 
 private:
 	//-------------------------------------------------------------------------
