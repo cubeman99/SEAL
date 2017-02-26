@@ -60,6 +60,8 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
+	m_fittestLists[0].Reset(10);
+	m_fittestLists[1].Reset(10);
 	
 	// Spawn some plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
@@ -79,7 +81,25 @@ void Simulation::Tick()
 	// Update systems.
 	m_ageInTicks++;
 	m_objectManager.UpdateObjects();
-		
+	UpdateSteadyStateGA();
+
+	// Advance to the next generation.
+	m_generationAge++;
+	if (m_generationAge >= m_generationDuration)
+		NextGeneration();
+
+	// Update statistic gathering.
+	UpdateStatistics();
+	if (m_ageInTicks % 60 == 0)
+		m_generationStats.push_back(m_statistics);
+	
+	// Measure elapsed time.
+	double endTime = Time::GetTime();
+	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
+}
+
+void Simulation::UpdateSteadyStateGA()
+{
 	// Count the number of agents and add new ones if population size is below the minimum.
 	int numAgents[2] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
@@ -87,29 +107,40 @@ void Simulation::Tick()
 	{
 		numAgents[(int) it->GetSpecies()]++;
 	}
+
+	const int tournamentSize = 5; // TODO: magic number
+
 	for (unsigned int i = 0; i < 2; ++i)
 	{
 		if (numAgents[i] < m_config.species[i].population.minAgents)
-			m_objectManager.SpawnObjectRandom(new Agent((Species) i));
+		{
+			// Choose method of agent generation.
+			if (m_fittestLists->IsFull() && 
+				m_random.NextFloat() < 0.5f) // TODO: magic number
+			{
+				// Mate two fittest agents.
+				Genome* mommy;
+				Genome* daddy;
+				m_fittestLists[i].PickTwoTournamentSelection(
+					tournamentSize, mommy, daddy);
+				Genome* childGenome = Genome::SpawnChild(
+					mommy, daddy, m_config.species[i], m_random);
+				Agent* child = new Agent(childGenome, 100, (Species) i);
+				child->SetEnergy(child->GetMaxEnergy());
+				child->SetHealthEnergy(child->GetMaxEnergy());
+				m_objectManager.SpawnObjectRandom(child);
+			}
+			else
+			{
+				// Generate a new random agent.
+				m_objectManager.SpawnObjectRandom(new Agent((Species) i));
+			}
+
+			// TODO: chance of elite
+		}
 	}
 
-	// Advance to the next generation.
-	m_generationAge++;
-	if (m_generationAge >= m_generationDuration)
-	{
-		NextGeneration();
-	}
-	UpdateStatistics();
-	if (m_ageInTicks % 60 == 0)
-	{
-		m_generationStats.push_back(m_statistics);
-	}
-	
-	// Measure elapsed time.
-	double endTime = Time::GetTime();
-	double elapsedTimeInMs = (endTime - startTime) * 1000.0;
 }
-
 
 //-----------------------------------------------------------------------------
 // Saving & loading

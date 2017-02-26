@@ -234,6 +234,9 @@
     <ClCompile Include="..\..\src\interface\SimulationRenderPanel.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\simulation\FittestList.cpp">
+      <Filter>Source Files\simulation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -427,6 +430,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\SimulationRenderPanel.h">
       <Filter>Source Files\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\simulation\FittestList.h">
+      <Filter>Source Files\simulation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

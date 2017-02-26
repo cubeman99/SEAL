@@ -9,6 +9,11 @@
 // Constructor & destructor
 //-----------------------------------------------------------------------------
 
+Genome::Genome(const Genome& copy)
+{
+	m_genes = copy.m_genes;
+}
+
 Genome::Genome(const SpeciesConfig& config)
 {	
 	m_genes.resize(DetermineGenomeSize(config));

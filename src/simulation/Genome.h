@@ -44,6 +44,7 @@ public:
 	//-------------------------------------------------------------------------
 	// Constructor & destructor
 
+	Genome(const Genome& copy);
 	Genome(const SpeciesConfig& config);
 	~Genome();
 	

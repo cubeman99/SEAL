@@ -1,6 +1,7 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
+#include <simulation/FittestList.h>
 #include <simulation/ObjectManager.h>
 #include <simulation/OctTree.h>
 #include <simulation/SimulationConfig.h>
@@ -8,6 +9,7 @@
 #include <simulation/SimulationStats.h>
 #include <simulation/World.h>
 #include <utilities/Random.h>
+
 
 //-----------------------------------------------------------------------------
 // Simulation
@@ -62,7 +64,9 @@ private:
 	//-------------------------------------------------------------------------
 	// Internal update mechanics
 
-	// Update the statistics
+	void UpdateSteadyStateGA();
+
+	// Update the statistics records
 	void UpdateStatistics();
 
 	// Advance to the next generation
@@ -82,6 +86,9 @@ private:
 	ObjectManager		m_objectManager;
 	RNG					m_random;
 	SimulationStats		m_statistics;
+
+	FittestList			m_fittestLists[2];
+
 	unsigned long		m_originalSeed;
 	unsigned int		m_ageInTicks;
 	unsigned int		m_generationIndex;

@@ -49,7 +49,6 @@ SimulationConfig::SimulationConfig()
 	
 	herbivore.genes.minChildren				= 1;
 	herbivore.genes.maxChildren				= 3;
-	//herbivore.genes.minMutationRate			= 0.002f;	// 1 in 500 genes mutate. TODO: tinker
 	herbivore.genes.minMutationRate			= 0.02f;	// 1 in 50 genes
 	herbivore.genes.maxMutationRate			= 0.1f;		// 1 in 10 genes
 	herbivore.genes.minCrossoverPoints		= 1;

@@ -8,6 +8,7 @@
 #include "Genome.h"
 #include "Brain.h"
 #include "Nerve.h"
+#include <math/MathLib.h>
 
 class Offshoot;
 
@@ -90,6 +91,12 @@ public:
 	inline Brain* GetBrain() { return m_brain; }
 	inline Genome* GetGenome() { return m_genome; }
 	
+	//-------------------------------------------------------------------------
+	// Setters
+
+	inline void SetEnergy(float energy) { m_energy = Math::Clamp(energy, 0.0f, m_maxEnergy); }
+	inline void SetHealthEnergy(float healthEnergy) { m_healthEnergy = Math::Clamp(healthEnergy, 0.0f, m_maxEnergy); }
+
 	//-------------------------------------------------------------------------
 	// Debug operations
 
