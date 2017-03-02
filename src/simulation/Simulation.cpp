@@ -25,8 +25,8 @@ bool Simulation::IsMatingSeason() const
 {
 	// TODO: mating season is disabled for now. We should implement
 	// predator/prey first before re-enabling it.
-	return true;
-	//return (m_generationAge > (m_generationDuration * 0.6f));
+	//return true;
+	return (m_generationAge > (m_generationDuration * 0.6f));
 }
 
 
