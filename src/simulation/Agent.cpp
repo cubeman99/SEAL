@@ -361,8 +361,8 @@ void Agent::UpdateVision()
 	std::vector<Agent*> agentMateCollisions;
 	std::vector<Agent*> agentCollisions;
 
-	//bool canEatPlants = (m_species == SPECIES_HERBIVORE);
-	bool canEatPlants = true;
+	bool canEatPlants = (m_species == SPECIES_HERBIVORE);
+	//bool canEatPlants = true;
 	bool canMate = (m_mateWaitTime == 0 && GetSimulation()->IsMatingSeason());
 
 	// Query the octtree for objects within vision range.
