@@ -347,6 +347,7 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 
 	float red, green, blue;
 	float x, z, xPrev, zPrev;
+	float alpha = 0.3f;
 	
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < numVertices; i++)
@@ -362,7 +363,7 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 			red   = agent->GetEye(0)->GetSightValue(0, 1.0f - t);
 			green = agent->GetEye(0)->GetSightValue(1, 1.0f - t);
 			blue  = agent->GetEye(0)->GetSightValue(2, 1.0f - t);
-			glColor3f(red, green, blue);
+			glColor4f(red, green, blue, alpha);
 			glVertex3f(-xPrev, 0, zPrev);
 			glVertex3f(-x, 0, z);
 			glVertex3f(0, 0, 0);
@@ -371,7 +372,7 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 			red   = agent->GetEye(1)->GetSightValue(0, t);
 			green = agent->GetEye(1)->GetSightValue(1, t);
 			blue  = agent->GetEye(1)->GetSightValue(2, t);
-			glColor3f(red, green, blue);
+			glColor4f(red, green, blue, alpha);
 			glVertex3f(xPrev, 0, zPrev);
 			glVertex3f(x, 0, z);
 			glVertex3f(0, 0, 0);
