@@ -98,11 +98,13 @@ void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bou
 			weightColor.Set(1, 1, 0);
 		else if (i == 1)
 			weightColor.Set(1, 0, 1);
-		else if ((int) i < 2 + (config.genes.maxSightResolution * 2))
+		else if (i == 2)
+			weightColor.Set(0.62f, 0.1f, 0.2f);
+		else if ((int) i < 3 + (config.genes.maxSightResolution * 2))
 			weightColor.Set(1, 0, 0);
-		else if ((int) i < 2 + (config.genes.maxSightResolution * 4))
+		else if ((int) i < 3 + (config.genes.maxSightResolution * 4))
 			weightColor.Set(0, 1, 0);
-		else if ((int) i < 2 + (config.genes.maxSightResolution * 6))
+		else if ((int) i < 3 + (config.genes.maxSightResolution * 6))
 			weightColor.Set(0, 0, 1);
 
 		// Fill box color.
