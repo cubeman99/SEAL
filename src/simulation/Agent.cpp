@@ -635,8 +635,9 @@ void Agent::UpdateBrain()
 	for (unsigned int i = 0; i < m_brain->GetNumInputNeurons(); ++i)
 		m_brain->SetNeuronActivation(i, 0.0f);
 
-	m_brain->SetNeuronActivation(0, m_energy / m_maxEnergy);
-	m_brain->SetNeuronActivation(1, random.NextFloat());
+	m_brain->SetNeuronActivation((unsigned int)CURRENT_ENERGY, m_energy / m_maxEnergy);
+	m_brain->SetNeuronActivation((unsigned int)RANDOM_ACTIVATION, random.NextFloat());
+	m_brain->SetNeuronActivation((unsigned int)IS_MATING_SEASON, (float)GetSimulation()->IsMatingSeason());
 	
 	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
@@ -645,9 +646,9 @@ void Agent::UpdateBrain()
 		{
 			for (unsigned int i = 0; i < eye.GetResolution(channel); ++i)
 			{
-				unsigned int geneIndex = 2 + (((channel * 2) + eyeIndex) *
+				unsigned int inputIndex = NUM_NON_SIGHT_INPUTS + (((channel * 2) + eyeIndex) *
 					config.genes.maxSightResolution) + i;
-				m_brain->SetNeuronActivation(geneIndex,
+				m_brain->SetNeuronActivation(inputIndex,
 					eye.GetSightValueAtIndex(channel, i));
 			}
 		}

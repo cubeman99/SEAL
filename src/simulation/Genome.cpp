@@ -37,7 +37,7 @@ void Genome::Randomize(RNG& random)
 int Genome::DetermineGenomeSize(const SpeciesConfig& config)
 {
 	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2); // TODO: Updates and comment. Remember the mating season input?
+	unsigned int maxInputNeurons = NUM_NON_SIGHT_INPUTS + (config.genes.maxSightResolution * 3 * 2);
 	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
 	return GenePosition::NUERON_GENES_BEGIN +
 		maxNeurons + (maxNeurons * (config.genes.maxInternalNeurons + numOutputNeurons));

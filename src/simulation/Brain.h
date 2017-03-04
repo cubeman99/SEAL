@@ -18,6 +18,21 @@ enum OutputNeurons
 	NUM_OUTPUT_NUERONS
 };
 
+//-----------------------------------------------------------------------------
+// InputNeurons
+//-----------------------------------------------------------------------------
+enum InputNeurons
+{
+	CURRENT_ENERGY = 0,
+	RANDOM_ACTIVATION,
+	IS_MATING_SEASON,
+
+	NUM_NON_SIGHT_INPUTS,
+
+	//----------------
+
+	SIGHT_INPUTS_BEGIN = NUM_NON_SIGHT_INPUTS
+};
 
 //-----------------------------------------------------------------------------
 // Neuron
