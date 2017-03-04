@@ -125,7 +125,7 @@ void Simulation::UpdateSteadyStateGA()
 		if (numAgents[i] < m_config.species[i].population.minAgents)
 		{
 			// Choose method of agent generation.
-			if (m_fittestLists->IsFull() && 
+			if (m_fittestLists[i].IsFull() && 
 				m_random.NextFloat() < 0.7f) // TODO: magic number
 			{
 				// Mate two fittest agents.

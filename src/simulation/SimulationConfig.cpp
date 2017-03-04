@@ -24,10 +24,10 @@ SimulationConfig::SimulationConfig()
 	plant.eatEnergyDepletionRate	= 5.0f;
 
 	//-------------------------------------------------------------------------
-	// Carnivore
+	// Herbivore
 
-	herbivore.population.initialAgents	= 80;
-	herbivore.population.minAgents		= 0;
+	herbivore.population.initialAgents	= 100;
+	herbivore.population.minAgents		= 20;
 	herbivore.population.maxAgents		= 160;
 
 	herbivore.agent.radiusAtMinStrength			= 4.0f;
@@ -87,14 +87,14 @@ SimulationConfig::SimulationConfig()
 	// Set carnivore config to herbivore config
 	carnivore = herbivore;
 	
-	carnivore.population.initialAgents	= 10;
-	carnivore.population.minAgents		= 10;
+	carnivore.population.initialAgents	= 15;
+	carnivore.population.minAgents		= 15;
 	carnivore.population.maxAgents		= 50;
 	
 	carnivore.agent.matingDelay			= 60 * 16;
 	
-	herbivore.genes.minLifeSpan			= 60 * 70;
-	herbivore.genes.maxLifeSpan			= 60 * 160;
+	carnivore.genes.minLifeSpan			 = 60 * 80;
+	carnivore.genes.maxLifeSpan			 = 60 * 160;
 	carnivore.genes.minChildren			= 1;
 	carnivore.genes.maxChildren			= 2;
 	carnivore.genes.minBodyColor[0]		= 1.0f; // carnivore = red for now
@@ -108,5 +108,3 @@ SimulationConfig::SimulationConfig()
 	carnivore.energy.energyCostMove		= 0.014f;
 	carnivore.energy.energyCostTurn		= 0.035f; // increased this to try prevent meat grinders
 }
-
-

@@ -131,7 +131,6 @@ void FittestList::PickTwoTournamentSelection(int tournamentSize, Genome*& outFir
 	int secondIndex = m_size - 1;
 	for (int z = 0; z < tournamentSize; z++)
 	{
-		// TODO: a crash will occur here, debug says division by 0 error.
 		int r = (firstIndex + 1 + Random::NextInt(0, m_size - 1)) % m_size;
 		if (secondIndex > r)
 			secondIndex = r;

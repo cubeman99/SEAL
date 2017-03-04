@@ -452,16 +452,16 @@ void Agent::OnTouchAgent(Agent* other)
 
 void Agent::Attack(Agent* other)
 {
-	// TODO: use strength attack algorithm thingy.
-
-	float attackAmount = (m_maxEnergy - m_energy) / m_maxEnergy;
+	// Calculate attack damage, lowered by herbivore strength
+	float attackAmount = m_strength * 2.0f * ((1.0f - other->m_strength) + 0.05f);
 
 	other->m_healthEnergy -= attackAmount;
 
 	if (other->m_healthEnergy <= 0.0f)
 	{
-		m_fitness += other->m_energy;
-		m_energy = Math::Min(m_energy + other->m_energy, m_maxEnergy);
+		float toGain = other->m_maxEnergy / 2.0f;
+		m_fitness += toGain;
+		m_energy = Math::Min(m_energy + toGain, m_maxEnergy);
 		other->m_healthEnergy = 0.0f;
 		other->Die();
 	}

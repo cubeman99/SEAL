@@ -165,7 +165,7 @@ Genome* Genome::SpawnChild(Genome* p1, Genome* p2, const SpeciesConfig& config, 
 
 float Genome::GetGeneAsFloat(unsigned int index) const
 {
-	return (float) m_genes[(int) index] / 255.0f;
+	return ((float) m_genes[(int) index]) / 255.0f;
 }
 
 float Genome::GetGeneAsFloat(unsigned int index, float minValue, float maxValue) const
