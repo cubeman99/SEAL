@@ -26,6 +26,7 @@ SimulationManager::SimulationManager() :
 	  m_showInvisibleObjects(false),
 	  m_showAxisLines(false),
 	  m_maxTicksPerFrame(false),
+	  m_debugMode(false),
 	  m_ticksPerFrame(1)
 {
 }
@@ -68,6 +69,7 @@ void SimulationManager::OnNewSimulation()
 	m_graphManager.OnNewSimulation(m_simulation);
 
 	// Reset viewing state.
+	m_debugMode				= false;
 	m_selectedAgent			= nullptr;
 	m_selectedAgentId		= -1;
 	m_isSimulationPaused	= false;

@@ -289,7 +289,8 @@ void SimulationWindow::CreateMenuBar()
 
     wxMenu* menuDebug = new wxMenu;
     menuBar->Append(menuDebug, wxT("&Debug"));
-    m_menuItemDebugMode = menuDebug->Append(DEBUG_DEBUG_MODE, "Debug &Mode");
+    m_menuItemDebugMode = menuDebug->AppendCheckItem(DEBUG_DEBUG_MODE, "Debug &Mode");
+	menuDebug->AppendSeparator();
     m_menuItemSpawnCarnivores = menuDebug->Append(DEBUG_SPAWN_CARNIVORES, "&Spawn Carnivore Agents\tG");
     m_menuItemSpawnHerbivores = menuDebug->Append(DEBUG_SPAWN_HERBIVORES, "&Spawn Herbivore Agents\tH");
     m_menuItemDeleteAgent = menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Agent\tDelete");
@@ -393,8 +394,18 @@ void SimulationWindow::OnUpdateMenuItem(wxUpdateUIEvent& e)
 	//-------------------------------------------------------------------------
 	// Debug
 
+	case DEBUG_DEBUG_MODE:
+		m_menuItemDebugMode->Check(m_simulationManager.IsDebugMode());
+		break;
+	case DEBUG_SPAWN_CARNIVORES:
+		m_menuItemSpawnCarnivores->Enable(m_simulationManager.IsDebugMode());
+		break;
+	case DEBUG_SPAWN_HERBIVORES:
+		m_menuItemSpawnHerbivores->Enable(m_simulationManager.IsDebugMode());
+		break;
 	case DEBUG_DELETE_AGENT:
 		m_menuItemDeleteAgent->Enable(
+			m_simulationManager.IsDebugMode() &&
 			m_simulationManager.GetSelectedAgent() != nullptr);
 		break;
 	}
@@ -460,6 +471,28 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	//-------------------------------------------------------------------------
 	// Debug
 		
+	case DEBUG_DEBUG_MODE:
+	{
+		if (e.IsChecked())
+		{
+			// Ask the user if they want to activate debug mode
+			wxMessageDialog dialog(this,
+				"Are you sure you want to activate Debug Mode?\n"
+				"Using debug controls will interfere with a simulation's evolutionary track, "
+				"making it susceptible to a more difficult or less valid interpretion.",
+				"Activate Debug Mode",
+				wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT | wxICON_WARNING);
+			if (dialog.ShowModal() == wxID_YES)
+			{
+				m_simulationManager.SetDebugMode(true);
+			}
+		}
+		else
+		{
+			m_simulationManager.SetDebugMode(false);
+		}
+		break;
+	}
 	case DEBUG_SPAWN_CARNIVORES:
 		for (int i = 0; i < 10; i++)
 		{

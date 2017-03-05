@@ -52,6 +52,7 @@ public:
 	inline void SetSimulationPaused(bool isSimulationPaused) { m_isSimulationPaused = isSimulationPaused; }
 	inline void SetTicksFerFrame(unsigned int ticksPerFrame) { m_ticksPerFrame = ticksPerFrame; }
 	inline void SetMaxTicksPerFrame(bool maxTicksPerFrame) { m_maxTicksPerFrame = maxTicksPerFrame; }
+	inline void SetDebugMode(bool debugMode) { m_debugMode = debugMode; }
 
 	// Render options
 	// TODO: have some sort of enum for view options like these.
@@ -73,7 +74,7 @@ public:
 	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 	inline bool GetShowAxisLines() const { return m_showAxisLines; }
-	
+	inline bool IsDebugMode() const { return m_debugMode; }
 
 private:
 	Simulation* m_simulation;
@@ -89,7 +90,8 @@ private:
 	bool			m_isSimulationPaused;
 	unsigned int	m_ticksPerFrame;
 	bool			m_maxTicksPerFrame;
-	
+	bool			m_debugMode;
+
 	// Render options.
 	bool m_viewWireFrameMode;
 	bool m_viewLighting;
