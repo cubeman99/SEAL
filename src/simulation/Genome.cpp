@@ -202,7 +202,7 @@ void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 
 	// Count the number of neurons.
 	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = 2 + (config.genes.maxSightResolution * 3 * 2);
+	unsigned int maxInputNeurons = NUM_NON_SIGHT_INPUTS + (config.genes.maxSightResolution * 3 * 2);
 	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
 	unsigned int maxSynapses = (numOutputNeurons + config.genes.maxInternalNeurons) * maxNeurons;
 
