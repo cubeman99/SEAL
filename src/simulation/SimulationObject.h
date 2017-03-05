@@ -85,13 +85,14 @@ public:
 	inline const Matrix4f& GetObjectToWorld() const { return m_objectToWorld; }
 	inline const Matrix4f& GetWorldToObject() const { return m_worldToObject; }
 	inline int GetId() const { return m_objectId; }
+	inline bool GetInOrbit() { return m_inOrbit > 1.0f; }
 
 	//-------------------------------------------------------------------------
 	// Setters
 
 	inline void SetPosition(const Vector3f& position) { m_position = position; }
 	inline void SetOrientation(const Quaternion& orientation) { m_orientation = orientation; }
-
+	inline void SetInOrbit() { m_inOrbit = 2.5f; }
 
 protected:
 	bool			m_isVisible;
@@ -103,6 +104,7 @@ protected:
 	bool			m_isDestroyed;
 	ObjectManager*	m_objectManager;
 	int				m_objectId;
+	float			m_inOrbit;
 
 protected:
 	//-------------------------------------------------------------------------

@@ -119,16 +119,22 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 	m_octTree.InsertObject(object);
 	
 	object->m_objectId = m_objectIdCounter;	// TODO: since this sim is meant to run for a long time, make sure
-	m_objectIdCounter += 1;
+	m_objectIdCounter += 1;					// this doesn't exceed INT_MAX
 
-	object->m_objectManager = this;				// this doesn't exceed INT_MAX
+	object->m_objectManager = this;
 	object->m_isDestroyed = false;
 	object->OnSpawn();
 }
 
-void ObjectManager::SpawnObjectRandom(SimulationObject* object)
+void ObjectManager::SpawnObjectRandom(SimulationObject* object, bool inOrbit)
 {
 	CreateRandomPositionAndOrientation(object->m_position, object->m_orientation);
+
+	if (inOrbit)
+	{
+		object->SetInOrbit();
+	}
+
 	SpawnObject(object);
 }
 

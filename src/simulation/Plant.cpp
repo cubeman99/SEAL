@@ -19,6 +19,7 @@ void Plant::OnSpawn()
 	m_isVisible = false;
 	m_radius = 4;
 	m_color.Set(1.0f, 1.0f, 0.0f);
+	m_inOrbit = 0.0f;
 
 	if (!m_isSerialized)
 	{

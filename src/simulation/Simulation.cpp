@@ -69,9 +69,9 @@ void Simulation::Initialize(const SimulationConfig& config)
 
 	// Spawn some agents.
 	for (int i = 0; i < m_config.herbivore.population.initialAgents; ++i)
-		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
+		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE), false);
 	for (int i = 0; i < m_config.carnivore.population.initialAgents; ++i)
-		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
+		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE), false);
 }
 
 void Simulation::Tick()
@@ -138,12 +138,12 @@ void Simulation::UpdateSteadyStateGA()
 				Agent* child = new Agent(childGenome, 100, (Species) i);
 				child->SetEnergy(child->GetMaxEnergy());
 				child->SetHealthEnergy(child->GetMaxEnergy());
-				m_objectManager.SpawnObjectRandom(child);
+				m_objectManager.SpawnObjectRandom(child, true);
 			}
 			else
 			{
 				// Generate a new random agent.
-				m_objectManager.SpawnObjectRandom(new Agent((Species) i));
+				m_objectManager.SpawnObjectRandom(new Agent((Species) i), true);
 			}
 
 			// TODO: chance of elite

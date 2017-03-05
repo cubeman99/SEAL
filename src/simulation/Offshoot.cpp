@@ -34,6 +34,7 @@ void Offshoot::OnSpawn()
 		config.plant.color[0],
 		config.plant.color[1],
 		config.plant.color[2]);
+	m_inOrbit = 0.0f;
 }
 
 void Offshoot::OnDestroy()

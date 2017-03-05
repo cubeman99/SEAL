@@ -389,14 +389,14 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		for (int i = 0; i < 10; i++)
 		{
 			m_simulationManager.GetSimulation()->
-				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_CARNIVORE));
+				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_CARNIVORE), true);
 		}
 		break;
 	case DEBUG_SPAWN_HERBIVORES:
 		for (int i = 0; i < 10; i++)
 		{
 			m_simulationManager.GetSimulation()->
-				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_HERBIVORE));
+				GetObjectManager()->SpawnObjectRandom(new Agent(SPECIES_HERBIVORE), true);
 		}
 		break;
 	case DEBUG_DELETE_AGENT:

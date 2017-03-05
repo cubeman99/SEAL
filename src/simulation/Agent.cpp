@@ -20,6 +20,7 @@ Agent::Agent(Species species) :
 	m_energyUsage(0.0f),
 	m_species(species)
 {
+	m_inOrbit = 0.0f;
 }
 
 // Natural born constructor
@@ -33,6 +34,7 @@ Agent::Agent(Genome* genome, float energy, Species species) :
 	m_brain(nullptr),
 	m_species(species)
 {
+	m_inOrbit = 0.0f;
 }
 
 Agent::~Agent()
@@ -183,29 +185,42 @@ void Agent::Update()
 {
 	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
 
-	UpdateVision();
-	UpdateBrain();
+	if (!GetInOrbit())
+	{
+		UpdateVision();
+		UpdateBrain();
+
+		// Turn and move.
+		m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
+		m_objectManager->MoveObjectForward(this, m_moveSpeed);
+
+		// Update energy usage.
+		m_energyUsage = config.energy.energyCostExist +
+			(config.energy.energyCostMove * m_moveSpeed) +
+			(config.energy.energyCostTurn * m_turnSpeed);
+		m_energy -= m_energyUsage;
+	}
+	else
+	{
+		// Fall
+		m_inOrbit -= 0.005f;
+
+		m_orientation.Rotate(m_orientation.GetUp(), 0.25f);
+
+		m_position.Normalize();
+		m_position *= GetSimulation()->GetWorld()->GetRadius() * m_inOrbit;
+	}
 
 	m_age++;
+
+	if (m_mateWaitTime > 0)
+		m_mateWaitTime--;
 
 	// Kill agent after lifetime expiration.
 	if (m_age > m_lifeSpan)
 	{
 		Die();
 	}
-
-	if (m_mateWaitTime > 0)
-		m_mateWaitTime--;
-
-	// Turn and move.
-	m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
-	m_objectManager->MoveObjectForward(this, m_moveSpeed);
-
-	// Update energy usage.
-	m_energyUsage = config.energy.energyCostExist +
-		(config.energy.energyCostMove * m_moveSpeed) +
-		(config.energy.energyCostTurn * m_turnSpeed);
-	m_energy -= m_energyUsage;
 
 	// Kill agent if its energy is depleted.
 	if (m_energy <= 0.0f)
@@ -232,6 +247,7 @@ void Agent::Read(std::ifstream& fileIn)
 	fileIn.read((char*)&m_energy, sizeof(float));
 	fileIn.read((char*)&m_age, sizeof(int));
 	fileIn.read((char*)&m_fitness, sizeof(float));
+	fileIn.read((char*)&m_inOrbit, sizeof(float));
 
 	// Read genome
 	fileIn.read((char*)m_genome->GetData(),
@@ -292,6 +308,7 @@ void Agent::Write(std::ofstream& fileOut)
 		fileOut.write((char*)&m_energy, sizeof(float));
 		fileOut.write((char*)&m_age, sizeof(int));
 		fileOut.write((char*)&m_fitness, sizeof(float));
+		fileOut.write((char*)&m_inOrbit, sizeof(float));
 
 		// Write genome
 		fileOut.write((char*)m_genome->GetData(), m_genome->GetSize() * sizeof(unsigned char));
@@ -394,8 +411,9 @@ void Agent::UpdateVision()
 			}
 
 			// Check for collision with another agent.
-			if (object->GetObjectType() == SimulationObjectType::AGENT &&
-				distSqr < contactDist * contactDist)
+			if (object->GetObjectType() == SimulationObjectType::AGENT 
+				&& !object->GetInOrbit()
+				&& distSqr < contactDist * contactDist)
 			{
 				agentCollisions.push_back((Agent*) object);
 			}
