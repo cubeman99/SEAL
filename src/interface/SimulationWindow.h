@@ -73,9 +73,28 @@ private:
 			wxWindow*				m_pageLog;
 				wxTextCtrl*			m_logBox;
 
-	// Menu items
+	// Simulation
+	wxMenuItem* m_menuItemPauseSimulation;
 	wxMenuItem* m_menuItemTickOnce;
+	wxMenuItem* m_menuItemSimulationSpeed100;
+	wxMenuItem* m_menuItemSimulationSpeed200;
+	wxMenuItem* m_menuItemSimulationSpeed400;
+	wxMenuItem* m_menuItemSimulationSpeedMax;
+	
+	// View
 	wxMenuItem* m_menuItemCameraTracking;
+	wxMenuItem* m_menuItemWireFrameMode;
+	wxMenuItem* m_menuItemViewLighting;
+	wxMenuItem* m_menuItemShowOctTreeOnSurface;
+	wxMenuItem* m_menuItemShowOctTreeWireFrame;
+	wxMenuItem* m_menuItemShowAgentVision;
+	wxMenuItem* m_menuItemShowAgentBrain;
+	wxMenuItem* m_menuItemShowInvisibleObjects;
+
+	// Debug
+	wxMenuItem* m_menuItemDebugMode;
+	wxMenuItem* m_menuItemSpawnCarnivores;
+	wxMenuItem* m_menuItemSpawnHerbivores;
 	wxMenuItem* m_menuItemDeleteAgent;
 };
 

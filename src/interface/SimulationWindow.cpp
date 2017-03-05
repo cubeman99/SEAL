@@ -12,40 +12,55 @@
 
 enum
 {
-    NEW_STEREO_WINDOW = wxID_HIGHEST + 1,
+    CUSTOM_EVENT_IDS_BEGIN = wxID_HIGHEST + 1,
+
+	//-------------------------------------------------------------------------
+
 
 	CHOOSE_GRAPH,
-
-	// File
-	// (using default wxIDs)
-
-	// Simulation
-	PLAY_PAUSE_SIMULATION,
-	SIMULATION_TICK_ONCE,
-	SIMULATION_SPEED_100,
-	SIMULATION_SPEED_200,
-	SIMULATION_SPEED_400,
-	SIMULATION_SPEED_MAX,
-
-	// View
-	TOGGLE_CAMERA_TRACKING,
-	VIEW_WIREFRAME_MODE,
-	VIEW_LIGHTING,
-	SHOW_OCT_TREE_ON_SURFACE,
-	SHOW_OCT_TREE_WIRE_FRAME,
-	SHOW_AGENT_VISION,
-	SHOW_AGENT_BRAIN,
-	SHOW_INVISIBLE_OBJECTS,
-
-	// Debug
-	DEBUG_SPAWN_CARNIVORES,
-	DEBUG_SPAWN_HERBIVORES,
-	DEBUG_DELETE_AGENT,
-
-	// Help
-	// (using default wxIDs)
-
 	UPDATE_TIMER,
+	
+	//-------------------------------------------------------------------------
+	MENU_ITEMS_BEGIN,
+
+		// File
+		FILE_NEW_SIMULATION,
+		FILE_OPEN_SIMULATION,
+		FILE_SAVE_SIMULATION,
+		FILE_SAVE_SIMULATION_AS,
+		FILE_CLOSE,
+
+		// (using default wxIDs)
+
+		// Simulation
+		PLAY_PAUSE_SIMULATION,
+		SIMULATION_TICK_ONCE,
+		SIMULATION_SPEED_100,
+		SIMULATION_SPEED_200,
+		SIMULATION_SPEED_400,
+		SIMULATION_SPEED_MAX,
+
+		// View
+		TOGGLE_CAMERA_TRACKING,
+		VIEW_WIREFRAME_MODE,
+		VIEW_LIGHTING,
+		SHOW_OCT_TREE_ON_SURFACE,
+		SHOW_OCT_TREE_WIRE_FRAME,
+		SHOW_AGENT_VISION,
+		SHOW_AGENT_BRAIN,
+		SHOW_INVISIBLE_OBJECTS,
+
+		// Debug
+		DEBUG_DEBUG_MODE,
+		DEBUG_SPAWN_CARNIVORES,
+		DEBUG_SPAWN_HERBIVORES,
+		DEBUG_DELETE_AGENT,
+
+		// Help
+		HELP_ABOUT,
+	
+	MENU_ITEMS_END,
+	//-------------------------------------------------------------------------
 };
 
 
@@ -60,15 +75,17 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 
 	EVT_COMBOBOX(CHOOSE_GRAPH, SimulationWindow::OnChooseGraph)
 
-	EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
-	EVT_UPDATE_UI(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnUpdateMenuItem)
-	EVT_UPDATE_UI(DEBUG_DELETE_AGENT, SimulationWindow::OnUpdateMenuItem)
+	EVT_UPDATE_UI_RANGE(MENU_ITEMS_BEGIN, MENU_ITEMS_END, SimulationWindow::OnUpdateMenuItem)
+	//EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
+	//EVT_UPDATE_UI(TOGGLE_CAMERA_TRACKING, SimulationWindow::OnUpdateMenuItem)
+	//EVT_UPDATE_UI(DEBUG_DELETE_AGENT, SimulationWindow::OnUpdateMenuItem)
 
 	// File
-	EVT_MENU(wxID_NEW, SimulationWindow::OnNewSimulation)
-    EVT_MENU(wxID_OPEN, SimulationWindow::OnOpenSimulation)
-    EVT_MENU(wxID_SAVE, SimulationWindow::OnSaveSimulation)
-    EVT_MENU(wxID_CLOSE, SimulationWindow::OnClose)
+	EVT_MENU(FILE_NEW_SIMULATION, SimulationWindow::OnNewSimulation)
+    EVT_MENU(FILE_OPEN_SIMULATION, SimulationWindow::OnOpenSimulation)
+    EVT_MENU(FILE_SAVE_SIMULATION, SimulationWindow::OnSaveSimulation)
+    EVT_MENU(FILE_SAVE_SIMULATION_AS, SimulationWindow::OnSaveSimulation)
+    EVT_MENU(FILE_CLOSE, SimulationWindow::OnClose)
 
 	// Simulation
     EVT_MENU(PLAY_PAUSE_SIMULATION, SimulationWindow::OnMenuItem)
@@ -89,12 +106,13 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
 	
 	// Debug
+    EVT_MENU(DEBUG_DEBUG_MODE, SimulationWindow::OnMenuItem)
     EVT_MENU(DEBUG_SPAWN_CARNIVORES, SimulationWindow::OnMenuItem)
     EVT_MENU(DEBUG_SPAWN_HERBIVORES, SimulationWindow::OnMenuItem)
     EVT_MENU(DEBUG_DELETE_AGENT, SimulationWindow::OnMenuItem)
 
 	// About
-    EVT_MENU(wxID_ABOUT, SimulationWindow::OnMenuItem)
+    EVT_MENU(HELP_ABOUT, SimulationWindow::OnMenuItem)
 	
 wxEND_EVENT_TABLE()
 
@@ -229,25 +247,26 @@ void SimulationWindow::CreateMenuBar()
 
     wxMenu* menuFile = new wxMenu;
     menuBar->Append(menuFile, wxT("&File"));
-    menuFile->Append(wxID_NEW, "&New Simulation...\tCtrl+N");
+    menuFile->Append(FILE_NEW_SIMULATION, "&New Simulation...\tCtrl+N");
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_SAVE, "&Save Simulation...\tCtrl+S");
-    menuFile->Append(wxID_OPEN, "&Open Simulation...\tCtrl+O");
+    menuFile->Append(FILE_SAVE_SIMULATION, "&Save Simulation...\tCtrl+S");
+    //menuFile->Append(FILE_SAVE_SIMULATION_AS, "&Save Simulation...\tCtrl+Shift+S");
+    menuFile->Append(FILE_OPEN_SIMULATION, "&Open Simulation...\tCtrl+O");
     menuFile->AppendSeparator();
-    menuFile->Append(wxID_CLOSE, "&Close\tCtrl+W");
+    menuFile->Append(FILE_CLOSE, "&Close\tCtrl+W");
 	
 	//-------------------------------------------------------------------------
 	// SIMULATION
 
     wxMenu* menuSimulation = new wxMenu;
     menuBar->Append(menuSimulation, wxT("&Simulation"));
-    menuSimulation->AppendCheckItem(PLAY_PAUSE_SIMULATION, "&Pause Simulation\tP")->Check(false);
+    m_menuItemPauseSimulation = menuSimulation->AppendCheckItem(PLAY_PAUSE_SIMULATION, "&Pause Simulation\tP");
     m_menuItemTickOnce = menuSimulation->Append(SIMULATION_TICK_ONCE, "&Tick once\t]");
     menuSimulation->AppendSeparator();
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_100, "&100% Speed\t1")->Check(true);
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_200, "&200% Speed\t2");
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_400, "&400% Speed\t3");
-    menuSimulation->AppendRadioItem(SIMULATION_SPEED_MAX, "&Maximum Speed\t0");
+    m_menuItemSimulationSpeed100 = menuSimulation->AppendRadioItem(SIMULATION_SPEED_100, "&100% Speed\t1");
+    m_menuItemSimulationSpeed200 = menuSimulation->AppendRadioItem(SIMULATION_SPEED_200, "&200% Speed\t2");
+    m_menuItemSimulationSpeed400 = menuSimulation->AppendRadioItem(SIMULATION_SPEED_400, "&400% Speed\t3");
+    m_menuItemSimulationSpeedMax = menuSimulation->AppendRadioItem(SIMULATION_SPEED_MAX, "&Maximum Speed\t0");
 	
 	//-------------------------------------------------------------------------
 	// VIEW
@@ -256,22 +275,23 @@ void SimulationWindow::CreateMenuBar()
     menuBar->Append(menuView, wxT("&View"));
     m_menuItemCameraTracking = menuView->AppendCheckItem(TOGGLE_CAMERA_TRACKING, "Camera &Tracking\tT");
 	menuView->AppendSeparator();
-    menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
-    menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL")->Check(true);
+    m_menuItemWireFrameMode = menuView->AppendCheckItem(VIEW_WIREFRAME_MODE, "&Wireframe mode\tW");
+    m_menuItemViewLighting = menuView->AppendCheckItem(VIEW_LIGHTING, "&Lighting\tL");
 	menuView->AppendSeparator();
-    menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO")->Check(false);
-    menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O")->Check(false);
-    menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA")->Check(false);
-    menuView->AppendCheckItem(SHOW_AGENT_BRAIN, "Show Agent &Brain\tB")->Check(false);
-    menuView->AppendCheckItem(SHOW_INVISIBLE_OBJECTS, "Show &Invisible Objects\tI")->Check(false);
+    m_menuItemShowOctTreeOnSurface = menuView->AppendCheckItem(SHOW_OCT_TREE_ON_SURFACE, "Show OctTree on &Surface\tO");
+    m_menuItemShowOctTreeWireFrame = menuView->AppendCheckItem(SHOW_OCT_TREE_WIRE_FRAME, "Show Oct&Tree Wireframe\tShift+O");
+    m_menuItemShowAgentVision = menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA");
+    m_menuItemShowAgentBrain = menuView->AppendCheckItem(SHOW_AGENT_BRAIN, "Show Agent &Brain\tB");
+    m_menuItemShowInvisibleObjects = menuView->AppendCheckItem(SHOW_INVISIBLE_OBJECTS, "Show &Invisible Objects\tI");
 
 	//-------------------------------------------------------------------------
 	// DEBUG
 
     wxMenu* menuDebug = new wxMenu;
     menuBar->Append(menuDebug, wxT("&Debug"));
-    menuDebug->Append(DEBUG_SPAWN_CARNIVORES, "&Spawn Carnivore Agents\tG");
-    menuDebug->Append(DEBUG_SPAWN_HERBIVORES, "&Spawn Herbivore Agents\tH");
+    m_menuItemDebugMode = menuDebug->Append(DEBUG_DEBUG_MODE, "Debug &Mode");
+    m_menuItemSpawnCarnivores = menuDebug->Append(DEBUG_SPAWN_CARNIVORES, "&Spawn Carnivore Agents\tG");
+    m_menuItemSpawnHerbivores = menuDebug->Append(DEBUG_SPAWN_HERBIVORES, "&Spawn Herbivore Agents\tH");
     m_menuItemDeleteAgent = menuDebug->Append(DEBUG_DELETE_AGENT, "&Delete Agent\tDelete");
 
 	//-------------------------------------------------------------------------
@@ -279,7 +299,7 @@ void SimulationWindow::CreateMenuBar()
 
     wxMenu* menuHelp = new wxMenu;
     menuBar->Append(menuHelp, wxT("&Help"));
-    menuHelp->Append(wxID_ABOUT);
+    menuHelp->Append(HELP_ABOUT, "About");
 }
 
 void SimulationWindow::OnNewSimulation()
@@ -312,12 +332,67 @@ void SimulationWindow::OnUpdateMenuItem(wxUpdateUIEvent& e)
 {
 	switch (e.GetId())
 	{
+	//-------------------------------------------------------------------------
+	// Simulation
+
+	case PLAY_PAUSE_SIMULATION:
+		m_menuItemPauseSimulation->Check(m_simulationManager.IsSimulationPaused());
+		break;
 	case SIMULATION_TICK_ONCE:
 		m_menuItemTickOnce->Enable(m_simulationManager.IsSimulationPaused());
 		break;
+	case SIMULATION_SPEED_100:
+		m_menuItemSimulationSpeed100->Check(m_simulationManager.GetTicksFerFrame() == 1);
+		break;
+	case SIMULATION_SPEED_200:
+		m_menuItemSimulationSpeed200->Check(m_simulationManager.GetTicksFerFrame() == 2);
+		break;
+	case SIMULATION_SPEED_400:
+		m_menuItemSimulationSpeed400->Check(m_simulationManager.GetTicksFerFrame() == 4);
+		break;
+	case SIMULATION_SPEED_MAX:
+		m_menuItemSimulationSpeedMax->Check(m_simulationManager.GetMaxTicksPerFrame());
+		break;
+		
+	//-------------------------------------------------------------------------
+	// View
+		
 	case TOGGLE_CAMERA_TRACKING:
 		m_menuItemCameraTracking->Check(
 			m_simulationManager.GetCameraSystem()->IsTrackingObject());
+		break;
+	case VIEW_WIREFRAME_MODE:
+		m_menuItemWireFrameMode->Check(
+			m_simulationManager.IsViewWireFrameMode());
+		break;
+	case VIEW_LIGHTING:
+		m_menuItemViewLighting->Check(
+			m_simulationManager.IsLightingEnabled());
+		break;
+	case SHOW_OCT_TREE_ON_SURFACE:
+		m_menuItemShowOctTreeOnSurface->Check(
+			m_simulationManager.GetShowOctTree());
+		break;
+	case SHOW_OCT_TREE_WIRE_FRAME:
+		m_menuItemShowOctTreeWireFrame->Check(
+			m_simulationManager.GetShowOctTreeWireFrame());
+		break;
+	case SHOW_AGENT_VISION:
+		m_menuItemShowAgentVision->Check(
+			m_simulationManager.GetShowAgentVision());
+		break;
+	case SHOW_AGENT_BRAIN:
+		m_menuItemShowAgentBrain->Check(
+			m_simulationManager.GetShowAgentBrain());
+		break;
+	case SHOW_INVISIBLE_OBJECTS:
+		m_menuItemShowInvisibleObjects->Check(
+			m_simulationManager.GetShowInvisibleObjects());
+		break;
+		
+	//-------------------------------------------------------------------------
+	// Debug
+
 	case DEBUG_DELETE_AGENT:
 		m_menuItemDeleteAgent->Enable(
 			m_simulationManager.GetSelectedAgent() != nullptr);
@@ -407,7 +482,7 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 	//-------------------------------------------------------------------------
 	// Help
 
-	case wxID_ABOUT:
+	case HELP_ABOUT:
 	{
 		wxMessageBox("SEAL\nSimulation of Evolutionary Artificial Life.\n\nBy David Jordan & Ben Russell (2017)",
 			"About SEAL", wxICON_INFORMATION);

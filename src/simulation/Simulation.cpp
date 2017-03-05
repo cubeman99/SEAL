@@ -183,8 +183,8 @@ void Simulation::GenerateNewAgent(Species species)
 // Saving & loading
 //-----------------------------------------------------------------------------
 
-#define SIMULATION_FILE_MAGIC_1   'SEAL'
-#define SIMULATION_FILE_MAGIC_2   'DJBR'
+#define SIMULATION_FILE_MAGIC_1   'LAES'
+#define SIMULATION_FILE_MAGIC_2   'RBJD'
 #define SIMULATION_FILE_VERSION   1
 
 bool Simulation::ReadSimulation(std::ifstream& fileIn)

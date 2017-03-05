@@ -42,9 +42,11 @@ public:
 	inline ResourceManager* GetResourceManager() { return m_simulationRenderer.GetResourceManager(); }
 	inline GraphManager* GetGraphManager() { return &m_graphManager; }
 	inline DiagramDrawer* GetDiagramDrawer() { return &m_diagramDrawer; }
-
-	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
+	
+	inline bool IsSimulationPaused() const { return m_isSimulationPaused; }
+	inline unsigned int GetTicksFerFrame() const { return m_ticksPerFrame; } 
+	inline bool GetMaxTicksPerFrame() const { return m_maxTicksPerFrame; } 
 
 	// Setters
 	inline void SetSimulationPaused(bool isSimulationPaused) { m_isSimulationPaused = isSimulationPaused; }
