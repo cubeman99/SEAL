@@ -4,6 +4,7 @@
 #include <math/Quaternion.h>
 #include <math/Vector3f.h>
 #include "SimulationObject.h"
+#include <simulation/SimulationConfig.h>
 #include "Vision.h"
 #include "Genome.h"
 #include "Brain.h"
@@ -11,13 +12,6 @@
 #include <math/MathLib.h>
 
 class Offshoot;
-
-
-enum Species
-{
-	SPECIES_HERBIVORE,
-	SPECIES_CARNIVORE,
-};
 
 
 //-----------------------------------------------------------------------------

@@ -159,10 +159,6 @@ bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)
 		nextObject = new Offshoot();
 		break;
 
-	case CARCASS:
-		// TODO: when carcass implemented
-		//break;
-
 	default:
 		// Object type not found
 		// Data is missing or corrupt

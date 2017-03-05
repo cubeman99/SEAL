@@ -117,7 +117,7 @@ void Simulation::UpdateSteadyStateGA()
 {
 	// Count the number of agents and add new ones
 	// if population size is below the minimum.
-	int numAgents[2] = { 0, 0 };
+	int numAgents[SPECIES_COUNT] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
@@ -183,10 +183,34 @@ void Simulation::GenerateNewAgent(Species species)
 // Saving & loading
 //-----------------------------------------------------------------------------
 
-void Simulation::ReadSimulation(std::ifstream& fileIn)
-{
-	unsigned long currentSeed;
+#define SIMULATION_FILE_MAGIC_1   'SEAL'
+#define SIMULATION_FILE_MAGIC_2   'DJBR'
+#define SIMULATION_FILE_VERSION   1
 
+bool Simulation::ReadSimulation(std::ifstream& fileIn)
+{
+	// Read the file header.
+	unsigned int magic1, magic2;
+	unsigned int version;
+	fileIn.read((char*)&magic1, sizeof(unsigned int));
+	fileIn.read((char*)&magic2, sizeof(unsigned int));
+	fileIn.read((char*)&version, sizeof(unsigned int));
+
+	// Validate header information.
+	if (magic1 != (unsigned int) SIMULATION_FILE_MAGIC_1 ||
+		magic2 != (unsigned int) SIMULATION_FILE_MAGIC_2)
+	{
+		fileIn.close();
+		return false;
+	}
+	else if (version != SIMULATION_FILE_VERSION)
+	{
+		fileIn.close();
+		return false;
+	}
+
+	// Read simulation information.
+	unsigned long currentSeed;
 	fileIn.read((char*)&currentSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_originalSeed, sizeof(unsigned long));
 	fileIn.read((char*)&m_ageInTicks, sizeof(unsigned int));
@@ -197,23 +221,58 @@ void Simulation::ReadSimulation(std::ifstream& fileIn)
 	fileIn.read((char*)&m_statistics, sizeof(SimulationStats));
 
 	// Read all generation statistics
-	m_generationStats.clear();
-	unsigned int statsNum;
-	fileIn.read((char*)&statsNum, sizeof(unsigned int));
+	unsigned int numStats;
+	fileIn.read((char*)&numStats, sizeof(unsigned int));
+	m_generationStats.resize(numStats);
+	fileIn.read((char*)m_generationStats.data(),
+		numStats * sizeof(SimulationStats));
+	
+	// Clear out the current objects
+	m_objectManager.ClearObjects();
 
-	for (unsigned int i = 0; i < statsNum; ++i)
+	// Get number of objects.
+	unsigned int numObjects;
+	fileIn.read((char*)&numObjects, sizeof(unsigned int));
+
+	// Read and create objects.
+	bool objectCreationGoingWell = true;
+	for (unsigned int i = 0; i < numObjects &&
+		objectCreationGoingWell; ++i)
 	{
-		m_generationStats.push_back(SimulationStats());
-		fileIn.read((char*)&m_generationStats[i], sizeof(SimulationStats));
+		objectCreationGoingWell = m_objectManager.
+			SpawnObjectSerialized(fileIn);
 	}
 
+	if (!objectCreationGoingWell)
+	{
+		// TODO: Tell user that the file was corrupt like our government
+		m_objectManager.ClearObjects();
+		fileIn.close();
+		return false;
+	}
+
+	fileIn.close();
+
+	// Setup the simulation state.
 	m_random.SetSeed(currentSeed);
+
+	return true;
 }
 
-void Simulation::WriteSimulation(std::ofstream& fileOut)
+bool Simulation::WriteSimulation(std::ofstream& fileOut)
 {
 	unsigned long currentSeed = m_random.GetSeed();
 
+	unsigned int magic1 = SIMULATION_FILE_MAGIC_1;
+	unsigned int magic2 = SIMULATION_FILE_MAGIC_2;
+	unsigned int version = SIMULATION_FILE_VERSION;
+	
+	// Write file header information.
+	fileOut.write((char*)&magic1, sizeof(unsigned int));
+	fileOut.write((char*)&magic2, sizeof(unsigned int));
+	fileOut.write((char*)&version, sizeof(unsigned int));
+	
+	// Write simulation information.
 	fileOut.write((char*)&currentSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_originalSeed, sizeof(unsigned long));
 	fileOut.write((char*)&m_ageInTicks, sizeof(unsigned int));
@@ -223,14 +282,23 @@ void Simulation::WriteSimulation(std::ofstream& fileOut)
 	fileOut.write((char*)&m_config, sizeof(SimulationConfig));
 	fileOut.write((char*)&m_statistics, sizeof(SimulationStats));
 
-	// Write all generation statistics
-	unsigned int statsNum = m_generationStats.size();
-	fileOut.write((char*)&statsNum, sizeof(unsigned int));
+	// Write all generation statistics.
+	unsigned int numStats = m_generationStats.size();
+	fileOut.write((char*)&numStats, sizeof(unsigned int));
+	fileOut.write((char*)m_generationStats.data(),
+		numStats * sizeof(SimulationStats));
 
-	for (unsigned int i = 0; i < statsNum; ++i)
+	// Write the number of objects.
+	unsigned int numObjects = m_objectManager.GetNumObjects();
+	fileOut.write((char*)&numObjects, sizeof(unsigned int));
+
+	// Write all object data.
+	for (unsigned int i = 0; i < m_objectManager.GetNumObjects(); ++i)
 	{
-		fileOut.write((char*)&m_generationStats[i], sizeof(SimulationStats));
+		m_objectManager.GetObjByIndex(i)->Write(fileOut);
 	}
+
+	return true;
 }
 
 
@@ -245,7 +313,7 @@ void Simulation::UpdateStatistics()
 	stats.simulationAge = m_ageInTicks;
 
 	// Cumulatively add statistic values for each agent.
-	unsigned int numAgents[2] = { 0, 0 };
+	unsigned int numAgents[SPECIES_COUNT] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{

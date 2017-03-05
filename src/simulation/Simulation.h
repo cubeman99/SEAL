@@ -54,10 +54,10 @@ public:
 	// Saving & loading
 
 	// Read simulation from file.
-	void ReadSimulation(std::ifstream& fileIn);
+	bool ReadSimulation(std::ifstream& fileIn);
 
 	// Write simulation data to file.
-	void WriteSimulation(std::ofstream& fileOut);
+	bool WriteSimulation(std::ofstream& fileOut);
 
 	//-------------------------------------------------------------------------
 	// Events
@@ -93,8 +93,7 @@ private:
 	ObjectManager		m_objectManager;
 	RNG					m_random;
 	SimulationStats		m_statistics;
-
-	FittestList			m_fittestLists[2];
+	FittestList			m_fittestLists[SPECIES_COUNT];
 
 	unsigned long		m_originalSeed;
 	unsigned int		m_ageInTicks;

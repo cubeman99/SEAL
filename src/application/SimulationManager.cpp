@@ -105,40 +105,18 @@ bool SimulationManager::SaveSimulation(const std::string& fileName)
 
 	if (!fileOut)
 	{
-		// TODO: Tell user that the file could not be opened for writing
+		return false; // TODO: Tell user that the file could not be opened for writing
+	}
+
+	// Write the simulation data
+	if (!m_simulation->WriteSimulation(fileOut))
+	{
+		fileOut.close();
 		return false;
 	}
 
-	// TODO: Write a file header, including:
-	// 1. A "magic number" (fixed sequence of characters)
-	//  - the magic number will always be the same for these timeline files
-	//  - try to use something particularly unique, like 'SEALTML'
-	//  - this will be an easy detection for files that are not the right format.
-	// 2. A file version number:
-	//  - this version number gets changed if the timeline file format changes.
-	//  - this will help detect loading of old timeline files, whether we
-	//    support loading legacy files or not.
-	// note: the file header could be made into a struct
-
-	// Write the simulation data
-	m_simulation->WriteSimulation(fileOut);
-
-	// Write the number of objects
-	ObjectManager* objManager = m_simulation->GetObjectManager();
-	unsigned int numObjects = objManager->GetNumObjects();
-	fileOut.write((char*)&numObjects, sizeof(unsigned int));
-
-	// Write the object data
-	for (unsigned int i = 0; i < objManager->GetNumObjects(); ++i)
-	{
-		objManager->GetObjByIndex(i)->Write(fileOut);
-	}
-
 	fileOut.close();
-
-	// TODO: Tell user that the file has been saved succesffully
-
-	return true;
+	return true; // TODO: Tell user that the file has been saved succesffully
 }
 
 bool SimulationManager::OpenSimulation(const std::string& fileName)
@@ -152,28 +130,10 @@ bool SimulationManager::OpenSimulation(const std::string& fileName)
 		return false;
 	}
 
-	// Clear out the current objects
-	ObjectManager* objManager = m_simulation->GetObjectManager();
-	objManager->ClearObjects();
-
 	// Read the simulation data
-	m_simulation->ReadSimulation(fileIn);
-
-	// Get number of objects
-	unsigned int numObjects;
-	fileIn.read((char*)&numObjects, sizeof(unsigned int));
-
-	// Read and create objects
-	bool objectCreationGoingWell = true;
-	for (unsigned int i = 0; i < numObjects && objectCreationGoingWell; ++i)
+	if (!m_simulation->ReadSimulation(fileIn))
 	{
-		objectCreationGoingWell = objManager->SpawnObjectSerialized(fileIn);
-	}
-
-	if (!objectCreationGoingWell)
-	{
-		// TODO: Tell user that the file was corrupt like our government
-		objManager->ClearObjects();
+		fileIn.close();
 		return false;
 	}
 
@@ -182,7 +142,6 @@ bool SimulationManager::OpenSimulation(const std::string& fileName)
 	OnNewSimulation();
 
 	// TODO: Tell user that the file has been loaded succesffully
-
 	return true;
 }
 
@@ -220,7 +179,7 @@ void SimulationManager::Update()
 		}
 	}
 	
-	// Check if our selected agent has died.
+	// Check if our selected agent has died to prevent dangling references.
 	// TODO: make an event queue for simultaion (for births and deaths)
 	if (m_selectedAgent != nullptr && m_simulation->
 		GetObjectManager()->GetObjectById(m_selectedAgentId) == nullptr)

@@ -239,15 +239,20 @@ void Agent::Read(std::ifstream& fileIn)
 	m_brain = new Brain();
 
 	// Read basic info
+	int speciesIndex;
 	fileIn.read((char*)&m_objectId, sizeof(int));
 	fileIn.read((char*)&m_position, sizeof(Vector3f));
 	fileIn.read((char*)&m_orientation, sizeof(Quaternion));
+	fileIn.read((char*)&speciesIndex, sizeof(int));
 	fileIn.read((char*)&m_moveSpeed, sizeof(float));
 	fileIn.read((char*)&m_turnSpeed, sizeof(float));
 	fileIn.read((char*)&m_energy, sizeof(float));
+	fileIn.read((char*)&m_healthEnergy, sizeof(float));
 	fileIn.read((char*)&m_age, sizeof(int));
 	fileIn.read((char*)&m_fitness, sizeof(float));
 	fileIn.read((char*)&m_inOrbit, sizeof(float));
+	fileIn.read((char*)&m_mateWaitTime, sizeof(int));
+	m_species = (Species) speciesIndex;
 
 	// Read genome
 	fileIn.read((char*)m_genome->GetData(),
@@ -267,29 +272,10 @@ void Agent::Read(std::ifstream& fileIn)
 	m_brain->m_prevNeuronActivations = new float[m_brain->m_numNeurons];
 	m_brain->m_synapses = new Synapse[m_brain->m_numSynapses];
 
-	// -Read nuerons
-	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-	{
-		fileIn.read((char*)&m_brain->m_neurons[i], sizeof(Neuron));
-	}
-
-	// -Read current nueron activations
-	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-	{
-		fileIn.read((char*)&m_brain->m_currNeuronActivations[i], sizeof(float));
-	}
-
-	// -Read previous neuron activations
-	for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-	{
-		fileIn.read((char*)&m_brain->m_prevNeuronActivations[i], sizeof(float));
-	}
-
-	// -Read synapses
-	for (unsigned int i = 0; i < m_brain->m_numSynapses; ++i)
-	{
-		fileIn.read((char*)&m_brain->m_synapses[i], sizeof(Synapse));
-	}
+	// Read neuron and synapse data
+	fileIn.read((char*)m_brain->m_neurons, m_brain->m_numNeurons * sizeof(Neuron));
+	fileIn.read((char*)m_brain->m_synapses, m_brain->m_numSynapses * sizeof(Synapse));
+	fileIn.read((char*)m_brain->m_currNeuronActivations, m_brain->m_numNeurons * sizeof(float));
 }
 
 void Agent::Write(std::ofstream& fileOut)
@@ -298,17 +284,22 @@ void Agent::Write(std::ofstream& fileOut)
 	{
 		int objType = GetObjectType();
 
+		int speciesIndex = (int) m_species;
+
 		// Write basic info
 		fileOut.write((char*)&objType, sizeof(int));
 		fileOut.write((char*)&m_objectId, sizeof(int));
 		fileOut.write((char*)&m_position, sizeof(Vector3f));
 		fileOut.write((char*)&m_orientation, sizeof(Quaternion));
+		fileOut.write((char*)&speciesIndex, sizeof(int));
 		fileOut.write((char*)&m_moveSpeed, sizeof(float));
 		fileOut.write((char*)&m_turnSpeed, sizeof(float));
 		fileOut.write((char*)&m_energy, sizeof(float));
+		fileOut.write((char*)&m_healthEnergy, sizeof(float));
 		fileOut.write((char*)&m_age, sizeof(int));
 		fileOut.write((char*)&m_fitness, sizeof(float));
 		fileOut.write((char*)&m_inOrbit, sizeof(float));
+		fileOut.write((char*)&m_mateWaitTime, sizeof(int));
 
 		// Write genome
 		fileOut.write((char*)m_genome->GetData(), m_genome->GetSize() * sizeof(unsigned char));
@@ -320,30 +311,12 @@ void Agent::Write(std::ofstream& fileOut)
 		fileOut.write((char*)&m_brain->m_numSynapses, sizeof(unsigned int));
 		fileOut.write((char*)&m_brain->m_decayRate, sizeof(float));
 		fileOut.write((char*)&m_brain->m_maxWeight, sizeof(float));
-
-		// -Write nuerons
-		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-		{
-			fileOut.write((char*)&m_brain->m_neurons[i], sizeof(Neuron));
-		}
-
-		// -Write current nueron activations
-		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-		{
-			fileOut.write((char*)&m_brain->m_currNeuronActivations[i], sizeof(float));
-		}
-
-		// -Write previous neuron activations
-		for (unsigned int i = 0; i < m_brain->m_numNeurons; ++i)
-		{
-			fileOut.write((char*)&m_brain->m_prevNeuronActivations[i], sizeof(float));
-		}
-
-		// -Write synapses
-		for (unsigned int i = 0; i < m_brain->m_numSynapses; ++i)
-		{
-			fileOut.write((char*)&m_brain->m_synapses[i], sizeof(Synapse));
-		}
+		fileOut.write((char*)m_brain->m_neurons,
+			m_brain->m_numNeurons * sizeof(Neuron));
+		fileOut.write((char*)m_brain->m_synapses,
+			m_brain->m_numSynapses * sizeof(Synapse));
+		fileOut.write((char*)m_brain->m_currNeuronActivations,
+			m_brain->m_numNeurons * sizeof(float));
 	}
 }
 

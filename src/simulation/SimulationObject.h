@@ -17,15 +17,10 @@ class Simulation;
 
 enum SimulationObjectType : int
 {
-	INVALID = '?',
-
-	AGENT = 'AGNT',
-	PLANT = 'PLNT',
-	OFFSHOOT = 'OFST',
-	CARCASS = 'CARC',
-	//PREDATOR_AGENT = 'PRED',
-	//PREY_AGENT = 'PREY',
-	//FOOD,
+	INVALID		= '?',
+	AGENT		= 'AGNT',
+	PLANT		= 'PLNT',
+	OFFSHOOT	= 'OFST',
 };
 
 // Use this in a subclass of SimulationObject to declare its type.

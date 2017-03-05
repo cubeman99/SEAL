@@ -3,6 +3,18 @@
 
 
 //-----------------------------------------------------------------------------
+// Species - list of species types
+//-----------------------------------------------------------------------------
+enum Species
+{
+	SPECIES_HERBIVORE = 0,
+	SPECIES_CARNIVORE = 1,
+
+	SPECIES_COUNT,
+};
+
+
+//-----------------------------------------------------------------------------
 // SpeciesConfig - configuration for a single agent species.
 //-----------------------------------------------------------------------------
 struct SpeciesConfig
@@ -156,7 +168,7 @@ public:
 
 	union
 	{
-		SpeciesConfig species[2];
+		SpeciesConfig species[SPECIES_COUNT];
 
 		struct
 		{

@@ -3,6 +3,8 @@
 
 #include "Genome.h"
 
+
+
 //-----------------------------------------------------------------------------
 // SpeciesStats - various statistics for a single agent species.
 //-----------------------------------------------------------------------------
@@ -61,7 +63,7 @@ public:
 
 	union
 	{
-		SpeciesStats species[2];
+		SpeciesStats species[SPECIES_COUNT];
 
 		struct
 		{
@@ -79,8 +81,8 @@ public:
 	{
 		simulationAge = 0;
 
-		species[0].Reset();
-		species[1].Reset();
+		species[SPECIES_HERBIVORE].Reset();
+		species[SPECIES_CARNIVORE].Reset();
 	}
 };
 
