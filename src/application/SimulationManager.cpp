@@ -50,8 +50,8 @@ void SimulationManager::Initialize()
 	m_diagramDrawer.Initialize();
 
 	// Seed Random with current time.
-	// The static random should NOT be used for simulation logic.
-	// It should be used for graphics or UI stuff.
+	// The static Random class should NOT be used for simulation logic.
+	// It should be used for graphics and UI stuff.
 	Random::SeedTime();
 
 	// Begin a new simulation with default config values.

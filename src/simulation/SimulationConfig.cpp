@@ -6,8 +6,10 @@ SimulationConfig::SimulationConfig()
 {
 	// Setup some default values for debug purposes.
 
-	world.radius	= 160; // gives a circumference of about 1000
-	world.seed		= -1;
+	world.radius				= 160; // gives a circumference of about 1000
+	world.seed					= -1;
+	world.matingSeasonDuration	= 60 * 12;
+	world.offSeasonDuration		= 60 * 18;
 
 	//-------------------------------------------------------------------------
 	// Plant
@@ -26,9 +28,15 @@ SimulationConfig::SimulationConfig()
 	//-------------------------------------------------------------------------
 	// Herbivore
 
-	herbivore.population.initialAgents	= 100;
-	herbivore.population.minAgents		= 20;
-	herbivore.population.maxAgents		= 160;
+	herbivore.population.initialAgents		= 100;
+	herbivore.population.minAgents			= 20;
+	herbivore.population.maxAgents			= 160;
+	
+	herbivore.fittestList.numFittestAgents		= 40;
+	herbivore.fittestList.mateTournamentSize	= 5;
+	herbivore.fittestList.mateChance			= 5; // 5/11 chance to mate and spawn child of two fittest agents
+	herbivore.fittestList.randomChance			= 5; // 5/11 chance to spawn random agent
+	herbivore.fittestList.eliteChance			= 1; // 1/11 chance to spawn elite fittest agent
 
 	herbivore.agent.radiusAtMinStrength			= 4.0f;
 	herbivore.agent.radiusAtMaxStrength			= 6.0f;
@@ -87,9 +95,9 @@ SimulationConfig::SimulationConfig()
 	// Set carnivore config to herbivore config
 	carnivore = herbivore;
 	
-	carnivore.population.initialAgents	= 15;
-	carnivore.population.minAgents		= 15;
-	carnivore.population.maxAgents		= 50;
+	carnivore.population.initialAgents		= 15;
+	carnivore.population.minAgents			= 15;
+	carnivore.population.maxAgents			= 50;
 	
 	carnivore.agent.matingDelay			= 60 * 16;
 	

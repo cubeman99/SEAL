@@ -25,27 +25,61 @@ struct Fittest
 class FittestList
 {
 public:
+	//-------------------------------------------------------------------------
+	// Constructors & destructor
+
 	FittestList();
 	FittestList(int capacity);
 	~FittestList();
 
-	void Reset(int capacity);
+
+	//-------------------------------------------------------------------------
+	// Getters
 
 	int GetCapacity() const;
+	
 	int GetSize() const;
+
+	bool IsEmpty() const;
+
+	// Is the list full (does size equal capacity?)
 	bool IsFull() const;
-	void Clear();
 
-	void Update(Agent* agent, float fitness);
-
+	// Get the fittest agent entry by rank, where rank 0 is the fittest.
 	Fittest* GetByRank(int rank);
 
-	void PickTwoTournamentSelection(int tournamentSize, Genome*& outFirst, Genome*& outSecond);
+
+	//-------------------------------------------------------------------------
+	// List modification
+
+	// Clear the list.
+	void Clear();
+	
+	// Clear and reset the list with the given capacity.
+	void Reset(int capacity);
+
+	// Update the list with the given agent and fitness.
+	void Update(Agent* agent, float fitness);
+
+
+	//-------------------------------------------------------------------------
+	// Fittest selection
+
+	// Pick a random genome.
+	Genome* PickOneRandom(RNG& random);
+
+	// Pick a random genome weighted by fitness.
+	Genome* PickOneRandomWeighted(RNG& random);
+
+	// Pick two random genomes using tournament selection.
+	void PickTwoTournamentSelection(RNG& random, int tournamentSize,
+		Genome*& outFirst, Genome*& outSecond);
+
 
 private:
-	int			m_capacity;
-	int			m_size;
-	Fittest*	m_fittest;
+	int			m_capacity;	// Maximum fittest genomes to store in the list.
+	int			m_size;		// Current number of genomes in the list.
+	Fittest*	m_fittest;	// Array of fittest genome entries.
 };
 
 

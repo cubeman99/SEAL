@@ -64,17 +64,20 @@ public:
 
 	void OnAgentDie(Agent* agent);
 
+
 private:
 	//-------------------------------------------------------------------------
 	// Internal update mechanics
 
+	// Update the steady state Genetic Algorithm (GA), which generates new
+	// agents if their population is below the minimum.
 	void UpdateSteadyStateGA();
+
+	// Generate a new agent of the given species using the steady state GA.
+	void GenerateNewAgent(Species species);
 
 	// Update the statistics records
 	void UpdateStatistics();
-
-	// Advance to the next generation
-	void NextGeneration();
 
 	// Randomly select an agent from the population with chances
 	// weighted by fitness.
@@ -97,9 +100,7 @@ private:
 	unsigned int		m_ageInTicks;
 	unsigned int		m_generationIndex;
 	unsigned int		m_generationAge;
-	unsigned int		m_generationDuration; // TODO: move into config.
-
-	// TODO: mating season values here??
+	unsigned int		m_generationDuration;
 
 public:
 	std::vector<SimulationStats> m_generationStats;

@@ -23,10 +23,9 @@ Simulation::~Simulation()
 
 bool Simulation::IsMatingSeason() const
 {
-	// TODO: mating season is disabled for now. We should implement
-	// predator/prey first before re-enabling it.
-	//return true;
-	return (m_generationAge > (m_generationDuration * 0.6f));
+	// Mating season happens at the end of a generation.
+	return (m_generationAge >= (unsigned int)
+		m_config.world.offSeasonDuration);
 }
 
 
@@ -41,7 +40,8 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize simulation state.
 	m_ageInTicks = 0;
 	m_generationAge = 0;
-	m_generationDuration = 60 * 30;
+	m_generationDuration = m_config.world.offSeasonDuration +
+		m_config.world.matingSeasonDuration;
 	m_generationIndex = 0;
 	m_generationStats.clear();
 
@@ -60,14 +60,16 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
-	m_fittestLists[0].Reset(20); // TODO: make these configurable
-	m_fittestLists[1].Reset(40);
+	m_fittestLists[SPECIES_HERBIVORE].Reset(
+		m_config.herbivore.fittestList.numFittestAgents);
+	m_fittestLists[SPECIES_CARNIVORE].Reset(
+		m_config.carnivore.fittestList.numFittestAgents);
 	
-	// Spawn some plants.
+	// Spawn initial plants.
 	for (int i = 0; i < m_config.plant.numPlants; ++i)
 		m_objectManager.SpawnObjectRandom<Plant>();
 
-	// Spawn some agents.
+	// Spawn initial agents.
 	for (int i = 0; i < m_config.herbivore.population.initialAgents; ++i)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE), false);
 	for (int i = 0; i < m_config.carnivore.population.initialAgents; ++i)
@@ -86,7 +88,10 @@ void Simulation::Tick()
 	// Advance to the next generation.
 	m_generationAge++;
 	if (m_generationAge >= m_generationDuration)
-		NextGeneration();
+	{
+		m_generationAge = 0;
+		m_generationIndex++;
+	}
 
 	// Update statistic gathering.
 	UpdateStatistics();
@@ -110,7 +115,8 @@ void Simulation::OnAgentDie(Agent* agent)
 
 void Simulation::UpdateSteadyStateGA()
 {
-	// Count the number of agents and add new ones if population size is below the minimum.
+	// Count the number of agents and add new ones
+	// if population size is below the minimum.
 	int numAgents[2] = { 0, 0 };
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
@@ -118,39 +124,60 @@ void Simulation::UpdateSteadyStateGA()
 		numAgents[(int) it->GetSpecies()]++;
 	}
 
-	const int tournamentSize = 5; // TODO: magic number
-
+	// Now generate new agents if necessary.
 	for (unsigned int i = 0; i < 2; ++i)
 	{
 		if (numAgents[i] < m_config.species[i].population.minAgents)
-		{
-			// Choose method of agent generation.
-			if (m_fittestLists[i].IsFull() && 
-				m_random.NextFloat() < 0.7f) // TODO: magic number
-			{
-				// Mate two fittest agents.
-				Genome* mommy;
-				Genome* daddy;
-				m_fittestLists[i].PickTwoTournamentSelection(
-					tournamentSize, mommy, daddy);
-				Genome* childGenome = Genome::SpawnChild(
-					mommy, daddy, m_config.species[i], m_random);
-				Agent* child = new Agent(childGenome, 100, (Species) i);
-				child->SetEnergy(child->GetMaxEnergy());
-				child->SetHealthEnergy(child->GetMaxEnergy());
-				m_objectManager.SpawnObjectRandom(child, true);
-			}
-			else
-			{
-				// Generate a new random agent.
-				m_objectManager.SpawnObjectRandom(new Agent((Species) i), true);
-			}
-
-			// TODO: chance of elite
-		}
+			GenerateNewAgent((Species) i);
 	}
-
 }
+
+void Simulation::GenerateNewAgent(Species species)
+{
+	const SpeciesConfig& config = m_config.species[species];
+	FittestList& fittestList = m_fittestLists[species];
+	float totalChance = config.fittestList.mateChance +
+		config.fittestList.randomChance + config.fittestList.eliteChance;
+	float pick = m_random.NextFloat(0.0f, totalChance);
+
+	// Pick a random agent genome generation method:
+	//   1. mate two fittest genomes
+	//   2. create a new random genome
+	//   3. use an elite genome
+
+	if (pick < config.fittestList.mateChance &&
+		fittestList.IsFull())
+	{
+		// Mate two fittest agents.
+		Genome* mommy;
+		Genome* daddy;
+		fittestList.PickTwoTournamentSelection(
+			m_random, config.fittestList.mateTournamentSize,
+			mommy, daddy);
+		Genome* childGenome = Genome::SpawnChild(
+			mommy, daddy, config, m_random);
+		Agent* child = new Agent(childGenome, 100, species);
+		child->SetEnergy(child->GetMaxEnergy());
+		child->SetHealthEnergy(child->GetMaxEnergy());
+		m_objectManager.SpawnObjectRandom(child, true);
+	}
+	else if (pick < config.fittestList.mateChance +
+		config.fittestList.randomChance || fittestList.IsEmpty())
+	{
+		// Generate a new random agent.
+		m_objectManager.SpawnObjectRandom(new Agent(species), true);
+	}
+	else
+	{
+		// Use an elite, unaltered agent genome from the fittest list.
+		Genome* genome = fittestList.PickOneRandom(m_random);
+		Agent* elite = new Agent(new Genome(*genome), 100, species);
+		elite->SetEnergy(elite->GetMaxEnergy());
+		elite->SetHealthEnergy(elite->GetMaxEnergy());
+		m_objectManager.SpawnObjectRandom(elite, true);
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 // Saving & loading
@@ -229,7 +256,6 @@ void Simulation::UpdateStatistics()
 		stats.species[spec].avgEnergyUsage += it->GetEnergyUsage();
 		stats.species[spec].avgMoveAmount += it->GetMoveAmount();
 		stats.species[spec].avgTurnAmount += Math::Abs(it->GetTurnAmount());
-
 		stats.species[spec].totalEnergy += it->GetEnergy();
 		stats.species[spec].populationSize++;
 		stats.species[spec].bestFitness = Math::Max(it->GetFitness(),
@@ -259,57 +285,6 @@ void Simulation::UpdateStatistics()
 	}
 
 	m_statistics = stats;
-}
-
-void Simulation::NextGeneration()
-{
-	// This function can still be useful for season purposes
-	m_generationAge = 0;
-	m_generationIndex++;
-
-	// Old asexual reproduction code: //////////////////////
-
-	//// Count the number of agents.
-	//unsigned int numAgents = 0;
-	//for (auto it = m_objectManager.agents_begin();
-	//	it != m_objectManager.agents_end(); ++it)
-	//{
-	//	numAgents++;
-	//}
-
-	//// Keep mating agents to create a new population.
-	//Agent** newPopulation = new Agent*[numAgents];
-	//for (unsigned int i = 0; i < numAgents; ++i)
-	//{
-	//	// Select and mate two agents.
-	//	Agent* mommy = SelectAgent();
-	//	Agent* daddy = SelectAgent();
-	//	Agent* child = CreateOffspring(mommy, daddy);
-	//	newPopulation[i] = child;
-	//}
-	//
-	//// Remove the old objects.
-	//m_objectManager.ClearObjects();
-	//
-	//// Spawn some plants.
-	//for (int i = 0; i < m_config.plant.numPlants; ++i)
-	//	m_objectManager.SpawnObjectRandom<Plant>();
-
-	//// Spawn the new agents.
-	//for (unsigned int i = 0; i < numAgents; ++i)
-	//{
-	//	Agent* agent = newPopulation[i];
-
-	//	// Randomize the agent's position & orientation.
-	//	Vector3f position;
-	//	Quaternion orientation;
-	//	m_objectManager.CreateRandomPositionAndOrientation(position, orientation);
-	//	agent->SetPosition(position);
-	//	agent->SetOrientation(orientation);
-	//	
-	//	// Spawn the agent into the world.
-	//	m_objectManager.SpawnObject(agent);
-	//}
 }
 
 Agent* Simulation::SelectAgent()

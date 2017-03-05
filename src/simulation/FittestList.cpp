@@ -56,6 +56,11 @@ int FittestList::GetSize() const
 	return m_size;
 }
 
+bool FittestList::IsEmpty() const
+{
+	return (m_size == 0);
+}
+
 bool FittestList::IsFull() const
 {
 	return (m_size == m_capacity);
@@ -116,22 +121,61 @@ Fittest* FittestList::GetByRank(int rank)
 
 
 
-void FittestList::PickTwoTournamentSelection(int tournamentSize, Genome*& outFirst, Genome*& outSecond)
+Genome* FittestList::PickOneRandom(RNG& random)
+{
+	if (m_size == 0)
+		return nullptr;
+	int index = random.NextInt(0, m_size);
+	return m_fittest[index].genome;
+}
+
+Genome* FittestList::PickOneRandomWeighted(RNG& random)
+{
+	if (m_size == 0)
+		return nullptr;
+
+	// Sum up the total fitness of all agents in the list.
+	float totalFitness = 0.0f;
+	for (int i = 0; i < m_size; ++i)
+		m_fittest[i].fitness += totalFitness;
+
+	// If all agents are equally weak, pick any one.
+	if (totalFitness == 0.0f)
+		return PickOneRandom(random);
+
+	// Otherwise, pick a random agent weighted by fitness.
+	float select = random.NextFloat(0.0f, totalFitness);
+	float counter = 0.0f;
+	for (int i = 0; i < m_size; ++i)
+	{
+		counter += m_fittest[i].fitness;
+		if (select <= counter)
+			return m_fittest[i].genome;
+	}
+
+	// This shouldn't happen, but handle it anyways.
+	return PickOneRandom(random);
+}
+
+void FittestList::PickTwoTournamentSelection(RNG& random,
+	int tournamentSize, Genome*& outFirst, Genome*& outSecond)
 {
 	assert(m_size >= 2);
-
+	
+	// Pick the first agent.
 	int firstIndex = m_size - 1;
-	for (int z = 0; z < tournamentSize; z++)
+	for (int i = 0; i < tournamentSize; ++i)
 	{
-		int r = Random::NextInt(0, m_size);
+		int r = random.NextInt(0, m_size);
 		if (firstIndex > r)
 			firstIndex = r;
 	}
 
+	// Pick the second agent.
 	int secondIndex = m_size - 1;
-	for (int z = 0; z < tournamentSize; z++)
+	for (int i = 0; i < tournamentSize; ++i)
 	{
-		int r = (firstIndex + 1 + Random::NextInt(0, m_size - 1)) % m_size;
+		int r = (firstIndex + 1 + random.NextInt(0, m_size - 1)) % m_size;
 		if (secondIndex > r)
 			secondIndex = r;
 	}

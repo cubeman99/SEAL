@@ -19,6 +19,18 @@ struct SpeciesConfig
 	} population;
 
 	//-------------------------------------------------------------------------
+	// Fittest list
+
+	struct
+	{
+		int		numFittestAgents;
+		int		mateTournamentSize;
+		float	mateChance;
+		float	randomChance;
+		float	eliteChance;
+	} fittestList;
+
+	//-------------------------------------------------------------------------
 	// Agent configuration
 
 	struct
@@ -118,6 +130,8 @@ public:
 	{
 		float	radius;
 		int		seed;	// -1 means random seed.
+		int		matingSeasonDuration; // for how many ticks does mating season occur?
+		int		offSeasonDuration; // how many ticks from when mating season ends to when it starts again
 
 	} world;
 
