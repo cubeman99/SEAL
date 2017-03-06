@@ -240,6 +240,9 @@
     <ClCompile Include="..\..\src\application\ConfigFileLoader.cpp">
       <Filter>Source Files\application</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\utilities\StringUtility.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -442,6 +445,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\application\ConfigFileLoader.h">
       <Filter>Source Files\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utilities\StringUtility.h">
+      <Filter>Source Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

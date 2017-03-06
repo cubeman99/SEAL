@@ -2,9 +2,19 @@
 #define _TIME_H_
 
 
-namespace Time
+//-----------------------------------------------------------------------------
+// Time - Static class for portable time utility functions
+//-----------------------------------------------------------------------------
+class Time
 {
-	double GetTime();
+public:
+	
+	// Get the current time in seconds since epoch.
+	static double GetTime();
+
+private:
+	// this is meant to be a static class.
+	Time() {}
 };
 
 

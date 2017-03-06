@@ -1,53 +1,10 @@
 #include "ConfigFileLoader.h"
 #include <math/MathLib.h>
 #include <utilities/Logging.h>
+#include <utilities/StringUtility.h>
 #include <fstream>
 #include <sstream>
 #include <vector>
-
-
-// Trim the whitespace (spaces and tabs) on both ends of a string.
-static std::string TrimString(const std::string& str)
-{
-	std::string result = str;
-
-	size_t index = result.find_first_not_of(" \t");
-	if (index != std::string::npos)
-		result = result.substr(index);
-
-	index = result.find_last_not_of(" \t");
-	if (index != std::string::npos)
-		result = result.substr(0, index + 1);
-
-	return result;
-}
-
-// Separate a string into an array of tokens, delimited by the given delimeter characters.
-static std::vector<std::string> TokenizeString(const std::string& str,
-	const std::string& delimeter, bool includeEmptyTokens)
-{
-	std::vector<std::string> tokens;
-	int tokenEnd;
-	int tokenBegin = 0;
-	int length = (int) str.length();
-
-	while (tokenBegin < length)
-	{
-		// Find the next whitespace (or end of string).
-		tokenEnd = str.find_first_of(delimeter, tokenBegin);
-		if (tokenEnd == std::string::npos)
-			tokenEnd = length;
-
-		// Add the token to the list.
-		if (tokenEnd > tokenBegin || includeEmptyTokens)
-			tokens.push_back(str.substr(tokenBegin, tokenEnd - tokenBegin));
-
-		// Move onto the next token.
-		tokenBegin = tokenEnd + 1;
-	}
-
-	return tokens;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -58,7 +15,7 @@ ConfigUnit::ConfigUnit(const std::string& names, ConfigParam::Units units, float
 	units(units),
 	conversionFactor(conversionFactor)
 {
-	this->names = TokenizeString(names, ";, \t", false);
+	this->names = StringUtility::Tokenize(names, ";, \t", false);
 }
 
 bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
@@ -309,7 +266,7 @@ bool ConfigFileLoader::ParseLine(const std::string& lineFromFile, std::string& o
 		line = line.substr(0, commentStart);
 
 	// Trim whitespace.
-	line = TrimString(line);
+	line = StringUtility::Trim(line);
 
 	// Ignore empty lines.
 	if (line.length() == 0)
@@ -324,14 +281,14 @@ bool ConfigFileLoader::ParseLine(const std::string& lineFromFile, std::string& o
 	}
 
 	// Split the line into key and value strings.
-	std::string key = TrimString(line.substr(0, equalsPos));
-	std::string value = TrimString(line.substr(equalsPos + 1));
+	std::string key = StringUtility::Trim(line.substr(0, equalsPos));
+	std::string value = StringUtility::Trim(line.substr(equalsPos + 1));
 	std::string label = "";
 
 	// Tokenize the value, delimeted by whitespace.
 	// The first token is the value number.
 	// The second token is the label (units like 'ticks', 'radians', etc.).
-	std::vector<std::string> tokens = TokenizeString(value, " \t", false);
+	std::vector<std::string> tokens = StringUtility::Tokenize(value, " \t", false);
 	if (tokens.empty())
 	{
 		outError = "expected a value";

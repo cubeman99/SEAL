@@ -4,6 +4,9 @@
 #include <string>
 
 
+//-----------------------------------------------------------------------------
+// FileUtility - Static class for file utility functions
+//-----------------------------------------------------------------------------
 class FileUtility
 {
 public:
