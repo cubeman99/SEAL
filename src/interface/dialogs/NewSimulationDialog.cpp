@@ -20,8 +20,6 @@ NewSimulationDialog::NewSimulationDialog(wxWindow* parent,
 
 	wxDialog(parent, id, title, position, size, style | wxRESIZE_BORDER)
 {
-	//wxStaticBox* configFileBox = new wxStaticBox(this, -1, _("Configuration File:"));
-	
 	m_textLoadMessage = new wxTextCtrl(this, -1, _("Please specify a configuration file"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE);
 	m_buttonOpenConfigFile = new wxButton(this, BUTTON_OPEN_CONFIG_FILE, _("Browse"));
 	m_textConfigFilePath = new wxTextCtrl(this, -1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);

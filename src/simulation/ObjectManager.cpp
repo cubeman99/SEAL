@@ -80,16 +80,8 @@ void ObjectManager::UpdateObjects()
 		if (object->m_isDestroyed)
 			continue;
 
-		// Calculate derived data.
-		object->m_worldToObject = 
-			Matrix4f::CreateRotation(object->m_orientation.GetConjugate()) *
-			Matrix4f::CreateTranslation(-object->m_position);
-		object->m_objectToWorld = 
-			Matrix4f::CreateTranslation(object->m_position) *
-			Matrix4f::CreateRotation(object->m_orientation);
-
-		// Update the object.
 		object->Update();
+		CalcObjectDerivedData(object);
 
 		// Update the object in the cct-tree since the
 		// object's position probably changed.
@@ -124,18 +116,22 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 	object->m_objectManager = this;
 	object->m_isDestroyed = false;
 	object->OnSpawn();
+	CalcObjectDerivedData(object);
 }
 
 void ObjectManager::SpawnObjectRandom(SimulationObject* object, bool inOrbit)
 {
 	CreateRandomPositionAndOrientation(object->m_position, object->m_orientation);
 
+	SpawnObject(object);
+
 	if (inOrbit)
 	{
 		object->SetInOrbit();
+		object->Update();
 	}
 
-	SpawnObject(object);
+	CalcObjectDerivedData(object);
 }
 
 bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)
@@ -182,6 +178,8 @@ bool ObjectManager::SpawnObjectSerialized(std::ifstream& fileIn)
 	// Set Id counter
 	// Once the last object has been read, the Id counter should match that of the loaded timelime
 	m_objectIdCounter = nextObject->GetId() + 1;
+	
+	CalcObjectDerivedData(nextObject);
 
 	nextObject = nullptr;
 	return true;
@@ -309,5 +307,15 @@ void ObjectManager::CreateRelativeRandomPositionAndOrientation(
 
 	// Make sure postion is on world's surface.
 	newPosition *= m_simulation->GetWorld()->GetRadius();
+}
+
+void ObjectManager::CalcObjectDerivedData(SimulationObject* object)
+{
+	object->m_worldToObject = 
+		Matrix4f::CreateRotation(object->m_orientation.GetConjugate()) *
+		Matrix4f::CreateTranslation(-object->m_position);
+	object->m_objectToWorld = 
+		Matrix4f::CreateTranslation(object->m_position) *
+		Matrix4f::CreateRotation(object->m_orientation);
 }
 

@@ -185,31 +185,28 @@ void Agent::Update()
 {
 	const SpeciesConfig& config = GetSimulation()->GetAgentConfig(m_species);
 
-	if (!GetInOrbit())
-	{
-		UpdateVision();
-		UpdateBrain();
-
-		// Turn and move.
-		m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
-		m_objectManager->MoveObjectForward(this, m_moveSpeed);
-
-		// Update energy usage.
-		m_energyUsage = config.energy.energyCostExist +
-			(config.energy.energyCostMove * m_moveSpeed) +
-			(config.energy.energyCostTurn * m_turnSpeed);
-		m_energy -= m_energyUsage;
-	}
-	else
+	if (GetInOrbit())
 	{
 		// Fall
 		m_inOrbit -= 0.005f;
-
 		m_orientation.Rotate(m_orientation.GetUp(), 0.25f);
-
 		m_position.Normalize();
 		m_position *= GetSimulation()->GetWorld()->GetRadius() * m_inOrbit;
+		return;
 	}
+
+	UpdateVision();
+	UpdateBrain();
+
+	// Turn and move.
+	m_orientation.Rotate(m_orientation.GetUp(), m_turnSpeed);
+	m_objectManager->MoveObjectForward(this, m_moveSpeed);
+
+	// Update energy usage.
+	m_energyUsage = config.energy.energyCostExist +
+		(config.energy.energyCostMove * m_moveSpeed) +
+		(config.energy.energyCostTurn * m_turnSpeed);
+	m_energy -= m_energyUsage;
 
 	m_age++;
 
@@ -360,7 +357,7 @@ void Agent::UpdateVision()
 	m_objectManager->GetOctTree()->Query(visionSphere,
 		[&](SimulationObject* object)
 	{
-		if (object != this)
+		if (object != this && !object->GetInOrbit())
 		{
 			float contactDist = m_radius + object->GetRadius();
 			float matingDist = config.agent.minMatingDistance;
@@ -384,9 +381,8 @@ void Agent::UpdateVision()
 			}
 
 			// Check for collision with another agent.
-			if (object->GetObjectType() == SimulationObjectType::AGENT 
-				&& !object->GetInOrbit()
-				&& distSqr < contactDist * contactDist)
+			if (object->GetObjectType() == SimulationObjectType::AGENT &&
+				distSqr < contactDist * contactDist)
 			{
 				agentCollisions.push_back((Agent*) object);
 			}

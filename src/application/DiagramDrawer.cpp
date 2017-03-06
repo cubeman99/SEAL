@@ -180,7 +180,7 @@ void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned in
 	CalcGraphRange(graphs[0], rangeMin, rangeMax);
 	for (unsigned int i = 1; i < numGraphs; ++i)
 	{
-		CalcGraphRange(graphs[0], r0, r1);
+		CalcGraphRange(graphs[i], r0, r1);
 		rangeMin = Math::Min(rangeMin, r0);
 		rangeMax = Math::Max(rangeMax, r1);
 	}

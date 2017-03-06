@@ -94,6 +94,11 @@ public:
 	void CreateRelativeRandomPositionAndOrientation( Vector3f relativePosition,
 		Vector3f& newPosition, float randomFactor, Quaternion& orientation) const;
 
+
+private:
+	void CalcObjectDerivedData(SimulationObject* object);
+
+
 private:
 	Simulation*		m_simulation;
 	OctTree			m_octTree;
