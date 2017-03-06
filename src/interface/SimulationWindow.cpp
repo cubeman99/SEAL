@@ -4,6 +4,7 @@
 #include <sstream>
 #include <utilities/Timing.h>
 #include "GraphCanvas.h"
+#include <utilities/Logging.h>
 
 
 //-----------------------------------------------------------------------------
@@ -234,7 +235,7 @@ void SimulationWindow::CreateUI()
     Show();
 
 	// TODO: remove this test message.
-	wxLogMessage("Test message using wxLogMessage()");
+	SEAL_LOG_MSG("Test message using SEAL_LOG_MSG()!!");
 }
 
 void SimulationWindow::CreateMenuBar()

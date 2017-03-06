@@ -73,6 +73,7 @@
     <ClCompile Include="..\..\src\simulation\Vision.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
     <ClCompile Include="..\..\src\utilities\FileUtility.cpp" />
+    <ClCompile Include="..\..\src\utilities\Logging.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
     <ClCompile Include="..\..\src\utilities\Timing.cpp" />
   </ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="..\..\src\simulation\Vision.h" />
     <ClInclude Include="..\..\src\simulation\World.h" />
     <ClInclude Include="..\..\src\utilities\FileUtility.h" />
+    <ClInclude Include="..\..\src\utilities\Logging.h" />
     <ClInclude Include="..\..\src\utilities\Random.h" />
     <ClInclude Include="..\..\src\utilities\Timing.h" />
   </ItemGroup>

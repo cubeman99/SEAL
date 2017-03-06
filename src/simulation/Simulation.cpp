@@ -1,6 +1,7 @@
 #include "Simulation.h"
 #include <utilities/Timing.h>
 #include <math/MathLib.h>
+#include <utilities/Logging.h>
 
 
 //-----------------------------------------------------------------------------

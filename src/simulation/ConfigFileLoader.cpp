@@ -3,9 +3,22 @@
 #include <sstream>
 
 
+#define ADD_FLOAT_PARAM(name) \
+	m_params[#name] = ConfigParam(#name, offsetof(SimulationConfig, name), ConfigParam::TYPE_FLOAT);
+
+
+
 ConfigFileLoader::ConfigFileLoader() :
 	m_outConfig(nullptr)
 {
+
+	//m_params["name"] = ConfigParam("name", offsetof(SimulationConfig, world.radius), ConfigParam::TYPE_FLOAT);
+
+
+	//ADD_FLOAT_PARAM(world.radius, ConfigParam::TYPE_FLOAT);
+	ADD_FLOAT_PARAM(world.radius);
+
+
 }
 
 
