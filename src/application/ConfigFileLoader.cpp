@@ -53,10 +53,10 @@ bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
 		offsetof(SimulationConfig, name[0]), \
 		ConfigParam::TYPE_FLOAT, ConfigParam::UNITS_NONE); \
 	m_params[#name ".green"] = new ConfigParam(#name ".green", \
-		offsetof(SimulationConfig, name[0]), \
+		offsetof(SimulationConfig, name[1]), \
 		ConfigParam::TYPE_FLOAT, ConfigParam::UNITS_NONE); \
 	m_params[#name ".blue"] = new ConfigParam(#name ".blue", \
-		offsetof(SimulationConfig, name[1]), \
+		offsetof(SimulationConfig, name[2]), \
 		ConfigParam::TYPE_FLOAT, ConfigParam::UNITS_NONE)
 
 // Species parameters
@@ -120,10 +120,10 @@ ConfigFileLoader::ConfigFileLoader() :
 	ADD_SPECIES_FLOAT_PARAM	(agent.radiusAtMaxStrength,			ConfigParam::UNITS_DISTANCE);
 	ADD_SPECIES_FLOAT_PARAM	(agent.maxEnergyAtMinStrength,		ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(agent.maxEnergyAtMaxStrength,		ConfigParam::UNITS_NONE);
-	ADD_SPECIES_FLOAT_PARAM	(agent.maxMoveSpeedAtMinStrength,	ConfigParam::UNITS_NONE); // distance / time
-	ADD_SPECIES_FLOAT_PARAM	(agent.maxMoveSpeedAtMaxStrength,	ConfigParam::UNITS_NONE); // distance / time
-	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMinStrength,	ConfigParam::UNITS_NONE); // angle / time
-	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMaxStrength,	ConfigParam::UNITS_NONE); // angle / time
+	ADD_SPECIES_FLOAT_PARAM	(agent.maxMoveSpeedAtMinStrength,	ConfigParam::UNITS_DISTANCE); // distance / time
+	ADD_SPECIES_FLOAT_PARAM	(agent.maxMoveSpeedAtMaxStrength,	ConfigParam::UNITS_DISTANCE); // distance / time
+	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMinStrength,	ConfigParam::UNITS_ANGLE); // angle / time
+	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMaxStrength,	ConfigParam::UNITS_ANGLE); // angle / time
 		
 	// Energy costs
 	ADD_SPECIES_FLOAT_PARAM	(energy.energyCostExist,			ConfigParam::UNITS_NONE); // energy / time

@@ -5,6 +5,7 @@
 #include <utilities/Timing.h>
 #include "GraphCanvas.h"
 #include <utilities/Logging.h>
+#include <interface/dialogs/NewSimulationDialog.h>
 
 
 //-----------------------------------------------------------------------------
@@ -537,20 +538,12 @@ void SimulationWindow::OnClose(wxCommandEvent& e)
 
 void SimulationWindow::OnNewSimulation(wxCommandEvent& e)
 {
-	// TODO: New simulation dialog
-	//   - specify path to config file.
-	//      -OR-
-	//   - dialog box for editing config params within app
+	NewSimulationDialog dialog(this, wxID_ANY, "New Simulation");
 	
-	// Ask the user if they're sure what they're doing.
-	wxMessageDialog dialog(this,
-		"Are you sure you want to begin a new simulation?",
-		"New Simulation", wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
-	if (dialog.ShowModal() == wxID_YES)
+	if (dialog.ShowModal() == wxID_OK)
 	{
-		// TEMP: begin a new simulation with default config values.
-		SimulationConfig config;
-		m_simulationManager.BeginNewSimulation(config);
+		// Begin a new simulation with loaded config.
+		m_simulationManager.BeginNewSimulation(dialog.GetSimulationConfig());
 		OnNewSimulation();
 	}
 }

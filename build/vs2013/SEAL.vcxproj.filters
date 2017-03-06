@@ -46,6 +46,9 @@
     <Filter Include="Source Files\interface\canvas">
       <UniqueIdentifier>{1af5b050-8ad3-4db9-9f8a-77d022fc7dc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\interface\dialogs">
+      <UniqueIdentifier>{548c0ea3-8624-4a36-97be-f10907528468}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -242,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\utilities\StringUtility.cpp">
       <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interface\dialogs\NewSimulationDialog.cpp">
+      <Filter>Source Files\interface\dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\utilities\StringUtility.h">
       <Filter>Source Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\interface\dialogs\NewSimulationDialog.h">
+      <Filter>Source Files\interface\dialogs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
