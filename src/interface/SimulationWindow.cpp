@@ -662,6 +662,14 @@ void SimulationWindow::UpdateDebugAgentControls()
 		m_controlledAgentId = agent->GetId();
 	else
 		m_controlledAgentId = -1;
+	
+	// Relinquish control over the agent if were not in debug mode.
+	if (!m_simulationManager.IsDebugMode())
+	{
+		if (agent != nullptr)
+			agent->SetManualOverride(false);
+		return;
+	}
 
 	// Update movement controls for the currently selected agent.
 	if (agent != nullptr)

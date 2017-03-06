@@ -656,13 +656,12 @@ void Agent::UpdateBrain()
 	if (!m_manualOverride)
 	{
 		float moveAmount = m_brain->GetNeuronActivation(
-			m_brain->GetNumInputNeurons() + 0);
+			m_brain->GetNumInputNeurons() + MOVE_SPEED);
 		float turnAmount = m_brain->GetNeuronActivation(
-			m_brain->GetNumInputNeurons() + 1);
+			m_brain->GetNumInputNeurons() + TURN_SPEED);
 
 		m_moveAmount = moveAmount;
 		m_turnAmount = (turnAmount * 2.0f) - 1.0f;
-
 		m_moveSpeed = m_moveAmount * m_maxMoveSpeed;
 		m_turnSpeed = m_turnAmount * m_maxTurnSpeed;
 	}
