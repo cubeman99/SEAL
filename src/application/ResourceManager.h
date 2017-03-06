@@ -26,6 +26,7 @@ public:
 
 	// Resource loading
 	Texture* LoadTexture(const std::string& name, const std::string& path);
+	Texture* LoadCubeMapTexture(const std::string& name, std::string paths[6]);
 	Shader* LoadShader(const std::string& name,
 		const std::string& vertexPath, const std::string& fragmentPath);
 	Mesh* LoadMesh(const std::string& name, const std::string& path);

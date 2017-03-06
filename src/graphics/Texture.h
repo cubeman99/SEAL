@@ -4,6 +4,7 @@
 #include <graphics/Color.h>
 #include <graphics/TextureParams.h>
 #include <graphics/ImageFormat.h>
+#include <vector>
 
 class RenderBuffer;
 
@@ -74,11 +75,26 @@ public:
 
 	void InitRenderTarget();
 
+	// Texture loading
 	static Texture* LoadTexture(const std::string& fileName, const TextureParams& params = TextureParams());
+	static Texture* LoadCubeMap(std::string fileNames[6], const TextureParams& params = TextureParams());
+
 
 	inline unsigned int GetGLTextureId() const { return m_glTextureId; }
 
+
 private:
+	struct ImageData
+	{
+		unsigned int width;
+		unsigned int height;
+		std::vector<unsigned char> data;
+	};
+
+	static bool LoadImageData(const std::string& fileName, ImageData& outImage);
+	static Texture* CreateTextureFromImage(const ImageData& image, const TextureParams& params);
+	static Texture* CreateCubeMapFromImages(const ImageData* images, const TextureParams& params);
+
 	void DoBindTexture();
 	void DoUnbindTexture();
 	unsigned int GetGLTextureTarget() const;

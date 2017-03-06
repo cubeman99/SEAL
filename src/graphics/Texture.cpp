@@ -592,12 +592,35 @@ void Texture::InitRenderTarget()
 
 Texture* Texture::LoadTexture(const std::string& fileName, const TextureParams& params)
 {
+	ImageData image;
+	if (!LoadImageData(fileName, image))
+		return NULL;
+	return CreateTextureFromImage(image, params);
+}
+
+Texture* Texture::LoadCubeMap(std::string fileNames[6], const TextureParams& params)
+{
+	ImageData images[6];
+
+	// Load each face image.
+	for (int i = 0; i < 6; i++)
+	{
+		if (!LoadImageData(fileNames[i], images[i]))
+			return false;
+	}
+
+	return CreateCubeMapFromImages(images, params);
+}
+
+
+bool Texture::LoadImageData(const std::string& fileName, ImageData& outImage)
+{
 	// Open the file.
 	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
 		std::cerr << "Error opening texture file " << fileName << std::endl;
-		return NULL;
+		return false;
 	}
 
 	// Read it's entirety.
@@ -607,32 +630,54 @@ Texture* Texture::LoadTexture(const std::string& fileName, const TextureParams& 
 	if (!file.read(fileData.data(), fileSize))
 	{
 		std::cerr << "Error reading texture file " << fileName << std::endl;
-		return NULL;
+		return false;
 	}
+	file.close();
 
 	// Decode the image file into pixel data.
-	unsigned int width;
-	unsigned int height;
-	std::vector<unsigned char> imageData;
 	lodepng::State lodePngState;
-	lodepng::decode(imageData, width, height, lodePngState,
+	lodepng::decode(outImage.data, outImage.width, outImage.height, lodePngState,
 		(unsigned char*) fileData.data(), fileData.size());
 	if (lodePngState.error != 0)
 	{
 		std::cerr << "lodepng_decode32 failed: "
 			<< lodepng_error_text(lodePngState.error) << std::endl;
-		return NULL;
+		return false;
 	}
 
+	return true;
+}
+
+Texture* Texture::CreateTextureFromImage(const ImageData& image, const TextureParams& params)
+{
 	// Create the texture.
 	TextureParams texParams = params;
 	texParams.SetTarget(TextureTarget::TEXTURE_2D);
 	Texture* texture = new Texture();
 	texture->SetParams(texParams);
-	texture->WritePixels2D(width, height,
+	texture->WritePixels2D(image.width, image.height,
 		PixelTransferFormat::RGBA,
 		PixelType::TYPE_UNSIGNED_BYTE,
-		imageData.data());
+		image.data.data());
+	return texture;
+}
+
+Texture* Texture::CreateCubeMapFromImages(const ImageData* images, const TextureParams& params)
+{
+	// Create the texture.
+	TextureParams texParams = params;
+	texParams.SetTarget(TextureTarget::TEXTURE_2D);
+	Texture* texture = new Texture();
+	texture->SetParams(texParams);
+
+	for (unsigned int i = 0; i < 6; ++i)
+	{
+		texture->WriteFacePixels(i,
+			images[i].width, images[i].height,
+			PixelTransferFormat::RGBA,
+			PixelType::TYPE_UNSIGNED_BYTE,
+			images[i].data.data());
+	}
 
 	return texture;
 }
