@@ -4,12 +4,16 @@
 #include <math/Quaternion.h>
 #include <simulation/World.h>
 #include <simulation/Simulation.h>
+#include <application/ConfigFileLoader.h>
 #include "CameraSystem.h"
 #include "GraphManager.h"
 #include "SimulationRenderer.h"
 #include "DiagramDrawer.h"
 
 
+//-----------------------------------------------------------------------------
+// SimulationManager
+//-----------------------------------------------------------------------------
 class SimulationManager
 {
 public:
@@ -84,6 +88,7 @@ private:
 	CameraSystem		m_cameraSystem;
 	GraphManager		m_graphManager;
 	DiagramDrawer		m_diagramDrawer;
+	ConfigFileLoader	m_configLoader;
 
 	int				m_selectedAgentId;
 	Agent*			m_selectedAgent;

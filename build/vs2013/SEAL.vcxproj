@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\application\ArcBallCamera.cpp" />
     <ClCompile Include="..\..\src\application\CameraSystem.cpp" />
+    <ClCompile Include="..\..\src\application\ConfigFileLoader.cpp" />
     <ClCompile Include="..\..\src\application\DiagramDrawer.cpp" />
     <ClCompile Include="..\..\src\application\GlobeCamera.cpp" />
     <ClCompile Include="..\..\src\application\GraphManager.cpp" />
@@ -59,7 +60,6 @@
     <ClCompile Include="..\..\src\math\Vector4f.cpp" />
     <ClCompile Include="..\..\src\simulation\Agent.cpp" />
     <ClCompile Include="..\..\src\simulation\Brain.cpp" />
-    <ClCompile Include="..\..\src\simulation\ConfigFileLoader.cpp" />
     <ClCompile Include="..\..\src\simulation\FittestList.cpp" />
     <ClCompile Include="..\..\src\simulation\Genome.cpp" />
     <ClCompile Include="..\..\src\simulation\Nerve.cpp" />
@@ -73,13 +73,13 @@
     <ClCompile Include="..\..\src\simulation\Vision.cpp" />
     <ClCompile Include="..\..\src\simulation\World.cpp" />
     <ClCompile Include="..\..\src\utilities\FileUtility.cpp" />
-    <ClCompile Include="..\..\src\utilities\Logging.cpp" />
     <ClCompile Include="..\..\src\utilities\Random.cpp" />
     <ClCompile Include="..\..\src\utilities\Timing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\application\ArcBallCamera.h" />
     <ClInclude Include="..\..\src\application\CameraSystem.h" />
+    <ClInclude Include="..\..\src\application\ConfigFileLoader.h" />
     <ClInclude Include="..\..\src\application\DiagramDrawer.h" />
     <ClInclude Include="..\..\src\application\GlobeCamera.h" />
     <ClInclude Include="..\..\src\application\GraphManager.h" />
@@ -127,7 +127,6 @@
     <ClInclude Include="..\..\src\math\Vector4f.h" />
     <ClInclude Include="..\..\src\simulation\Agent.h" />
     <ClInclude Include="..\..\src\simulation\Brain.h" />
-    <ClInclude Include="..\..\src\simulation\ConfigFileLoader.h" />
     <ClInclude Include="..\..\src\simulation\FittestList.h" />
     <ClInclude Include="..\..\src\simulation\Genome.h" />
     <ClInclude Include="..\..\src\simulation\Nerve.h" />

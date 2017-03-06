@@ -237,11 +237,8 @@
     <ClCompile Include="..\..\src\simulation\FittestList.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\simulation\ConfigFileLoader.cpp">
-      <Filter>Source Files\simulation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\utilities\Logging.cpp">
-      <Filter>Source Files\utilities</Filter>
+    <ClCompile Include="..\..\src\application\ConfigFileLoader.cpp">
+      <Filter>Source Files\application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -440,11 +437,11 @@
     <ClInclude Include="..\..\src\simulation\FittestList.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\simulation\ConfigFileLoader.h">
-      <Filter>Source Files\simulation</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\utilities\Logging.h">
       <Filter>Source Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\ConfigFileLoader.h">
+      <Filter>Source Files\application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
