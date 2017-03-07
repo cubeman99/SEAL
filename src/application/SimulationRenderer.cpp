@@ -4,6 +4,7 @@
 #include <simulation/Offshoot.h>
 #include <simulation/Plant.h>
 #include <utilities/Timing.h>
+#include <graphics/OpenGLIncludes.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -26,6 +27,24 @@ void SimulationRenderer::LoadResources()
 		"font", "fonts/font_console.png", 16, 8, 12, 0);
 
 	//-------------------------------------------------------------------------
+	// Load textures.
+
+	std::string skyBoxFileNames[6] = {
+		"textures/starbox_right1.png",
+		"textures/starbox_left2.png",
+		"textures/starbox_top3.png",
+		"textures/starbox_bottom4.png",
+		"textures/starbox_front5.png",
+		"textures/starbox_back6.png",
+	};
+	
+	TextureParams texParams;
+	texParams.SetMinFilter(TextureFilterOptions::LINEAR); // NOTE: default filter params will break this because of mip maps
+	texParams.SetMagFilter(TextureFilterOptions::LINEAR);
+	texParams.SetMipMapFilter(TextureFilterOptions::NONE);
+	m_textureSkyBox = m_resourceManager.LoadCubeMapTexture("skybox", skyBoxFileNames, texParams);
+
+	//-------------------------------------------------------------------------
 	// Load shaders.
 
 	m_shaderLit = m_resourceManager.LoadShader("lit",
@@ -40,6 +59,9 @@ void SimulationRenderer::LoadResources()
 	m_shaderUnlitVertexColored = m_resourceManager.LoadShader("unlit_vertex_colored",
 		"shaders/unlit_vertex_colored_vs.glsl",
 		"shaders/unlit_vertex_colored_fs.glsl");
+	m_shaderSkyBox = m_resourceManager.LoadShader("skybox",
+		"shaders/skybox_vs.glsl",
+		"shaders/skybox_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
 	Shader* m_defaultShader = new Shader();
@@ -79,8 +101,11 @@ void SimulationRenderer::LoadResources()
 	m_worldMaterial = new Material();
 	m_worldMaterial->SetColor(Color::WHITE);
 	
-	// TODO: Move this resource creation code somewhere else.
+	// Skybox inverted-cube model.
+	m_skyBoxMesh = m_resourceManager.LoadMesh("skybox", "models/skybox.obj");
 
+	// TODO: Move this resource creation code somewhere else.
+	
 	// Create selection circle mesh.
 	{
 		std::vector<VertexPos> vertices;
@@ -212,6 +237,34 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
     glViewport(0, 0, (int) canvasSize.x, (int) canvasSize.y);
 	glDisable(GL_SCISSOR_TEST);
 
+	//-------------------------------------------------------------------------
+	// Render the skybox.
+	
+	renderParams.EnableDepthBufferWrite(false);
+	renderParams.EnableDepthTest(false);
+	m_renderer.SetRenderParams(renderParams);
+	m_renderer.ApplyRenderSettings(false);
+	{
+		transform.SetIdentity();
+		transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
+		m_renderer.SetShader(m_shaderSkyBox);
+
+		int uniformLocation = -1;
+		if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
+			glUniform1i(uniformLocation, 0);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
+
+		m_renderer.RenderMesh(m_skyBoxMesh, m_worldMaterial, transform);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+	renderParams.EnableDepthBufferWrite(true);
+	renderParams.EnableDepthTest(true);
+	m_renderer.SetRenderParams(renderParams);
+	m_renderer.ApplyRenderSettings(false);
+	
 
 	//-------------------------------------------------------------------------
 	// Render the simulation.

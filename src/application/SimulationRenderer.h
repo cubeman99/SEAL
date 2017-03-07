@@ -52,12 +52,14 @@ private:
 
 	// Resources
 	Font* m_font;
+	Texture* m_textureSkyBox;
 	Mesh* m_agentMeshHerbivore;
 	Mesh* m_agentMeshCarnivore;
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;
 	Mesh* m_meshSelectionCircle;
 	Mesh* m_meshAxisLines;
+	Mesh* m_skyBoxMesh;
 	Material* m_worldMaterial;
 	Material* m_agentMaterial;
 	Material* m_plantMaterial;
@@ -67,6 +69,7 @@ private:
 	Shader* m_shaderLitVertexColored;
 	Shader* m_shaderUnlit;
 	Shader* m_shaderUnlitVertexColored;
+	Shader* m_shaderSkyBox;
 };
 
 

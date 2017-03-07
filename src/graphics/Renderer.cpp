@@ -288,7 +288,7 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Transform3f& tra
 
 void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelMatrix)
 {
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 
 	UpdateUniforms(material, modelMatrix * mesh->GetTransformMatrix());
 

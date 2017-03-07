@@ -66,12 +66,12 @@ Texture* ResourceManager::LoadTexture(const std::string& name, const std::string
 	return texture;
 }
 
-Texture* ResourceManager::LoadCubeMapTexture(const std::string& name, std::string paths[6])
+Texture* ResourceManager::LoadCubeMapTexture(const std::string& name, std::string paths[6], TextureParams& params)
 {
 	std::string finalPaths[6];
 	for (unsigned int i = 0; i < 6; ++i)
 		finalPaths[i] = m_assetsPath + paths[i];
-	Texture* texture = Texture::LoadCubeMap(finalPaths);
+	Texture* texture = Texture::LoadCubeMap(finalPaths, params);
 	if (texture == nullptr)
 		return nullptr;
 	AddTexture(name, texture);

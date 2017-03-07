@@ -606,7 +606,7 @@ Texture* Texture::LoadCubeMap(std::string fileNames[6], const TextureParams& par
 	for (int i = 0; i < 6; i++)
 	{
 		if (!LoadImageData(fileNames[i], images[i]))
-			return false;
+			return nullptr;
 	}
 
 	return CreateCubeMapFromImages(images, params);
@@ -666,7 +666,7 @@ Texture* Texture::CreateCubeMapFromImages(const ImageData* images, const Texture
 {
 	// Create the texture.
 	TextureParams texParams = params;
-	texParams.SetTarget(TextureTarget::TEXTURE_2D);
+	texParams.SetTarget(TextureTarget::TEXTURE_CUBE_MAP);
 	Texture* texture = new Texture();
 	texture->SetParams(texParams);
 
@@ -678,7 +678,7 @@ Texture* Texture::CreateCubeMapFromImages(const ImageData* images, const Texture
 			PixelType::TYPE_UNSIGNED_BYTE,
 			images[i].data.data());
 	}
-
+	
 	return texture;
 }
 
