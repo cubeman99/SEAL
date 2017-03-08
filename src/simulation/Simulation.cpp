@@ -158,9 +158,11 @@ void Simulation::GenerateNewAgent(Species species)
 		Genome* childGenome = Genome::SpawnChild(
 			mommy, daddy, config, m_random);
 		Agent* child = new Agent(childGenome, 100, species);
+		m_objectManager.SpawnObjectRandom(child, true);
+
+		// Max's are determined after OnSpawn(), through SpawnObjectRandom()
 		child->SetEnergy(child->GetMaxEnergy());
 		child->SetHealthEnergy(child->GetMaxEnergy());
-		m_objectManager.SpawnObjectRandom(child, true);
 	}
 	else if (pick < config.fittestList.mateChance +
 		config.fittestList.randomChance || fittestList.IsEmpty())
@@ -173,9 +175,11 @@ void Simulation::GenerateNewAgent(Species species)
 		// Use an elite, unaltered agent genome from the fittest list.
 		Genome* genome = fittestList.PickOneRandom(m_random);
 		Agent* elite = new Agent(new Genome(*genome), 100, species);
+		m_objectManager.SpawnObjectRandom(elite, true);
+
+		// Max's are determined after OnSpawn(), through SpawnObjectRandom()
 		elite->SetEnergy(elite->GetMaxEnergy());
 		elite->SetHealthEnergy(elite->GetMaxEnergy());
-		m_objectManager.SpawnObjectRandom(elite, true);
 	}
 }
 

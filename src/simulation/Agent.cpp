@@ -69,7 +69,7 @@ void Agent::OnSpawn()
 	}
 
 	// If the genome is null, then create a randomized one.
-	// This is a sign that this agent is a first gen with no parents.
+	// This is a sign that this agent has no parents.
 	if (m_genome == nullptr)
 	{
 		m_genome = new Genome(config);
