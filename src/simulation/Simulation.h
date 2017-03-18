@@ -8,6 +8,7 @@
 #include <simulation/SimulationObject.h>
 #include <simulation/SimulationStats.h>
 #include <simulation/World.h>
+#include <graphics/ParticleSystem.h>
 #include <utilities/Random.h>
 
 
@@ -91,6 +92,7 @@ private:
 	SimulationConfig	m_config;
 	World				m_world;
 	ObjectManager		m_objectManager;
+	ParticleSystem		m_particleSystem;
 	RNG					m_random;
 	SimulationStats		m_statistics;
 	FittestList			m_fittestLists[SPECIES_COUNT];

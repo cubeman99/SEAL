@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\src\graphics\lodepng\lodepng.cpp" />
     <ClCompile Include="..\..\src\graphics\Material.cpp" />
     <ClCompile Include="..\..\src\graphics\Mesh.cpp" />
+    <ClCompile Include="..\..\src\graphics\ParticleSystem.cpp" />
     <ClCompile Include="..\..\src\graphics\Primitives.cpp" />
     <ClCompile Include="..\..\src\graphics\Renderer.cpp" />
     <ClCompile Include="..\..\src\graphics\RenderParams.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="..\..\src\graphics\Material.h" />
     <ClInclude Include="..\..\src\graphics\Mesh.h" />
     <ClInclude Include="..\..\src\graphics\OpenGLIncludes.h" />
+    <ClInclude Include="..\..\src\graphics\ParticleSystem.h" />
     <ClInclude Include="..\..\src\graphics\Primitives.h" />
     <ClInclude Include="..\..\src\graphics\Renderer.h" />
     <ClInclude Include="..\..\src\graphics\RenderParams.h" />

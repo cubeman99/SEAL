@@ -249,6 +249,9 @@
     <ClCompile Include="..\..\src\interface\dialogs\NewSimulationDialog.cpp">
       <Filter>Source Files\interface\dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\graphics\ParticleSystem.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -457,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\interface\dialogs\NewSimulationDialog.h">
       <Filter>Source Files\interface\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\graphics\ParticleSystem.h">
+      <Filter>Source Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
