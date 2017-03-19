@@ -47,6 +47,9 @@ public:
 	// Begin a new simulation using the given configuration.
 	void Initialize(const SimulationConfig& config);
 
+	// A new Simulation is being loaded
+	void OnNewSimulation();
+
 	// Update the simulation for one tick.
 	void Tick();
 

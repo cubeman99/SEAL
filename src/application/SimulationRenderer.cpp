@@ -309,6 +309,9 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
 	}
 
+	// Render particles
+	//TODO
+
 	// Render agent vision.
 	if (m_simulationManager->GetShowAgentVision())
 	{

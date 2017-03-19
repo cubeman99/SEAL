@@ -61,6 +61,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
+	m_particleSystem.Init();
 	m_fittestLists[SPECIES_HERBIVORE].Reset(
 		m_config.herbivore.fittestList.numFittestAgents);
 	m_fittestLists[SPECIES_CARNIVORE].Reset(
@@ -77,6 +78,11 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE), false);
 }
 
+void Simulation::OnNewSimulation()
+{
+	m_particleSystem.Init();
+}
+
 void Simulation::Tick()
 {
 	double startTime = Time::GetTime();
@@ -84,6 +90,7 @@ void Simulation::Tick()
 	// Update systems.
 	m_ageInTicks++;
 	m_objectManager.UpdateObjects();
+	m_particleSystem.Update();
 	UpdateSteadyStateGA();
 
 	// Advance to the next generation.

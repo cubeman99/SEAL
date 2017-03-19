@@ -33,9 +33,10 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 	m_inUse = true;
 	m_age = 0;
 	m_type = type;
-	m_color = Color::WHITE;
-
 	m_position = position;
+
+	// Clear old values
+	m_color = Color::WHITE;
 	m_velocity = Vector3f(0.0f);
 	m_acceleration = m_velocity;
 
@@ -57,14 +58,25 @@ ParticleSystem::ParticleSystem()
 
 void ParticleSystem::Init()
 {
+	CleanUp();
+
 	m_numFreeParticles = MAX_PARTICLES;
 
 	// Populate object pool
 	m_particles.resize(MAX_PARTICLES);
 	for (int i = 0; i < MAX_PARTICLES; ++i)
 	{
-		m_particles.push_back(Particle());
+		m_particles[i] = new Particle();
 	}
+}
+
+void ParticleSystem::CleanUp()
+{
+	for (unsigned int i = 0; i < m_particles.size(); ++i)
+	{
+		delete m_particles[i];
+	}
+	m_particles.clear();
 }
 
 void ParticleSystem::Update()
@@ -73,9 +85,9 @@ void ParticleSystem::Update()
 
 	for (int i = 0; i < MAX_PARTICLES; ++i)
 	{
-		if (m_particles[i].m_inUse)
+		if (m_particles[i]->m_inUse)
 		{
-			stillInUse = m_particles[i].Update();
+			stillInUse = m_particles[i]->Update();
 
 			if (!stillInUse)
 			{
@@ -83,11 +95,6 @@ void ParticleSystem::Update()
 			}
 		}
 	}
-}
-
-void ParticleSystem::Draw()
-{
-	//...
 }
 
 void ParticleSystem::AddParticle(ParticleType type, Vector3f position)
@@ -99,11 +106,11 @@ void ParticleSystem::AddParticle(ParticleType type, Vector3f position)
 		// Search for unused particle
 		for (int i = 0; i < MAX_PARTICLES && !foundOne; ++i)
 		{
-			if (!m_particles[i].m_inUse)
+			if (!m_particles[i]->m_inUse)
 			{
 				foundOne = true;
 				m_numFreeParticles--;
-				m_particles[i].Reassign(type, position);
+				m_particles[i]->Reassign(type, position);
 			}
 		}
 	}

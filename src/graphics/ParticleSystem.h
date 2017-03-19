@@ -49,13 +49,13 @@ public:
 	~ParticleSystem() {};
 
 	void Update();
-	void Draw();
 	void Init();
+	void CleanUp();
 
 	void AddParticle(ParticleType type, Vector3f position);
 
 private:
-	std::vector<Particle> m_particles; // object pool
+	std::vector<Particle*> m_particles; // object pool
 
 	int m_numFreeParticles;
 

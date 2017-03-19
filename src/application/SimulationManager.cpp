@@ -68,6 +68,7 @@ void SimulationManager::OnNewSimulation()
 	m_cameraSystem.OnNewSimulation(m_simulation);
 	m_simulationRenderer.OnNewSimulation(m_simulation);
 	m_graphManager.OnNewSimulation(m_simulation);
+	m_simulation->OnNewSimulation();
 
 	// Reset viewing state.
 	m_debugMode				= false;
