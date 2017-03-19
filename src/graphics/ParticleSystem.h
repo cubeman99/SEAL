@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include <math/Quaternion.h>
-#include <math/Matrix4f.h>
+#include <math/Vector3f.h>
+#include <graphics/Color.h>
 
-const int MAX_PARTICLES = 1000;
+const int MAX_PARTICLES = 666;
 
 enum ParticleType
 {
@@ -32,6 +32,8 @@ private:
 	ParticleType m_type;
 	int m_lifeTime;
 	int m_age;
+	Color m_color;
+
 	Vector3f m_position;
 	Vector3f m_velocity;
 	Vector3f m_acceleration;
@@ -50,9 +52,12 @@ public:
 	void Draw();
 	void Init();
 
+	void AddParticle(ParticleType type, Vector3f position);
 
 private:
 	std::vector<Particle> m_particles; // object pool
+
+	int m_numFreeParticles;
 
 };
 
