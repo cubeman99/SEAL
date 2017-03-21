@@ -35,18 +35,18 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 	m_type = type;
 	m_position = position;
 
-	// Clear old values
+	// Default values
 	m_color = Color::WHITE;
 	m_velocity = Vector3f(0.0f);
 	m_acceleration = m_velocity;
 
 	switch (type)
 	{
-	case VIOLENCE:
+	case AGENT_KILLED:
 		m_color = Color::RED;
 		break;
 
-	case MATING:
+	case AGENT_MATED:
 		m_color = Color(255, 105, 180);
 		break;
 	}

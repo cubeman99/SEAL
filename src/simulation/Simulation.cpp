@@ -120,6 +120,14 @@ void Simulation::OnAgentDie(Agent* agent)
 	// TODO: death statistics
 }
 
+void Simulation::AddParticles(unsigned int num, ParticleType type, Vector3f position)
+{
+	for (unsigned int i = 0; i < num; ++i)
+	{
+		m_particleSystem.AddParticle(type, position);
+	}
+}
+
 
 void Simulation::UpdateSteadyStateGA()
 {

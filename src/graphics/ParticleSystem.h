@@ -11,8 +11,8 @@ const int MAX_PARTICLES = 666;
 enum ParticleType
 {
 	INVALID_PARTICLE = 0,
-	VIOLENCE,
-	MATING,
+	AGENT_KILLED,
+	AGENT_MATED,
 
 	NUM_PARTICLE_TYPES
 };
@@ -30,9 +30,9 @@ private:
 	friend class ParticleSystem;
 
 	ParticleType m_type;
+	Color m_color;
 	int m_lifeTime;
 	int m_age;
-	Color m_color;
 
 	Vector3f m_position;
 	Vector3f m_velocity;
@@ -48,10 +48,10 @@ public:
 	ParticleSystem();
 	~ParticleSystem() {};
 
-	void Update();
 	void Init();
 	void CleanUp();
 
+	void Update();
 	void AddParticle(ParticleType type, Vector3f position);
 
 private:

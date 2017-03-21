@@ -1,4 +1,5 @@
 #include "Agent.h"
+#include "graphics/ParticleSystem.h"
 #include <utilities/Random.h>
 #include <simulation/ObjectManager.h>
 #include <simulation/Simulation.h>
@@ -446,6 +447,9 @@ void Agent::Attack(Agent* other)
 
 	if (other->m_healthEnergy <= 0.0f)
 	{
+		// Death particles
+		GetSimulation()->AddParticles(12, ParticleType::AGENT_KILLED, other->m_position);
+
 		float toGain = other->m_maxEnergy / 2.0f;
 		m_fitness += toGain;
 		m_energy = Math::Min(m_energy + toGain, m_maxEnergy);
@@ -523,6 +527,9 @@ void Agent::Mate(Agent* mate)
 	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 	parents[0]->m_mateWaitTime = config.agent.matingDelay;
 	parents[1]->m_mateWaitTime = config.agent.matingDelay;
+
+	// Mated particles
+	GetSimulation()->AddParticles(12, ParticleType::AGENT_MATED, m_position);
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)
