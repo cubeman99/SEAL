@@ -1,5 +1,6 @@
 #include "SimulationRenderer.h"
 #include "SimulationManager.h"
+#include "graphics/ParticleSystem.h"
 #include <simulation/Agent.h>
 #include <simulation/Offshoot.h>
 #include <simulation/Plant.h>
@@ -310,7 +311,19 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	}
 
 	// Render particles
-	//TODO
+	std::vector<Particle*> particles = simulation->GetParticleSystem()->GetParticles();
+	for (unsigned int i = 0; i < particles.size(); ++i)
+	{
+		if (particles[i]->GetInUse())
+		{
+			Matrix4f modelMatrix = Matrix4f::CreateTranslation(particles[i]->GetPosition()) *
+				Matrix4f::CreateRotation(Vector3f(), 0.0f);
+			modelMatrix *= Matrix4f::CreateScale(particles[i]->GetRadius());
+			material.SetColor(particles[i]->GetColor());
+
+			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
+		}
+	}
 
 	// Render agent vision.
 	if (m_simulationManager->GetShowAgentVision())

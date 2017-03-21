@@ -25,6 +25,7 @@ public:
 	// Getters
 
 	inline ObjectManager* GetObjectManager() { return &m_objectManager; }
+	inline ParticleSystem* GetParticleSystem() { return &m_particleSystem; }
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
 	inline RNG& GetRandom() { return m_random; }

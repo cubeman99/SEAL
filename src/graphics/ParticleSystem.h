@@ -2,7 +2,6 @@
 #define _PARTICLE_SYSTEM_H
 
 #include <vector>
-
 #include <math/Vector3f.h>
 #include <graphics/Color.h>
 
@@ -26,6 +25,11 @@ public:
 	bool Update();
 	void Reassign(ParticleType type, Vector3f position);
 
+	inline bool GetInUse() { return m_inUse; }
+	inline Color GetColor() { return m_color; }
+	inline float GetRadius() { return m_radius; }
+	inline Vector3f GetPosition() { return m_position; }
+
 private:
 	friend class ParticleSystem;
 
@@ -33,6 +37,7 @@ private:
 	Color m_color;
 	int m_lifeTime;
 	int m_age;
+	float m_radius;
 
 	Vector3f m_position;
 	Vector3f m_velocity;
@@ -42,20 +47,25 @@ private:
 
 };
 
+class Simulation;
+
 class ParticleSystem
 {
 public:
-	ParticleSystem();
+	ParticleSystem(Simulation* theSimulation);
 	~ParticleSystem() {};
 
-	void Init();
+	void Initialize();
 	void CleanUp();
 
 	void Update();
 	void AddParticle(ParticleType type, Vector3f position);
 
+	inline std::vector<Particle*> GetParticles() const { return m_particles; }
+
 private:
 	std::vector<Particle*> m_particles; // object pool
+	Simulation* m_simulation;
 
 	int m_numFreeParticles;
 

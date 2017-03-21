@@ -1,13 +1,15 @@
 #include "ParticleSystem.h"
+#include "simulation\Simulation.h"
 
 Particle::Particle()
 {
 	m_inUse = false;
 	m_type = INVALID_PARTICLE;
-	m_lifeTime = 60;
+	m_lifeTime = 180;
 	m_age = 0;
 	m_color = Color::WHITE;
 
+	m_radius = 4.0f;
 	m_position = Vector3f(0.0f);
 	m_velocity = m_position;
 	m_acceleration = m_position;
@@ -37,8 +39,8 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 
 	// Default values
 	m_color = Color::WHITE;
-	m_velocity = Vector3f(0.0f);
-	m_acceleration = m_velocity;
+	m_velocity = position.Normalize() * 0.5f;
+	m_acceleration = position.Normalize() * 0.1f;
 
 	switch (type)
 	{
@@ -52,11 +54,12 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 	}
 }
 
-ParticleSystem::ParticleSystem()
+ParticleSystem::ParticleSystem(Simulation* theSimulation)
 {
+	m_simulation = theSimulation;
 }
 
-void ParticleSystem::Init()
+void ParticleSystem::Initialize()
 {
 	CleanUp();
 

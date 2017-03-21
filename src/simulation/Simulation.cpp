@@ -9,7 +9,8 @@
 //-----------------------------------------------------------------------------
 
 Simulation::Simulation() :
-	m_objectManager(this)
+	m_objectManager(this),
+	m_particleSystem(this)
 {
 }
 
@@ -61,7 +62,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 	// Initialize systems.
 	m_world.Initialize(config.world.radius);
 	m_objectManager.Initialize();
-	m_particleSystem.Init();
+	m_particleSystem.Initialize();
 	m_fittestLists[SPECIES_HERBIVORE].Reset(
 		m_config.herbivore.fittestList.numFittestAgents);
 	m_fittestLists[SPECIES_CARNIVORE].Reset(
@@ -80,7 +81,7 @@ void Simulation::Initialize(const SimulationConfig& config)
 
 void Simulation::OnNewSimulation()
 {
-	m_particleSystem.Init();
+	m_particleSystem.Initialize();
 }
 
 void Simulation::Tick()
