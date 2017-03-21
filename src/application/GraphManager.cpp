@@ -194,7 +194,9 @@ void GraphManager::Initialize()
 void GraphManager::OnNewSimulation(Simulation* simulation)
 {
 	SimulationConfig config = simulation->GetConfig();
-
+	
+	for (unsigned int i = 0; i < m_graphs.size(); ++i)
+		delete m_graphs[i];
 	m_graphs.clear();
 
 	GraphRange zeroAndUp;
@@ -214,30 +216,30 @@ void GraphManager::OnNewSimulation(Simulation* simulation)
 	Color orange(255, 128, 0);
 
 	// General
-	CREATE_GRAPH_FLOAT("Population Size", populationSize, Color::CYAN).SetRange(rangePop);
-	CREATE_GRAPH_FLOAT("Total Energy", totalEnergy, Color::YELLOW).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Avg Energy", avgEnergy, Color::YELLOW).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Avg Energy Usage", avgEnergyUsage, Color::YELLOW).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Best Fitness", bestFitness, Color::GREEN).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Avg Fitness", avgFitness, Color::GREEN).SetRange(zeroAndUp);
-	CREATE_GRAPH_FLOAT("Avg Move Amount", avgMoveAmount, Color::GREEN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Turn Amount", avgTurnAmount, Color::YELLOW).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Population Size",	populationSize,	Color::CYAN).SetRange(rangePop);
+	CREATE_GRAPH_FLOAT("Total Energy",		totalEnergy,	Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Energy",		avgEnergy,		Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Energy Usage",	avgEnergyUsage,	Color::YELLOW).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Best Fitness",		bestFitness,	Color::GREEN).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Fitness",		avgFitness,		Color::GREEN).SetRange(zeroAndUp);
+	CREATE_GRAPH_FLOAT("Avg Move Amount",	avgMoveAmount,	Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Turn Amount",	avgTurnAmount,	Color::YELLOW).SetRange(zeroToOne);
 
 	// Average gene values
-	CREATE_GRAPH_FLOAT("Avg Color Red", avgGeneValue[GenePosition::COLOR_RED], Color::RED).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Color Green", avgGeneValue[GenePosition::COLOR_GREEN], Color::GREEN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Color Blue", avgGeneValue[GenePosition::COLOR_BLUE], blue).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Lifespan", avgGeneValue[GenePosition::LIFE_SPAN], Color::MAGENTA).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Strength", avgGeneValue[GenePosition::STRENGTH], Color::RED).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Child Count", avgGeneValue[GenePosition::CHILD_COUNT], Color::GREEN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Mutation Rate", avgGeneValue[GenePosition::MUTATION_RATE], Color::MAGENTA).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Crossover Points", avgGeneValue[GenePosition::CROSSOVER_POINTS], Color::YELLOW).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Field of View", avgGeneValue[GenePosition::FIELD_OF_VIEW], Color::GREEN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Angle Between Eyes", avgGeneValue[GenePosition::ANGLE_BETWEEN_EYES], orange).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Sight Distance", avgGeneValue[GenePosition::VIEW_DISTANCE], Color::CYAN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Resolution Red", avgGeneValue[GenePosition::RESOLUTION_RED], Color::RED).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Resolution Green", avgGeneValue[GenePosition::RESOLUTION_GREEN], Color::GREEN).SetRange(zeroToOne);
-	CREATE_GRAPH_FLOAT("Avg Resolution Blue", avgGeneValue[GenePosition::RESOLUTION_BLUE], blue).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Color Red",				avgGeneValue[GenePosition::COLOR_RED],			Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Color Green",			avgGeneValue[GenePosition::COLOR_GREEN],		Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Color Blue",			avgGeneValue[GenePosition::COLOR_BLUE],			blue).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Lifespan",				avgGeneValue[GenePosition::LIFE_SPAN],			Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Strength",				avgGeneValue[GenePosition::STRENGTH],			Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Child Count",			avgGeneValue[GenePosition::CHILD_COUNT],		Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Mutation Rate",			avgGeneValue[GenePosition::MUTATION_RATE],		Color::MAGENTA).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Crossover Points",		avgGeneValue[GenePosition::CROSSOVER_POINTS],	Color::YELLOW).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Field of View",			avgGeneValue[GenePosition::FIELD_OF_VIEW],		Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Angle Between Eyes",	avgGeneValue[GenePosition::ANGLE_BETWEEN_EYES],	orange).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Sight Distance",		avgGeneValue[GenePosition::VIEW_DISTANCE],		Color::CYAN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Red",		avgGeneValue[GenePosition::RESOLUTION_RED],		Color::RED).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Green",		avgGeneValue[GenePosition::RESOLUTION_GREEN],	Color::GREEN).SetRange(zeroToOne);
+	CREATE_GRAPH_FLOAT("Avg Resolution Blue",		avgGeneValue[GenePosition::RESOLUTION_BLUE],	blue).SetRange(zeroToOne);
 }
 
 GraphInfo& GraphManager::AddGraph(const GraphInfo& graphInfo)

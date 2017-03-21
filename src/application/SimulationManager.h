@@ -7,6 +7,7 @@
 #include <application/ConfigFileLoader.h>
 #include "CameraSystem.h"
 #include "GraphManager.h"
+#include "HeatMapManager.h"
 #include "SimulationRenderer.h"
 #include "DiagramDrawer.h"
 
@@ -45,6 +46,7 @@ public:
 	inline SimulationRenderer* GetSimulationRenderer() { return &m_simulationRenderer; }
 	inline ResourceManager* GetResourceManager() { return m_simulationRenderer.GetResourceManager(); }
 	inline GraphManager* GetGraphManager() { return &m_graphManager; }
+	inline HeatMapManager* GetHeatMapManager() { return &m_heatMapManager; }
 	inline DiagramDrawer* GetDiagramDrawer() { return &m_diagramDrawer; }
 	inline Agent* GetSelectedAgent() { return m_selectedAgent; }
 	
@@ -57,6 +59,7 @@ public:
 	inline void SetTicksFerFrame(unsigned int ticksPerFrame) { m_ticksPerFrame = ticksPerFrame; }
 	inline void SetMaxTicksPerFrame(bool maxTicksPerFrame) { m_maxTicksPerFrame = maxTicksPerFrame; }
 	inline void SetDebugMode(bool debugMode) { m_debugMode = debugMode; }
+	inline void SetActiveHeatMapIndex(bool index) { m_activeHeatMapIndex = index; }
 
 	// Render options
 	// TODO: have some sort of enum for view options like these.
@@ -79,6 +82,7 @@ public:
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 	inline bool GetShowAxisLines() const { return m_showAxisLines; }
 	inline bool IsDebugMode() const { return m_debugMode; }
+	inline int GetActiveHeatMapIndex() const { return m_activeHeatMapIndex; } 
 
 private:
 	Simulation* m_simulation;
@@ -87,6 +91,7 @@ private:
 	SimulationRenderer	m_simulationRenderer;
 	CameraSystem		m_cameraSystem;
 	GraphManager		m_graphManager;
+	HeatMapManager		m_heatMapManager;
 	DiagramDrawer		m_diagramDrawer;
 	ConfigFileLoader	m_configLoader;
 
@@ -96,6 +101,7 @@ private:
 	unsigned int	m_ticksPerFrame;
 	bool			m_maxTicksPerFrame;
 	bool			m_debugMode;
+	int				m_activeHeatMapIndex;
 
 	// Render options.
 	bool m_viewWireFrameMode;

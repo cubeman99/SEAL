@@ -206,7 +206,9 @@ void Agent::Update()
 	// Update energy usage.
 	m_energyUsage = config.energy.energyCostExist +
 		(config.energy.energyCostMove * m_moveSpeed) +
-		(config.energy.energyCostTurn * m_turnSpeed);
+		(config.energy.energyCostTurn * m_turnSpeed) +
+		(config.energy.energyCostNeuron * m_brain->GetNumNeurons()) +
+		(config.energy.energyCostSynapse * m_brain->GetNumSynapses());
 	m_energy -= m_energyUsage;
 
 	m_age++;

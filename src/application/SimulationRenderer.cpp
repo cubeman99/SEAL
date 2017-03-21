@@ -101,7 +101,9 @@ void SimulationRenderer::LoadResources()
 	m_agentMeshHerbivore = m_resourceManager.LoadMesh("herbivore", "models/herbivore.obj");
 	m_agentMaterial = m_resourceManager.CreateMaterial("agent");
 	m_agentMaterial->SetColor(Color::BLUE);
-	
+	m_agentMeshes[SPECIES_CARNIVORE] = m_agentMeshCarnivore;
+	m_agentMeshes[SPECIES_HERBIVORE] = m_agentMeshHerbivore;
+
 	// Plant model.
 	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
 	m_plantMaterial = m_resourceManager.CreateMaterial("plant");
@@ -201,6 +203,8 @@ void SimulationRenderer::Initialize()
 	m_simulationRenderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
 	m_simulationRenderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA,
 		BlendFunc::ONE_MINUS_SOURCE_ALPHA);
+
+	m_heatMapRenderParams = m_simulationRenderParams;
 
 	m_skyBoxRenderParams = m_simulationRenderParams;
 	m_skyBoxRenderParams.EnableDepthBufferWrite(false);
@@ -358,6 +362,10 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		}
 	}
 
+	// Draw heat-map overlay, colorizing agents by some value.
+	m_simulationManager->SetActiveHeatMapIndex(0);
+	RenderHeatMapOverlay();
+
 	// Draw agent vision.
 	if (m_simulationManager->GetShowAgentVision())
 	{
@@ -434,6 +442,61 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	m_renderTime = (endTime - startTime);
 }
 
+
+//-----------------------------------------------------------------------------
+// Private rendering methods
+//-----------------------------------------------------------------------------
+
+// Draw heat-map overlay, colorizing agents by some value.
+void SimulationRenderer::RenderHeatMapOverlay()
+{
+	if (m_simulationManager->GetActiveHeatMapIndex() < 0)
+		return;
+
+	Simulation* simulation = m_simulationManager->GetSimulation();
+	ObjectManager* objectManager = simulation->GetObjectManager();
+	HeatMapInfo* heatMap = m_simulationManager->GetHeatMapManager()->
+		GetHeatMap(m_simulationManager->GetActiveHeatMapIndex());
+
+	// Calculate value range.
+	float maxValue = FLT_MIN;
+	float minValue = FLT_MAX;
+	for (auto it = objectManager->agents_begin();
+		it != objectManager->agents_end(); ++it)
+	{
+		float value = heatMap->GetData(*it);
+		if (value < minValue)
+			minValue = value;
+		if (value > maxValue)
+			maxValue = value;
+	}
+	heatMap->GetRange().AdjustValueRange(minValue, maxValue);
+		
+	Material material;
+	material.SetIsLit(true);
+	material.SetTexture(nullptr);
+	m_renderer.SetRenderParams(m_heatMapRenderParams);
+	m_renderer.ApplyRenderSettings(false);
+	m_renderer.SetShader(m_shaderUnlit);
+	
+	// Draw colorized agents.
+	for (auto it = objectManager->agents_begin();
+		it != objectManager->agents_end(); ++it)
+	{
+		Agent* agent = *it;
+		
+		// Colorize based on the normalized value for this agent.
+		float value = heatMap->GetData(agent);
+		value = (value - minValue) / (maxValue - minValue);
+		material.SetColor(Color::Lerp(Color::BLACK, heatMap->GetColor(), value));
+
+		Matrix4f modelMatrix = agent->GetObjectToWorld() * 
+			Matrix4f::CreateScale(agent->GetRadius());
+
+		m_renderer.RenderMesh(m_agentMeshes[agent->GetSpecies()],
+			&material, modelMatrix);
+	}
+}
 
 void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 {

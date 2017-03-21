@@ -255,6 +255,9 @@
     <ClCompile Include="..\..\src\graphics\ParticleSystem.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\application\HeatMapManager.cpp">
+      <Filter>Source Files\application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\math\MathLib.h">
@@ -466,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\graphics\ParticleSystem.h">
       <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\application\HeatMapManager.h">
+      <Filter>Source Files\application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

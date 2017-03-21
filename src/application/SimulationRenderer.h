@@ -35,6 +35,7 @@ private:
 	void LoadResources();
 
 	// Rendering
+	void RenderHeatMapOverlay();
 	void RenderAgentVisionArcs(Agent* agent);
 	void RenderAgentVisionStrips(Agent* agent);
 
@@ -52,12 +53,14 @@ private:
 
 	RenderParams	m_skyBoxRenderParams;
 	RenderParams	m_simulationRenderParams;
+	RenderParams	m_heatMapRenderParams;
 	RenderParams	m_uiRenderParams;
 
 	// Resources
 	Font* m_font;
 	Texture* m_textureSkyBox;
 	Texture* m_textureHeart;
+	Mesh* m_agentMeshes[2];
 	Mesh* m_agentMeshHerbivore;
 	Mesh* m_agentMeshCarnivore;
 	Mesh* m_plantMesh;

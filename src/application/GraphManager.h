@@ -36,6 +36,15 @@ struct GraphRange
 	GraphRange& SetDynamicMax(float smallestRangeMax);
 	GraphRange& SetDynamicRange(float largestRangeMin, float smallestRangeMax);
 	GraphRange& SetDynamicRangePadding(float dynamicPaddingPercent);
+
+
+	inline void AdjustValueRange(float& rangeMin, float& rangeMax) const
+	{
+		if (minType == FIXED || (minType == DYNAMIC_CLAMPED && rangeMin > minValue))
+			rangeMin = minValue;
+		if (maxType == FIXED || (maxType == DYNAMIC_CLAMPED && rangeMax < maxValue))
+			rangeMax = maxValue;
+	}
 };
 
 

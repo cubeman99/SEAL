@@ -28,7 +28,8 @@ SimulationManager::SimulationManager() :
 	  m_showAxisLines(false),
 	  m_maxTicksPerFrame(false),
 	  m_debugMode(false),
-	  m_ticksPerFrame(1)
+	  m_ticksPerFrame(1),
+	  m_activeHeatMapIndex(-1)
 {
 }
 
@@ -49,6 +50,7 @@ void SimulationManager::Initialize()
 	m_cameraSystem.Initialize();
 	m_simulationRenderer.Initialize();
 	m_graphManager.Initialize();
+	m_heatMapManager.Initialize();
 	m_diagramDrawer.Initialize();
 
 	// Seed Random with current time.
@@ -68,6 +70,7 @@ void SimulationManager::OnNewSimulation()
 	m_cameraSystem.OnNewSimulation(m_simulation);
 	m_simulationRenderer.OnNewSimulation(m_simulation);
 	m_graphManager.OnNewSimulation(m_simulation);
+	m_heatMapManager.OnNewSimulation(m_simulation);
 	m_simulation->OnNewSimulation();
 
 	// Reset viewing state.
