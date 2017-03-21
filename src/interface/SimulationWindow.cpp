@@ -234,9 +234,6 @@ void SimulationWindow::CreateUI()
 	// Set initial window size.
     SetClientSize(1000, 600);
     Show();
-
-	// TODO: remove this test message.
-	SEAL_LOG_MSG("Test message using SEAL_LOG_MSG()!!");
 }
 
 void SimulationWindow::CreateMenuBar()

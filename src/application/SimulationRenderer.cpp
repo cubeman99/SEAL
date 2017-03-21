@@ -22,14 +22,15 @@ void SimulationRenderer::LoadResources()
 	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: this must change when the executable is moved
 
 	//-------------------------------------------------------------------------
-	// Load fonts.
-
-	m_font = m_resourceManager.LoadSpriteFont(
-		"font", "fonts/font_console.png", 16, 8, 12, 0);
-
-	//-------------------------------------------------------------------------
 	// Load textures.
+	
+	// NOTE: default filter params will break this because of mip maps
+	TextureParams texParams;
+	texParams.SetMinFilter(TextureFilterOptions::LINEAR);
+	texParams.SetMagFilter(TextureFilterOptions::LINEAR);
+	texParams.SetMipMapFilter(TextureFilterOptions::NONE);
 
+	// Skybox
 	std::string skyBoxFileNames[6] = {
 		"textures/starbox_right1.png",
 		"textures/starbox_left2.png",
@@ -38,12 +39,16 @@ void SimulationRenderer::LoadResources()
 		"textures/starbox_front5.png",
 		"textures/starbox_back6.png",
 	};
-	
-	TextureParams texParams;
-	texParams.SetMinFilter(TextureFilterOptions::LINEAR); // NOTE: default filter params will break this because of mip maps
-	texParams.SetMagFilter(TextureFilterOptions::LINEAR);
-	texParams.SetMipMapFilter(TextureFilterOptions::NONE);
-	m_textureSkyBox = m_resourceManager.LoadCubeMapTexture("skybox", skyBoxFileNames, texParams);
+	m_textureSkyBox = m_resourceManager.LoadCubeMapTexture(
+		"skybox", skyBoxFileNames, texParams);
+
+	// TODO: particle textures?
+
+	//-------------------------------------------------------------------------
+	// Load fonts.
+
+	m_font = m_resourceManager.LoadSpriteFont(
+		"font", "fonts/font_console.png", 16, 8, 12, 0);
 
 	//-------------------------------------------------------------------------
 	// Load shaders.
@@ -65,7 +70,8 @@ void SimulationRenderer::LoadResources()
 		"shaders/skybox_fs.glsl");
 	
 	// Create the default fallback shader used when other shaders have errors.
-	Shader* m_defaultShader = new Shader();
+	// This shader will set the clip position and color things solid magenta.
+	Shader* m_defaultShader = m_resourceManager.CreateShader("default_fallback");
 	const std::string vertexSource = 
 		"#version 330 core\n"
 		"in vec3 a_vertPos;\n"
@@ -81,86 +87,124 @@ void SimulationRenderer::LoadResources()
 		ShaderType::FRAGMENT_SHADER, "default_shader_fs");
 	m_defaultShader->CompileAndLink();
 	m_renderer.SetDefaultShader(m_defaultShader);
-	m_resourceManager.AddShader("default_fallback", m_defaultShader);
 
 	//-------------------------------------------------------------------------
-	// Models
+	// Loaded Models
 
 	// Agent model.
 	m_agentMeshCarnivore = m_resourceManager.LoadMesh("carnivore", "models/agent.obj");
 	m_agentMeshHerbivore = m_resourceManager.LoadMesh("herbivore", "models/herbivore.obj");
-	m_agentMaterial = new Material();
+	m_agentMaterial = m_resourceManager.CreateMaterial("agent");
 	m_agentMaterial->SetColor(Color::BLUE);
 	
 	// Plant model.
 	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
-	m_plantMaterial = new Material();
+	m_plantMaterial = m_resourceManager.CreateMaterial("plant");
 	m_plantMaterial->SetColor(Color::GREEN);
 
 	// World model (ico-sphere).
 	m_worldMesh = m_resourceManager.LoadMesh("icosphere", "models/icosphere.obj");
-	m_worldMaterial = new Material();
+	m_worldMaterial = m_resourceManager.CreateMaterial("world");
 	m_worldMaterial->SetColor(Color::WHITE);
 	
 	// Skybox inverted-cube model.
 	m_skyBoxMesh = m_resourceManager.LoadMesh("skybox", "models/skybox.obj");
 
-	// TODO: Move this resource creation code somewhere else.
-	
-	// Create selection circle mesh.
+	//-------------------------------------------------------------------------
+	// Prodedural models
+
+	// Textured, unit quad for rendering billboards
+	{
+		VertexPosTex vertices[4] {
+			VertexPosTex(0,0,0, 0,0),
+			VertexPosTex(0,1,0, 0,1),
+			VertexPosTex(1,1,0, 1,1),
+			VertexPosTex(1,0,0, 1,0)
+		};
+		unsigned int indices[4] = {
+			0, 1, 2, 3
+		};
+		
+		m_meshQuad = m_resourceManager.CreateMesh("quad");
+		m_meshQuad->GetVertexData()->BufferVertices(4, vertices);
+		m_meshQuad->GetIndexData()->BufferIndices(4, indices);
+		m_meshQuad->SetPrimitiveType(VertexPrimitiveType::TRIANGLE_FAN);
+	}
+
+	// Selection circle
 	{
 		std::vector<VertexPos> vertices;
 		std::vector<unsigned int> indices;
-
 		for (unsigned int i = 0; i < 40; i++)
 		{
 			float a = (i / 40.0f) * Math::TWO_PI;
-			vertices.push_back(VertexPos(cos(a), 0.0f, sin(a)));
+			vertices.push_back(VertexPos(Math::Cos(a), 0.0f, Math::Sin(a)));
 			indices.push_back(i);
 		}
 
-		m_meshSelectionCircle = new Mesh();
+		m_meshSelectionCircle = m_resourceManager.CreateMesh("circle");
 		m_meshSelectionCircle->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
 		m_meshSelectionCircle->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
 		m_meshSelectionCircle->SetPrimitiveType(VertexPrimitiveType::LINE_LOOP);
-		m_materialSelectionCircle = new Material();
+		m_materialSelectionCircle = m_resourceManager.CreateMaterial("circle");
 		m_materialSelectionCircle->SetColor(Color::GREEN);
 		m_materialSelectionCircle->SetIsLit(false);
 	}
 
-	// Create 3-axis lines mesh
+	// Vertex-colored, 3-axis lines
 	{
-		std::vector<VertexPosCol> vertices;
-		std::vector<unsigned int> indices;
-		vertices.push_back(VertexPosCol(Vector3f(1,0,0),  Color::RED));
-		vertices.push_back(VertexPosCol(Vector3f(-1,0,0),  Color::RED));
-		vertices.push_back(VertexPosCol(Vector3f(0,1,0),  Color::GREEN));
-		vertices.push_back(VertexPosCol(Vector3f(0,-1,0),  Color::GREEN));
-		vertices.push_back(VertexPosCol(Vector3f(0,0,1),  Color::BLUE));
-		vertices.push_back(VertexPosCol(Vector3f(0,0,-1),  Color::BLUE));
-		for (unsigned int i = 0; i < vertices.size(); i++)
-			indices.push_back(i);
+		VertexPosCol vertices[6] {
+			VertexPosCol(Vector3f(1,0,0),  Color::RED),
+			VertexPosCol(Vector3f(-1,0,0),  Color::RED),
+			VertexPosCol(Vector3f(0,1,0),  Color::GREEN),
+			VertexPosCol(Vector3f(0,-1,0),  Color::GREEN),
+			VertexPosCol(Vector3f(0,0,1),  Color::BLUE),
+			VertexPosCol(Vector3f(0,0,-1),  Color::BLUE)
+		};
+		unsigned int indices[] = {
+			0, 1, 2, 3, 4, 5
+		};
 
-		m_meshAxisLines = new Mesh();
-		m_meshAxisLines->GetVertexData()->BufferVertices((int) vertices.size(), vertices.data());
-		m_meshAxisLines->GetIndexData()->BufferIndices((int) indices.size(), indices.data());
+		m_meshAxisLines = m_resourceManager.CreateMesh("axis_lines");
+		m_meshAxisLines->GetVertexData()->BufferVertices(6, vertices);
+		m_meshAxisLines->GetIndexData()->BufferIndices(6, indices);
 		m_meshAxisLines->SetPrimitiveType(VertexPrimitiveType::LINES);
-		m_materialAxisLines= new Material();
+		m_materialAxisLines = m_resourceManager.CreateMaterial("axis_lines");
 		m_materialAxisLines->SetColor(Color::WHITE);
 		m_materialAxisLines->SetIsLit(false);
 	}
-	
-	// Add the computationally generated meshes to the resource manager.
-	m_resourceManager.AddMesh("axis_lines", m_meshAxisLines);
-	m_resourceManager.AddMesh("circle", m_meshSelectionCircle);
-	m_resourceManager.AddMaterial("axis_lines", m_materialAxisLines);
-	m_resourceManager.AddMaterial("circle", m_materialSelectionCircle);
-	m_resourceManager.AddMaterial("world", m_worldMaterial);
 }
 
 void SimulationRenderer::Initialize()
 {
 	LoadResources();
+
+	// Initialize render parameters.
+	m_simulationRenderParams.EnableDepthTest(true);
+	m_simulationRenderParams.EnableDepthBufferWrite(true);
+	m_simulationRenderParams.EnableNearFarPlaneClipping(true);
+	m_simulationRenderParams.EnableBlend(true);
+	m_simulationRenderParams.EnableLineSmooth(false);
+	m_simulationRenderParams.EnablePolygonSmooth(false);
+	m_simulationRenderParams.EnableCullFace(true);
+	m_simulationRenderParams.SetCullFace(CullFace::BACK);
+	m_simulationRenderParams.SetFrontFace(FrontFace::COUNTER_CLOCKWISE);
+	m_simulationRenderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT |
+		ClearBits::DEPTH_BUFFER_BIT);
+	m_simulationRenderParams.SetClearColor(Color::BLACK);
+	m_simulationRenderParams.SetPolygonMode(PolygonMode::FILL);
+	m_simulationRenderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
+	m_simulationRenderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA,
+		BlendFunc::ONE_MINUS_SOURCE_ALPHA);
+
+	m_skyBoxRenderParams = m_simulationRenderParams;
+	m_skyBoxRenderParams.EnableDepthBufferWrite(false);
+	m_skyBoxRenderParams.EnableDepthTest(false);
+
+	m_uiRenderParams = m_simulationRenderParams;
+	m_uiRenderParams.EnableDepthTest(false);
+	m_uiRenderParams.EnableCullFace(false);
+	m_uiRenderParams.SetPolygonMode(PolygonMode::FILL);
 
 	// Initialize the oct-tree renderer.
 	m_octTreeRenderer.Initialize();
@@ -189,38 +233,19 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	Agent* selectedAgent = m_simulationManager->GetSelectedAgent();
 	float worldRadius = simulation->GetWorld()->GetRadius();
 	Transform3f transform;
+	int uniformLocation = -1;
 	
 	float aspectRatio = canvasSize.x / canvasSize.y;
 	m_simulationManager->GetCameraSystem()->SetAspectRatio(aspectRatio);
 	
-
 	//-------------------------------------------------------------------------
 	// Setup render parameters.
-
-	RenderParams renderParams;
-	renderParams.EnableDepthTest(true);
-	renderParams.EnableDepthBufferWrite(true);
-	renderParams.EnableNearFarPlaneClipping(true);
-	renderParams.EnableBlend(true);
-	renderParams.EnableLineSmooth(false);
-	renderParams.EnablePolygonSmooth(false);
-	renderParams.EnableCullFace(false);
-	renderParams.SetCullFace(CullFace::BACK);
-	renderParams.SetFrontFace(FrontFace::CLOCKWISE); // TODO: meshes loaded from file have CCW front-face winding order ??
-	renderParams.SetClearBits(ClearBits::COLOR_BUFFER_BIT |
-		ClearBits::DEPTH_BUFFER_BIT);
-	renderParams.SetClearColor(Color::BLACK);
-	renderParams.SetPolygonMode(PolygonMode::FILL);
-	renderParams.SetDepthFunction(CompareFunction::LESS_EQUAL);
-	renderParams.SetBlendFunction(BlendFunc::SOURCE_ALPHA,
-		BlendFunc::ONE_MINUS_SOURCE_ALPHA);
+	
 	if (m_simulationManager->IsViewWireFrameMode())
-		renderParams.SetPolygonMode(PolygonMode::LINE);
+		m_simulationRenderParams.SetPolygonMode(PolygonMode::LINE);
 	else
-		renderParams.SetPolygonMode(PolygonMode::FILL);
+		m_simulationRenderParams.SetPolygonMode(PolygonMode::FILL);
 
-	m_renderer.SetRenderParams(renderParams);
-	m_renderer.ApplyRenderSettings(true);
 	m_renderer.SetCamera(camera);
 
 	// Setup lighting properties.
@@ -234,49 +259,48 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		m_renderer.SetLightColor(Color(255, 220, 132));
 		m_renderer.SetAmbientLight(Color(33, 36, 63));
 	}
-
+	
+	//-------------------------------------------------------------------------
+	// Clear the screen.
+	
     glViewport(0, 0, (int) canvasSize.x, (int) canvasSize.y);
 	glDisable(GL_SCISSOR_TEST);
+	
+	m_renderer.SetRenderParams(m_simulationRenderParams);
+	m_renderer.ApplyRenderSettings(true);
 
 	//-------------------------------------------------------------------------
-	// Render the skybox.
+	// Draw the skybox.
 	
-	renderParams.EnableDepthBufferWrite(false);
-	renderParams.EnableDepthTest(false);
-	m_renderer.SetRenderParams(renderParams);
+	m_renderer.SetRenderParams(m_skyBoxRenderParams);
 	m_renderer.ApplyRenderSettings(false);
-	{
-		transform.SetIdentity();
-		transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
-		m_renderer.SetShader(m_shaderSkyBox);
+	m_renderer.SetShader(m_shaderSkyBox);
 
-		int uniformLocation = -1;
-		if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
-			glUniform1i(uniformLocation, 0);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
-
-		m_renderer.RenderMesh(m_skyBoxMesh, m_worldMaterial, transform);
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	}
-	renderParams.EnableDepthBufferWrite(true);
-	renderParams.EnableDepthTest(true);
-	m_renderer.SetRenderParams(renderParams);
-	m_renderer.ApplyRenderSettings(false);
+	// Bind the skybox texture.
+	if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
+		glUniform1i(uniformLocation, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
 	
+	transform.SetIdentity();
+	transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
+	m_renderer.RenderMesh(m_skyBoxMesh, m_worldMaterial, transform);
 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	
 	//-------------------------------------------------------------------------
 	// Render the simulation.
+	
+	m_renderer.SetRenderParams(m_simulationRenderParams);
+	m_renderer.ApplyRenderSettings(false);
 
-	// Render the world.
+	// Draw the world sphere.
 	transform.SetIdentity();
 	transform.SetScale(worldRadius);
 	m_renderer.SetShader(m_shaderLit);
 	m_renderer.RenderMesh(m_worldMesh, m_worldMaterial, transform);
 	
-	// Render all simulation objects.
+	// Draw all simulation objects.
 	Material material;
 	material.SetIsLit(true);
 	m_renderer.SetShader(m_shaderLit);
@@ -310,7 +334,7 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
 	}
 
-	// Render particles
+	// Draw particles.
 	std::vector<Particle*> particles = simulation->GetParticleSystem()->GetParticles();
 	for (unsigned int i = 0; i < particles.size(); ++i)
 	{
@@ -325,7 +349,7 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		}
 	}
 
-	// Render agent vision.
+	// Draw agent vision.
 	if (m_simulationManager->GetShowAgentVision())
 	{
 		m_renderer.SetShader(nullptr);
@@ -361,7 +385,7 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 			m_materialSelectionCircle, transform);
 	}
 	
-	// Render the X/Y/Z axis lines.
+	// Draw the X/Y/Z axis lines.
 	if (m_simulationManager->GetShowAxisLines())
 	{
 		transform.SetIdentity();
@@ -370,13 +394,15 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		m_renderer.RenderMesh(m_meshAxisLines, m_materialAxisLines, transform);
 	}
 
-	// Render the OctTree
+	// Draw the OctTree.
 	m_octTreeRenderer.RenderOctTree(&m_renderer, simulation->GetOctTree());
 	
-
+	
 	//-------------------------------------------------------------------------
 	// Render UI overlay.
-
+	
+	m_renderer.SetRenderParams(m_uiRenderParams);
+	m_renderer.ApplyRenderSettings(false);
 	m_graphics.SetupCanvas2D((int) m_canvasSize.x, (int) m_canvasSize.y);
 
 	if (selectedAgent != nullptr)
@@ -443,8 +469,8 @@ void SimulationRenderer::RenderAgentVisionArcs(Agent* agent)
 			blue  = agent->GetEye(1)->GetSightValue(2, t);
 			glColor4f(red, green, blue, alpha);
 			glVertex3f(xPrev, 0, zPrev);
-			glVertex3f(x, 0, z);
 			glVertex3f(0, 0, 0);
+			glVertex3f(x, 0, z);
 		}
 
 		xPrev = x;

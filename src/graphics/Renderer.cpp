@@ -252,6 +252,7 @@ void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
 		
 	// Material properties.
 	//if (material != m_material || m_isShaderChanged)
+	if (material != nullptr)
 	{
 		m_material = material;
 		if (m_activeShader->GetUniformLocation("u_isLit", uniformLocation))
@@ -288,7 +289,8 @@ void Renderer::RenderMesh(Mesh* mesh, Material* material, const Transform3f& tra
 
 void Renderer::RenderMesh(Mesh* mesh, Material* material, const Matrix4f& modelMatrix)
 {
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	if (mesh == nullptr || material == nullptr)
+		return;
 
 	UpdateUniforms(material, modelMatrix * mesh->GetTransformMatrix());
 

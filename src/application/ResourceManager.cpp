@@ -1,5 +1,6 @@
 #include "ResourceManager.h"
 #include <wx/wx.h>
+#include <utilities/Logging.h>
 
 
 //-----------------------------------------------------------------------------
@@ -80,34 +81,33 @@ Texture* ResourceManager::LoadCubeMapTexture(const std::string& name, std::strin
 
 Shader* ResourceManager::LoadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath)
 {
-	std::string vertexSource;
-	std::string fragmentSource;
-	
-	// Load the text file contents for the VS and FS.
-	if (!FileUtility::OpenAndGetContents(m_assetsPath + vertexPath, vertexSource))
-	{
-		//wxMessageBox("Error loading vertex shader " + vertexPath, "Shader Error", wxICON_WARNING);
-		return nullptr;
-	}
-	if (!FileUtility::OpenAndGetContents(m_assetsPath + fragmentPath, fragmentSource))
-	{
-		//wxMessageBox("Error loading fragment shader " + fragmentPath, "Shader Error", wxICON_WARNING);
-		return nullptr;
-	}
-	
-	// Create the shader and add the fragment and vertex stages.
+	std::string vertexSource = "";
+	std::string fragmentSource = "";
+	bool vertexSuccess;
+	bool fragmentSuccess;
 	Shader* shader = new Shader();
-	shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, vertexPath);
-	shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, fragmentPath);
 
-	// Compile and link the shader.
-	ShaderCompileError compileError;
-	if (!shader->CompileAndLink(&compileError))
+	// Load the vertex shader source code.
+	vertexSuccess = FileUtility::OpenAndGetContents(m_assetsPath + vertexPath, vertexSource);
+	if (!vertexSuccess)
+		SEAL_LOG_MSG("Error loading vertex shader '%s'", vertexPath.c_str());
+
+	// Load the fragment shader source code.
+	fragmentSuccess = FileUtility::OpenAndGetContents(m_assetsPath + fragmentPath, fragmentSource);
+	if (!fragmentSuccess)
+		SEAL_LOG_MSG("Error loading fragment shader '%s'", fragmentPath.c_str());
+	
+	// Create the shader.
+	if (vertexSuccess && fragmentSuccess)
 	{
-		assert(false);
-		//wxMessageBox(compileError.GetMessage(), "Shader Error", wxICON_WARNING);
-		delete shader;
-		return nullptr;
+		// Add the two shader stages.
+		shader->AddStage(vertexSource, ShaderType::VERTEX_SHADER, vertexPath);
+		shader->AddStage(fragmentSource, ShaderType::FRAGMENT_SHADER, fragmentPath);
+
+		// Compile and link the shader.
+		ShaderCompileError compileError;
+		if (!shader->CompileAndLink(&compileError))
+			SEAL_LOG_MSG(compileError.GetMessage().c_str());
 	}
 
 	AddShader(name, shader);
@@ -121,8 +121,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	// Read the file contents.
 	if (!FileUtility::OpenAndGetContents(m_assetsPath + path, fileContents))
 	{
-		assert(false);
-		//wxMessageBox("Error loading mesh file " + path, "File Error", wxICON_WARNING);
+		SEAL_LOG_MSG("Error loading mesh file '%s'", path.c_str());
 		return nullptr;
 	}
 
@@ -130,8 +129,7 @@ Mesh* ResourceManager::LoadMesh(const std::string& name, const std::string& path
 	Mesh* mesh = Mesh::ImportFromOBJ(fileContents);
 	if (mesh == nullptr)
 	{
-		assert(false);
-		//wxMessageBox("Error parsing .obj data from mesh file " + path, "File Error", wxICON_WARNING);
+		SEAL_LOG_MSG("Error parsing .obj data from mesh file '%s'", path.c_str());
 		return nullptr;
 	}
 
@@ -153,6 +151,32 @@ Font* ResourceManager::LoadSpriteFont(const std::string& name,
 		charsPerRow, charWidth, charHeight, charSpacing);
 	AddFont(name, font);
 	return font;
+}
+
+
+//-----------------------------------------------------------------------------
+// Procedural resource creation
+//-----------------------------------------------------------------------------
+
+Mesh* ResourceManager::CreateMesh(const std::string& name)
+{
+	Mesh* mesh = new Mesh();
+	AddMesh(name, mesh);
+	return mesh;
+}
+
+Material* ResourceManager::CreateMaterial(const std::string& name)
+{
+	Material* material = new Material();
+	AddMaterial(name, material);
+	return material;
+}
+
+Shader* ResourceManager::CreateShader(const std::string& name)
+{
+	Shader* shader = new Shader();
+	AddShader(name, shader);
+	return shader;
 }
 
 

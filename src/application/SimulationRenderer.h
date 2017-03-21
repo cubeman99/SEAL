@@ -50,6 +50,10 @@ private:
 	double			m_renderTime; // measured time of render (in seconds)
 	Vector2f		m_canvasSize;
 
+	RenderParams	m_skyBoxRenderParams;
+	RenderParams	m_simulationRenderParams;
+	RenderParams	m_uiRenderParams;
+
 	// Resources
 	Font* m_font;
 	Texture* m_textureSkyBox;
@@ -58,6 +62,7 @@ private:
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;
 	Mesh* m_meshSelectionCircle;
+	Mesh* m_meshQuad;
 	Mesh* m_meshAxisLines;
 	Mesh* m_skyBoxMesh;
 	Material* m_worldMaterial;

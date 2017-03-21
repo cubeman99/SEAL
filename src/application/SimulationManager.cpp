@@ -85,17 +85,6 @@ void SimulationManager::OnNewSimulation()
 	m_showAxisLines			= false;
 	m_maxTicksPerFrame		= false;
 	m_ticksPerFrame			= 1;
-
-	// DEBUG: load a test config file.
-	SimulationConfig config;
-	std::string errorMessage;
-	memset((char*) &config, 0, sizeof(SimulationConfig));
-	bool success = m_configLoader.LoadConfigFile("../../assets/configs/test_config.txt", config, errorMessage);
-
-	if (!success)
-		SEAL_LOG_MSG("%s", errorMessage.c_str());
-	else
-		SEAL_LOG_MSG("Successfully loaded test config file");
 }
 
 //-----------------------------------------------------------------------------

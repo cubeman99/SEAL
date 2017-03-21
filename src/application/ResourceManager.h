@@ -33,6 +33,13 @@ public:
 	SpriteFont* LoadSpriteFont(const std::string& name, const std::string& path,
 		int charsPerRow, int charWidth, int charHeight, int charSpacing);
 
+	// Procedural resource creation
+	//Texture* CreateTexture(const std::string& name);
+	Mesh* CreateMesh(const std::string& name);
+	Material* CreateMaterial(const std::string& name);
+	Shader* CreateShader(const std::string& name);
+	//Font* CreateFont(const std::string& name);
+
 	// Resource management
 	void AddTexture(const std::string& name, Texture* texture);
 	void AddMesh(const std::string& name, Mesh* mesh);
