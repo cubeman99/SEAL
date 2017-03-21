@@ -58,16 +58,16 @@ ResourceManager::~ResourceManager()
 // Resource loading
 //-----------------------------------------------------------------------------
 
-Texture* ResourceManager::LoadTexture(const std::string& name, const std::string& path)
+Texture* ResourceManager::LoadTexture(const std::string& name, const std::string& path, const TextureParams& params)
 {
-	Texture* texture = Texture::LoadTexture(m_assetsPath + path);
+	Texture* texture = Texture::LoadTexture(m_assetsPath + path, params);
 	if (texture == nullptr)
 		return nullptr;
 	AddTexture(name, texture);
 	return texture;
 }
 
-Texture* ResourceManager::LoadCubeMapTexture(const std::string& name, std::string paths[6], TextureParams& params)
+Texture* ResourceManager::LoadCubeMapTexture(const std::string& name, std::string paths[6], const TextureParams& params)
 {
 	std::string finalPaths[6];
 	for (unsigned int i = 0; i < 6; ++i)

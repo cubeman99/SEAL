@@ -2,8 +2,8 @@
 
 layout(location = 0) in vec3 a_vertPos;
 layout(location = 1) in vec3 a_vertNorm;
-layout(location = 2) in vec4 a_vertColor;
-//in vec2 a_vertTexCoord;
+//layout(location = 2) in vec2 a_vertTexCoord;
+layout(location = 3) in vec4 a_vertColor;
 
 //out vec2 v_texCoord;
 out vec3 v_normal;
@@ -27,8 +27,6 @@ void main()
 	// Calculate lighting (half-lambartian).
 	vec3 lightDir = normalize(u_lightDir);
 	float lightAmount = dot(-lightDir, v_normal);
-	//lightAmount = (lightAmount + 1) / 2;
 	lightAmount = max(0, lightAmount);
 	v_lightColor = u_lightColor * lightAmount;
-	//v_lightColor = (max(0, lightAmount) + vec3(1)) / 2; 
 }

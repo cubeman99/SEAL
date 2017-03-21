@@ -57,6 +57,7 @@ private:
 	// Resources
 	Font* m_font;
 	Texture* m_textureSkyBox;
+	Texture* m_textureHeart;
 	Mesh* m_agentMeshHerbivore;
 	Mesh* m_agentMeshCarnivore;
 	Mesh* m_plantMesh;
@@ -71,6 +72,7 @@ private:
 	Material* m_materialSelectionCircle;
 	Material* m_materialAxisLines;
 	Shader* m_shaderLit;
+	Shader* m_shaderLitTextured;
 	Shader* m_shaderLitVertexColored;
 	Shader* m_shaderUnlit;
 	Shader* m_shaderUnlitVertexColored;

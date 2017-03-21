@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec3 a_vertPos;
+layout (location = 0) in vec3 a_vertPos;
 
 uniform mat4 u_mvp;
 

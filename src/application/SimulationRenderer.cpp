@@ -42,7 +42,9 @@ void SimulationRenderer::LoadResources()
 	m_textureSkyBox = m_resourceManager.LoadCubeMapTexture(
 		"skybox", skyBoxFileNames, texParams);
 
-	// TODO: particle textures?
+	// TODO: load particle textures here
+	m_textureHeart = m_resourceManager.LoadTexture("particle_heart",
+		"textures/particle_heart.png", texParams);
 
 	//-------------------------------------------------------------------------
 	// Load fonts.
@@ -56,6 +58,9 @@ void SimulationRenderer::LoadResources()
 	m_shaderLit = m_resourceManager.LoadShader("lit",
 		"shaders/lit_colored_vs.glsl",
 		"shaders/lit_colored_fs.glsl");
+	m_shaderLitTextured = m_resourceManager.LoadShader("lit_textured",
+		"shaders/lit_textured_vs.glsl",
+		"shaders/lit_textured_fs.glsl");
 	m_shaderLitVertexColored = m_resourceManager.LoadShader("lit_vertex_colored",
 		"shaders/lit_vertex_colored_vs.glsl",
 		"shaders/lit_vertex_colored_fs.glsl");
@@ -115,11 +120,11 @@ void SimulationRenderer::LoadResources()
 
 	// Textured, unit quad for rendering billboards
 	{
-		VertexPosTex vertices[4] {
-			VertexPosTex(0,0,0, 0,0),
-			VertexPosTex(0,1,0, 0,1),
-			VertexPosTex(1,1,0, 1,1),
-			VertexPosTex(1,0,0, 1,0)
+		VertexPosTexNorm vertices[4] {
+			VertexPosTexNorm(Vector3f(-0.5f,  0.5f, 0), Vector2f(0,0), Vector3f::UNITZ),
+			VertexPosTexNorm(Vector3f(-0.5f, -0.5f, 0), Vector2f(0,1), Vector3f::UNITZ),
+			VertexPosTexNorm(Vector3f( 0.5f, -0.5f, 0), Vector2f(1,1), Vector3f::UNITZ),
+			VertexPosTexNorm(Vector3f( 0.5f,  0.5f, 0), Vector2f(1,0), Vector3f::UNITZ),
 		};
 		unsigned int indices[4] = {
 			0, 1, 2, 3
@@ -336,16 +341,20 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 
 	// Draw particles.
 	std::vector<Particle*> particles = simulation->GetParticleSystem()->GetParticles();
+	m_renderer.SetShader(m_shaderLitTextured);
 	for (unsigned int i = 0; i < particles.size(); ++i)
 	{
 		if (particles[i]->GetInUse())
 		{
-			Matrix4f modelMatrix = Matrix4f::CreateTranslation(particles[i]->GetPosition()) *
-				Matrix4f::CreateRotation(Vector3f(), 0.0f);
-			modelMatrix *= Matrix4f::CreateScale(particles[i]->GetRadius());
-			material.SetColor(particles[i]->GetColor());
+			// Make the quad-model face the camera.
+			Matrix4f modelMatrix =
+				Matrix4f::CreateTranslation(particles[i]->GetPosition()) *
+				Matrix4f::CreateRotation(camera->GetOrientation()) *
+				Matrix4f::CreateScale(particles[i]->GetRadius()); 
 
-			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);
+			material.SetColor(particles[i]->GetColor());
+			material.SetTexture(m_textureHeart);
+			m_renderer.RenderMesh(m_meshQuad, &material, modelMatrix);
 		}
 	}
 

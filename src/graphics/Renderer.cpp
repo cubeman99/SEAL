@@ -249,7 +249,10 @@ void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
 		return;
 
 	int uniformLocation = -1;
-		
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	// Material properties.
 	//if (material != m_material || m_isShaderChanged)
 	if (material != nullptr)
@@ -259,6 +262,12 @@ void Renderer::UpdateUniforms(Material* material, const Matrix4f& modelMatrix)
 			glUniform1i(uniformLocation, (int) material->IsLit());
 		if (m_activeShader->GetUniformLocation("u_color", uniformLocation))
 			glUniform4fv(uniformLocation, 1, material->GetColor().ToVector4f().data());
+		if (m_activeShader->GetUniformLocation("s_texture", uniformLocation))
+		{
+			glUniform1i(uniformLocation, 0);
+			if (material->GetTexture() != nullptr)
+				glBindTexture(GL_TEXTURE_2D, material->GetTexture()->GetGLTextureId());
+		}
 	}
 
 	// Lighting properties.

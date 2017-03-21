@@ -151,6 +151,20 @@
     <ClInclude Include="..\..\src\utilities\StringUtility.h" />
     <ClInclude Include="..\..\src\utilities\Timing.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\assets\shaders\lit_colored_fs.glsl" />
+    <None Include="..\..\assets\shaders\lit_colored_vs.glsl" />
+    <None Include="..\..\assets\shaders\lit_textured_fs.glsl" />
+    <None Include="..\..\assets\shaders\lit_textured_vs.glsl" />
+    <None Include="..\..\assets\shaders\lit_vertex_colored_fs.glsl" />
+    <None Include="..\..\assets\shaders\lit_vertex_colored_vs.glsl" />
+    <None Include="..\..\assets\shaders\skybox_fs.glsl" />
+    <None Include="..\..\assets\shaders\skybox_vs.glsl" />
+    <None Include="..\..\assets\shaders\unlit_colored_fs.glsl" />
+    <None Include="..\..\assets\shaders\unlit_colored_vs.glsl" />
+    <None Include="..\..\assets\shaders\unlit_vertex_colored_fs.glsl" />
+    <None Include="..\..\assets\shaders\unlit_vertex_colored_vs.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E03D0738-5F20-40FB-89A2-DFDAA49A304A}</ProjectGuid>
     <RootNamespace>SEAL</RootNamespace>

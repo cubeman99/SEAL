@@ -3,7 +3,8 @@
 
 Material::Material() :
 	m_color(Color::WHITE),
-	m_isLit(true)
+	m_isLit(true),
+	m_texture(nullptr)
 {
 }
 

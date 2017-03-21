@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec3 a_vertPos;
-in vec4 a_vertColor;
+layout (location = 0) in vec3 a_vertPos;
+layout (location = 3) in vec4 a_vertColor;
 
 out vec4 v_color;
 

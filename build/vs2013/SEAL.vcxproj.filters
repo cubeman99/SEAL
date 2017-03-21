@@ -49,6 +49,9 @@
     <Filter Include="Source Files\interface\dialogs">
       <UniqueIdentifier>{548c0ea3-8624-4a36-97be-f10907528468}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{00e41105-7563-4a06-aa17-db35d9f67ae7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\math\MathLib.cpp">
@@ -464,5 +467,43 @@
     <ClInclude Include="..\..\src\graphics\ParticleSystem.h">
       <Filter>Source Files\graphics</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\assets\shaders\lit_colored_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\lit_colored_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\lit_vertex_colored_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\lit_vertex_colored_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\skybox_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\skybox_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\unlit_colored_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\unlit_colored_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\unlit_vertex_colored_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\unlit_vertex_colored_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\lit_textured_fs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\..\assets\shaders\lit_textured_vs.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

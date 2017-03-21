@@ -51,18 +51,26 @@ struct PrimitiveList
 // Standard vertex formats for models
 //-----------------------------------------------------------------------------
 
-// NOTE: Order is important here
 struct VertexType
 {
 	enum
 	{
-		POSITION		= 0x1, // All vertices should have a position.
-		NORMAL			= 0x2,
-		TEX_COORD		= 0x4,
-		COLOR			= 0x8,
-		BONE_WEIGHTS	= 0x10,
-		BONE_INDICES	= 0x20,
-		//TBN_MATRIX		= 0x40, // TODO: TBN Matrix support
+		POSITION	= 0x1, // All vertices should have a position.
+		NORMAL		= 0x2,
+		TEX_COORD	= 0x4,
+		COLOR		= 0x8,
+	};
+};
+
+// These locations are important for vertex shaders!!
+struct VertexAttribLocations
+{
+	enum
+	{
+		POSITION	= 0,	// layout (location = 0) in vec3 a_vertPos;
+		NORMAL		= 1,	// layout (location = 1) in vec3 a_vertNorm;
+		TEX_COORD	= 2,	// layout (location = 2) in vec2 a_vertTexCoord;
+		COLOR		= 3,	// layout (location = 3) in vec4 a_vertColor;
 	};
 };
 
@@ -71,34 +79,15 @@ struct VertexType
 	enum { kVertexType = _type }
 
 
-#define NUM_BONES_PER_VERTEX 4
-
-// A standard model vertex, with position, normal, texCoord, color, and bone
-// weights/indices.
-struct ModelVertex
-{
-	Vector3f	position;
-	Vector3f	normal;
-	Vector2f	texCoord;
-	Color		color;
-	float		boneWeights[NUM_BONES_PER_VERTEX];
-	int			boneIndices[NUM_BONES_PER_VERTEX];
-	
-	DECLARE_VERTEX_TYPE(VertexType::POSITION |
-						VertexType::TEX_COORD |
-						VertexType::NORMAL |
-						VertexType::COLOR |
-						VertexType::BONE_WEIGHTS |
-						VertexType::BONE_INDICES);
-};
-
-
 struct VertexPosTexNormCol
 {
 	Vector3f	position;
 	Vector2f	texCoord;
 	Vector3f	normal;
 	Vector4f	color;
+
+	VertexPosTexNormCol()
+	{}
 	
 	DECLARE_VERTEX_TYPE(VertexType::POSITION |
 						VertexType::TEX_COORD |
@@ -113,6 +102,12 @@ struct VertexPosTexNorm
 	Vector2f	texCoord;
 	Vector3f	normal;
 
+	VertexPosTexNorm()
+	{}
+	VertexPosTexNorm(const Vector3f& position, const Vector2f& texCoord, const Vector3f& normal) :
+		position(position), texCoord(texCoord), normal(normal)
+	{}
+
 	DECLARE_VERTEX_TYPE(VertexType::POSITION |
 						VertexType::TEX_COORD |
 						VertexType::NORMAL);
@@ -123,6 +118,9 @@ struct VertexPosTexCol
 	Vector3f	position;
 	Vector2f	texCoord;
 	Vector4f	color;
+
+	VertexPosTexCol()
+	{}
 
 	DECLARE_VERTEX_TYPE(VertexType::POSITION |
 						VertexType::TEX_COORD |
@@ -135,16 +133,14 @@ struct VertexPosNormCol
 	Vector3f	normal;
 	Vector4f	color;
 
-	VertexPosNormCol() {}
-
+	VertexPosNormCol()
+	{}
 	VertexPosNormCol(const Vector3f& position) :
 		position(position)
 	{}
-	
 	VertexPosNormCol(const Vector3f& position, const Vector3f& normal, const Vector4f& color) :
 		position(position), normal(normal), color(color)
 	{}
-
 	VertexPosNormCol(const Vector3f& position, const Vector3f& normal, const Color& color) :
 		position(position), normal(normal), color(color.ToVector4f())
 	{}
@@ -179,7 +175,6 @@ struct VertexPosNorm
 	
 	VertexPosNorm()
 	{}
-
 	VertexPosNorm(const Vector3f& position, const Vector3f& normal) :
 		position(position),
 		normal(normal)
@@ -198,11 +193,9 @@ struct VertexPosCol
 	VertexPosCol(const Vector3f& position) :
 		position(position)
 	{}
-	
 	VertexPosCol(const Vector3f& position, const Vector4f& color) :
 		position(position), color(color)
 	{}
-
 	VertexPosCol(const Vector3f& position, const Color& color) :
 		position(position), color(color.ToVector4f())
 	{}
@@ -224,24 +217,6 @@ struct VertexPos
 
 	DECLARE_VERTEX_TYPE(VertexType::POSITION);
 };
-
-
-//typedef VertexPos VertexP;
-//typedef VertexPosTex VertexPT;
-//typedef VertexPosNorm VertexPN;
-//typedef VertexPosCol VertexPC;
-//typedef VertexPosTexNorm VertexPTN;
-//typedef VertexPosTexCol VertexPTC;
-//typedef VertexPosNormCol VertexPNC;
-//typedef VertexPosTexNormCol VertexPTNC;
-
-// A vertex with a position, texture coordinate, and normal.
-//struct VertexPosTexTBN
-//{
-//	Vector3f	position;
-//	Vector2f	texCoord;
-//	Matrix3f	tbn;
-//};
 
 
 //-----------------------------------------------------------------------------
@@ -421,40 +396,34 @@ void VertexBuffer::SetVertices(int numVertices, const T* vertices)
 	glBindVertexArray(m_glVertexArray);
 
 	unsigned int offset = 0;
-	unsigned int index = 0;
 	int sizeOfVertex = sizeof(T);
 
 	m_vertexType = T::kVertexType;
 
 	if (m_vertexType & VertexType::POSITION)
 	{
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
+		glEnableVertexAttribArray(VertexAttribLocations::POSITION);
+		glVertexAttribPointer(VertexAttribLocations::POSITION, 3, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
 		offset += sizeof(Vector3f);
-		index++;
 	}
 	if (m_vertexType & VertexType::TEX_COORD)
 	{
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
+		glEnableVertexAttribArray(VertexAttribLocations::TEX_COORD);
+		glVertexAttribPointer(VertexAttribLocations::TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
 		offset += sizeof(Vector2f);
-		index++;
 	}
 	if (m_vertexType & VertexType::NORMAL)
 	{
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
+		glEnableVertexAttribArray(VertexAttribLocations::NORMAL);
+		glVertexAttribPointer(VertexAttribLocations::NORMAL, 3, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
 		offset += sizeof(Vector3f);
-		index++;
 	}
 	if (m_vertexType & VertexType::COLOR)
 	{
-		glEnableVertexAttribArray(index);
-		glVertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
+		glEnableVertexAttribArray(VertexAttribLocations::COLOR);
+		glVertexAttribPointer(VertexAttribLocations::COLOR, 4, GL_FLOAT, GL_FALSE, sizeOfVertex, (void*) offset);
 		offset += sizeof(Vector4f);
-		index++;
 	}
-	// TODO: Bone and TBN attributes.
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
