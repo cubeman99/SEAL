@@ -457,7 +457,9 @@ void SimulationRenderer::RenderHeatMapOverlay()
 	HeatMapInfo* heatMap = m_simulationManager->GetHeatMapManager()->
 		GetHeatMap(m_simulationManager->GetActiveHeatMapIndex());
 
+	//-------------------------------------------------------------------------
 	// Calculate value range.
+
 	float maxValue = FLT_MIN;
 	float minValue = FLT_MAX;
 	for (auto it = objectManager->agents_begin();
@@ -470,17 +472,44 @@ void SimulationRenderer::RenderHeatMapOverlay()
 			maxValue = value;
 	}
 	heatMap->GetRange().AdjustValueRange(minValue, maxValue);
+
+	//-------------------------------------------------------------------------
+	// Darken the screen.
+
+	glUseProgram(0);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_TEXTURE_2D);
+	glDepthMask(0);
+	{
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glBegin(GL_TRIANGLE_FAN);
+			glColor4f(0, 0, 0, 0.8f);
+			glVertex2f(-1, 1);
+			glVertex2f(-1, -1);
+			glVertex2f(1, -1);
+			glVertex2f(1, 1);
+		glEnd();
+	}
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glDepthMask(1);
+
+	//-------------------------------------------------------------------------
+	// Draw colorized agents.
 		
 	Material material;
 	material.SetIsLit(true);
 	material.SetTexture(nullptr);
+
 	m_renderer.SetRenderParams(m_heatMapRenderParams);
 	m_renderer.ApplyRenderSettings(false);
 	m_renderer.SetShader(m_shaderUnlit);
 	
 	SpeciesFilter speciesFilter = m_simulationManager->GetHeatMapSpeciesFilter();
 
-	// Draw colorized agents.
 	for (auto it = objectManager->agents_begin();
 		it != objectManager->agents_end(); ++it)
 	{
@@ -502,7 +531,18 @@ void SimulationRenderer::RenderHeatMapOverlay()
 
 		Matrix4f modelMatrix = agent->GetObjectToWorld() * 
 			Matrix4f::CreateScale(agent->GetRadius());
+		
+		// Draw outline.
+		glCullFace(GL_FRONT);
+		glDepthMask(0);
+		material.SetColor(heatMap->GetColor());
+		m_renderer.RenderMesh(m_agentMeshes[agent->GetSpecies()],
+			&material, modelMatrix * Matrix4f::CreateScale(1.1f));
+		glDepthMask(1);
+		glCullFace(GL_BACK);
 
+		// Fill agent with its value color.
+		material.SetColor(Color::Lerp(Color::BLACK, heatMap->GetColor(), value));
 		m_renderer.RenderMesh(m_agentMeshes[agent->GetSpecies()],
 			&material, modelMatrix);
 	}
