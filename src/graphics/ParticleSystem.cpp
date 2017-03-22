@@ -30,7 +30,7 @@ bool Particle::Update()
 	return m_inUse;
 }
 
-void Particle::Reassign(ParticleType type, Vector3f position)
+void Particle::Reassign(ParticleType type, Vector3f position, RNG& random)
 {
 	m_inUse = true;
 	m_age = 0;
@@ -38,18 +38,28 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 	m_position = position;
 
 	// Default values
+	m_lifeTime = 180;
 	m_color = Color::WHITE;
-	m_velocity = position.Normalize() * 0.5f;
-	m_acceleration = position.Normalize() * 0.1f;
+	m_velocity = position.Normalize() * 0.7f;
+	m_acceleration = Vector3f(0.0f);
 
 	switch (type)
 	{
 	case AGENT_KILLED:
+		m_lifeTime = 30;
 		m_color = Color::RED;
+		m_velocity = position.Normalize() * 2.0f;
+		m_velocity += 1.8f * Vector3f(random.NextFloatClamped(),
+									random.NextFloatClamped(),
+									random.NextFloatClamped());
 		break;
 
 	case AGENT_MATED:
 		m_color = Color(255, 105, 180);
+		m_acceleration = position.Normalize() * -0.008f;
+		m_velocity += 0.1f * Vector3f(random.NextFloatClamped(),
+									random.NextFloatClamped(),
+									random.NextFloatClamped());
 		break;
 	}
 }
@@ -57,6 +67,12 @@ void Particle::Reassign(ParticleType type, Vector3f position)
 ParticleSystem::ParticleSystem(Simulation* theSimulation)
 {
 	m_simulation = theSimulation;
+	m_particleRNG.SeedTime();
+}
+
+ParticleSystem::~ParticleSystem()
+{
+	CleanUp();
 }
 
 void ParticleSystem::Initialize()
@@ -113,7 +129,7 @@ void ParticleSystem::AddParticle(ParticleType type, Vector3f position)
 			{
 				foundOne = true;
 				m_numFreeParticles--;
-				m_particles[i]->Reassign(type, position);
+				m_particles[i]->Reassign(type, position, m_particleRNG);
 			}
 		}
 	}

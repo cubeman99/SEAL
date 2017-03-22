@@ -450,7 +450,7 @@ void Agent::Attack(Agent* other)
 	if (other->m_healthEnergy <= 0.0f)
 	{
 		// Death particles
-		GetSimulation()->AddParticles(12, ParticleType::AGENT_KILLED, other->m_position);
+		GetSimulation()->SpawnParticleGroup(ParticleType::AGENT_KILLED, m_position);
 
 		float toGain = other->m_maxEnergy / 2.0f;
 		m_fitness += toGain;
@@ -531,7 +531,7 @@ void Agent::Mate(Agent* mate)
 	parents[1]->m_mateWaitTime = config.agent.matingDelay;
 
 	// Mated particles
-	GetSimulation()->AddParticles(12, ParticleType::AGENT_MATED, m_position);
+	GetSimulation()->SpawnParticleGroup(ParticleType::AGENT_MATED, m_position);
 
 	// Spawn the children.
 	for (int i = 0; i < actualNumChildren; ++i)

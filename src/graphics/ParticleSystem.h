@@ -4,6 +4,7 @@
 #include <vector>
 #include <math/Vector3f.h>
 #include <graphics/Color.h>
+#include "utilities/Random.h"
 
 const int MAX_PARTICLES = 666;
 
@@ -23,12 +24,13 @@ public:
 	~Particle() {};
 
 	bool Update();
-	void Reassign(ParticleType type, Vector3f position);
+	void Reassign(ParticleType type, Vector3f position, RNG& random);
 
-	inline bool GetInUse() { return m_inUse; }
-	inline Color GetColor() { return m_color; }
-	inline float GetRadius() { return m_radius; }
-	inline Vector3f GetPosition() { return m_position; }
+	inline ParticleType GetType() const { return m_type; }
+	inline bool GetInUse() const { return m_inUse; }
+	inline Color GetColor() const { return m_color; }
+	inline float GetRadius() const { return m_radius; }
+	inline Vector3f GetPosition() const { return m_position; }
 
 private:
 	friend class ParticleSystem;
@@ -53,7 +55,7 @@ class ParticleSystem
 {
 public:
 	ParticleSystem(Simulation* theSimulation);
-	~ParticleSystem() {};
+	~ParticleSystem();
 
 	void Initialize();
 	void CleanUp();
@@ -66,6 +68,7 @@ public:
 private:
 	std::vector<Particle*> m_particles; // object pool
 	Simulation* m_simulation;
+	RNG m_particleRNG;					// Shouldn't affect the RNG of simulation timelines
 
 	int m_numFreeParticles;
 

@@ -121,8 +121,11 @@ void Simulation::OnAgentDie(Agent* agent)
 	// TODO: death statistics
 }
 
-void Simulation::AddParticles(unsigned int num, ParticleType type, Vector3f position)
+void Simulation::SpawnParticleGroup(ParticleType type, Vector3f position)
 {
+	// default particle count
+	unsigned int num = 6;
+
 	for (unsigned int i = 0; i < num; ++i)
 	{
 		m_particleSystem.AddParticle(type, position);

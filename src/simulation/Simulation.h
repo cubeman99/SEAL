@@ -68,7 +68,7 @@ public:
 	// Events
 
 	void OnAgentDie(Agent* agent);
-	void AddParticles(unsigned int num, ParticleType type, Vector3f position);
+	void SpawnParticleGroup(ParticleType type, Vector3f position);
 
 
 private:
