@@ -29,7 +29,8 @@ SimulationManager::SimulationManager() :
 	  m_maxTicksPerFrame(false),
 	  m_debugMode(false),
 	  m_ticksPerFrame(1),
-	  m_activeHeatMapIndex(-1)
+	  m_activeHeatMapIndex(-1),
+	  m_heatMapSpeciesFilter(SPECIES_FILTER_BOTH)
 {
 }
 

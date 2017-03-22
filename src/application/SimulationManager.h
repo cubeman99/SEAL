@@ -12,6 +12,14 @@
 #include "DiagramDrawer.h"
 
 
+enum SpeciesFilter
+{
+	SPECIES_FILTER_ONLY_HERBIVORES,
+	SPECIES_FILTER_ONLY_CARNIVORES,
+	SPECIES_FILTER_BOTH,
+};
+
+
 //-----------------------------------------------------------------------------
 // SimulationManager
 //-----------------------------------------------------------------------------
@@ -59,7 +67,8 @@ public:
 	inline void SetTicksFerFrame(unsigned int ticksPerFrame) { m_ticksPerFrame = ticksPerFrame; }
 	inline void SetMaxTicksPerFrame(bool maxTicksPerFrame) { m_maxTicksPerFrame = maxTicksPerFrame; }
 	inline void SetDebugMode(bool debugMode) { m_debugMode = debugMode; }
-	inline void SetActiveHeatMapIndex(bool index) { m_activeHeatMapIndex = index; }
+	inline void SetActiveHeatMapIndex(int index) { m_activeHeatMapIndex = index; }
+	inline void SetHeatMapSpeciesFilter(SpeciesFilter filter) { m_heatMapSpeciesFilter = filter; }
 
 	// Render options
 	// TODO: have some sort of enum for view options like these.
@@ -83,6 +92,7 @@ public:
 	inline bool GetShowAxisLines() const { return m_showAxisLines; }
 	inline bool IsDebugMode() const { return m_debugMode; }
 	inline int GetActiveHeatMapIndex() const { return m_activeHeatMapIndex; } 
+	inline SpeciesFilter GetHeatMapSpeciesFilter() const { return m_heatMapSpeciesFilter; } 
 
 private:
 	Simulation* m_simulation;
@@ -102,6 +112,7 @@ private:
 	bool			m_maxTicksPerFrame;
 	bool			m_debugMode;
 	int				m_activeHeatMapIndex;
+	SpeciesFilter	m_heatMapSpeciesFilter;
 
 	// Render options.
 	bool m_viewWireFrameMode;

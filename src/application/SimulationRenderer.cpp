@@ -363,7 +363,6 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	}
 
 	// Draw heat-map overlay, colorizing agents by some value.
-	m_simulationManager->SetActiveHeatMapIndex(0);
 	RenderHeatMapOverlay();
 
 	// Draw agent vision.
@@ -479,12 +478,23 @@ void SimulationRenderer::RenderHeatMapOverlay()
 	m_renderer.ApplyRenderSettings(false);
 	m_renderer.SetShader(m_shaderUnlit);
 	
+	SpeciesFilter speciesFilter = m_simulationManager->GetHeatMapSpeciesFilter();
+
 	// Draw colorized agents.
 	for (auto it = objectManager->agents_begin();
 		it != objectManager->agents_end(); ++it)
 	{
 		Agent* agent = *it;
 		
+		// Check the species filter for this agent.
+		if ((speciesFilter == SPECIES_FILTER_ONLY_HERBIVORES &&
+			agent->GetSpecies() != SPECIES_HERBIVORE) ||
+			(speciesFilter == SPECIES_FILTER_ONLY_CARNIVORES &&
+			agent->GetSpecies() != SPECIES_CARNIVORE))
+		{
+			continue;
+		}
+
 		// Colorize based on the normalized value for this agent.
 		float value = heatMap->GetData(agent);
 		value = (value - minValue) / (maxValue - minValue);

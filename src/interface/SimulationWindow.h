@@ -41,6 +41,8 @@ private:
 	void OnUpdateMenuItem(wxUpdateUIEvent& e);
     void OnMenuItem(wxCommandEvent& e);
 	void OnChooseGraph(wxCommandEvent& e);
+	void OnChooseHeatMapData(wxCommandEvent& e);
+	void OnChooseHeatMapSpecies(wxCommandEvent& e);
     void OnClose(wxCommandEvent& e);
     void OnNewSimulation(wxCommandEvent& e);
 	void OnOpenSimulation(wxCommandEvent& e);
@@ -72,6 +74,9 @@ private:
 				wxComboBox*			m_graphComboBox;
 			wxWindow*				m_pageLog;
 				wxTextCtrl*			m_logBox;
+			wxWindow*				m_pageHeatMaps;
+				wxComboBox*			m_heatMapDataComboBox;
+				wxComboBox*			m_heatMapSpeciesComboBox;
 
 	// Simulation
 	wxMenuItem* m_menuItemPauseSimulation;

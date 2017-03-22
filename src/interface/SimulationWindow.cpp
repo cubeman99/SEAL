@@ -20,6 +20,8 @@ enum
 
 
 	CHOOSE_GRAPH,
+	CHOOSE_HEAT_MAP_DATA,
+	CHOOSE_HEAT_MAP_SPECIES,
 	UPDATE_TIMER,
 	
 	//-------------------------------------------------------------------------
@@ -76,6 +78,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
     EVT_CLOSE(SimulationWindow::OnWindowClose)
 
 	EVT_COMBOBOX(CHOOSE_GRAPH, SimulationWindow::OnChooseGraph)
+	EVT_COMBOBOX(CHOOSE_HEAT_MAP_DATA, SimulationWindow::OnChooseHeatMapData)
+	EVT_COMBOBOX(CHOOSE_HEAT_MAP_SPECIES, SimulationWindow::OnChooseHeatMapSpecies)
 
 	EVT_UPDATE_UI_RANGE(MENU_ITEMS_BEGIN, MENU_ITEMS_END, SimulationWindow::OnUpdateMenuItem)
 	//EVT_UPDATE_UI(SIMULATION_TICK_ONCE, SimulationWindow::OnUpdateMenuItem)
@@ -205,6 +209,35 @@ void SimulationWindow::CreateUI()
 		m_pageGraphs->SetSizerAndFit(sizer);
 	}
 	m_tabControl->AddPage(m_pageGraphs, "Graphs");
+	
+	//-------------------------------------------------------------------------
+	// Heat Maps tab.
+
+	m_pageHeatMaps = new wxWindow(m_tabControl, -1, wxDefaultPosition, wxDefaultSize, 0L);
+	{
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+
+		m_heatMapDataComboBox = new wxComboBox(m_pageHeatMaps, CHOOSE_HEAT_MAP_DATA,
+			wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+
+		int b = 2;
+
+		wxBoxSizer* sizerData = new wxBoxSizer(wxHORIZONTAL);
+		sizerData->Add(new wxStaticText(m_pageHeatMaps, -1, "Heat map data:"), 0, wxALL, b);
+		sizerData->Add(m_heatMapDataComboBox, 1, wxEXPAND | wxALL, b);
+		sizer->Add(sizerData, 0, wxEXPAND | wxALL, 0);
+
+		m_heatMapSpeciesComboBox = new wxComboBox(m_pageHeatMaps, CHOOSE_HEAT_MAP_SPECIES,
+			wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+
+		wxBoxSizer* sizerSpeciesFilter = new wxBoxSizer(wxHORIZONTAL);
+		sizerSpeciesFilter->Add(new wxStaticText(m_pageHeatMaps, -1, "Species filter:"), 0, wxALL, b);
+		sizerSpeciesFilter->Add(m_heatMapSpeciesComboBox, 1, wxEXPAND | wxALL, b);
+		sizer->Add(sizerSpeciesFilter, 0, wxEXPAND | wxALL, 0);
+
+		m_pageHeatMaps->SetSizerAndFit(sizer);
+	}
+	m_tabControl->AddPage(m_pageHeatMaps, "Heat Maps");
 
 	//-------------------------------------------------------------------------
 	// Log tab.
@@ -305,12 +338,30 @@ void SimulationWindow::CreateMenuBar()
 void SimulationWindow::OnNewSimulation()
 {
 	GraphManager* graphManager = m_simulationManager.GetGraphManager();
-
+	HeatMapManager* heatMapManager = m_simulationManager.GetHeatMapManager();
+	
+	// Graphs
 	m_graphComboBox->Clear();
 	for (unsigned int i = 0; i < graphManager->GetNumGraphs(); ++i)
 		m_graphComboBox->Append(graphManager->GetGraph(i)->GetTitle());
 	m_graphComboBox->SetSelection(0);
 	m_graphCanvas->SetGraphIndex(0);
+
+	// Heat map data
+	m_heatMapDataComboBox->Clear();
+	m_heatMapDataComboBox->Append("None");
+	for (unsigned int i = 0; i < heatMapManager->GetNumHeatMap(); ++i)
+		m_heatMapDataComboBox->Append(heatMapManager->GetHeatMap(i)->GetTitle());
+	m_heatMapDataComboBox->SetSelection(0);
+	m_simulationManager.SetActiveHeatMapIndex(-1);
+
+	// Heat map species filter
+	m_heatMapSpeciesComboBox->Clear();
+	m_heatMapSpeciesComboBox->Append("Herbivores");
+	m_heatMapSpeciesComboBox->Append("Carnivores");
+	m_heatMapSpeciesComboBox->Append("Both");
+	m_heatMapSpeciesComboBox->SetSelection(2);
+	m_simulationManager.SetHeatMapSpeciesFilter(SPECIES_FILTER_BOTH);
 }
 
 
@@ -526,6 +577,17 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 void SimulationWindow::OnChooseGraph(wxCommandEvent& e)
 {
 	m_graphCanvas->SetGraphIndex(e.GetSelection());
+}
+
+void SimulationWindow::OnChooseHeatMapData(wxCommandEvent& e)
+{
+	m_simulationManager.SetActiveHeatMapIndex(e.GetSelection() - 1);
+}
+
+void SimulationWindow::OnChooseHeatMapSpecies(wxCommandEvent& e)
+{
+	m_simulationManager.SetHeatMapSpeciesFilter(
+		(SpeciesFilter) e.GetSelection());
 }
 
 void SimulationWindow::OnClose(wxCommandEvent& e)
