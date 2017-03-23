@@ -126,6 +126,13 @@ void Simulation::SpawnParticleGroup(ParticleType type, Vector3f position)
 	// default particle count
 	unsigned int num = 6;
 
+	switch (type)
+	{
+	case AGENT_KILLED:
+		num = 10;
+		break;
+	}
+
 	for (unsigned int i = 0; i < num; ++i)
 	{
 		m_particleSystem.AddParticle(type, position);

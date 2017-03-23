@@ -20,6 +20,16 @@ bool Particle::Update()
 	m_velocity += m_acceleration;
 	m_position += m_velocity;
 	
+	switch (m_type)
+	{
+	case AGENT_KILLED:
+		m_radius *= 0.9f;
+		break;
+	case AGENT_MATED:
+		m_radius *= 0.999f;
+		break;
+	}
+
 	++m_age;
 
 	if (m_age >= m_lifeTime)
@@ -39,6 +49,7 @@ void Particle::Reassign(ParticleType type, Vector3f position, RNG& random)
 
 	// Default values
 	m_lifeTime = 180;
+	m_radius = 4.0f;
 	m_color = Color::WHITE;
 	m_velocity = position.Normalize() * 0.7f;
 	m_acceleration = Vector3f(0.0f);
@@ -47,6 +58,7 @@ void Particle::Reassign(ParticleType type, Vector3f position, RNG& random)
 	{
 	case AGENT_KILLED:
 		m_lifeTime = 30;
+		m_radius = 10.0f;
 		m_color = Color::RED;
 		m_velocity = position.Normalize() * 2.0f;
 		m_velocity += 1.8f * Vector3f(random.NextFloatClamped(),
