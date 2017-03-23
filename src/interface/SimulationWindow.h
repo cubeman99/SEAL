@@ -95,6 +95,8 @@ private:
 	wxMenuItem* m_menuItemShowAgentVision;
 	wxMenuItem* m_menuItemShowAgentBrain;
 	wxMenuItem* m_menuItemShowInvisibleObjects;
+	wxMenuItem* m_menuItemShowSkyBox;
+	wxMenuItem* m_menuItemShowParticles;
 
 	// Debug
 	wxMenuItem* m_menuItemDebugMode;

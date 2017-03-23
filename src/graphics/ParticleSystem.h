@@ -63,7 +63,7 @@ public:
 	void Update();
 	void AddParticle(ParticleType type, Vector3f position);
 
-	inline std::vector<Particle*> GetParticles() const { return m_particles; }
+	inline const std::vector<Particle*>& GetParticles() const { return m_particles; }
 
 private:
 	std::vector<Particle*> m_particles; // object pool

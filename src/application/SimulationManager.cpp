@@ -26,6 +26,8 @@ SimulationManager::SimulationManager() :
 	  m_showAgentBrain(false),
 	  m_showInvisibleObjects(false),
 	  m_showAxisLines(false),
+	  m_showSkyBox(true),
+	  m_showParticles(true),
 	  m_maxTicksPerFrame(false),
 	  m_debugMode(false),
 	  m_ticksPerFrame(1),
@@ -87,6 +89,8 @@ void SimulationManager::OnNewSimulation()
 	m_showAgentBrain		= false;
 	m_showInvisibleObjects	= false;
 	m_showAxisLines			= false;
+	m_showSkyBox			= true;
+	m_showParticles			= true;
 	m_maxTicksPerFrame		= false;
 	m_ticksPerFrame			= 1;
 }

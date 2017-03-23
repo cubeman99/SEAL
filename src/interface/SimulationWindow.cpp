@@ -53,6 +53,8 @@ enum
 		SHOW_AGENT_VISION,
 		SHOW_AGENT_BRAIN,
 		SHOW_INVISIBLE_OBJECTS,
+		SHOW_SKY_BOX,
+		SHOW_PARTICLES,
 
 		// Debug
 		DEBUG_DEBUG_MODE,
@@ -110,6 +112,8 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_AGENT_VISION, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_AGENT_BRAIN, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_SKY_BOX, SimulationWindow::OnMenuItem)
+	EVT_MENU(SHOW_PARTICLES, SimulationWindow::OnMenuItem)
 	
 	// Debug
     EVT_MENU(DEBUG_DEBUG_MODE, SimulationWindow::OnMenuItem)
@@ -315,6 +319,8 @@ void SimulationWindow::CreateMenuBar()
     m_menuItemShowAgentVision = menuView->AppendCheckItem(SHOW_AGENT_VISION, "Show Agent &Vision\tA");
     m_menuItemShowAgentBrain = menuView->AppendCheckItem(SHOW_AGENT_BRAIN, "Show Agent &Brain\tB");
     m_menuItemShowInvisibleObjects = menuView->AppendCheckItem(SHOW_INVISIBLE_OBJECTS, "Show &Invisible Objects\tI");
+    m_menuItemShowSkyBox = menuView->AppendCheckItem(SHOW_SKY_BOX, "Show S&kybox");
+    m_menuItemShowParticles = menuView->AppendCheckItem(SHOW_PARTICLES, "Show &Particles");
 
 	//-------------------------------------------------------------------------
 	// DEBUG
@@ -440,6 +446,14 @@ void SimulationWindow::OnUpdateMenuItem(wxUpdateUIEvent& e)
 		m_menuItemShowInvisibleObjects->Check(
 			m_simulationManager.GetShowInvisibleObjects());
 		break;
+	case SHOW_SKY_BOX:
+		m_menuItemShowSkyBox->Check(
+			m_simulationManager.GetShowSkyBox());
+		break;
+	case SHOW_PARTICLES:
+		m_menuItemShowParticles->Check(
+			m_simulationManager.GetShowParticles());
+		break;
 		
 	//-------------------------------------------------------------------------
 	// Debug
@@ -516,6 +530,12 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		break;
 	case SHOW_INVISIBLE_OBJECTS:
 		m_simulationManager.SetShowInvisibleObjects(e.IsChecked());
+		break;
+	case SHOW_SKY_BOX:
+		m_simulationManager.SetShowSkyBox(e.IsChecked());
+		break;
+	case SHOW_PARTICLES:
+		m_simulationManager.SetShowParticles(e.IsChecked());
 		break;
 
 	//-------------------------------------------------------------------------
