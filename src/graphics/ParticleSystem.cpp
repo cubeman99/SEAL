@@ -26,7 +26,7 @@ bool Particle::Update()
 		m_radius *= 0.9f;
 		break;
 	case AGENT_MATED:
-		m_radius *= 0.999f;
+		m_radius *= 0.997f;
 		break;
 	}
 
