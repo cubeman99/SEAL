@@ -344,11 +344,12 @@ void Simulation::UpdateStatistics()
 	stats.simulationAge = m_ageInTicks;
 
 	// Cumulatively add statistic values for each agent.
-	unsigned int numAgents[SPECIES_COUNT] = { 0, 0 };
+	unsigned int numAgents[SPECIES_COUNT + 1] = { 0, 0, 0};
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
 		Species spec = it->GetSpecies();
+
 		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
 			stats.species[spec].avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
 		stats.species[spec].avgFitness += it->GetFitness();
@@ -359,12 +360,23 @@ void Simulation::UpdateStatistics()
 		stats.species[spec].populationSize++;
 		stats.species[spec].bestFitness = Math::Max(it->GetFitness(),
 			stats.species[spec].bestFitness);
-
 		numAgents[spec]++;
+
+		for (unsigned int i = 0; i < GenePosition::PHYSIOLOGICAL_GENES_COUNT; ++i)
+			stats.species[SPECIES_COUNT].avgGeneValue[i] += it->GetGenome()->GetGeneAsFloat(i);
+		stats.species[SPECIES_COUNT].avgFitness += it->GetFitness();
+		stats.species[SPECIES_COUNT].avgEnergyUsage += it->GetEnergyUsage();
+		stats.species[SPECIES_COUNT].avgMoveAmount += it->GetMoveAmount();
+		stats.species[SPECIES_COUNT].avgTurnAmount += Math::Abs(it->GetTurnAmount());
+		stats.species[SPECIES_COUNT].totalEnergy += it->GetEnergy();
+		stats.species[SPECIES_COUNT].populationSize++;
+		stats.species[SPECIES_COUNT].bestFitness = Math::Max(it->GetFitness(),
+			stats.species[SPECIES_COUNT].bestFitness);
+		numAgents[SPECIES_COUNT]++;
 	}
 	
 	// Divide averages by agent count.
-	for (unsigned int species = 0; species < 2; ++species)
+	for (unsigned int species = 0; species < SPECIES_COUNT + 1; ++species)
 	{
 		if (numAgents[species] > 0)
 		{

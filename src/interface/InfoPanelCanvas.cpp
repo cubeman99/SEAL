@@ -102,15 +102,15 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 	m_simInfoPanel.AddItem("seed").SetValue(simulation->GetOriginalSeed());
 	m_simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
 	m_simInfoPanel.AddItem("season age").SetValue(simulation->GetGenerationAge()).InitBar(Color::MAGENTA, 0u, simulation->GetGenerationDuration());
-	m_simInfoPanel.AddItem("population size").SetValue((int) stats.carnivore.populationSize).InitBar(Color::CYAN, config.population.minAgents, config.population.maxAgents);
 	m_simInfoPanel.AddSeparator();
-	m_simInfoPanel.AddItem("total energy").SetValue(stats.carnivore.totalEnergy);
-	m_simInfoPanel.AddItem("avg energy").SetValue(stats.carnivore.avgEnergy);
-	m_simInfoPanel.AddItem("avg energy usage").SetValue(stats.carnivore.avgEnergyUsage);
-	m_simInfoPanel.AddItem("avg fitness").SetValue(stats.carnivore.avgFitness);
+	m_simInfoPanel.AddItem("population size").SetValue((int) stats.combined.populationSize).InitBar(Color::CYAN, config.population.minAgents, config.population.maxAgents);
+	m_simInfoPanel.AddItem("total energy").SetValue(stats.combined.totalEnergy);
+	m_simInfoPanel.AddItem("avg energy").SetValue(stats.combined.avgEnergy);
+	m_simInfoPanel.AddItem("avg energy usage").SetValue(stats.combined.avgEnergyUsage);
+	m_simInfoPanel.AddItem("avg fitness").SetValue(stats.combined.avgFitness);
 	m_simInfoPanel.AddSeparator();
-	m_simInfoPanel.AddItem("avg move amount").SetValue(stats.carnivore.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
-	m_simInfoPanel.AddItem("avg turn amount").SetValue(stats.carnivore.avgTurnAmount).InitBar(Color::CYAN, 0, 1);
+	m_simInfoPanel.AddItem("avg move amount").SetValue(stats.combined.avgMoveAmount).InitBar(Color::GREEN, 0, 1);
+	m_simInfoPanel.AddItem("avg turn amount").SetValue(stats.combined.avgTurnAmount).InitBar(Color::CYAN, 0, 1);
 	m_simInfoPanel.Draw(m_graphics, bounds);
 
 	//-------------------------------------------------------------------------

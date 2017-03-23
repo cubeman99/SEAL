@@ -218,7 +218,6 @@ void InfoPanel::Clear()
 
 void InfoPanel::AddSeparator()
 {
-	// TODO: InfoPanel::AddSeparator()
 	AddItem("---------------").SetValue("------");
 }
 

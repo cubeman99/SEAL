@@ -108,8 +108,7 @@ herbivore.brain.weightDecayRate			= 0.998
 #==============================================================================
 # Carnivore
 
-# Set carnivore config to herbivore config
-###carnivore = herbivore
+# Carnivore config values default to herbivore's
 
 carnivore.population.initialAgents		= 15
 carnivore.population.minAgents			= 15

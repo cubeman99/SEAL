@@ -63,12 +63,13 @@ public:
 
 	union
 	{
-		SpeciesStats species[SPECIES_COUNT];
+		SpeciesStats species[SPECIES_COUNT + 1];
 
 		struct
 		{
 			SpeciesStats herbivore; // species[0]
 			SpeciesStats carnivore; // species[1]
+			SpeciesStats combined; // species[2]
 		};
 	};
 
@@ -83,6 +84,7 @@ public:
 
 		species[SPECIES_HERBIVORE].Reset();
 		species[SPECIES_CARNIVORE].Reset();
+		species[SPECIES_COUNT].Reset();
 	}
 };
 
