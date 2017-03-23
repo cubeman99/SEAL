@@ -99,6 +99,7 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 	m_simInfoPanel.SetFont(m_font);
 	m_simInfoPanel.Clear();
 	m_simInfoPanel.AddItem("world age").SetValue(simulation->GetAgeInTicks());
+	m_simInfoPanel.AddItem("seed").SetValue(simulation->GetOriginalSeed());
 	m_simInfoPanel.AddItem("generation").SetValue(simulation->GetGeneration());
 	m_simInfoPanel.AddItem("season age").SetValue(simulation->GetGenerationAge()).InitBar(Color::MAGENTA, 0u, simulation->GetGenerationDuration());
 	m_simInfoPanel.AddItem("population size").SetValue((int) stats.carnivore.populationSize).InitBar(Color::CYAN, config.population.minAgents, config.population.maxAgents);

@@ -35,6 +35,7 @@ public:
 	InfoPanelItem& SetValue(float value);
 	InfoPanelItem& SetValue(int value);
 	InfoPanelItem& SetValue(unsigned int value);
+	InfoPanelItem& SetValue(unsigned long value);
 	InfoPanelItem& SetPrecision(int precision);
 	InfoPanelItem& SetValueColor(const Color& color);
 

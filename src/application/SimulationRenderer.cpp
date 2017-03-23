@@ -42,9 +42,11 @@ void SimulationRenderer::LoadResources()
 	m_textureSkyBox = m_resourceManager.LoadCubeMapTexture(
 		"skybox", skyBoxFileNames, texParams);
 
-	// TODO: load particle textures here
+	// Load particle textures
 	m_textureHeart = m_resourceManager.LoadTexture("particle_heart",
 		"textures/particle_heart.png", texParams);
+	m_textureCircle = m_resourceManager.LoadTexture("particle_circle",
+		"textures/particle_circle.png", texParams);
 
 	//-------------------------------------------------------------------------
 	// Load fonts.
@@ -362,8 +364,17 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 					Matrix4f::CreateRotation(camera->GetOrientation()) *
 					Matrix4f::CreateScale(particles[i]->GetRadius()); 
 
+				switch (particles[i]->GetType())
+				{
+				case AGENT_KILLED:
+					material.SetTexture(m_textureCircle);
+					break;
+				case AGENT_MATED:
+					material.SetTexture(m_textureHeart);
+					break;
+				}
+
 				material.SetColor(particles[i]->GetColor());
-				material.SetTexture(m_textureHeart);
 				m_renderer.RenderMesh(m_meshQuad, &material, modelMatrix);
 			}
 		}

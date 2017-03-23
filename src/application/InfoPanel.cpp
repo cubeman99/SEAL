@@ -78,6 +78,14 @@ InfoPanelItem& InfoPanelItem::SetValue(int value)
 	return *this;
 }
 
+InfoPanelItem& InfoPanelItem::SetValue(unsigned long value)
+{
+	m_valueType = 2;
+	m_valueFloat = (float)value;
+	m_valueInt = value;
+	return *this;
+}
+
 InfoPanelItem& InfoPanelItem::SetPrecision(int precision)
 {
 	m_valuePrecision = precision;

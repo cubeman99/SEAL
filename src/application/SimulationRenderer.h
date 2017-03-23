@@ -60,6 +60,7 @@ private:
 	Font* m_font;
 	Texture* m_textureSkyBox;
 	Texture* m_textureHeart;
+	Texture* m_textureCircle;
 	Mesh* m_agentMeshes[2];
 	Mesh* m_agentMeshHerbivore;
 	Mesh* m_agentMeshCarnivore;
