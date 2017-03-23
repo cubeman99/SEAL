@@ -280,23 +280,26 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 
 	//-------------------------------------------------------------------------
 	// Draw the skybox.
-	
-	m_renderer.SetRenderParams(m_skyBoxRenderParams);
-	m_renderer.ApplyRenderSettings(false);
-	m_renderer.SetShader(m_shaderSkyBox);
+		
+	if (m_simulationManager->GetShowSkyBox())
+	{
+		m_renderer.SetRenderParams(m_skyBoxRenderParams);
+		m_renderer.ApplyRenderSettings(false);
+		m_renderer.SetShader(m_shaderSkyBox);
 
-	// Bind the skybox texture.
-	if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
-		glUniform1i(uniformLocation, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
+		// Bind the skybox texture.
+		if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
+			glUniform1i(uniformLocation, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
 	
-	transform.SetIdentity();
-	transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
-	m_renderer.RenderMesh(m_skyBoxMesh, m_worldMaterial, transform);
+		transform.SetIdentity();
+		transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
+		m_renderer.RenderMesh(m_skyBoxMesh, m_worldMaterial, transform);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+
 	//-------------------------------------------------------------------------
 	// Render the simulation.
 	
@@ -344,21 +347,25 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	}
 
 	// Draw particles.
-	std::vector<Particle*> particles = simulation->GetParticleSystem()->GetParticles();
-	m_renderer.SetShader(m_shaderLitTextured);
-	for (unsigned int i = 0; i < particles.size(); ++i)
+	if (m_simulationManager->GetShowParticles())
 	{
-		if (particles[i]->GetInUse())
+		const std::vector<Particle*>& particles = simulation->
+			GetParticleSystem()->GetParticles();
+		m_renderer.SetShader(m_shaderLitTextured);
+		for (unsigned int i = 0; i < particles.size(); ++i)
 		{
-			// Make the quad-model face the camera.
-			Matrix4f modelMatrix =
-				Matrix4f::CreateTranslation(particles[i]->GetPosition()) *
-				Matrix4f::CreateRotation(camera->GetOrientation()) *
-				Matrix4f::CreateScale(particles[i]->GetRadius()); 
+			if (particles[i]->GetInUse())
+			{
+				// Make the quad-model face the camera.
+				Matrix4f modelMatrix =
+					Matrix4f::CreateTranslation(particles[i]->GetPosition()) *
+					Matrix4f::CreateRotation(camera->GetOrientation()) *
+					Matrix4f::CreateScale(particles[i]->GetRadius()); 
 
-			material.SetColor(particles[i]->GetColor());
-			material.SetTexture(m_textureHeart);
-			m_renderer.RenderMesh(m_meshQuad, &material, modelMatrix);
+				material.SetColor(particles[i]->GetColor());
+				material.SetTexture(m_textureHeart);
+				m_renderer.RenderMesh(m_meshQuad, &material, modelMatrix);
+			}
 		}
 	}
 

@@ -81,6 +81,8 @@ public:
 	inline void SetShowAgentBrain(bool showAgentBrain) { m_showAgentBrain = showAgentBrain; }
 	inline void SetShowInvisibleObjects(bool showInvisibleObjects) { m_showInvisibleObjects = showInvisibleObjects; }
 	inline void SetShowAxisLines(bool showAxisLines) { m_showAxisLines = showAxisLines; }
+	inline void SetShowSkyBox(bool showSkyBox) { m_showSkyBox = showSkyBox; }
+	inline void SetShowParticles(bool showParticles) { m_showParticles = showParticles; }
 
 	inline bool IsViewWireFrameMode() const { return m_viewWireFrameMode; }
 	inline bool IsLightingEnabled() const { return m_viewLighting; }
@@ -90,6 +92,8 @@ public:
 	inline bool GetShowAgentBrain() const { return m_showAgentBrain; }
 	inline bool GetShowInvisibleObjects() const { return m_showInvisibleObjects; }
 	inline bool GetShowAxisLines() const { return m_showAxisLines; }
+	inline bool GetShowSkyBox() const { return m_showSkyBox; }
+	inline bool GetShowParticles() const { return m_showParticles; }
 	inline bool IsDebugMode() const { return m_debugMode; }
 	inline int GetActiveHeatMapIndex() const { return m_activeHeatMapIndex; } 
 	inline SpeciesFilter GetHeatMapSpeciesFilter() const { return m_heatMapSpeciesFilter; } 
@@ -123,6 +127,8 @@ private:
 	bool m_showAgentBrain;
 	bool m_showInvisibleObjects;
 	bool m_showAxisLines;
+	bool m_showSkyBox;
+	bool m_showParticles;
 };
 
 
