@@ -52,6 +52,11 @@ HeatMapInfo& HeatMapInfo::SetRange(const GraphRange& range)
 		return (float) agent->agentFloatGetterFunc(); \
 	})).SetColor(color)
 
+#define CREATE_HEAT_MAP_CUSTOM(title, color, agentFloatGetterCode) \
+	AddHeatMap(HeatMapInfo(title, [](Agent* agent)\
+		agentFloatGetterCode \
+	)).SetColor(color)
+
 #define CREATE_GENE_HEAT_MAP(title, color, geneIndex) \
 	AddHeatMap(HeatMapInfo(title, [](Agent* agent) { \
 		return agent->GetGenome()->GetGeneAsFloat(geneIndex); \
@@ -100,22 +105,26 @@ void HeatMapManager::OnNewSimulation(Simulation* simulation)
 	CREATE_HEAT_MAP("Fitness",			Color::GREEN,	GetFitness).SetRange(zeroAndUp);
 	CREATE_HEAT_MAP("Move Amount",		Color::GREEN,	GetMoveAmount).SetRange(zeroToOne);
 
+	CREATE_HEAT_MAP_CUSTOM("Turn Amount", Color::CYAN, {
+		return Math::Abs(agent->GetTurnAmount());
+	}).SetRange(zeroToOne);
+
 	// Gene heat maps:
 
-	CREATE_GENE_HEAT_MAP("Color Red",			Color::RED,			COLOR_RED);
-	CREATE_GENE_HEAT_MAP("Color Green",			Color::GREEN,		COLOR_GREEN);
-	CREATE_GENE_HEAT_MAP("Color Blue",			Color::BLUE,		COLOR_BLUE);
-	CREATE_GENE_HEAT_MAP("Life Span",			Color::MAGENTA,		LIFE_SPAN);
-	CREATE_GENE_HEAT_MAP("Strength",			Color::RED,			STRENGTH);
-	CREATE_GENE_HEAT_MAP("Mutation Rate",		Color::MAGENTA,		MUTATION_RATE);
-	CREATE_GENE_HEAT_MAP("Crossover Points",	Color::YELLOW,		CROSSOVER_POINTS);
-	CREATE_GENE_HEAT_MAP("Child Count",			Color::GREEN,		CHILD_COUNT);
-	CREATE_GENE_HEAT_MAP("Field of View",		Color::GREEN,		FIELD_OF_VIEW);
-	CREATE_GENE_HEAT_MAP("Angle Between Eyes",	orange,				ANGLE_BETWEEN_EYES);
-	CREATE_GENE_HEAT_MAP("Sight Distance",		Color::CYAN,		VIEW_DISTANCE);
-	CREATE_GENE_HEAT_MAP("Resolution Red",		Color::RED,			RESOLUTION_RED);
-	CREATE_GENE_HEAT_MAP("Resolution Green",	Color::GREEN,		RESOLUTION_GREEN);
-	CREATE_GENE_HEAT_MAP("Resolution Blue",		Color::BLUE,		RESOLUTION_BLUE);
+	CREATE_GENE_HEAT_MAP("Gene - Color Red",			Color::RED,			COLOR_RED);
+	CREATE_GENE_HEAT_MAP("Gene - Color Green",			Color::GREEN,		COLOR_GREEN);
+	CREATE_GENE_HEAT_MAP("Gene - Color Blue",			Color::BLUE,		COLOR_BLUE);
+	CREATE_GENE_HEAT_MAP("Gene - Life Span",			Color::MAGENTA,		LIFE_SPAN);
+	CREATE_GENE_HEAT_MAP("Gene - Strength",				Color::RED,			STRENGTH);
+	CREATE_GENE_HEAT_MAP("Gene - Mutation Rate",		Color::MAGENTA,		MUTATION_RATE);
+	CREATE_GENE_HEAT_MAP("Gene - Crossover Points",		Color::YELLOW,		CROSSOVER_POINTS);
+	CREATE_GENE_HEAT_MAP("Gene - Child Count",			Color::GREEN,		CHILD_COUNT);
+	CREATE_GENE_HEAT_MAP("Gene - Field of View",		Color::GREEN,		FIELD_OF_VIEW);
+	CREATE_GENE_HEAT_MAP("Gene - Angle Between Eyes",	orange,				ANGLE_BETWEEN_EYES);
+	CREATE_GENE_HEAT_MAP("Gene - Sight Distance",		Color::CYAN,		VIEW_DISTANCE);
+	CREATE_GENE_HEAT_MAP("Gene - Resolution Red",		Color::RED,			RESOLUTION_RED);
+	CREATE_GENE_HEAT_MAP("Gene - Resolution Green",		Color::GREEN,		RESOLUTION_GREEN);
+	CREATE_GENE_HEAT_MAP("Gene - Resolution Blue",		Color::BLUE,		RESOLUTION_BLUE);
 }
 
 HeatMapInfo& HeatMapManager::AddHeatMap(const HeatMapInfo& heatMapInfo)

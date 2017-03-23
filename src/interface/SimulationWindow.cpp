@@ -269,7 +269,7 @@ void SimulationWindow::CreateUI()
 	SetTitle(wxT("New Simulation - SEAL"));
 	
 	// Set initial window size.
-    SetClientSize(1000, 600);
+    SetClientSize(1000, 640);
     Show();
 }
 
