@@ -74,6 +74,7 @@ struct Quaternion
 	static Quaternion	Rotate(const Quaternion& v, const Vector3f axis, float angle);
 	static float		SmallestAngle(const Quaternion& a, const Quaternion& b);
 	static Quaternion	FromEuler(float pitch, float yaw, float roll);
+	static Quaternion	LookRotation(const Vector3f& forward, const Vector3f& up);
 };
 
 

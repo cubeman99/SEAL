@@ -2,6 +2,7 @@
 #include "Vector3f.h"
 #include "Vector4f.h"
 #include "MathLib.h"
+#include "Matrix3f.h"
 
 
 //-----------------------------------------------------------------------------
@@ -430,6 +431,62 @@ Quaternion Quaternion::FromEuler(float pitch, float yaw, float roll)
 {
 	Quaternion q;
 	q.SetEuler(pitch, yaw, roll);
+	return q;
+}
+
+Quaternion Quaternion::LookRotation(const Vector3f& forward, const Vector3f& up)
+{
+	Matrix3f m = Matrix3f::CreateLookAt(forward, up);
+
+	// Modified from:
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+
+	#define m00 m[0]
+	#define m10 m[1]
+	#define m20 m[2]
+	#define m01 m[3]
+	#define m11 m[4]
+	#define m21 m[5]
+	#define m02 m[6]
+	#define m12 m[7]
+	#define m22 m[8]
+	
+	Quaternion q;
+	float trace = m00 + m11 + m22;
+
+	if (trace > 0)
+	{
+		float S = Math::Sqrt(trace + 1.0f) * 2.0f;
+		q.w = S * 0.25f;
+		q.x = (m21 - m12) / S;
+		q.y = (m02 - m20) / S; 
+		q.z = (m10 - m01) / S; 
+	}
+	else if (m00 > m11 && m00 > m22)
+	{
+		float S = Math::Sqrt(1.0f + m00 - m11 - m22) * 2.0f;
+		q.w = (m21 - m12) / S;
+		q.x = S * 0.25f;
+		q.y = (m01 + m10) / S; 
+		q.z = (m02 + m20) / S; 
+	}
+	else if (m11 > m22)
+	{
+		float S = Math::Sqrt(1.0f + m11 - m00 - m22) * 2.0f;
+		q.w = (m02 - m20) / S;
+		q.x = (m01 + m10) / S; 
+		q.y = S * 0.25f;
+		q.z = (m12 + m21) / S; 
+	}
+	else
+	{
+		float S = Math::Sqrt(1.0f + m22 - m00 - m11) * 2.0f;
+		q.w = (m10 - m01) / S;
+		q.x = (m02 + m20) / S;
+		q.y = (m12 + m21) / S;
+		q.z = S * 0.25f;
+	}
+
 	return q;
 }
 

@@ -205,9 +205,11 @@ void ObjectManager::MoveObjectForward(SimulationObject* object, float distance) 
 	object->m_position.Normalize();
 	object->m_position *= worldRadius;
 
-	// TODO: Keep orientation tangent to world surface.
-	//Vector3f forward = object->m_orientation.GetForward();
-	//Vector3f up = object->m_position;
+	// Keep orientation tangent to world surface.
+	// This prevents the quaternions from getting un-aligned over time.
+	Vector3f forward = object->m_orientation.GetForward();
+	Vector3f up = object->m_position;
+	object->m_orientation = Quaternion::LookRotation(forward, up);
 }
 
 

@@ -539,6 +539,18 @@ Matrix3f& Matrix3f::InitRotation(const Quaternion& q)
 	return *this;
 }
 
+Matrix3f& Matrix3f::InitLookAt(const Vector3f& forward, const Vector3f& up)
+{
+	Vector3f orthoForward = forward;
+	orthoForward.Normalize();
+	Vector3f orthoRight = Vector3f::Cross(orthoForward, up).Normalize();
+	Vector3f orthoUp = orthoRight.Cross(orthoForward).Normalize();
+	SetColumn(0, orthoRight);
+	SetColumn(1, orthoUp);
+	SetColumn(2, -orthoForward);
+	return *this;
+}
+
 Matrix3f Matrix3f::CreateIdentity()
 {
 	Matrix3f result;
@@ -622,6 +634,14 @@ Matrix3f Matrix3f::CreateRotation(const Quaternion& rotation)
 {
 	Matrix3f result;
 	result.InitRotation(rotation);
+	return result;
+}
+
+
+Matrix3f Matrix3f::CreateLookAt(const Vector3f& forward, const Vector3f& up)
+{
+	Matrix3f result;
+	result.InitLookAt(forward, up);
 	return result;
 }
 

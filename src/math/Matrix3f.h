@@ -86,6 +86,7 @@ struct Matrix3f
 	Matrix3f& InitRotation(const Vector2f& origin, float angle);
 	Matrix3f& InitRotation(const Vector3f& axis, float angle);
 	Matrix3f& InitRotation(const Quaternion& rotation);
+	Matrix3f& InitLookAt(const Vector3f& forward, const Vector3f& up);
 	static Matrix3f	CreateIdentity();
 	static Matrix3f	CreateTranslation(float x, float y);
 	static Matrix3f	CreateTranslation(const Vector2f& translation);
@@ -98,6 +99,7 @@ struct Matrix3f
 	static Matrix3f	CreateRotation(const Vector2f& origin, float angle);
 	static Matrix3f	CreateRotation(const Vector3f& axis, float angle);
 	static Matrix3f	CreateRotation(const Quaternion& rotation);
+	static Matrix3f	CreateLookAt(const Vector3f& forward, const Vector3f& up);
 	
 	// Static matrix operations.
 	static Matrix3f	Multiply(const Matrix3f& left, const Matrix3f& right);
