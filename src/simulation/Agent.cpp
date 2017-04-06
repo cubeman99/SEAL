@@ -446,13 +446,17 @@ void Agent::OnTouchAgent(Agent* other)
 		float radiusSum = (m_radius + other->m_radius) * 0.9f;
 		float dist = m_position.DistTo(other->m_position) - radiusSum;
 
-		if (dist < 0.0f)
+		if (dist <= 0.0f)
 		{
 			// Determine the axis and angle to rotate around the world
 			// surface in order to separate the two agents.
 			float worldRadius = GetSimulation()->GetWorld()->GetRadius();
 			Vector3f meToOther = other->m_position - m_position;
-			Vector3f axis = meToOther.Cross(m_position).Normalize();
+			Vector3f axis;
+			if (dist == 0.0f)
+				axis = m_orientation.GetRight();
+			else
+				axis = meToOther.Cross(m_position).Normalize();
 			float angle = (-dist * 0.5f) / worldRadius;
 			Quaternion rotation(axis, angle);
 
