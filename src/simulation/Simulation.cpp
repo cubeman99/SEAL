@@ -77,6 +77,9 @@ void Simulation::Initialize(const SimulationConfig& config)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_HERBIVORE), false);
 	for (int i = 0; i < m_config.carnivore.population.initialAgents; ++i)
 		m_objectManager.SpawnObjectRandom(new Agent(SPECIES_CARNIVORE), false);
+
+	m_numAgents[SPECIES_HERBIVORE] = m_config.herbivore.population.initialAgents;
+	m_numAgents[SPECIES_CARNIVORE] = m_config.carnivore.population.initialAgents;
 }
 
 void Simulation::OnNewSimulation()
@@ -144,17 +147,18 @@ void Simulation::UpdateSteadyStateGA()
 {
 	// Count the number of agents and add new ones
 	// if population size is below the minimum.
-	int numAgents[SPECIES_COUNT] = { 0, 0 };
+	m_numAgents[SPECIES_HERBIVORE] = 0;
+	m_numAgents[SPECIES_CARNIVORE] = 0;
 	for (auto it = m_objectManager.agents_begin();
 		it != m_objectManager.agents_end(); ++it)
 	{
-		numAgents[(int) it->GetSpecies()]++;
+		m_numAgents[(int) it->GetSpecies()]++;
 	}
 
 	// Now generate new agents if necessary.
 	for (unsigned int i = 0; i < 2; ++i)
 	{
-		if (numAgents[i] < m_config.species[i].population.minAgents)
+		if ((int) m_numAgents[i] < m_config.species[i].population.minAgents)
 			GenerateNewAgent((Species) i);
 	}
 }

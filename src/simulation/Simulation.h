@@ -29,6 +29,7 @@ public:
 	inline World* GetWorld() { return &m_world; }
 	inline OctTree* GetOctTree() { return m_objectManager.GetOctTree(); }
 	inline RNG& GetRandom() { return m_random; }
+	inline int GetNumAgents(Species species) const { return m_numAgents[(int) species]; }
 
 	inline const SimulationConfig& GetConfig() const { return m_config; }
 	inline const SpeciesConfig& GetAgentConfig(Species species) const { return m_config.species[(int) species]; }
@@ -102,6 +103,8 @@ private:
 	RNG					m_random;
 	SimulationStats		m_statistics;
 	FittestList			m_fittestLists[SPECIES_COUNT];
+
+	unsigned int		m_numAgents[SPECIES_COUNT];
 
 	unsigned long		m_originalSeed;
 	unsigned int		m_ageInTicks;

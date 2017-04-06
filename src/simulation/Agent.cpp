@@ -433,10 +433,36 @@ void Agent::EatPlant(Offshoot* plant)
 
 void Agent::OnTouchAgent(Agent* other)
 {
+	// Check for attacking.
 	if (m_species == SPECIES_CARNIVORE &&
 		other->m_species == SPECIES_HERBIVORE)
 	{
 		Attack(other);
+	}
+
+	// Check if two agents are colliding and need to be pushed apart.
+	if (m_species == other->m_species && m_objectId < other->m_objectId)
+	{
+		float radiusSum = (m_radius + other->m_radius) * 0.9f;
+		float dist = m_position.DistTo(other->m_position) - radiusSum;
+
+		if (dist < 0.0f)
+		{
+			// Determine the axis and angle to rotate around the world
+			// surface in order to separate the two agents.
+			float worldRadius = GetSimulation()->GetWorld()->GetRadius();
+			Vector3f meToOther = other->m_position - m_position;
+			Vector3f axis = meToOther.Cross(m_position).Normalize();
+			float angle = (-dist * 0.5f) / worldRadius;
+			Quaternion rotation(axis, angle);
+
+			// Rotate the position and orientation for each
+			// agent in opposite directions.
+			rotation.RotateVector(m_position);
+			m_orientation.Rotate(rotation);
+			rotation.GetConjugate().RotateVector(other->m_position);
+			other->m_orientation.Rotate(rotation.GetConjugate());
+		}
 	}
 }
 
@@ -444,6 +470,12 @@ void Agent::Attack(Agent* other)
 {
 	// Calculate attack damage, lowered by herbivore strength
 	float attackAmount = m_strength * 2.0f * ((1.0f - other->m_strength) + 0.05f);
+
+	// Scale attack amount based on population control.
+	//unsigned int numHerbs = GetSimulation()->GetNumAgents(SPECIES_HERBIVORE);
+	//unsigned int numCarns = GetSimulation()->GetNumAgents(SPECIES_CARNIVORE);
+	//float carnivorePercent = (float) numCarns / Math::Max(1.0f, (float) (numHerbs + numCarns));
+	//attackAmount /= 0.5f + (carnivorePercent * 1.0f);
 
 	other->m_healthEnergy -= attackAmount;
 
