@@ -65,7 +65,6 @@
     <ClCompile Include="..\..\src\simulation\Brain.cpp" />
     <ClCompile Include="..\..\src\simulation\FittestList.cpp" />
     <ClCompile Include="..\..\src\simulation\Genome.cpp" />
-    <ClCompile Include="..\..\src\simulation\Nerve.cpp" />
     <ClCompile Include="..\..\src\simulation\ObjectManager.cpp" />
     <ClCompile Include="..\..\src\simulation\OctTree.cpp" />
     <ClCompile Include="..\..\src\simulation\Offshoot.cpp" />
@@ -136,7 +135,6 @@
     <ClInclude Include="..\..\src\simulation\Brain.h" />
     <ClInclude Include="..\..\src\simulation\FittestList.h" />
     <ClInclude Include="..\..\src\simulation\Genome.h" />
-    <ClInclude Include="..\..\src\simulation\Nerve.h" />
     <ClInclude Include="..\..\src\simulation\ObjectManager.h" />
     <ClInclude Include="..\..\src\simulation\OctTree.h" />
     <ClInclude Include="..\..\src\simulation\Offshoot.h" />

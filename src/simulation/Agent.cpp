@@ -665,11 +665,14 @@ void Agent::UpdateBrain()
 	//-------------------------------------------------------------------------
 	// Set the input nerve activations.
 
+	// Initially set all input activations to zero.
 	for (unsigned int i = 0; i < m_brain->GetNumInputNeurons(); ++i)
 		m_brain->SetNeuronActivation(i, 0.0f);
 
-	float canMateActivation = 0.0f;				// Could the agent reasonably mate? (magic numbered)
-	if (GetSimulation()->IsMatingSeason() && m_mateWaitTime == 0 && m_energy / m_maxEnergy > 0.25f)
+	// Could the agent reasonably mate? (magic numbered)
+	float canMateActivation = 0.0f;
+	if (GetSimulation()->IsMatingSeason() &&
+		m_mateWaitTime == 0 && m_energy / m_maxEnergy > 0.25f)
 	{
 		canMateActivation = 1.0f;
 	}
@@ -678,6 +681,7 @@ void Agent::UpdateBrain()
 	m_brain->SetNeuronActivation((unsigned int)RANDOM_ACTIVATION, random.NextFloat());
 	m_brain->SetNeuronActivation((unsigned int)CAN_MATE, canMateActivation);
 	
+	// Set vision neuron activations.
 	for (unsigned int eyeIndex = 0; eyeIndex < m_numEyes; ++eyeIndex)
 	{
 		Retina& eye = m_eyes[eyeIndex];

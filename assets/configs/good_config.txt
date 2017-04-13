@@ -1,9 +1,10 @@
 #==============================================================================
 # SEAL - Example Simulation Configuration File
 #==============================================================================
-# Units:
-#
+
 # Comments: inline comments begin with '#'
+# 
+# Boolean values: true/false, 1/0, on/off, yes/no
 #
 # Accepted units:
 #  * radians: radians, radian, rads, rad, r

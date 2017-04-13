@@ -8,7 +8,6 @@
 #include "Vision.h"
 #include "Genome.h"
 #include "Brain.h"
-#include "Nerve.h"
 #include <math/MathLib.h>
 
 class Offshoot;
@@ -105,13 +104,6 @@ private:
 
 	Genome*			m_genome;
 	Brain*			m_brain;
-
-	// TODO: actually integrate Nerve class and start using these.
-	Nerve*			m_nerveVision[3];
-	Nerve*			m_nerveEnergy;
-	Nerve*			m_nerveRandom;
-	Nerve*			m_nerveMoveSpeed;
-	Nerve*			m_nerveTurnSpeed;
 
 	Species			m_species;
 

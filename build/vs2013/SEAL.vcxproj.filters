@@ -210,9 +210,6 @@
     <ClCompile Include="..\..\src\simulation\SimulationConfig.cpp">
       <Filter>Source Files\simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\simulation\Nerve.cpp">
-      <Filter>Source Files\simulation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\Rect2i.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
@@ -417,9 +414,6 @@
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\SimulationConfig.h">
-      <Filter>Source Files\simulation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\simulation\Nerve.h">
       <Filter>Source Files\simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\simulation\SimulationStats.h">
