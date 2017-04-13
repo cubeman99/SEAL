@@ -48,6 +48,9 @@ bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
 #define ADD_FLOAT_PARAM(name, units) \
 	ADD_PARAM(name, ConfigParam::TYPE_FLOAT, units)
 
+#define ADD_BOOL_PARAM(name, units) \
+	ADD_PARAM(name, ConfigParam::TYPE_BOOL, units)
+
 #define ADD_COLOR_PARAM(name) \
 	m_params[#name ".red"] = new ConfigParam(#name ".red",\
 		offsetof(SimulationConfig, name[0]), \
@@ -66,6 +69,9 @@ bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
 
 #define ADD_SPECIES_FLOAT_PARAM(name, units) \
 	ADD_FLOAT_PARAM(carnivore.name, units); ADD_FLOAT_PARAM(herbivore.name, units)
+
+#define ADD_SPECIES_BOOL_PARAM(name, units) \
+	ADD_BOOL_PARAM(carnivore.name, units); ADD_BOOL_PARAM(herbivore.name, units)
 
 #define ADD_SPECIES_COLOR_PARAM(name) \
 	ADD_COLOR_PARAM(carnivore.name); ADD_COLOR_PARAM(herbivore.name)
@@ -124,6 +130,7 @@ ConfigFileLoader::ConfigFileLoader() :
 	ADD_SPECIES_FLOAT_PARAM	(agent.maxMoveSpeedAtMaxStrength,	ConfigParam::UNITS_DISTANCE); // distance / time
 	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMinStrength,	ConfigParam::UNITS_ANGLE); // angle / time
 	ADD_SPECIES_FLOAT_PARAM	(agent.maxTurnSpeedAtMaxStrength,	ConfigParam::UNITS_ANGLE); // angle / time
+	ADD_SPECIES_BOOL_PARAM	(agent.collisions,					ConfigParam::UNITS_NONE);
 		
 	// Energy costs
 	ADD_SPECIES_FLOAT_PARAM	(energy.energyCostExist,			ConfigParam::UNITS_NONE); // energy / time
@@ -390,6 +397,21 @@ bool ConfigFileLoader::ParseValueParam(const std::string& value,
 		if (unitsType == ConfigParam::UNITS_ANGLE)
 			floatValue = Math::ToRadians(floatValue); // angles by default are in degrees
 		*((float*) dataPtr) = floatValue;
+	}
+	else if (dataType == ConfigParam::TYPE_BOOL)
+	{
+		// Convert the string to lowercase first.
+		std::string str = value;
+		for (unsigned int i = 0; i < str.length(); ++i)
+			str[i] = tolower(str[i]);
+		bool isTrue  = (str == "true"  || str == "1" || str == "on"  || str == "yes");
+		bool isFalse = (str == "false" || str == "0" || str == "off" || str == "no");
+		if (!isTrue && !isFalse)
+		{
+			outError = "'" + value + "' : unexpected token";
+			return false;
+		}
+		*((bool*) dataPtr) = isTrue;
 	}
 	else if (dataType == ConfigParam::TYPE_INT)
 	{

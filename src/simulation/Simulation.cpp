@@ -218,9 +218,9 @@ void Simulation::GenerateNewAgent(Species species)
 // Saving & loading
 //-----------------------------------------------------------------------------
 
-#define SIMULATION_FILE_MAGIC_1   'LAES'
+#define SIMULATION_FILE_MAGIC_1   'LAES'	// these will appear backwards in file
 #define SIMULATION_FILE_MAGIC_2   'RBJD'
-#define SIMULATION_FILE_VERSION   1
+#define SIMULATION_FILE_VERSION   2
 
 bool Simulation::ReadSimulation(std::ifstream& fileIn)
 {

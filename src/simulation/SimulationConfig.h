@@ -57,6 +57,7 @@ struct SpeciesConfig
 		float	maxMoveSpeedAtMaxStrength;
 		float	maxTurnSpeedAtMinStrength;
 		float	maxTurnSpeedAtMaxStrength;
+		bool	collisions;
 
 	} agent;
 

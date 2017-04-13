@@ -441,7 +441,8 @@ void Agent::OnTouchAgent(Agent* other)
 	}
 
 	// Check if two agents are colliding and need to be pushed apart.
-	if (m_species == other->m_species && m_objectId < other->m_objectId)
+	if (GetSimulation()->GetAgentConfig(m_species).agent.collisions &&
+		m_species == other->m_species && m_objectId < other->m_objectId)
 	{
 		float radiusSum = (m_radius + other->m_radius) * 0.9f;
 		float dist = m_position.DistTo(other->m_position) - radiusSum;

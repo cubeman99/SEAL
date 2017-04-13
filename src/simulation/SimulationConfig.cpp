@@ -48,7 +48,8 @@ SimulationConfig::SimulationConfig()
 	herbivore.agent.maxEnergyAtMaxStrength		= 100.0f;
 	herbivore.agent.minMatingDistance			= 23.0f;
 	herbivore.agent.matingDelay					= 60 * 4;
-	
+	herbivore.agent.collisions					= true;
+
 	herbivore.energy.energyCostExist		= 0.006f;
 	herbivore.energy.energyCostMove			= 0.014f;
 	herbivore.energy.energyCostTurn			= 0.014f;

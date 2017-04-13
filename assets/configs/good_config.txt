@@ -64,6 +64,7 @@ herbivore.agent.maxEnergyAtMinStrength		= 50.0
 herbivore.agent.maxEnergyAtMaxStrength		= 100.0
 herbivore.agent.minMatingDistance			= 23.0
 herbivore.agent.matingDelay					= 4 seconds
+herbivore.agent.collisions					= yes
 
 herbivore.energy.energyCostExist		= 0.006		# energy/tick
 herbivore.energy.energyCostMove			= 0.014		# energy
