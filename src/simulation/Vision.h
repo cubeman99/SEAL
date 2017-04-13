@@ -5,7 +5,7 @@
 
 
 //-----------------------------------------------------------------------------
-// VisionChannel
+// VisionChannel - a single color channel for a vision strip.
 //-----------------------------------------------------------------------------
 class VisionChannel
 {
@@ -30,7 +30,8 @@ private:
 
 
 //-----------------------------------------------------------------------------
-// Retina
+// Retina - An eyeball that stores a strip of color data, and is positioned
+//          on an agent's body.
 //-----------------------------------------------------------------------------
 class Retina
 {

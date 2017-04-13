@@ -99,15 +99,14 @@ public:
 	Shader();
 	~Shader();
 	
-	// Accessors.
-	//const char*		GetName() const;
+	// Accessors
 	bool				IsLinked() const;
 	unsigned int		GetNumUniforms() const;
 	const Uniform&		GetUniform(unsigned int index) const;
 	const Uniform*		GetUniform(const std::string& name) const;
 	int					GetUniformLocation(const std::string& name) const;
 	bool				GetUniformLocation(const std::string& name, int& outUniformLocation) const;
-			
+	
 	bool AddStage(const std::string& code, ShaderType::value_type type, const std::string& fileName = "");
 	bool CompileAndLink(ShaderCompileError* outError = nullptr);
 
@@ -120,7 +119,6 @@ public:
 	std::string				m_shaderStageFileNames[MAX_SHADER_STAGES];
 	bool					m_isLinked;
 	std::vector<Uniform>	m_uniforms;
-	//std::map<std::string, ShaderParam> m_paramMap;
 };
 
 

@@ -25,24 +25,6 @@ struct CompareFunction
 	};
 };
 
-/*
-struct DepthFunc
-{
-	typedef int value_type;
-
-	enum
-	{
-		Never,
-		Less,
-		Equal,
-		LessEqual,
-		Greater,
-		NotEqual,
-		GreaterEqual,
-		Always,
-	};
-};*/
-
 //-----------------------------------------------------------------------------
 // Blend Function
 //-----------------------------------------------------------------------------

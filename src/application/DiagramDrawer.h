@@ -9,6 +9,9 @@ class SimulationManager;
 class Simulation;
 
 
+//-----------------------------------------------------------------------------
+// DiagramDrawer - Draws diagrams like graphs and stuff.
+//-----------------------------------------------------------------------------
 class DiagramDrawer
 {
 public:

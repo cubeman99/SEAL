@@ -14,7 +14,6 @@ class Simulation;
 //-----------------------------------------------------------------------------
 // SimulationObjectType - Defines the types of simulation objects.
 //-----------------------------------------------------------------------------
-
 enum SimulationObjectType : int
 {
 	INVALID		= '?',
@@ -30,7 +29,7 @@ enum SimulationObjectType : int
 
 
 //-----------------------------------------------------------------------------
-// SimulationObject - The base class for all objects in the simulation.
+// SimulationObject - The base class for all object types in a simulation.
 //-----------------------------------------------------------------------------
 class SimulationObject
 {

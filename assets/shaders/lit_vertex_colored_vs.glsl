@@ -2,10 +2,8 @@
 
 layout(location = 0) in vec3 a_vertPos;
 layout(location = 1) in vec3 a_vertNorm;
-//layout(location = 2) in vec2 a_vertTexCoord;
 layout(location = 3) in vec4 a_vertColor;
 
-//out vec2 v_texCoord;
 out vec3 v_normal;
 out vec4 v_color;
 out vec3 v_lightColor;
@@ -20,7 +18,6 @@ void main()
 {
 	gl_Position = u_mvp * vec4(a_vertPos, 1.0);
 	
-	//v_texCoord = a_vertTexCoord;
 	v_normal = normalize((u_model * vec4(a_vertNorm, 0)).xyz);
 	v_color = a_vertColor;
 	

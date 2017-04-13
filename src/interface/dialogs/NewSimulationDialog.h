@@ -5,6 +5,9 @@
 #include <application/ConfigFileLoader.h>
 
 
+//-----------------------------------------------------------------------------
+// NewSimulationDialog
+//-----------------------------------------------------------------------------
 class NewSimulationDialog : public wxDialog
 {
 public:

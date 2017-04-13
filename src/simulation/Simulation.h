@@ -13,7 +13,9 @@
 
 
 //-----------------------------------------------------------------------------
-// Simulation
+// Simulation - Contains the state of a simulation, including the world, its
+//              objects, and various statistics. It also has methods for
+//              updating, saving, and loading simulations.
 //-----------------------------------------------------------------------------
 class Simulation
 {
@@ -40,6 +42,9 @@ public:
 	inline unsigned int GetGeneration() const { return m_generationIndex; }
 	inline unsigned int GetGenerationAge() const { return m_generationAge; }
 	inline unsigned int GetGenerationDuration() const { return m_generationDuration; }
+
+	inline SimulationStats* GetSimulationStats() { return m_generationStats.data(); }
+	inline unsigned int GetNumSimulationStats() const { return m_generationStats.size(); }
 
 	bool IsMatingSeason() const;
 
@@ -112,7 +117,6 @@ private:
 	unsigned int		m_generationAge;
 	unsigned int		m_generationDuration;
 
-public:
 	std::vector<SimulationStats> m_generationStats;
 };
 

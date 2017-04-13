@@ -153,8 +153,8 @@ void DiagramDrawer::DrawGraph(Graphics& g, const GraphInfo& graph, const Rect2f&
 void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned int numGraphs, const Rect2f& rect)
 {
 	Simulation* simulation = m_simulationManager->GetSimulation();
-	SimulationStats* stats = simulation->m_generationStats.data();
-	unsigned int numStats = simulation->m_generationStats.size();
+	SimulationStats* stats = simulation->GetSimulationStats();
+	unsigned int numStats = simulation->GetNumSimulationStats();
 
 	// Assume the title and data type of the first graph.
 	std::string title = graphs[0].GetTitle();
@@ -318,8 +318,8 @@ void DiagramDrawer::DrawGraphs(Graphics& g, const GraphInfo* graphs, unsigned in
 void DiagramDrawer::CalcGraphRange(const GraphInfo& graph, float& rangeMin, float& rangeMax)
 {
 	Simulation* simulation = m_simulationManager->GetSimulation();
-	SimulationStats* stats = simulation->m_generationStats.data();
-	unsigned int numStats = simulation->m_generationStats.size();
+	SimulationStats* stats = simulation->GetSimulationStats();
+	unsigned int numStats = simulation->GetNumSimulationStats();
 
 	//-------------------------------------------------------------------------
 	// Calculate view bounds.

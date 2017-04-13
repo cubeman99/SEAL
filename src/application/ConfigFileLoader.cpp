@@ -211,8 +211,8 @@ ConfigFileLoader::ConfigFileLoader() :
 	ADD_SPECIES_FLOAT_PARAM	(brain.sigmoidSlope,				ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(brain.maxWeight,					ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(brain.initMaxWeight,				ConfigParam::UNITS_NONE);
-	ADD_SPECIES_FLOAT_PARAM	(brain.weightLearningRate,			ConfigParam::UNITS_NONE); // 1 / time
-	ADD_SPECIES_FLOAT_PARAM	(brain.weightDecayRate,				ConfigParam::UNITS_NONE); // 1 / time
+	ADD_SPECIES_FLOAT_PARAM	(brain.weightLearningRate,			ConfigParam::UNITS_NONE);
+	ADD_SPECIES_FLOAT_PARAM	(brain.weightDecayRate,				ConfigParam::UNITS_NONE);
 	
 	// DEBUG: print out all the params.
 	//for (auto it = m_params.begin(); it != m_params.end(); ++it)

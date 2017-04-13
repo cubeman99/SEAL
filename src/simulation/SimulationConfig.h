@@ -15,7 +15,7 @@ enum Species
 
 
 //-----------------------------------------------------------------------------
-// SpeciesConfig - configuration for a single agent species.
+// SpeciesConfig - configuration parameters for a single agent species.
 //-----------------------------------------------------------------------------
 struct SpeciesConfig
 {
@@ -127,8 +127,7 @@ struct SpeciesConfig
 
 
 //-----------------------------------------------------------------------------
-// SimulationConfig - configuration for an entire simulation. Contains the
-//                    values for various simulation parameters
+// SimulationConfig - Configuration parameters for an entire simulation.
 //-----------------------------------------------------------------------------
 struct SimulationConfig
 {

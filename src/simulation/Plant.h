@@ -7,7 +7,8 @@
 class Simulation;
 
 //-----------------------------------------------------------------------------
-// Plant - Invisible source unit of vegetation for herbivore agents
+// Plant - Invisible source unit of vegetation for herbivore agents. The plant
+//         spawns Offshoots within a radius around it.
 //-----------------------------------------------------------------------------
 class Plant : public SimulationObject
 {

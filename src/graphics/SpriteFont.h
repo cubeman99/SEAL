@@ -6,6 +6,9 @@
 #include "Texture.h"
 
 
+//-----------------------------------------------------------------------------
+// SpriteFont - Describes text as a texture of a fixed size grid of characters
+//-----------------------------------------------------------------------------
 class SpriteFont
 {
 public:

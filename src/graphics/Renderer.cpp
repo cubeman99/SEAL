@@ -189,7 +189,7 @@ void Renderer::ApplyRenderSettings(bool clear)
 	EnableDisableGL(m_params.IsDepthTestEnabled(), GL_DEPTH_TEST);
 	EnableDisableGL(!m_params.IsNearFarPlaneClippingEnabled(), GL_DEPTH_CLAMP);
 	glDepthFunc(TranslateCompareFunc(m_params.GetDepthFunction()));
-	glDepthMask(m_params.IsDepthBufferWriteEnabled());				// glDepthMask(true) means writing to the depth buffer is enabled.
+	glDepthMask(m_params.IsDepthBufferWriteEnabled());
 
 	// Face culling.
 	EnableDisableGL(m_params.IsCullFaceEnabled(), GL_CULL_FACE);

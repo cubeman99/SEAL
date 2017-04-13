@@ -33,8 +33,10 @@ private:
 
 
 //-----------------------------------------------------------------------------
-// OctTree - Stores and sorts simulation objects by position in a box-volume
-//           tree heirerchery that is recursively subdivided into 8 sectors.
+// OctTree - Spatial partitioning data structure that stores and sorts
+//           simulation objects by position in a box-volume tree heirerchery
+//           that is recursively subdivided into 8 sectors. This speeds up
+//           queries for objects based on their position.
 //-----------------------------------------------------------------------------
 class OctTree
 {

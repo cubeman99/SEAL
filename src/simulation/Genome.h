@@ -9,6 +9,9 @@ class Simulation;
 class Brain;
 
 
+//-----------------------------------------------------------------------------
+// GenePosition - byte offsets for the different genes in a genome
+//-----------------------------------------------------------------------------
 enum GenePosition
 {
 	// Vision
@@ -38,6 +41,10 @@ enum GenePosition
 };
 
 
+//-----------------------------------------------------------------------------
+// Genome - A collection of single-byte genes, that can be crossed-over and
+//          mutated.
+//-----------------------------------------------------------------------------
 class Genome
 {
 public:

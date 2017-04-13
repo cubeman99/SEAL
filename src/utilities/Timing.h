@@ -3,7 +3,7 @@
 
 
 //-----------------------------------------------------------------------------
-// Time - Static class for portable time utility functions
+// Time - Static class for time utility functions
 //-----------------------------------------------------------------------------
 class Time
 {

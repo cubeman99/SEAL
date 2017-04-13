@@ -6,7 +6,7 @@
 
 
 //-----------------------------------------------------------------------------
-// GraphRange
+// GraphRange - Method for determining the displayed range of a graph.
 //-----------------------------------------------------------------------------
 struct GraphRange
 {
@@ -49,7 +49,7 @@ struct GraphRange
 
 
 //-----------------------------------------------------------------------------
-// GraphInfo
+// GraphInfo - Describes how to display a graph, and what data it uses.
 //-----------------------------------------------------------------------------
 class GraphInfo
 {
@@ -99,7 +99,7 @@ private:
 
 
 //-----------------------------------------------------------------------------
-// GraphManager
+// GraphManager - Manages all the types of graphs for the application.
 //-----------------------------------------------------------------------------
 class GraphManager
 {

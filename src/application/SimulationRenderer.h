@@ -13,6 +13,10 @@ class SimulationManager;
 class Agent;
 
 
+//-----------------------------------------------------------------------------
+// SimulationRenderer - Render's a simulation to screen. It manages the
+//                      graphics resources that it uses.
+//-----------------------------------------------------------------------------
 class SimulationRenderer
 {
 public:

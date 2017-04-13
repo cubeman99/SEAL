@@ -6,6 +6,10 @@
 #include <graphics/Graphics.h>
 
 
+//-----------------------------------------------------------------------------
+// InfoPanelItem - A single item in an InfoPanel, consisting of a label,
+//                 value, and visual display.
+//-----------------------------------------------------------------------------
 class InfoPanelItem
 {
 public:
@@ -67,6 +71,10 @@ private:
 };
 
 
+//-----------------------------------------------------------------------------
+// InfoPanel - A panel for displaying information, with keys, values, and
+//             optional, colored bar-graphs.
+//-----------------------------------------------------------------------------
 class InfoPanel
 {
 public:

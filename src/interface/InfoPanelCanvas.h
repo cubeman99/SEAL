@@ -15,7 +15,7 @@ class SimulationManager;
 
 
 //-----------------------------------------------------------------------------
-// GraphCanvas
+// InfoPanelCanvas
 //-----------------------------------------------------------------------------
 class InfoPanelCanvas : public wxGLCanvas
 {

@@ -17,11 +17,6 @@ Shader::Shader()
 
 Shader::~Shader()
 {
-	if (m_isLinked)
-	{
-		//delete [] m_params;
-	}
-
 	glDeleteProgram(m_glProgram);
 		
 	// Delete the shader stages.

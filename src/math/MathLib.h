@@ -24,8 +24,8 @@ public:
 	static const float RAD_TO_DEG;	// Multiply a radian value by this to convert it to degrees.
 	static const float LOG_2;		// Log base 10 of 2.
 	static const float LOG_10;		// Log base 10 of 10.
-	static const float INV_LOG_2;	// 
-	static const float INV_LOG_10;	// 
+	static const float INV_LOG_2;	// 1 / ln(2)
+	static const float INV_LOG_10;	// 1 / ln(10)
 
 	
 	//-----------------------------------------------------------------------------

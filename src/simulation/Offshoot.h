@@ -9,7 +9,8 @@ class Plant;
 
 
 //-----------------------------------------------------------------------------
-// Offshoot - A plant offshoot
+// Offshoot - The actual visible and edible object that get's spawned by a
+//            hidden Plant object.
 //-----------------------------------------------------------------------------
 class Offshoot : public SimulationObject
 {

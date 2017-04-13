@@ -10,7 +10,7 @@ typedef float (*GetAgentFloatValueCallback) (Agent* agent);
 
 
 //-----------------------------------------------------------------------------
-// HeatMapInfo
+// HeatMapInfo - Describes how to display a heat-map, and what data it uses.
 //-----------------------------------------------------------------------------
 class HeatMapInfo
 {
@@ -54,7 +54,7 @@ private:
 
 
 //-----------------------------------------------------------------------------
-// HeatMapManager
+// HeatMapManager - Manages all the types of heat-maps for the application.
 //-----------------------------------------------------------------------------
 class HeatMapManager
 {
