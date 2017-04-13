@@ -40,8 +40,6 @@ namespace
 			return GL_REPEAT;
 		case TextureWrap::MIRROR_REPEAT:
 			return GL_MIRRORED_REPEAT;
-		//case TextureWrap::MIRROR_CLAMP_TO_EDGE:
-			//return GL_MIRROR_CLAMP_TO_EDGE; //TODO: Figure this out.
 		}
 		return GL_CLAMP_TO_BORDER;
 	}
@@ -532,8 +530,6 @@ void Texture::SetParams(const TextureParams& params)
 	// Anisotropic filtering.
 	if (m_params.UseAnisotropy())
 	{
-		// TODO: Customize anisotropy samples.
-		// Determine hardware's max anisotropy samples.
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &m_anisotropyAmount);
 		m_anisotropyAmount = Math::Clamp(m_anisotropyAmount, 0.0f, 8.0f);
 		glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_anisotropyAmount);

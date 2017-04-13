@@ -71,8 +71,7 @@ public:
 	inline void SetHeatMapSpeciesFilter(SpeciesFilter filter) { m_heatMapSpeciesFilter = filter; }
 
 	// Render options
-	// TODO: have some sort of enum for view options like these.
-
+	
 	inline void SetViewWireFrameMode(bool viewWireFrameMode) { m_viewWireFrameMode = viewWireFrameMode; }
 	inline void EnableLighting(bool enableLighting) { m_viewLighting = enableLighting; }
 	inline void SetShowOctTree(bool showOctTree) { m_showOctTree = showOctTree; }

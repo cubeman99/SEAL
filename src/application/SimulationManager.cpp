@@ -62,7 +62,6 @@ void SimulationManager::Initialize()
 	Random::SeedTime();
 
 	// Begin a new simulation with default config values.
-	// TODO: load default config values from a default config file.
 	SimulationConfig config;
 	BeginNewSimulation(config);
 }
@@ -192,7 +191,6 @@ void SimulationManager::Update()
 	}
 	
 	// Check if our selected agent has died to prevent dangling references.
-	// TODO: make an event queue for simultaion (for births and deaths)
 	if (m_selectedAgent != nullptr && m_simulation->
 		GetObjectManager()->GetObjectById(m_selectedAgentId) == nullptr)
 	{

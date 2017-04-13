@@ -12,8 +12,6 @@
 	#define OS_WINDOWS
 #elif defined(__linux__)
 	#define OS_LINUX
-#elif __cplusplus >= 201103L
-	#define OS_OTHER_CPP11
 #else
 	#define OS_OTHER
 #endif
@@ -29,10 +27,6 @@
 	#include <sys/time.h>
 	static const long NANOSECONDS_PER_SECOND = 1000000000L;
 	
-#elif defined(OS_OTHER_CPP11)
-	#include <chrono>
-	static std::chrono::system_clock::time_point m_epoch =
-		std::chrono::high_resolution_clock::now();
 #endif
 
 
@@ -64,15 +58,6 @@ double Time::GetTime()
 		return (double) (((long) ts.tv_sec * NANOSECONDS_PER_SECOND) +
 			ts.tv_nsec) / ((double) (NANOSECONDS_PER_SECOND));
 
-	#elif defined(OS_OTHER_CPP11)
-
-		// TODO: apparently this only has 1 second precision.
-
-		return std::chrono::duration_cast<std::chrono::nanoseconds>(
-			std::chrono::high_resolution_clock::now() -
-			m_epoch).count() / 1000000000.0;
-
-	#else
 		return 0.0; // Error: unsupported operating system.	
 	#endif
 }

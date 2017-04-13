@@ -42,8 +42,6 @@ struct PixelInternalFormat
 		DEPTH_COMPONENT,
 		STENCIL_INDEX,
 		DEPTH_STENCIL,
-			
-		// TODO: Sized Internal Formats
 	};
 };
 
@@ -95,9 +93,6 @@ struct PixelType
 		TYPE_UNSIGNED_INT,
 		TYPE_INT,
 		TYPE_FLOAT,
-
-		// TODO: Different bit storage formats.
-		// Ex: TYPE_UNSIGNED_BYTE_3_3_2
 	};
 };
 

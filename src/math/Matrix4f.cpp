@@ -888,7 +888,6 @@ void Matrix4f::Transpose(const Matrix4f& src, Matrix4f& dst)
 
 void Matrix4f::Invert(const Matrix4f& inMat, Matrix4f& outResult)
 {
-	// TODO: implement matrix4 inversion.
 	assert(false);
 }
 

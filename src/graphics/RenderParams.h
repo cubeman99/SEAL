@@ -210,11 +210,6 @@ private:
 	bool						m_cullFaceEnabled;
 	bool						m_lineSmoothEnabled;
 	bool						m_polygonSmoothEnabled;
-	
-	// TODO: for RenderParams:
-	//  * m_fbo (Frame buffer object)
-	//  * m_pointSize (for the points polygon mode)
-	//  * m_dimensions (dimensions of the frame buffer)
 };
 
 

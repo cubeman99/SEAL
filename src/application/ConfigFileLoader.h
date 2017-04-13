@@ -19,9 +19,6 @@ public:
 		TYPE_FLOAT,
 		TYPE_BOOL,
 		TYPE_INT, TYPE_UNSIGNED_INT,
-		//TYPE_BYTE, TYPE_UNSIGNED_BYTE,
-		//TYPE_SHORT, TYPE_UNSIGNED_SHORT,
-		//TYPE_LONG, TYPE_UNSIGNED_LONG,
 	};
 
 	// Types of units.
@@ -33,11 +30,16 @@ public:
 		UNITS_TIME,
 	};
 
+	// Get the size in bytes of a data type.
+	static unsigned int GetDataTypeSize(DataType dataType);
+
 public:
 	std::string		name;
 	unsigned int	offset;
 	DataType		type;
 	Units			units;
+	bool			isSet;
+	ConfigParam*	otherSpeciesParam; // link to this parameter for the opposite species.
 	//std::string	description;
 	// min/max
 
@@ -45,7 +47,9 @@ public:
 		name(name),
 		offset(offset),
 		type(type),
-		units(units)
+		units(units),
+		isSet(false),
+		otherSpeciesParam(nullptr)
 	{
 	}
 };

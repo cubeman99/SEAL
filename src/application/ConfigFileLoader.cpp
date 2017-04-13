@@ -8,10 +8,25 @@
 
 
 //-----------------------------------------------------------------------------
+// ConfigParam
+//-----------------------------------------------------------------------------
+
+unsigned int ConfigParam::GetDataTypeSize(DataType dataType)
+{
+	if (dataType == TYPE_FLOAT)			return sizeof(float);
+	if (dataType == TYPE_INT)			return sizeof(int);
+	if (dataType == TYPE_UNSIGNED_INT)	return sizeof(unsigned int);
+	if (dataType == TYPE_BOOL)			return sizeof(bool);
+	return 0;
+}
+
+
+//-----------------------------------------------------------------------------
 // ConfigUnit
 //-----------------------------------------------------------------------------
 
-ConfigUnit::ConfigUnit(const std::string& names, ConfigParam::Units units, float conversionFactor) :
+ConfigUnit::ConfigUnit(const std::string& names,
+		ConfigParam::Units units, float conversionFactor) :
 	units(units),
 	conversionFactor(conversionFactor)
 {
@@ -21,13 +36,23 @@ ConfigUnit::ConfigUnit(const std::string& names, ConfigParam::Units units, float
 bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
 {
 	if (dataType == ConfigParam::TYPE_FLOAT)
+	{
 		*((float*) value) = *((float*) value) * conversionFactor;
+	}
 	else if (dataType == ConfigParam::TYPE_INT)
-		*((int*) value) = (int) ((float) *((int*) value) * conversionFactor + 0.5f);
+	{
+		*((int*) value) = (int) ((float) *((int*) value) *
+			conversionFactor + 0.5f);
+	}
 	else if (dataType == ConfigParam::TYPE_INT)
-		*((unsigned int*) value) = (unsigned int) ((float) *((unsigned int*) value) * conversionFactor + 0.5f);
+	{
+		*((unsigned int*) value) = (unsigned int)
+			((float) *((unsigned int*) value) * conversionFactor + 0.5f);
+	}
 	else
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -64,17 +89,31 @@ bool ConfigUnit::ConvertValue(void* value, unsigned int dataType)
 
 // Species parameters
 
+#define LINK_SPECIES_PARM(name) \
+	m_params["herbivore." #name]->otherSpeciesParam = m_params["carnivore." #name]; \
+	m_params["carnivore." #name]->otherSpeciesParam = m_params["herbivore." #name]
+
 #define ADD_SPECIES_INT_PARAM(name, units) \
-	ADD_INT_PARAM(carnivore.name, units); ADD_INT_PARAM(herbivore.name, units)
+	ADD_INT_PARAM(carnivore.name, units); \
+	ADD_INT_PARAM(herbivore.name, units); \
+	LINK_SPECIES_PARM(name)
 
 #define ADD_SPECIES_FLOAT_PARAM(name, units) \
-	ADD_FLOAT_PARAM(carnivore.name, units); ADD_FLOAT_PARAM(herbivore.name, units)
+	ADD_FLOAT_PARAM(carnivore.name, units); \
+	ADD_FLOAT_PARAM(herbivore.name, units); \
+	LINK_SPECIES_PARM(name)
 
 #define ADD_SPECIES_BOOL_PARAM(name, units) \
-	ADD_BOOL_PARAM(carnivore.name, units); ADD_BOOL_PARAM(herbivore.name, units)
+	ADD_BOOL_PARAM(carnivore.name, units); \
+	ADD_BOOL_PARAM(herbivore.name, units); \
+	LINK_SPECIES_PARM(name)
 
 #define ADD_SPECIES_COLOR_PARAM(name) \
-	ADD_COLOR_PARAM(carnivore.name); ADD_COLOR_PARAM(herbivore.name)
+	ADD_COLOR_PARAM(carnivore.name); \
+	ADD_COLOR_PARAM(herbivore.name); \
+	LINK_SPECIES_PARM(name.red); \
+	LINK_SPECIES_PARM(name.green); \
+	LINK_SPECIES_PARM(name.blue)
 
 
 
@@ -224,6 +263,12 @@ bool ConfigFileLoader::LoadConfigFile(const std::string& fileName,
 	}
 
 	errorMessage = "There were errors in the Config File:\n\n";
+	
+	// Initialize loading state
+	for (auto it = m_params.begin(); it != m_params.end(); ++it)
+	{
+		it->second->isSet = false;
+	}
 
 	// Read the file line by line.
 	std::string line;
@@ -374,6 +419,18 @@ bool ConfigFileLoader::ParseParam(const std::string& key,
 		}
 	}
 
+	// If this parameter is a species parameter it hasn't been
+	// set manually for the other species yet, then set this value
+	// automatically for the other species as well.
+	if (param->otherSpeciesParam != nullptr &&
+		!param->otherSpeciesParam->isSet)
+	{
+		void* otherDataPtr = ((char*) m_outConfig +
+			param->otherSpeciesParam->offset);
+		memcpy(otherDataPtr, dataPtr, ConfigParam::GetDataTypeSize(param->type));
+	}
+	
+	param->isSet = true;
 	return true;
 }
 

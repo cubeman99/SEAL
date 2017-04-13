@@ -1,7 +1,7 @@
 #==============================================================================
 # SEAL - Example Simulation Configuration File
 #==============================================================================
-
+#
 # Comments: inline comments begin with '#'
 # 
 # Boolean values: true/false, 1/0, on/off, yes/no
@@ -16,6 +16,10 @@
 #
 # By default, time values are specified in ticks.
 # By default, angle values are specified in degrees.
+#
+# When setting a species parameter, by default that specific parameter will
+# be copied over to the opposite species as well if it is not specified
+# somewhere in this file.
 #
 #==============================================================================
 
@@ -109,8 +113,6 @@ herbivore.brain.weightDecayRate			= 0.998
 
 #==============================================================================
 # Carnivore
-
-# Carnivore config values default to herbivore's
 
 carnivore.population.initialAgents		= 15
 carnivore.population.minAgents			= 15

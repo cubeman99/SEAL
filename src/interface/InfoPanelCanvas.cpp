@@ -124,7 +124,12 @@ void InfoPanelCanvas::OnPaint(wxPaintEvent& e)
 		std::stringstream text;
 
 		// Set title text.
-		text << "Agent " << agent->GetId();
+		text << "Agent " << agent->GetId() << " (";
+		if (agent->GetSpecies() == SPECIES_HERBIVORE)
+			text << "herbivore";
+		else
+			text << "carnivore";
+		text << ")";
 		std::string titleText = text.str();
 
 		// Set color value text as a hexcode
