@@ -183,7 +183,8 @@ void Graphics::DrawString(const Font* font, const std::string& text, float x, fl
 
 void Graphics::DrawString(const Font* font, const std::string& text, const Vector2f& position, const Color& color, int align)
 {
-	assert(font != nullptr);
+	if (font == nullptr)
+		return;
 
 	float scale = 1.0f;
 

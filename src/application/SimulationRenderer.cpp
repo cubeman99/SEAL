@@ -17,7 +17,7 @@ SimulationRenderer::SimulationRenderer(SimulationManager* simulationManager) :
 {
 }
 
-void SimulationRenderer::LoadResources()
+bool SimulationRenderer::LoadResources()
 {
 	m_resourceManager.SetAssetsPath("../../assets/"); // TODO: this must change when the executable is moved
 	//m_resourceManager.SetAssetsPath("assets/");
@@ -100,12 +100,10 @@ void SimulationRenderer::LoadResources()
 	// Loaded Models
 
 	// Agent model.
-	m_agentMeshCarnivore = m_resourceManager.LoadMesh("carnivore", "models/agent.obj");
-	m_agentMeshHerbivore = m_resourceManager.LoadMesh("herbivore", "models/herbivore.obj");
+	m_agentMeshes[SPECIES_CARNIVORE] = m_resourceManager.LoadMesh("carnivore", "models/agent.obj");
+	m_agentMeshes[SPECIES_HERBIVORE] = m_resourceManager.LoadMesh("herbivore", "models/herbivore.obj");
 	m_agentMaterial = m_resourceManager.CreateMaterial("agent");
 	m_agentMaterial->SetColor(Color::BLUE);
-	m_agentMeshes[SPECIES_CARNIVORE] = m_agentMeshCarnivore;
-	m_agentMeshes[SPECIES_HERBIVORE] = m_agentMeshHerbivore;
 
 	// Plant model.
 	m_plantMesh = m_resourceManager.LoadMesh("plant", "models/plant.obj");
@@ -183,11 +181,16 @@ void SimulationRenderer::LoadResources()
 		m_materialAxisLines->SetColor(Color::WHITE);
 		m_materialAxisLines->SetIsLit(false);
 	}
+
+	return (m_font && m_textureSkyBox && m_textureHeart && m_textureCircle &&
+			m_agentMeshes[0] && m_agentMeshes[1] && m_plantMesh && m_worldMesh &&
+			m_shaderLit && m_shaderLitTextured && m_shaderLitVertexColored && m_shaderUnlit &&
+			m_shaderUnlitVertexColored && m_shaderSkyBox);
 }
 
-void SimulationRenderer::Initialize()
+bool SimulationRenderer::Initialize()
 {
-	LoadResources();
+	bool rc = LoadResources();
 
 	// Initialize render parameters.
 	m_simulationRenderParams.EnableDepthTest(true);
@@ -220,6 +223,8 @@ void SimulationRenderer::Initialize()
 
 	// Initialize the oct-tree renderer.
 	m_octTreeRenderer.Initialize();
+
+	return rc;
 }
 
 void SimulationRenderer::OnNewSimulation(Simulation* simulation)
@@ -294,7 +299,8 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		if (m_shaderSkyBox->GetUniformLocation("u_texture", uniformLocation))
 			glUniform1i(uniformLocation, 0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
+		if (m_textureSkyBox)
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureSkyBox->GetGLTextureId());
 	
 		transform.SetIdentity();
 		transform.SetPosition(m_renderer.GetCamera()->GetViewPosition());
@@ -338,10 +344,8 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 		if (object->IsObjectType<Agent>())
 		{
 			Agent* agent = (Agent*) object;
-			if (agent->GetSpecies() == SPECIES_HERBIVORE)
-				m_renderer.RenderMesh(m_agentMeshHerbivore, &material, modelMatrix);
-			else
-				m_renderer.RenderMesh(m_agentMeshCarnivore, &material, modelMatrix);
+			m_renderer.RenderMesh(m_agentMeshes[(int) agent->GetSpecies()],
+				&material, modelMatrix);
 		}
 		else if (object->IsObjectType<Plant>())
 			m_renderer.RenderMesh(m_plantMesh, &material, modelMatrix);

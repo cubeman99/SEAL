@@ -28,7 +28,7 @@ public:
 	inline ResourceManager* GetResourceManager() { return &m_resourceManager; }
 	inline OctTreeRenderer* GetOctTreeRenderer() { return &m_octTreeRenderer; }
 
-	void Initialize();
+	bool Initialize();
 	void OnNewSimulation(Simulation* simulation);
 
 	// Render the simulation display given the canvas size.
@@ -36,7 +36,7 @@ public:
 
 
 private:
-	void LoadResources();
+	bool LoadResources();
 
 	// Rendering
 	void RenderHeatMapOverlay();
@@ -66,8 +66,6 @@ private:
 	Texture* m_textureHeart;
 	Texture* m_textureCircle;
 	Mesh* m_agentMeshes[2];
-	Mesh* m_agentMeshHerbivore;
-	Mesh* m_agentMeshCarnivore;
 	Mesh* m_plantMesh;
 	Mesh* m_worldMesh;
 	Mesh* m_meshSelectionCircle;
