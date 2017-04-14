@@ -8,6 +8,7 @@ Particle::Particle()
 	m_lifeTime = 180;
 	m_age = 0;
 	m_color = Color::WHITE;
+	m_growthFactor = 1.0f;
 
 	m_radius = 4.0f;
 	m_position = Vector3f(0.0f);
@@ -17,18 +18,9 @@ Particle::Particle()
 
 bool Particle::Update()
 {
+	m_radius *= m_growthFactor;
 	m_velocity += m_acceleration;
 	m_position += m_velocity;
-	
-	switch (m_type)
-	{
-	case AGENT_KILLED:
-		m_radius *= 0.9f;
-		break;
-	case AGENT_MATED:
-		m_radius *= 0.997f;
-		break;
-	}
 
 	++m_age;
 
@@ -57,8 +49,9 @@ void Particle::Reassign(ParticleType type, Vector3f position, RNG& random)
 	switch (type)
 	{
 	case AGENT_KILLED:
-		m_lifeTime = 30;
+		m_lifeTime = 20;
 		m_radius = 10.0f;
+		m_growthFactor = 0.87f;
 		m_color = Color::RED;
 		m_velocity = position.Normalize() * 2.0f;
 		m_velocity += 1.8f * Vector3f(random.NextFloatClamped(),
@@ -67,6 +60,7 @@ void Particle::Reassign(ParticleType type, Vector3f position, RNG& random)
 		break;
 
 	case AGENT_MATED:
+		m_growthFactor = 0.997f;
 		m_color = Color(255, 105, 180);
 		m_acceleration = position.Normalize() * -0.008f;
 		m_velocity += 0.1f * Vector3f(random.NextFloatClamped(),

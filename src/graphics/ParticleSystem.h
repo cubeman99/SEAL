@@ -40,6 +40,7 @@ private:
 	int m_lifeTime;
 	int m_age;
 	float m_radius;
+	float m_growthFactor;
 
 	Vector3f m_position;
 	Vector3f m_velocity;
