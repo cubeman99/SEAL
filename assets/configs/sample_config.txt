@@ -248,8 +248,7 @@ herbivore.brain.weightLearningRate = 0.08
 # A rate of 0.99 means that the weights get multiplied by 0.99 every tick.
 herbivore.brain.weightDecayRate = 0.998
 
-# Warning: not using Hebbian learning is experimental. It causes 
-# the synapses of agents that "fire together, to wire 
+# Hebbian learning causes the synapses of agents that "fire together, to wire 
 # together." This is done within the range of excititory or inhibitory, as
 # defined in agents' genomes. When turned off, agent offspring will receive
 # the exact synapse weight from their parents. This may cause evolution to 

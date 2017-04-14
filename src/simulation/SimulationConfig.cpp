@@ -103,11 +103,11 @@ SimulationConfig::SimulationConfig()
 	
 	carnivore.agent.matingDelay			= 60 * 16;
 	
-	carnivore.genes.minLifeSpan			 = 60 * 80;
-	carnivore.genes.maxLifeSpan			 = 60 * 160;
+	carnivore.genes.minLifeSpan			= 60 * 80;
+	carnivore.genes.maxLifeSpan			= 60 * 160;
 	carnivore.genes.minChildren			= 1;
 	carnivore.genes.maxChildren			= 2;
-	carnivore.genes.minBodyColor[0] = 1.0f;
+	carnivore.genes.minBodyColor[0]		= 1.0f;
 	carnivore.genes.maxBodyColor[0]		= 1.0f;
 	carnivore.genes.minBodyColor[1]		= 0.0f;
 	carnivore.genes.maxBodyColor[1]		= 0.0f;

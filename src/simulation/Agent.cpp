@@ -554,7 +554,6 @@ void Agent::Mate(Agent* mate)
 	if (actualNumChildren == 0)
 	{
 		// Small delay to decrease the unnecessary use of this function
-		// TODO: magic numbers
 		parents[0]->m_mateWaitTime = 10;
 		parents[1]->m_mateWaitTime = 10;
 		return;
