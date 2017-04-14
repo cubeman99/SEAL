@@ -280,7 +280,6 @@ bool Simulation::ReadSimulation(std::ifstream& fileIn)
 
 	if (!objectCreationGoingWell)
 	{
-		// TODO: Tell user that the file was corrupt like our government
 		m_objectManager.ClearObjects();
 		fileIn.close();
 		return false;

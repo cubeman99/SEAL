@@ -116,7 +116,8 @@ bool SimulationManager::SaveSimulation(const std::string& fileName)
 
 	if (!fileOut)
 	{
-		return false; // TODO: Tell user that the file could not be opened for writing
+		SEAL_LOG_MSG("File could not be opened for writing");
+		return false;
 	}
 
 	// Write the simulation data
@@ -127,7 +128,9 @@ bool SimulationManager::SaveSimulation(const std::string& fileName)
 	}
 
 	fileOut.close();
-	return true; // TODO: Tell user that the file has been saved succesffully
+
+	SEAL_LOG_MSG("Simulation saved successfully");
+	return true;
 }
 
 bool SimulationManager::OpenSimulation(const std::string& fileName)
@@ -137,7 +140,6 @@ bool SimulationManager::OpenSimulation(const std::string& fileName)
 
 	if (!fileIn)
 	{
-		// TODO: Tell user that the file could not be opened for reading
 		return false;
 	}
 
@@ -151,8 +153,8 @@ bool SimulationManager::OpenSimulation(const std::string& fileName)
 	fileIn.close();
 
 	OnNewSimulation();
+	SEAL_LOG_MSG("Simulation loaded successfully");
 
-	// TODO: Tell user that the file has been loaded succesffully
 	return true;
 }
 

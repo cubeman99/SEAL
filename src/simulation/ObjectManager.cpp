@@ -110,8 +110,13 @@ void ObjectManager::SpawnObject(SimulationObject* object)
 	m_idToObjectMap[m_objectIdCounter] = object;
 	m_octTree.InsertObject(object);
 	
-	object->m_objectId = m_objectIdCounter;	// TODO: since this sim is meant to run for a long time, make sure
-	m_objectIdCounter += 1;					// this doesn't exceed INT_MAX
+	object->m_objectId = m_objectIdCounter;
+	m_objectIdCounter += 1;
+
+	if (m_objectIdCounter == INT_MAX)
+	{
+		m_objectIdCounter = 1;
+	}
 	
 	object->m_objectManager = this;
 	object->m_isDestroyed = false;
