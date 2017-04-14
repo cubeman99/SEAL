@@ -269,7 +269,8 @@ void Genome::GrowBrain(Brain* brain, RNG& random, const SpeciesConfig& speciesCo
 		else
 		{
 			// Not doing Hebbian? Take on exact value which won't be modified over lifetime
-			synapse.weight = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, -speciesConfig.brain.maxWeight, speciesConfig.brain.maxWeight);
+			synapse.weight = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i,
+				-speciesConfig.brain.maxWeight, speciesConfig.brain.maxWeight);
 			synapse.learningRate = 0.0f;
 		}
 		

@@ -55,12 +55,12 @@ void DiagramDrawer::DrawBrainMatrix(Graphics& g, Agent* agent, const Rect2f& bou
 				(synapse.neuronTo - numInputNeurons) - 1));
 			
 			Vector3f weightColor(0, 0, 0);
-			if (synapse.weight > 0.0f)
+			if (synapse.weight >= 0.0f)
 				weightColor[1] = 1.0f;
-			if (synapse.weight < 0.0f)
+			else
 				weightColor[0] = 1.0f;
 			weightColor *= Math::Abs(synapse.weight) / config.brain.maxWeight;
-			if (synapse.learningRate == 0.0f)
+			if (synapse.learningRate == 0.0f && config.brain.useHebbianLearning)
 				weightColor = Vector3f(0.3f, 0.3f, 0.3f);
 
 			// Fill synapse box with color.

@@ -1,6 +1,7 @@
 # SEAL - Simulation of Evolutionary Artificial Life
 A Capstone Project by David Jordan and Benjamin Russell
 
+GitHub: https://github.com/cubeman99/SEAL
 
 ## What is SEAL?
 
