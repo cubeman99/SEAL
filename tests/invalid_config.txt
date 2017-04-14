@@ -1,10 +1,9 @@
 #==============================================================================
 # SEAL - Example Simulation Configuration File
 #==============================================================================
+# Units:
 #
 # Comments: inline comments begin with '#'
-# 
-# Boolean values: true/false, 1/0, on/off, yes/no
 #
 # Accepted units:
 #  * radians: radians, radian, rads, rad, r
@@ -17,10 +16,6 @@
 # By default, time values are specified in ticks.
 # By default, angle values are specified in degrees.
 #
-# When setting a species parameter, by default that specific parameter will
-# be copied over to the opposite species as well if it is not specified
-# somewhere in this file.
-#
 #==============================================================================
 
 
@@ -29,7 +24,7 @@
 
 world.radius				= 160  # gives a circumference of about 1000
 world.seed					= -1
-world.matingSeasonDuration	= 12 seconds
+world.matingSeasonDuration	= 12 frames
 world.offSeasonDuration		= 18 seconds
 
 #==============================================================================
@@ -49,27 +44,34 @@ plant.eatEnergyDepletionRate	= 5.0  # energy/tick
 #==============================================================================
 # Herbivore
 
-herbivore.population.initialAgents			= 100
-herbivore.population.minAgents				= 20
-herbivore.population.maxAgents				= 160
+ads apish dasi
 
-herbivore.fittestList.numFittestAgents		= 40
-herbivore.fittestList.mateTournamentSize	= 5  	
+something = 23
+
+herbivore.population.initialAgents			= whoops ooo
+
+herbivore.fittestList.numFittestAgents = 3.14159265358979323846264338327950288419793
+
+ herbivore.population.initialAgents			= 100 radians
+herbivore.population.minAgents				= 20;
+herbivore.population.maxAgents				= 160 ticks
+
+herbivore.fittestList.numFittestAgents		= 40 flarbnogs
+	herbivore.fittestList.mateTournamentSize	= 	5  	
 herbivore.fittestList.mateChance			= 5 # chance to mate and spawn child of two fittest agents
 herbivore.fittestList.randomChance			= 5 # chance to spawn random agent
 herbivore.fittestList.eliteChance			= 1 # chance to spawn elite fittest agent
 
 herbivore.agent.radiusAtMinStrength			= 4.0
-herbivore.agent.radiusAtMaxStrength			= 6.0
+herbivore.agent.radiusAtMaxStrength			= 6.0f
 herbivore.agent.maxMoveSpeedAtMinStrength	= 0.7
-herbivore.agent.maxMoveSpeedAtMaxStrength	= 0.3
-herbivore.agent.maxTurnSpeedAtMinStrength	= 8 deg
-herbivore.agent.maxTurnSpeedAtMaxStrength	= 5 deg
+herbivore.agent.maxMoveSpeedAtMaxStrength	= 0.3f
+herbivore.agent.maxTurnSpeedAtMinStrength	= 8
+herbivore.agent.maxTurnSpeedAtMaxStrength	= 5
 herbivore.agent.maxEnergyAtMinStrength		= 50.0
 herbivore.agent.maxEnergyAtMaxStrength		= 100.0
 herbivore.agent.minMatingDistance			= 23.0
-herbivore.agent.matingDelay					= 4 seconds
-herbivore.agent.collisions					= yes
+herbivore.agent.matingDelay					= 4 degrees
 
 herbivore.energy.energyCostExist		= 0.006		# energy/tick
 herbivore.energy.energyCostMove			= 0.014		# energy
@@ -84,16 +86,16 @@ herbivore.genes.maxMutationRate			= 0.1
 herbivore.genes.minCrossoverPoints		= 1
 herbivore.genes.maxCrossoverPoints		= 4
 herbivore.genes.maxInternalNeurons		= 20
-herbivore.genes.minLifeSpan				= 60 seconds
-herbivore.genes.maxLifeSpan				= 200 secs
+herbivore.genes.minLifeSpan				= 60 s
+herbivore.genes.maxLifeSpan				= 200 seconds
 herbivore.genes.minStrength				= 0.0
 herbivore.genes.maxStrength				= 1.0
 herbivore.genes.minSightDistance		= 20
 herbivore.genes.maxSightDistance		= 60
 herbivore.genes.minFieldOfView			= 10 degrees
 herbivore.genes.maxFieldOfView			= 120 deg
-herbivore.genes.minAngleBetweenEyes		= 180 deg
-herbivore.genes.maxAngleBetweenEyes		= 100 degs
+herbivore.genes.minAngleBetweenEyes		= 180
+herbivore.genes.maxAngleBetweenEyes		= 100 radians
 herbivore.genes.minSightResolution		= 1
 herbivore.genes.maxSightResolution		= 6
 herbivore.genes.minBodyColor.red		= 0.0
@@ -114,14 +116,17 @@ herbivore.brain.weightDecayRate			= 0.998
 #==============================================================================
 # Carnivore
 
+# Set carnivore config to herbivore config
+###carnivore = herbivore
+
 carnivore.population.initialAgents		= 15
 carnivore.population.minAgents			= 15
 carnivore.population.maxAgents			= 50
 
-carnivore.agent.matingDelay				= 16 sec
+carnivore.agent.matingDelay				= 16
 
-carnivore.genes.minLifeSpan				= 80 sec
-carnivore.genes.maxLifeSpan				= 160 sec
+carnivore.genes.minLifeSpan				= 80
+carnivore.genes.maxLifeSpan				= 160
 carnivore.genes.minChildren				= 1
 carnivore.genes.maxChildren				= 2
 carnivore.genes.minBodyColor.red		= 1.0

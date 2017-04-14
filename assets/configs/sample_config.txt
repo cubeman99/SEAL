@@ -1,0 +1,290 @@
+#==============================================================================
+# SEAL - Example Simulation Configuration File
+#==============================================================================
+#
+# Comments begin with '#'
+# 
+# Boolean values can be written as:
+#  * 'true' or 'false'
+#  * '1' or '0'
+#  * 'on' or 'off'
+#  * 'yes' or 'no'
+#
+# Parameter values can be followed by a unit.
+#
+# The accepted units and their possible labels are:
+#  * radians: 'radians', 'radian', 'rads', 'rad', 'r'
+#  * degrees: 'degrees', 'degree', 'degs', 'deg', 'd'
+#  * ticks: 'ticks', 'tick', 'frames', 'frame'
+#  * seconds: 'seconds', 'second', 'secs', 'sec', 's'
+#    (1 second = 60 ticks)
+#
+# By default, time values are specified in ticks.
+# By default, angle values are specified in degrees.
+#
+#==============================================================================
+
+
+#==============================================================================
+# World
+#==============================================================================
+
+# The initial seed for the simulation's random number generator
+# A value of -1 indicates to begin with a random seed.
+world.seed = -1
+
+# The radius of the world.
+world.radius = 160
+
+# The duration of the mating season, when agents can mate.
+world.matingSeasonDuration = 12 seconds
+
+# The duration of the off-season, when agents cannot mate.
+# Setting this to zero means that agents can mate whenever.
+# The length of one generation is equal to
+# matingSeasonDuration + offSeasonDuration.
+world.offSeasonDuration = 18 seconds
+
+
+#==============================================================================
+# Plants
+#==============================================================================
+
+# Radius of a plant object.
+plant.radius = 2.5
+
+# RGB color of all plants.
+plant.color.red   = 0.0
+plant.color.green = 1.0
+plant.color.blue  = 0.0
+
+# The number of plants present at any given time.
+plant.numPlants = 12
+
+# How many edible offshoot objects does a single plant spawn.
+plant.numOffshootsPerPlant = 4
+
+# The maximum amount of energy that plant offshoots contain.
+plant.maxEnergy = 16.0
+
+# The radius around a plant in which it spawns its offshoots.
+plant.offshootSpawnRadius = 80
+
+# The growth rate of newly-spawned plant objects in energy per tick.
+plant.growthRate = 0.05 # energy/tick
+
+# The number of energy per tick that agents consume from the plant.
+plant.eatEnergyDepletionRate = 5.0
+
+
+#==============================================================================
+# Agents
+#==============================================================================
+
+# The agent configuration parameters can be set for each species individually
+# Meaning herbivores and carnivores can have completely different properties.
+
+# If you want both species to have the same properties, then you only need to
+# set the parameters for one species, and they will be applied to both.
+# For example, if you set a parameter for herbivores, then that parameter
+# will also be set for carnivores as well, unless the parameter is explicitly
+# defined for carnivores somewhere else in the config file.
+
+#------------------------------------------------------------------------------
+# Population size
+
+# The initial population size upon beginning a new simulation.
+herbivore.population.initialAgents = 100
+
+# The minimum allowed number of agents before new ones are spawned in.
+herbivore.population.minAgents = 20
+
+# The maximum allowed number of agents.
+herbivore.population.maxAgents = 160
+
+
+#------------------------------------------------------------------------------
+# Fittest list & steady state genetic algorithm
+
+# Maximum fittest agents to keep track of.
+herbivore.fittestList.numFittestAgents = 40
+
+# Tournament size used to select fittest agents.
+herbivore.fittestList.mateTournamentSize = 5
+
+# Chances to spawn a crossover/mutation of two selected fittest agents.
+herbivore.fittestList.mateChance = 5
+
+# Chances to spawn an elite: a copy of a selected fittest agent.
+herbivore.fittestList.eliteChance = 1
+
+# Chances to spawn a new agent with a random genome.
+herbivore.fittestList.randomChance = 5
+
+
+#------------------------------------------------------------------------------
+# General agent properties
+
+# The radius of the agent when at minimum and maximum strength.
+herbivore.agent.radiusAtMinStrength = 4.0
+herbivore.agent.radiusAtMaxStrength = 6.0
+
+# The movement speed of the agent when at minimum and maximum strength.
+herbivore.agent.maxMoveSpeedAtMinStrength = 0.7
+herbivore.agent.maxMoveSpeedAtMaxStrength = 0.3
+
+# The turn speed of the agent when at minimum and maximum strength.
+herbivore.agent.maxTurnSpeedAtMinStrength = 8 degrees
+herbivore.agent.maxTurnSpeedAtMaxStrength = 5 degrees
+
+# The maximum energy capacity of the agent when at minimum and maximum strength.
+herbivore.agent.maxEnergyAtMinStrength = 50.0
+herbivore.agent.maxEnergyAtMaxStrength = 100.0
+
+# The minimum distance between agents required for mating.
+herbivore.agent.minMatingDistance = 23.0
+
+# The delay in between each time an agent can mate.
+herbivore.agent.matingDelay = 4 seconds
+
+# Enables collisions between the agents of this species.
+herbivore.agent.collisions = yes
+
+
+#------------------------------------------------------------------------------
+# Energy costs
+
+# The constant energy cost depleted every tick.
+herbivore.energy.energyCostExist = 0.006
+
+# The energy cost to move (energy per distance).
+herbivore.energy.energyCostMove = 0.014
+
+# The energy cost to turn (energy per angle).
+herbivore.energy.energyCostTurn = 0.014
+
+# The constant energy cost per neuron, depleted every tick.
+herbivore.energy.energyCostNeuron = 0.0
+
+# The constant energy cost per synapse, depleted every tick.
+herbivore.energy.energyCostSynapse = 0.0
+
+
+#------------------------------------------------------------------------------
+# Genes
+
+# A gene has a value in the range 0 to 1, so we need to translate what this
+# range means for each specific gene.
+
+# The desired number of children when mating.
+herbivore.genes.minChildren = 1
+herbivore.genes.maxChildren = 3
+
+# Genome mutation rate (per gene).
+herbivore.genes.minMutationRate = 0.02
+herbivore.genes.maxMutationRate = 0.1
+
+# Number of genome crossover points.
+herbivore.genes.minCrossoverPoints = 1
+herbivore.genes.maxCrossoverPoints = 4
+
+# Maximum number of internal neurons in the brain.
+herbivore.genes.maxInternalNeurons = 20
+
+# Life span, after which an agent dies.
+herbivore.genes.minLifeSpan = 60 seconds
+herbivore.genes.maxLifeSpan = 200 seconds
+
+# Min/max strength values (these should be kept at 0 and 1).
+herbivore.genes.minStrength = 0.0
+herbivore.genes.maxStrength = 1.0
+
+# Maximum distance an agent can see.
+herbivore.genes.minSightDistance = 20
+herbivore.genes.maxSightDistance = 60
+
+# Field of view angle for each eye.
+herbivore.genes.minFieldOfView = 10 degrees
+herbivore.genes.maxFieldOfView = 120 degrees
+
+# The angle between an agents two eyes.
+herbivore.genes.minAngleBetweenEyes = 180 degrees
+herbivore.genes.maxAngleBetweenEyes = 100 degrees
+
+# The min and max possible sight resolutions for vision.
+# Resolution genes are independent for red, green, and blue.
+# These values must be larger than zero.
+herbivore.genes.minSightResolution = 1
+herbivore.genes.maxSightResolution = 6
+
+# Range of RGB body color (in the range 0 to 1).
+herbivore.genes.minBodyColor.red   = 0.0
+herbivore.genes.maxBodyColor.red   = 0.0
+herbivore.genes.minBodyColor.green = 0.0
+herbivore.genes.maxBodyColor.green = 0.0
+herbivore.genes.minBodyColor.blue  = 1.0
+herbivore.genes.maxBodyColor.blue  = 1.0
+
+
+#------------------------------------------------------------------------------
+# Brain (recurrent Neural Network)
+
+# Number of pre-birth cycles applied when an agent is born.
+# A pre-birth cycle is where the neural network is updated while given random
+# activation values to its input neurons.
+herbivore.brain.numPrebirthCycles = 10
+
+# Slope of the sigmoid function.
+herbivore.brain.sigmoidSlope = 1.0
+
+# Maximum neuron bias value.
+herbivore.brain.maxBias = 1.0
+
+# Maximum initial synapse weight (because weight is randomized upon birth).
+herbivore.brain.initMaxWeight = 0.5
+
+# Maximum allowed synapse weight.
+herbivore.brain.maxWeight = 1.0
+
+# Synapse weight learning rate used in Hebbian Learning.
+# Higher values mean synapse weights will be able to change more quickly.
+herbivore.brain.weightLearningRate = 0.08
+
+# The decay rate of synapse (neuron connection) weights used in Hebbian Learning.
+# A rate of 0.99 means that the weights get multiplied by 0.99 every tick.
+herbivore.brain.weightDecayRate = 0.998
+
+
+#==============================================================================
+# Carnivores
+#==============================================================================
+
+# Set some unique parameter values for carnivores
+
+# Population size
+carnivore.population.initialAgents = 15
+carnivore.population.minAgents = 15
+carnivore.population.maxAgents = 50
+
+# General properties
+carnivore.agent.matingDelay = 16 sec
+
+# Energy costs
+carnivore.energy.energyCostExist = 0.006
+carnivore.energy.energyCostMove = 0.014
+carnivore.energy.energyCostTurn = 0.035
+
+# Genes
+carnivore.genes.minLifeSpan			= 80 sec
+carnivore.genes.maxLifeSpan			= 160 sec
+carnivore.genes.minChildren			= 1
+carnivore.genes.maxChildren			= 2
+carnivore.genes.minBodyColor.red	= 1.0
+carnivore.genes.maxBodyColor.red	= 1.0
+carnivore.genes.minBodyColor.green	= 0.0
+carnivore.genes.maxBodyColor.green	= 0.0
+carnivore.genes.minBodyColor.blue	= 0.0
+carnivore.genes.maxBodyColor.blue	= 0.0
+
+
+

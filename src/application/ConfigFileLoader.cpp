@@ -214,13 +214,6 @@ ConfigFileLoader::ConfigFileLoader() :
 	ADD_SPECIES_FLOAT_PARAM	(brain.weightLearningRate,			ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(brain.weightDecayRate,				ConfigParam::UNITS_NONE);
 	
-	// DEBUG: print out all the params.
-	//for (auto it = m_params.begin(); it != m_params.end(); ++it)
-	//{
-	//	ConfigParam param = it->second;
-	//	SEAL_LOG_MSG("%s, %u, %u", param.name, param.offset, param.type);
-	//}
-
 	//-------------------------------------------------------------------------
 	// Units
 
