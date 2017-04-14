@@ -123,6 +123,7 @@ struct SpeciesConfig
 		float	initMaxWeight;
 		float	weightLearningRate;
 		float	weightDecayRate;
+		bool	useHebbianLearning;
 
 	} brain;
 };

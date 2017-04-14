@@ -165,6 +165,9 @@
     <None Include="..\..\assets\shaders\unlit_vertex_colored_fs.glsl" />
     <None Include="..\..\assets\shaders\unlit_vertex_colored_vs.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\assets\configs\sample_config.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E03D0738-5F20-40FB-89A2-DFDAA49A304A}</ProjectGuid>
     <RootNamespace>SEAL</RootNamespace>

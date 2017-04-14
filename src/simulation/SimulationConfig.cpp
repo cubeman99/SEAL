@@ -79,7 +79,7 @@ SimulationConfig::SimulationConfig()
 	herbivore.genes.maxBodyColor[0]			= 0.0f;
 	herbivore.genes.minBodyColor[1]			= 0.0f;
 	herbivore.genes.maxBodyColor[1]			= 0.0f;
-	herbivore.genes.minBodyColor[2]			= 1.0f; // herbivore = blue for now
+	herbivore.genes.minBodyColor[2]			= 1.0f;
 	herbivore.genes.maxBodyColor[2]			= 1.0f;
 	
 	herbivore.brain.numPrebirthCycles		= 10;
@@ -89,6 +89,7 @@ SimulationConfig::SimulationConfig()
 	herbivore.brain.maxWeight				= 1.0f;
 	herbivore.brain.weightLearningRate		= 0.08f;
 	herbivore.brain.weightDecayRate			= 0.998f;
+	herbivore.brain.useHebbianLearning		= true;
 
 	//-------------------------------------------------------------------------
 	// Carnivore
@@ -106,7 +107,7 @@ SimulationConfig::SimulationConfig()
 	carnivore.genes.maxLifeSpan			 = 60 * 160;
 	carnivore.genes.minChildren			= 1;
 	carnivore.genes.maxChildren			= 2;
-	carnivore.genes.minBodyColor[0]		= 1.0f; // carnivore = red for now
+	carnivore.genes.minBodyColor[0] = 1.0f;
 	carnivore.genes.maxBodyColor[0]		= 1.0f;
 	carnivore.genes.minBodyColor[1]		= 0.0f;
 	carnivore.genes.maxBodyColor[1]		= 0.0f;
