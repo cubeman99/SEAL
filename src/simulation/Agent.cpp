@@ -559,8 +559,7 @@ void Agent::Mate(Agent* mate)
 		parents[1]->m_mateWaitTime = 10;
 		return;
 	}
-
-
+	
 	// Subtract the transferred energy for each parent.
 	parents[0]->m_energy -= (transferrableEnergy[0] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;
 	parents[1]->m_energy -= (transferrableEnergy[1] / actualTransferrableEnergy) * energyPerChild * actualNumChildren;

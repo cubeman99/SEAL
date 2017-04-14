@@ -5,6 +5,10 @@
 #include <utilities/Random.h>
 
 
+// Brain implementation modified from Polyworld:
+// https://github.com/polyworld/polyworld
+
+
 //-----------------------------------------------------------------------------
 // OutputNeurons
 //-----------------------------------------------------------------------------

@@ -190,6 +190,9 @@ unsigned int Genome::GetGeneAsInt(unsigned int index, unsigned int minValue, uns
 
 void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 {
+	// Algorithm partially based on Polyworld:
+	// https://github.com/polyworld/polyworld
+
 	//-------------------------------------------------------------------------
 	// Count up the input and output neurons.
 

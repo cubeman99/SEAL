@@ -14,6 +14,9 @@ enum Species
 };
 
 
+// Config file parameters explained in "assets/configs/sample_config.txt"
+
+
 //-----------------------------------------------------------------------------
 // SpeciesConfig - configuration parameters for a single agent species.
 //-----------------------------------------------------------------------------

@@ -7,6 +7,13 @@
 class Agent;
 
 
+// Fittest List and steady state GA idea modified from Polyworld:
+// https://github.com/polyworld/polyworld
+
+
+//-----------------------------------------------------------------------------
+// Fittest - A single entry in the fittest list.
+//-----------------------------------------------------------------------------
 struct Fittest
 {
 	int		agentId;
@@ -22,6 +29,9 @@ struct Fittest
 };
 
 
+//-----------------------------------------------------------------------------
+// FittestList - Used to store a list of the most fit genomes.
+//-----------------------------------------------------------------------------
 class FittestList
 {
 public:

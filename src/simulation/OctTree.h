@@ -85,7 +85,7 @@ public:
 	// the tree structure if the object has moved.
 	void DynamicUpdate(object_pointer object);
 
-	// TODO: describe this or rename it.
+	// Get the child node and bounds of an octtree node.
 	OctTreeNode* TraverseIntoSector(OctTreeNode* node,
 		unsigned int sectorIndex, AABB& bounds);
 	

@@ -62,7 +62,7 @@ SimulationConfig::SimulationConfig()
 	herbivore.genes.maxMutationRate			= 0.1f;		// 1 in 10 genes
 	herbivore.genes.minCrossoverPoints		= 1;
 	herbivore.genes.maxCrossoverPoints		= 4;
-	herbivore.genes.maxInternalNeurons		= 20;		// TODO: tinker
+	herbivore.genes.maxInternalNeurons		= 20;
 	herbivore.genes.minLifeSpan				= 60 * 120;
 	herbivore.genes.maxLifeSpan				= 60 * 200;
 	herbivore.genes.minStrength				= 0.0f;

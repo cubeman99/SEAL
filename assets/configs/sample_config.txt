@@ -163,12 +163,6 @@ herbivore.energy.energyCostMove = 0.014
 # The energy cost to turn (energy per angle).
 herbivore.energy.energyCostTurn = 0.014
 
-# The constant energy cost per neuron, depleted every tick.
-herbivore.energy.energyCostNeuron = 0.0
-
-# The constant energy cost per synapse, depleted every tick.
-herbivore.energy.energyCostSynapse = 0.0
-
 
 #------------------------------------------------------------------------------
 # Genes
