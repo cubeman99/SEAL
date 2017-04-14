@@ -85,7 +85,7 @@ public:
 	// Neurogenetics
 
 	// Create a brain from the encoding in the neurological genes.
-	void GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random);
+	void GrowBrain(Brain* brain, RNG& random, const SpeciesConfig& speciesConfig);
 
 
 private:

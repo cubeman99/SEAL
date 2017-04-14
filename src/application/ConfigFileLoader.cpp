@@ -213,6 +213,7 @@ ConfigFileLoader::ConfigFileLoader() :
 	ADD_SPECIES_FLOAT_PARAM	(brain.initMaxWeight,				ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(brain.weightLearningRate,			ConfigParam::UNITS_NONE);
 	ADD_SPECIES_FLOAT_PARAM	(brain.weightDecayRate,				ConfigParam::UNITS_NONE);
+	ADD_SPECIES_BOOL_PARAM	(brain.useHebbianLearning,			ConfigParam::UNITS_NONE);
 	
 	//-------------------------------------------------------------------------
 	// Units

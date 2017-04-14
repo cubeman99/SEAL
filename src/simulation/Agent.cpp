@@ -83,7 +83,7 @@ void Agent::OnSpawn()
 	{
 		// Grow the brain from the genome.
 		m_brain = new Brain();
-		m_genome->GrowBrain(m_brain, config, GetSimulation()->GetRandom());
+		m_genome->GrowBrain(m_brain, GetSimulation()->GetRandom(), config);
 		m_brain->PreBirth(config.brain.numPrebirthCycles,
 			GetSimulation()->GetRandom());
 	}

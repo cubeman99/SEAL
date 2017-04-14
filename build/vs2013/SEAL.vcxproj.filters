@@ -506,4 +506,9 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\assets\configs\sample_config.txt">
+      <Filter>Source Files\utilities</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

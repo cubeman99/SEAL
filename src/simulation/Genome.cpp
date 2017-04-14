@@ -188,23 +188,23 @@ unsigned int Genome::GetGeneAsInt(unsigned int index, unsigned int minValue, uns
 // Neurogenetics
 //-----------------------------------------------------------------------------
 
-void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
+void Genome::GrowBrain(Brain* brain, RNG& random, const SpeciesConfig& speciesConfig)
 {
 	//-------------------------------------------------------------------------
 	// Count up the input and output neurons.
 
 	unsigned int resRed = GetGeneAsInt(RESOLUTION_RED,
-		config.genes.minSightResolution, config.genes.maxSightResolution);
+		speciesConfig.genes.minSightResolution, speciesConfig.genes.maxSightResolution);
 	unsigned int resGreen = GetGeneAsInt(RESOLUTION_GREEN,
-		config.genes.minSightResolution, config.genes.maxSightResolution);
+		speciesConfig.genes.minSightResolution, speciesConfig.genes.maxSightResolution);
 	unsigned int resBlue = GetGeneAsInt(RESOLUTION_BLUE,
-		config.genes.minSightResolution, config.genes.maxSightResolution);
+		speciesConfig.genes.minSightResolution, speciesConfig.genes.maxSightResolution);
 
 	// Count the number of neurons.
 	unsigned int numOutputNeurons = 2;
-	unsigned int maxInputNeurons = NUM_NON_SIGHT_INPUTS + (config.genes.maxSightResolution * 3 * 2);
-	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + config.genes.maxInternalNeurons;
-	unsigned int maxSynapses = (numOutputNeurons + config.genes.maxInternalNeurons) * maxNeurons;
+	unsigned int maxInputNeurons = NUM_NON_SIGHT_INPUTS + (speciesConfig.genes.maxSightResolution * 3 * 2);
+	unsigned int maxNeurons = maxInputNeurons + numOutputNeurons + speciesConfig.genes.maxInternalNeurons;
+	unsigned int maxSynapses = (numOutputNeurons + speciesConfig.genes.maxInternalNeurons) * maxNeurons;
 
 	std::vector<Neuron> neurons;
 	std::vector<Synapse> synapses;
@@ -216,7 +216,7 @@ void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 	{
 		Neuron neuron;
 		float bias = GetGeneAsFloat(NUERON_GENES_BEGIN + i,
-			-config.brain.maxBias, config.brain.maxBias);
+			-speciesConfig.brain.maxBias, speciesConfig.brain.maxBias);
 		neuron.bias = bias;
 
 		if (i >= maxInputNeurons)
@@ -242,22 +242,31 @@ void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 		synapse.neuronFrom = i % maxNeurons;
 		synapse.neuronTo = (i / maxNeurons) + maxInputNeurons;
 
-		// Randomize synapse weight.
-		// Positive for excitatory, negative for inhibitory.
-		float gene = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, 0.0f, 1.0f);
-		if (gene > 0.8f)
+		if (speciesConfig.brain.useHebbianLearning)
 		{
-			synapse.weight = random.NextFloat(1e-10f, config.brain.initMaxWeight);
-			synapse.learningRate = config.brain.weightLearningRate;
-		}
-		else if (gene < 0.2f)
-		{
-			synapse.weight = random.NextFloat(-config.brain.initMaxWeight, -1e-10f);
-			synapse.learningRate = -config.brain.weightLearningRate;
+			// Randomize synapse weight.
+			// Positive for excitatory, negative for inhibitory.
+			float gene = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, 0.0f, 1.0f);
+			if (gene > 0.8f)
+			{
+				synapse.weight = random.NextFloat(1e-10f, speciesConfig.brain.initMaxWeight);
+				synapse.learningRate = speciesConfig.brain.weightLearningRate;
+			}
+			else if (gene < 0.2f)
+			{
+				synapse.weight = random.NextFloat(-speciesConfig.brain.initMaxWeight, -1e-10f);
+				synapse.learningRate = -speciesConfig.brain.weightLearningRate;
+			}
+			else
+			{
+				synapse.weight = 0.0f;
+				synapse.learningRate = 0.0f;
+			}
 		}
 		else
 		{
-			synapse.weight = 0.0f;
+			// Not doing Hebbian? Take on exact value which won't be modified over lifetime
+			synapse.weight = GetGeneAsFloat(NUERON_GENES_BEGIN + maxNeurons + i, -speciesConfig.brain.maxWeight, speciesConfig.brain.maxWeight);
 			synapse.learningRate = 0.0f;
 		}
 		
@@ -276,8 +285,8 @@ void Genome::GrowBrain(Brain* brain, const SpeciesConfig& config, RNG& random)
 	brain->Initialize(neurons, synapses, 0.1f);
 	brain->SetNumInputNeurons(maxInputNeurons);
 	brain->SetNumOutputNeurons(numOutputNeurons);
-	brain->SetMaxWeight(config.brain.maxWeight);
-	brain->SetDecayRate(config.brain.weightDecayRate);
+	brain->SetMaxWeight(speciesConfig.brain.maxWeight);
+	brain->SetDecayRate(speciesConfig.brain.weightDecayRate);
 
 	// TODO: prune the network of redundencies.
 	// If an input neuron is not used (vision neuron), then remove it.
