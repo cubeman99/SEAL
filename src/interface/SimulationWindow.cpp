@@ -55,6 +55,7 @@ enum
 		SHOW_INVISIBLE_OBJECTS,
 		SHOW_SKY_BOX,
 		SHOW_PARTICLES,
+		SET_LIGHT_DIRECTION,
 
 		// Debug
 		DEBUG_DEBUG_MODE,
@@ -114,6 +115,7 @@ wxBEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_MENU(SHOW_INVISIBLE_OBJECTS, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_SKY_BOX, SimulationWindow::OnMenuItem)
 	EVT_MENU(SHOW_PARTICLES, SimulationWindow::OnMenuItem)
+	EVT_MENU(SET_LIGHT_DIRECTION, SimulationWindow::OnMenuItem)
 	
 	// Debug
     EVT_MENU(DEBUG_DEBUG_MODE, SimulationWindow::OnMenuItem)
@@ -321,6 +323,7 @@ void SimulationWindow::CreateMenuBar()
     m_menuItemShowInvisibleObjects = menuView->AppendCheckItem(SHOW_INVISIBLE_OBJECTS, "Show &Invisible Objects\tI");
     m_menuItemShowSkyBox = menuView->AppendCheckItem(SHOW_SKY_BOX, "Show S&kybox");
     m_menuItemShowParticles = menuView->AppendCheckItem(SHOW_PARTICLES, "Show &Particles");
+    menuView->AppendCheckItem(SET_LIGHT_DIRECTION, "Set Light &Direction\tCtrl+L");
 
 	//-------------------------------------------------------------------------
 	// DEBUG
@@ -536,6 +539,10 @@ void SimulationWindow::OnMenuItem(wxCommandEvent& e)
 		break;
 	case SHOW_PARTICLES:
 		m_simulationManager.SetShowParticles(e.IsChecked());
+		break;
+	case SET_LIGHT_DIRECTION:
+		m_simulationManager.GetSimulationRenderer()->GetRenderer()->SetLightDirection(
+			m_simulationManager.GetActiveCamera()->GetOrientation().GetForward());
 		break;
 
 	//-------------------------------------------------------------------------

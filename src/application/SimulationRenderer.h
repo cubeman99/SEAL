@@ -27,6 +27,7 @@ public:
 	inline double GetAverageRenderTime() const { return m_renderTime; }
 	inline ResourceManager* GetResourceManager() { return &m_resourceManager; }
 	inline OctTreeRenderer* GetOctTreeRenderer() { return &m_octTreeRenderer; }
+	inline Renderer* GetRenderer() { return &m_renderer; }
 
 	bool Initialize();
 	void OnNewSimulation(Simulation* simulation);

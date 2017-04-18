@@ -20,6 +20,7 @@ SimulationRenderer::SimulationRenderer(SimulationManager* simulationManager) :
 bool SimulationRenderer::LoadResources()
 {
 	m_resourceManager.SetAssetsPath("../../assets/"); // This must change when the executable is moved
+	//m_resourceManager.SetAssetsPath("assets/"); // This must change when the executable is moved
 
 	//-------------------------------------------------------------------------
 	// Load textures.
