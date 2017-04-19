@@ -255,6 +255,10 @@ bool Simulation::ReadSimulation(std::ifstream& fileIn)
 	fileIn.read((char*)&m_config, sizeof(SimulationConfig));
 	fileIn.read((char*)&m_statistics, sizeof(SimulationStats));
 
+	// Re-initialize some systems.
+	m_world.Initialize(m_config.world.radius);
+	m_objectManager.Initialize();
+
 	// Read all generation statistics
 	unsigned int numStats;
 	fileIn.read((char*)&numStats, sizeof(unsigned int));

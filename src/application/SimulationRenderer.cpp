@@ -268,8 +268,10 @@ void SimulationRenderer::Render(const Vector2f& canvasSize)
 	// Setup lighting properties.
 	if (!m_simulationManager->IsLightingEnabled())
 	{
-		m_renderer.SetLightColor(Color::BLACK);
-		m_renderer.SetAmbientLight(Color::WHITE);
+		//m_renderer.SetLightColor(Color::BLACK);
+		//m_renderer.SetAmbientLight(Color::WHITE);
+		m_renderer.SetLightDirection(m_simulationManager->
+			GetActiveCamera()->GetOrientation().GetForward());
 	}
 	else
 	{
