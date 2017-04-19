@@ -291,7 +291,7 @@ void SimulationWindow::CreateMenuBar()
     //menuFile->Append(FILE_SAVE_SIMULATION_AS, "&Save Simulation...\tCtrl+Shift+S");
     menuFile->Append(FILE_OPEN_SIMULATION, "&Open Simulation...\tCtrl+O");
     menuFile->AppendSeparator();
-    menuFile->Append(FILE_CLOSE, "&Close\tCtrl+W");
+    menuFile->Append(FILE_CLOSE, "&Close");
 	
 	//-------------------------------------------------------------------------
 	// SIMULATION

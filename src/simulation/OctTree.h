@@ -232,7 +232,7 @@ void OctTree::DoBoxQuery(OctTreeNode* sectorNode,
 		SimulationObject* object = sectorNode->m_objects[i];
 		Sphere objectSphere(object->GetPosition(), object->GetRadius());
 
-		if (box.Intersects(objectSphere))
+		if (box.Intersects(objectSphere) && !object->IsDestroyed())
 		{
 			callback(object);
 		}
@@ -270,7 +270,7 @@ void OctTree::DoSphereQuery(OctTreeNode* sectorNode,
 		SimulationObject* object = sectorNode->m_objects[i];
 		Sphere objectSphere(object->GetPosition(), object->GetRadius());
 
-		if (sphere.Intersects(objectSphere))
+		if (sphere.Intersects(objectSphere) && !object->IsDestroyed())
 		{
 			callback(object);
 		}
